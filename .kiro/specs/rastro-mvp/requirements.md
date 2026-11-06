@@ -60,7 +60,7 @@ Marcados com **[spike]**: os critérios que dependem do que o spike mostrar. Ele
 
 **Como** auditor, **quero** que a IA reconheça bibliotecas escondidas em bundles **para** não perder falhas que a assinatura não vê.
 
-1. QUANDO um script não for reconhecido por assinatura e tiver tamanho de bundle, o Rastro DEVE enviar à IA trechos selecionados do código e pedir nome, versão e o trecho que prova a resposta. **[spike]** O tamanho mínimo e a seleção de trechos saem do teste no Juice Shop.
+1. QUANDO um script não for reconhecido por assinatura e tiver tamanho de bundle, o Rastro DEVE enviar à IA trechos selecionados do código e pedir nome, versão e o trecho que prova a resposta. Tamanho de bundle é acima de 30 KB; os trechos são os comentários de licença e as janelas em volta de versões entre aspas (spike T03).
 2. O Rastro DEVE registrar cada biblioteca reconhecida pela IA com método "ia" e o trecho usado como evidência.
 3. O Rastro DEVE passar cada biblioteca devolvida pela IA pelas travas de R21 antes de usá-la. Quem confirma é a trava, nunca a IA.
 4. SE a biblioteca não passar em todas as travas, ENTÃO o Rastro DEVE mostrá-la na lista "a confirmar", com a trava que falhou e como confirmar à mão, fora da nota, do resumo e do plano de ação.
@@ -249,7 +249,7 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 2. **Trecho real:** SE o trecho de evidência devolvido pela IA não for cópia literal de um dos trechos enviados, ENTÃO a biblioteca não é confirmada.
 3. **Ancoragem:** SE a versão devolvida não aparecer literalmente no trecho de evidência, ENTÃO a biblioteca não é confirmada.
 4. **Pacote existe:** QUANDO uma biblioteca for identificada, por assinatura ou por IA, o Rastro DEVE confirmar no registro do npm, só com leitura, que `pacote@versão` foi publicado. SE não foi, ENTÃO a biblioteca não é confirmada.
-5. **Código confere:** QUANDO a biblioteca vier da IA, o Rastro DEVE ler o pacote publicado naquela versão (em memória, sem instalar, extrair em disco nem executar) e conferir que o trecho de evidência aparece no código dele. SE não aparecer, ENTÃO a biblioteca não é confirmada. **[spike]** O critério de comparação sai do teste no Juice Shop.
+5. **Código confere:** QUANDO a biblioteca vier da IA, o Rastro DEVE ler o pacote publicado naquela versão (em memória, sem instalar, extrair em disco nem executar) e conferir que o trecho de evidência aparece no código dele: cada string do trecho existe, com o mesmo valor, como string no pacote, e o trecho tem a versão e pelo menos uma string além dela (spike T03). SE não aparecer, ENTÃO a biblioteca não é confirmada.
 6. **Explicação sem fato novo:** SE a explicação da IA citar CVE, GHSA, versão ou número que não estava na entrada enviada, ENTÃO o Rastro DEVE descartar a explicação (R07.3).
 7. **Faixa conferida:** O Rastro DEVE conferir localmente que a versão está dentro da faixa afetada de cada aviso. SE não estiver, ENTÃO o Rastro DEVE descartar o aviso para aquela biblioteca e registrar o motivo.
 8. **Fatos só da fonte:** versão-alvo, CVE, GHSA, CVSS, EPSS, links, nota e prioridade DEVEM vir só do GitHub Advisory, do registro do npm e da fórmula. A IA nunca preenche esses campos.

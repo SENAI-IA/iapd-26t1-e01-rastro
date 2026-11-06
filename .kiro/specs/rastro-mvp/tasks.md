@@ -84,7 +84,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R14.4, R18.1
   - Revisão: @luiz.pagliari
 
-- [ ] **T03 Validar o HAR real e o bundle do Juice Shop**
+- [x] **T03 Validar o HAR real e o bundle do Juice Shop**
   - Entrega: HAR exportado do Chrome (completo e sanitized) e prova de identificação de um bundle pela IA, à mão.
   - Aceite: está registrado se o HAR traz o conteúdo dos scripts, o que o sanitized remove, o tamanho dos bundles, se a IA acerta nome e versão e qual critério da trava 5 (trecho × código publicado no npm) acerta sem deixar passar invenção.
   - Arquivos: `docs/spike/har-e-bundles.md`, `design.md`
@@ -94,7 +94,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 - [ ] **T04 Montar a avaliação**
   - Entrega: HARs das aplicações-alvo e o gabarito com as bibliotecas e versões reais de cada uma.
-  - Aceite: pelo menos dois alvos com bibliotecas vulneráveis reais; o gabarito diz quais estão em bundle.
+  - Aceite: pelo menos dois alvos com bibliotecas vulneráveis reais, além do Juice Shop (o front-end dele não tem falha conhecida, spike T03); o gabarito diz quais estão em bundle; o HAR sanitized e o completo exportados do Chrome conferidos pela lista "A conferir no Chrome" de `docs/spike/har-e-bundles.md`.
   - Arquivos: `avaliacao/README.md`, `avaliacao/gabarito.json`, `avaliacao/*.har` (só HAR sanitized no repo)
   - Teste: não se aplica.
   - Requisito: métricas do PRD

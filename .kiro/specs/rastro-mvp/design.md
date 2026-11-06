@@ -141,8 +141,9 @@ A `situacao` sai só das travas; a IA não tem campo de confiança que decida al
 ## 5. Ler o HAR (R01)
 
 - `json.loads` do arquivo aberto com `encoding="utf-8"`. Valida `log.entries` como lista.
-- `response.content.encoding == "base64"` → `base64.b64decode` e depois decodifica em UTF-8 com `errors="replace"`.
-- Cookies: usa `response.cookies` do HAR. Se vier vazio, interpreta os `Set-Cookie` dos cabeçalhos, guardando só o nome e os atributos.
+- O conteúdo dos scripts vem em `response.content.text`, em texto puro (spike T03, `docs/spike/har-e-bundles.md`). Entrada sem `text` (ex.: WebSocket) fica sem conteúdo. Chaves com `_` (`_resourceType`, `_initiator`…) são ignoradas.
+- `response.content.encoding == "base64"` → `base64.b64decode` e depois decodifica em UTF-8 com `errors="replace"`. No spike, só imagens e fontes vieram assim.
+- Cookies: usa `response.cookies` do HAR. Se vier vazio, interpreta os `Set-Cookie` dos cabeçalhos, guardando só o nome e os atributos. Cookie criado por JavaScript não tem `Set-Cookie` e fica de fora das checagens.
 - **Site analisado:** host da primeira resposta com `tipo_conteudo` `text/html`.
 
 ## 6. Identificar bibliotecas
@@ -164,8 +165,8 @@ Os padrões são o ponto de partida; o spike ajusta com os HARs reais. O coment�
 
 ### Em bundles, com IA (R03)
 
-1. **Escolher bundles** (`bundles.py`): scripts sem assinatura com mais de 30 KB. **[spike]**
-2. **Extrair trechos:** comentários de licença `/*!` e janelas de 300 caracteres em volta de padrões de versão (`version`, `VERSION`, `\d+\.\d+\.\d+`). No máximo 5 trechos por bundle. **[spike]**
+1. **Escolher bundles** (`bundles.py`): scripts sem assinatura com mais de 30 KB. No Juice Shop, os bundles com versão tinham mais de 140 KB.
+2. **Extrair trechos:** comentários de licença `/*!` com conteúdo (`/*!*/` vazio é ignorado) e janelas de 300 caracteres em volta de versões entre aspas (`["'`]v?\d+\.\d+\.\d+(-[\w.]+)?["'`]`). No máximo 5 trechos por bundle. O número solto e a palavra `version` ficaram de fora: no spike T03, só trouxeram coordenadas de SVG e propriedades sem relação.
 3. **Sanitizar** (`ia/sanitizacao.py`) e enviar com o prompt `identificar_bibliotecas.md`.
 4. **Resposta fechada:** JSON `{"bibliotecas": [{"pacote", "versao", "trecho"}]}`, nada além disso. Nome de pacote npm inválido ou versão fora do formato `x.y.z` derrubam a resposta inteira.
 5. **Travas:** cada biblioteca passa pelas travas da seção 8 antes de ser usada.
@@ -237,15 +238,23 @@ GET <dist.tarball>                                     → pacote .tgz, só para
 ```
 
 - Pacotes com escopo (`@angular/core`) levam a barra codificada como `%2F`.
-- O `.tgz` é lido **em memória**: `tarfile.open(fileobj=io.BytesIO(dados), mode="r:gz")` e `extractfile` só nos `.js`. Nunca `extract` nem `extractall`, nada gravado em disco, nada executado.
+- O `.tgz` é lido **em memória**: `tarfile.open(fileobj=io.BytesIO(dados), mode="r:gz")` e `extractfile` só nos `.js`, `.mjs` e `.cjs` (o Angular só publica `.mjs`). Nunca `extract` nem `extractall`, nada gravado em disco, nada executado.
 - A integridade do pacote é conferida com `hashlib.sha512` contra `dist.integrity` antes da leitura.
 - Limite de 10 MB por pacote e tempo limite de 15 s. Acima disso, a trava 5 não roda e a biblioteca fica "a confirmar".
 - Cada `pacote@versão` é consultado uma vez por análise.
 - Sem resposta do registro (R21.9): biblioteca por assinatura segue com o selo "não conferida no npm"; da IA vai para "a confirmar".
 
-### Como a trava 5 compara **[spike]**
+### Como a trava 5 compara
 
-O código do bundle passou por minificação, então a comparação não pode ser byte a byte do arquivo inteiro. Proposta inicial: normalizar espaços do trecho e dos arquivos do pacote e exigir que o trecho normalizado apareça em algum arquivo; se não aparecer, aceitar quando o comentário de licença ou a declaração de versão do trecho aparecem iguais no pacote. O spike com o Juice Shop decide qual critério acerta sem deixar passar invenção.
+Conferido no spike T03 (`docs/spike/har-e-bundles.md`). O minificador renomeia variáveis e troca as aspas (`"FA \"5.15.4\""` vira `` `FA "5.15.4"` ``), mas mantém o valor das strings. Por isso a trava compara **o valor das strings**:
+
+1. Tira do trecho todas as strings (entre `"`, `'` ou `` ` ``) e resolve os escapes.
+2. Exige que uma delas contenha a versão e que alguma tenha 3 ou mais caracteres além da versão. Só a versão não prova o pacote.
+3. Exige que cada string do trecho apareça, com o mesmo valor, como string em algum arquivo do pacote.
+
+No spike, esse critério passou o acerto da IA (`@angular/core@22.2.2`) e barrou versão vizinha, pacote irmão na mesma versão, trecho inventado e "só a versão". Comparar o trecho com espaços normalizados nunca passou, porque o minificador muda o código. Já aceitar só a versão ou a licença deixou passar invenção.
+
+**Limite:** um pacote que traz por dentro o código de outro na mesma versão (ex.: `@fortawesome/fontawesome-free` contém o `fontawesome-svg-core`) passa pela trava, porque o código é mesmo dele. Por isso a biblioteca da IA aparece sempre com o método "ia" e o trecho como evidência (R03.2).
 
 ### Faixa de versão
 
@@ -474,7 +483,7 @@ Código 0 significa que a análise terminou, mesmo com achados. As mensagens vã
 |---|---|---|
 | Limite do GitHub Advisory sem token; formato de `epss` e `cvss_severities` | seção 7, R04.4 | respondida na T01 (`docs/spike/github-advisory.md`) |
 | Com que frequência o EPSS vem vazio | seção 9, R05.3 | respondida na T01 (`docs/spike/github-advisory.md`) |
-| O HAR do Chrome traz o conteúdo dos scripts? O sanitized remove só cookies e cabeçalhos de autenticação, ou mais? | R01, R06.7, R16.5 | T03 |
-| Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 | T03 |
+| O HAR do Chrome traz o conteúdo dos scripts? O sanitized remove só cookies e cabeçalhos de autenticação, ou mais? | R01, R06.7, R16.5 | conteúdo respondido na T03 com HAR do Playwright (`docs/spike/har-e-bundles.md`); sanitized × completo do Chrome na T04 |
+| Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 | respondida na T03 (`docs/spike/har-e-bundles.md`) |
 | Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 | Linux respondido na T02 (`docs/spike/clis-de-ia.md`); Windows na T42 |
-| Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 | T03 |
+| Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 | respondida na T03 (`docs/spike/har-e-bundles.md`) |
