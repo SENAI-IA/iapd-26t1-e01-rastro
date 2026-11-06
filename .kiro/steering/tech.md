@@ -2,7 +2,7 @@
 
 ## Stack
 
-- **Núcleo e CLI:** Python, biblioteca padrão primeiro (`argparse`, `json`, `pathlib`, `dataclasses`, `urllib.request`, `subprocess`).
+- **Núcleo e CLI:** Python 3.10 ou mais novo, biblioteca padrão primeiro (`argparse`, `json`, `pathlib`, `dataclasses`, `urllib.request`, `subprocess`).
 - **Relatório:** React + TypeScript (template padrão do Vite) + `vite-plugin-singlefile`, gerando um único HTML. O Python embute o JSON da análise nesse HTML.
 - **IA:** Kiro (padrão), Claude ou Codex, chamados pela CLI já instalada e autenticada na máquina. Escolha por `--ia` ou `RASTRO_IA`.
 - **Dados:** GitHub Advisory; OSV e NVD como extensão opcional. Registro do npm só com leitura, para as travas.
@@ -12,7 +12,8 @@
 ## Dependências
 
 - **Python em produção:** nenhuma. Nada de SDK de IA nem chave de API no projeto.
-- **Python em desenvolvimento:** `pytest`, `pytest-cov`, `ruff`, `mypy`.
+- **Python em desenvolvimento:** `pytest`, `pytest-cov`, `ruff`, `mypy`, com versão fixa em `requirements-dev.txt`, instalados num `.venv` na raiz do projeto.
+- **Configuração:** `ruff`, `mypy` (modo `strict`), `pytest` e cobertura no `pyproject.toml`.
 - **Frontend:** `react`, `react-dom`; em desenvolvimento, `vite`, `typescript`, `vite-plugin-singlefile`. Sem biblioteca de componentes, de estado ou de gráficos.
 - Qualquer dependência nova precisa resolver algo que o padrão não resolve. Justifique antes de adicionar.
 

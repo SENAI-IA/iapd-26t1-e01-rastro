@@ -100,7 +100,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: métricas do PRD
   - Revisão: @geison.santos
 
-- [ ] **T05 Criar o esqueleto Python**
+- [x] **T05 Criar o esqueleto Python**
   - Entrega: pacote `rastro` com `python -m rastro --help`, `requirements-dev.txt` e a configuração de `ruff`, `mypy` e `pytest` no `pyproject.toml`.
   - Aceite: `pip install -r requirements-dev.txt`, `ruff check`, `mypy rastro` e `pytest` passam no Linux e no Windows; um `conftest.py` bloqueia qualquer acesso à rede nos testes.
   - Arquivos: `pyproject.toml`, `requirements-dev.txt`, `rastro/__init__.py`, `rastro/__main__.py`, `rastro/cli.py`, `tests/test_cli.py`
