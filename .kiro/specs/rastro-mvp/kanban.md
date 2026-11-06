@@ -21,14 +21,14 @@ _(vazio)_
 
 - [ ] **T01** Validar o GitHub Advisory e o EPSS · fase 0 · revisão @cristiano.albino · commit f8c8fe6 · 06/11
 - [ ] **T02** Validar as CLIs de IA sem interação · fase 0 · revisão @luiz.pagliari · commit 36ca444 · 06/11 · Windows conferido na T42
-- [ ] **T03** Validar o HAR real e o bundle do Juice Shop · fase 0 · revisão @ali.santos · 06/11 · HAR do Chrome conferido na T04
+- [ ] **T03** Validar o HAR real e o bundle do Juice Shop · fase 0 · revisão @ali.santos · commit df8697a · 06/11 · HAR do Chrome conferido na T04
+- [ ] **T04** Montar a avaliação · fase 0 · revisão @geison.santos · 06/11 · pendente: exportar do Chrome o HAR sanitized e o completo e conferir (`avaliacao/README.md`)
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
 
 ### Fase 0. Preparar
 
-- [ ] **T04** Montar a avaliação · fase 0 · 09–13/11 · revisão @geison.santos
 - [ ] **T05** Criar o esqueleto Python · fase 0 · 09–13/11 · revisão @ali.santos
 - [ ] **T06** Documentar a verificação local · fase 0 · 09–13/11 · revisão @luiz.pagliari
 - [ ] **T07** Escrever a skill `rastro-nova-regra` · fase 0 · 09–13/11 · revisão @luiz.pagliari

@@ -53,7 +53,7 @@ Marcados com **[spike]**: os critérios que dependem do que o spike mostrar. Ele
 1. QUANDO a URL de um script trouxer nome e versão de uma biblioteca conhecida (ex.: `jquery-3.4.1.min.js`, `/lodash@4.17.15/`), o Rastro DEVE registrar a biblioteca com método "assinatura" e a URL como evidência.
 2. QUANDO o conteúdo de um script trouxer um comentário de versão conhecido (ex.: `/*! jQuery v3.4.1`), o Rastro DEVE registrar a biblioteca com método "assinatura" e o trecho do comentário como evidência.
 3. QUANDO a mesma biblioteca e versão aparecerem em mais de uma requisição, o Rastro DEVE registrá-la uma vez só, guardando todas as requisições como evidência.
-4. O Rastro DEVE reconhecer por assinatura, no mínimo, jQuery, jQuery UI, Bootstrap, Lodash, Moment.js e AngularJS. **[spike]** A lista final sai das aplicações da avaliação.
+4. O Rastro DEVE reconhecer por assinatura, no mínimo, jQuery, jQuery UI, Bootstrap, Lodash, Moment.js, AngularJS, Underscore, RequireJS e CKEditor 4. Underscore, RequireJS e CKEditor vieram dos alvos da avaliação (T04).
 5. O Rastro DEVE registrar cada biblioteca com nome do pacote npm, versão, método de identificação e evidência.
 
 ## R03 Identificar bibliotecas em bundles com IA (RF03)

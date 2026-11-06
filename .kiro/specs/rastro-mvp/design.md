@@ -160,8 +160,18 @@ Uma tabela de dados em `assinaturas.py`, uma linha por biblioteca:
 | `lodash` | `lodash[-.@/]?(\d+\.\d+\.\d+)` | `lodash (?:lodash\.com/license \| )?v?(\d+\.\d+\.\d+)` |
 | `moment` | `moment[-.@/]?(\d+\.\d+\.\d+)` | `//! version : (\d+\.\d+\.\d+)` |
 | `angular` | `angular[-.@/]?(\d+\.\d+\.\d+)` | `AngularJS v(\d+\.\d+\.\d+)` |
+| `underscore` | `underscore[-.@/]?(\d+\.\d+\.\d+)` | `Underscore\.js (\d+\.\d+\.\d+)` |
+| `requirejs` | `requirejs[-.@/]?(\d+\.\d+\.\d+)` | `@license RequireJS (\d+\.\d+\.\d+)` |
+| `ckeditor` | `ckeditor[-.@/]?(\d+\.\d+\.\d+)` ou `ckeditor\.js\?v(?:er)?=(\d+\.\d+\.\d+)` | — |
 
-Os padrões são o ponto de partida; o spike ajusta com os HARs reais. O comentário só é procurado nos primeiros 2 KB do conteúdo. Bibliotecas iguais são agrupadas por `(pacote, versao)`.
+As linhas de Underscore, RequireJS e CKEditor vêm da avaliação (T04, `avaliacao/README.md`): as três têm aviso nos alvos. As de Lodash, Moment.js e AngularJS não apareceram nos alvos e ficam como estão.
+
+- **O comentário é procurado no conteúdo inteiro**, e cada comentário encontrado registra uma biblioteca. Um bundle agregado (Drupal) junta várias bibliotecas e cada uma mantém o seu `/*!`: jQuery no início, Underscore no byte 86 mil e jQuery UI no 136 mil. No WebGoat, o `//     Underscore.js` vem depois do *wrapper* UMD.
+- **O padrão do comentário começa no início de um comentário** (`/*`, `/*!`, `//`, `//!` ou ` * ` no começo da linha). Assim, `Requires jQuery v1.7.2`, dentro do comentário do jQuery Form, não vira jQuery 1.7.2.
+- **O nome do arquivo inclui o `?v=` e o `?ver=` da URL**, onde o Drupal e o WordPress põem a versão (`ckeditor.js?v=4.10.1`).
+- **Nome e comentário divergentes: vale o comentário**, que é o código que rodou. O nome entra na evidência. No WebGoat, `jquery-ui-1.10.4.js` traz a jQuery UI 1.10.3.
+
+Bibliotecas iguais são agrupadas por `(pacote, versao)`.
 
 ### Em bundles, com IA (R03)
 
@@ -483,7 +493,8 @@ Código 0 significa que a análise terminou, mesmo com achados. As mensagens vã
 |---|---|---|
 | Limite do GitHub Advisory sem token; formato de `epss` e `cvss_severities` | seção 7, R04.4 | respondida na T01 (`docs/spike/github-advisory.md`) |
 | Com que frequência o EPSS vem vazio | seção 9, R05.3 | respondida na T01 (`docs/spike/github-advisory.md`) |
-| O HAR do Chrome traz o conteúdo dos scripts? O sanitized remove só cookies e cabeçalhos de autenticação, ou mais? | R01, R06.7, R16.5 | conteúdo respondido na T03 com HAR do Playwright (`docs/spike/har-e-bundles.md`); sanitized × completo do Chrome na T04 |
+| O HAR do Chrome traz o conteúdo dos scripts? O sanitized remove só cookies e cabeçalhos de autenticação, ou mais? | R01, R06.7, R16.5 | conteúdo respondido na T03 com HAR do Playwright (`docs/spike/har-e-bundles.md`); sanitized × completo do Chrome pendente, por exportação manual (`avaliacao/README.md`) |
+| Lista de assinaturas de R02.4 | seção 6, R02.4 | respondida na T04 (`avaliacao/README.md`) |
 | Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 | respondida na T03 (`docs/spike/har-e-bundles.md`) |
 | Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 | Linux respondido na T02 (`docs/spike/clis-de-ia.md`); Windows na T42 |
 | Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 | respondida na T03 (`docs/spike/har-e-bundles.md`) |

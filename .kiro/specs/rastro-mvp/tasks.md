@@ -92,7 +92,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R01.1, R03.1, R06.7, R21.5
   - Revisão: @ali.santos
 
-- [ ] **T04 Montar a avaliação**
+- [x] **T04 Montar a avaliação**
   - Entrega: HARs das aplicações-alvo e o gabarito com as bibliotecas e versões reais de cada uma.
   - Aceite: pelo menos dois alvos com bibliotecas vulneráveis reais, além do Juice Shop (o front-end dele não tem falha conhecida, spike T03); o gabarito diz quais estão em bundle; o HAR sanitized e o completo exportados do Chrome conferidos pela lista "A conferir no Chrome" de `docs/spike/har-e-bundles.md`.
   - Arquivos: `avaliacao/README.md`, `avaliacao/gabarito.json`, `avaliacao/*.har` (só HAR sanitized no repo)
@@ -144,15 +144,15 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 - [ ] **T10 Identificar bibliotecas pelo nome do arquivo**
   - Entrega: tabela de assinaturas e reconhecimento pela URL.
-  - Aceite: reconhece as seis bibliotecas mínimas por URL de arquivo e de CDN (`@versão`).
+  - Aceite: reconhece as bibliotecas mínimas de R02.4 por URL de arquivo, de CDN (`@versão`) e com `?v=` (`ckeditor.js?v=4.10.1`).
   - Arquivos: `rastro/identificacao/assinaturas.py`, `rastro/identificacao/modelos.py`, `tests/identificacao/test_assinaturas.py`
   - Teste: `test_r02_1_*`, `test_r02_4_*`
   - Requisito: R02.1, R02.4, R02.5
   - Revisão: @ali.santos
 
 - [ ] **T11 Identificar bibliotecas pelo comentário de versão**
-  - Entrega: reconhecimento pelo comentário nos primeiros 2 KB e agrupamento das repetidas.
-  - Aceite: a mesma biblioteca em duas requisições aparece uma vez, com duas evidências.
+  - Entrega: reconhecimento pelo comentário no conteúdo inteiro, a partir do início do comentário, e agrupamento das repetidas.
+  - Aceite: a mesma biblioteca em duas requisições aparece uma vez, com duas evidências; um bundle com vários comentários registra cada biblioteca; `Requires jQuery v1.7.2` não vira jQuery; com nome e comentário divergentes, vale o comentário (casos do `avaliacao/gabarito.json`).
   - Arquivos: `rastro/identificacao/assinaturas.py`, `tests/identificacao/test_assinaturas.py`
   - Teste: `test_r02_2_*`, `test_r02_3_*`
   - Requisito: R02.2, R02.3
