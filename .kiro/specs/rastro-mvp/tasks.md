@@ -76,9 +76,9 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R04.1, R04.4, R05.3
   - Revisão: @cristiano.albino
 
-- [ ] **T02 Validar as CLIs de IA sem interação**
-  - Entrega: comando, formato da resposta e tokens de Kiro, Claude e Codex, com o prompt pela entrada padrão, no Linux e no Windows.
-  - Aceite: a tabela de provedores do design está preenchida, com o que funciona e o que não funciona em cada sistema.
+- [x] **T02 Validar as CLIs de IA sem interação**
+  - Entrega: comando, formato da resposta e tokens de Kiro, Claude e Codex, com o prompt pela entrada padrão, no Linux. O Windows é conferido na T42, com a lista do spike.
+  - Aceite: a tabela de provedores do design está preenchida, com o que funciona e o que não funciona no Linux e o que falta conferir no Windows.
   - Arquivos: `docs/spike/clis-de-ia.md`, `design.md`
   - Teste: não se aplica (exploração).
   - Requisito: R14.4, R18.1
@@ -407,10 +407,10 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 - [ ] **T42 Instalar do zero no Windows e no Linux**
   - Entrega: instalação conferida numa máquina limpa de cada sistema, só com Python e a CLI de IA já instalada.
-  - Aceite: seguindo só o README, gera o relatório com IA e com `--sem-ia`, sem Node e sem instalar nada global.
-  - Arquivos: `README.md` (ajustes que aparecerem)
+  - Aceite: seguindo só o README, gera o relatório com IA e com `--sem-ia`, sem Node e sem instalar nada global; no Windows, a lista "A conferir no Windows" de `docs/spike/clis-de-ia.md` está conferida e a coluna Windows da tabela de provedores do design, preenchida.
+  - Arquivos: `README.md` (ajustes que aparecerem), `docs/spike/clis-de-ia.md`, `design.md`
   - Teste: verificação manual.
-  - Requisito: R17.2, R18.1, R20.1–R20.3
+  - Requisito: R14.4, R17.2, R18.1, R20.1–R20.3
   - Revisão: @ali.santos
 
 - [ ] **T43 Escrever o README de uso**

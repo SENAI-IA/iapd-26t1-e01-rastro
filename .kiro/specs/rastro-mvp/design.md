@@ -306,15 +306,21 @@ class ClienteDeIA:
 
 `perguntar` sanitiza, mede o tempo com `time.perf_counter`, chama o provedor, registra a `ChamadaIA` e devolve `None` em caso de falha. Só ele conversa com os provedores.
 
-### Provedores **[spike]**
+### Provedores
 
-| Provedor | Comando provável (prompt pela entrada padrão) | Tokens |
-|---|---|---|
-| Claude | `claude -p --output-format json` | campo `usage` do JSON |
-| Codex | `codex exec -` | a confirmar |
-| Kiro | `kiro-cli chat --no-interactive` | a confirmar |
+Conferido no Linux no spike T02 (`docs/spike/clis-de-ia.md`). O Windows é conferido na T42.
 
-Regras comuns: executável por `shutil.which`, `subprocess.run(..., input=prompt, capture_output=True, encoding="utf-8", timeout=120)`, código de saída diferente de zero conta como falha.
+| Provedor | Comando (prompt pela entrada padrão) | Texto da resposta | Tokens | Linux | Windows |
+|---|---|---|---|---|---|
+| Claude | `claude -p --output-format json --tools ""` | campo `result` do JSON | `usage`: entrada (`input_tokens` + `cache_creation_input_tokens` + `cache_read_input_tokens`) e `output_tokens` | funciona | a conferir (T42) |
+| Codex | `codex exec --skip-git-repo-check --sandbox read-only --ephemeral --json -` | `text` do evento `item.completed` do tipo `agent_message` | `usage` do evento `turn.completed` | funciona | a conferir (T42) |
+| Kiro | `kiro-cli chat --no-interactive --trust-tools=` | a saída padrão inteira | não informa: "não informado" (R11.3) | funciona | a conferir (T42) |
+
+Regras comuns: executável por `shutil.which`, `subprocess.run(..., input=prompt, capture_output=True, encoding="utf-8", timeout=120)`. Falha: código de saída diferente de zero, tempo limite estourado, `is_error: true` no Claude ou nenhum `agent_message` no Codex.
+
+- As opções desligam ferramentas e gravação: a IA só responde, sem ler, rodar ou gravar nada na máquina.
+- Sem `--bare` no Claude: ele exige `ANTHROPIC_API_KEY`, e o Rastro não usa chave.
+- O Rastro não escolhe o modelo: vale o padrão de cada CLI. Cada CLI soma o próprio prompt de sistema (de 12 mil a 27 mil tokens de entrada por chamada no spike), e o custo entra na medição da T46.
 
 ### Prompts
 
@@ -470,5 +476,5 @@ Código 0 significa que a análise terminou, mesmo com achados. As mensagens vã
 | Com que frequência o EPSS vem vazio | seção 9, R05.3 | respondida na T01 (`docs/spike/github-advisory.md`) |
 | O HAR do Chrome traz o conteúdo dos scripts? O sanitized remove só cookies e cabeçalhos de autenticação, ou mais? | R01, R06.7, R16.5 | T03 |
 | Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 | T03 |
-| Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 | T02 |
+| Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 | Linux respondido na T02 (`docs/spike/clis-de-ia.md`); Windows na T42 |
 | Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 | T03 |
