@@ -147,7 +147,7 @@ A `situacao` sai só das travas; a IA não tem campo de confiança que decida al
 - Cabeçalhos: nome em minúsculas; nome repetido junta os valores com `, `. O `Set-Cookie` não entra em `cabecalhos_resposta`: o cookie fica só em `cookies_resposta`, sem o valor.
 - `tipo_conteudo`: `content.mimeType` (ou o `Content-Type`) sem parâmetros e em minúsculas, ex.: `text/html`.
 - Erros: `HarNaoEncontrado` (caminho que não é arquivo) e `HarInvalido` (não é UTF-8, não é JSON, sem `log.entries` em lista ou entrada sem `request.url`, `request.method` e `response.status`), filhas de `ErroAoLerHar`. O `cli.py` transforma em código 1 (T23). Base64 corrompido deixa a entrada sem conteúdo.
-- **Site analisado:** host da primeira resposta com `tipo_conteudo` `text/html`.
+- **Site analisado:** host da primeira resposta com `tipo_conteudo` `text/html` que não seja redirecionamento (3xx), em minúsculas e com a porta (`localhost:3000`). Sem resposta HTML, `None` (R13.3 usa o nome do HAR).
 
 ## 6. Identificar bibliotecas
 

@@ -134,7 +134,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R01.1–R01.5
   - Revisão: @ali.santos
 
-- [ ] **T09 Descobrir o site analisado**
+- [x] **T09 Descobrir o site analisado**
   - Entrega: `descobrir_site_analisado(requisicoes)` devolve o host da primeira resposta HTML.
   - Aceite: funciona com redirecionamento e com HAR sem HTML (devolve `None`).
   - Arquivos: `rastro/har/site.py`, `tests/har/test_site.py`
