@@ -116,9 +116,9 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R18.2, R19.3
   - Revisão: @luiz.pagliari
 
-- [ ] **T07 Escrever a skill `rastro-nova-regra`**
-  - Entrega: passo a passo para acrescentar checagem, assinatura, fonte ou provedor de IA, com o teste e a cobertura esperados.
-  - Aceite: a skill é usada de verdade em T10 e T19.
+- [x] **T07 Escrever a skill `rastro-nova-regra`**
+  - Entrega: passo a passo para acrescentar checagem, assinatura, fonte, provedor de IA ou trava, com o teste e a cobertura esperados.
+  - Aceite: a skill é usada de verdade em T10 e T19 (conferido nessas tasks).
   - Arquivos: `.kiro/skills/rastro-nova-regra/SKILL.md`
   - Teste: não se aplica.
   - Requisito: entregável do curso

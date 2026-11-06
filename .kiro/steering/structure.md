@@ -49,4 +49,4 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 - **Assinatura nova:** em `identificacao/assinaturas.py`.
 - **Trava nova:** um arquivo em `travas/`, chamado por `conferencia.py`, com teste em que a IA (dublê) inventa algo e a trava barra.
 
-A skill `rastro-nova-regra` descreve o passo a passo.
+A skill `rastro-nova-regra` (`.kiro/skills/rastro-nova-regra/SKILL.md`) descreve o passo a passo.
