@@ -73,8 +73,9 @@ Marcados com **[spike]**: os critérios que dependem do que o spike mostrar. Ele
 1. QUANDO houver biblioteca identificada, o Rastro DEVE consultar o GitHub Advisory pelo ecossistema npm e por `pacote@versão`.
 2. O Rastro DEVE registrar, para cada aviso: ID GHSA, CVE (quando houver), resumo, CVSS, percentil EPSS, faixa de versões afetadas, primeira versão corrigida e link do aviso.
 3. SE a consulta de uma biblioteca falhar (sem rede, limite de requisições, erro do servidor), ENTÃO o Rastro DEVE seguir com as demais e marcar essa biblioteca como "não consultada", com o motivo.
-4. ONDE a variável `GITHUB_TOKEN` estiver definida, o Rastro DEVE usá-la na consulta. **[spike]** Confirmar se o limite sem token basta.
+4. ONDE a variável `GITHUB_TOKEN` estiver definida, o Rastro DEVE usá-la na consulta. Sem token, o limite de 60 consultas por hora basta para uma análise (spike T01).
 5. O Rastro DEVE consultar só fontes oficiais de vulnerabilidades: o GitHub Advisory e, se a extensão R04A for entregue, o OSV e o NVD. O registro do npm (R21) serve só para conferir pacotes, não para buscar falhas.
+6. SE o aviso estiver retirado pela fonte (`withdrawn_at` preenchido), ENTÃO o Rastro DEVE descartá-lo.
 
 ### R04A Extensão opcional: OSV e NVD (só se houver tempo)
 
@@ -94,7 +95,7 @@ O GitHub Advisory é a fonte do MVP. OSV e NVD entram **só se** as fases 1 e 2 
 
 1. O Rastro DEVE calcular a nota como `10 × (0,5 × CVSS/10 + 0,5 × percentil EPSS)`, arredondada a uma casa decimal.
 2. O Rastro DEVE classificar a prioridade como alta (nota ≥ 7,5), média (nota ≥ 6,5) ou baixa (abaixo de 6,5).
-3. SE o aviso não tiver EPSS, ENTÃO o Rastro DEVE usar a nota igual ao CVSS e mostrar o selo "sem EPSS". **[spike]** Validar com a frequência real de EPSS vazio.
+3. SE o aviso não tiver EPSS, ENTÃO o Rastro DEVE usar a nota igual ao CVSS e mostrar o selo "sem EPSS". No spike T01, 8,8% dos avisos vieram sem EPSS, todos sem CVE.
 4. SE o aviso não tiver CVSS, ENTÃO o Rastro DEVE mostrá-lo com "sem nota" e prioridade "a avaliar", sem escondê-lo.
 5. O Rastro DEVE usar como nota da biblioteca a maior nota entre os seus achados.
 6. O Rastro DEVE ordenar os achados por nota decrescente e, no empate, por CVSS decrescente.

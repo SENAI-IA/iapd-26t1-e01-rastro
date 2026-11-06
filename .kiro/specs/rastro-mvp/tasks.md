@@ -68,10 +68,10 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 ## Fase 0. Preparar
 
-- [ ] **T01 Validar o GitHub Advisory e o EPSS**
+- [x] **T01 Validar o GitHub Advisory e o EPSS**
   - Entrega: registro do spike com limite sem token, formato de `epss` e `cvss_severities` e taxa de EPSS vazio em 20 pacotes.
   - Aceite: as perguntas da seção 17 do design sobre a fonte estão respondidas; o design e os critérios [spike] de R04 e R05 estão ajustados.
-  - Arquivos: `docs/spike/github-advisory.md`, `design.md`
+  - Arquivos: `docs/spike/github-advisory.md`, `design.md`, `requirements.md`
   - Teste: não se aplica (exploração).
   - Requisito: R04.1, R04.4, R05.3
   - Revisão: @cristiano.albino
@@ -160,10 +160,10 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 - [ ] **T12 Consultar o GitHub Advisory**
   - Entrega: `ConectorDeAvisos` e `GitHubAdvisory.consultar(pacote, versao)`.
-  - Aceite: converte uma resposta gravada em `Aviso`; usa o token quando existe; erro de rede vira "não consultada".
+  - Aceite: converte uma resposta gravada em `Aviso`; usa o token quando existe; erro de rede vira "não consultada"; descarta aviso retirado; CVSS com `score: 0.0` e vetor nulo conta como ausente; sem a chave `epss`, o percentil fica `None`.
   - Arquivos: `rastro/fontes/conector.py`, `rastro/fontes/github_advisory.py`, `tests/fontes/test_github_advisory.py`, `tests/dados/advisory-*.json`
   - Teste: `test_r04_*` (com `urlopen` trocado por dublê)
-  - Requisito: R04.1–R04.5
+  - Requisito: R04.1–R04.6
   - Revisão: @cristiano.albino
 
 - [ ] **T13 Conferir a faixa de versão afetada**

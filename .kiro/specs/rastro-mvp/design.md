@@ -178,14 +178,19 @@ Accept: application/vnd.github+json
 Authorization: Bearer $GITHUB_TOKEN      (só se a variável existir)
 ```
 
-| Campo do aviso | Vem de **[spike]** |
-|---|---|
-| `ghsa`, `cve`, `resumo`, `link` | `ghsa_id`, `cve_id`, `summary`, `html_url` |
-| `cvss` | `cvss_severities.cvss_v3.score`; se nulo, `cvss_v4.score`; se nulo, `cvss.score` |
-| `percentil_epss` | `epss.percentile` |
-| `versoes_afetadas`, `versao_corrigida` | item de `vulnerabilities` do pacote: `vulnerable_version_range`, `first_patched_version` |
+Formato conferido no spike T01 (`docs/spike/github-advisory.md`).
 
-- `urllib.request` com tempo limite de 15 s. Sem token, o limite é de 60 requisições por hora, uma por biblioteca. **[spike]**
+| Campo do aviso | Vem de |
+|---|---|
+| `ghsa`, `cve`, `resumo`, `link` | `ghsa_id`, `cve_id` (pode ser `null`), `summary`, `html_url` |
+| `cvss` | `cvss_severities.cvss_v3.score`; senão, `cvss_v4.score`; senão, nenhum. Cada um só vale com `vector_string` preenchido: CVSS ausente vem como `score: 0.0` e vetor `null`. O campo legado `cvss` não é usado. |
+| `percentil_epss` | `epss.percentile` (0 a 1). Sem EPSS, a chave `epss` não vem na resposta. |
+| `versoes_afetadas`, `versao_corrigida` | itens de `vulnerabilities` com `package.ecosystem == "npm"` e `package.name == pacote`; vale o item cuja `vulnerable_version_range` contém a versão (trava 6). `first_patched_version` pode ser `null`. |
+
+- Aviso com `withdrawn_at` preenchido (retirado) é descartado (R04.6).
+- `urllib.request` com tempo limite de 15 s. Sem token, o limite é de 60 requisições por hora por IP, uma por biblioteca: uma análise cabe nele; várias na mesma hora dividem as 60. Com `GITHUB_TOKEN`, 5.000 por hora.
+- Sem paginação: com `per_page=100`, nenhuma resposta do spike passou de 26 avisos.
+- Lista vazia não prova que o pacote existe; isso é da trava 4.
 - Erro de rede, HTTP 403/429 ou 5xx → biblioteca "não consultada" com o motivo (R04.3). A análise continua.
 - `ConectorDeAvisos.consultar(pacote, versao) -> list[Aviso]`. Nos testes, `ConectorFalso` devolve avisos fixos.
 
@@ -260,8 +265,10 @@ def calcular_nota_de_risco(cvss: float, percentil_epss: float) -> float:
 | Situação | Nota | Prioridade |
 |---|---|---|
 | CVSS e EPSS | fórmula | pela faixa |
-| Só CVSS | igual ao CVSS, selo "sem EPSS" **[spike]** | pela faixa |
+| Só CVSS | igual ao CVSS, selo "sem EPSS" | pela faixa |
 | Sem CVSS | sem nota | "a avaliar" |
+
+No spike T01, 8,8% dos avisos vieram sem EPSS (todos sem CVE, porque o EPSS só existe para CVE) e 5,9% sem CVSS.
 
 Faixas: alta ≥ 7,5; média ≥ 6,5; baixa no resto. Nota da biblioteca = maior nota dos seus achados. Ordem: nota decrescente e, no empate, CVSS decrescente. O porquê dos pesos 0,5 / 0,5 vai para `docs/decisoes/`.
 
@@ -457,11 +464,11 @@ Código 0 significa que a análise terminou, mesmo com achados. As mensagens vã
 
 ## 17. A validar no spike
 
-| Pergunta | Afeta |
-|---|---|
-| Limite do GitHub Advisory sem token; formato de `epss` e `cvss_severities` | seção 7, R04.4 |
-| Com que frequência o EPSS vem vazio | seção 9, R05.3 |
-| O HAR do Chrome traz o conteúdo dos scripts? O sanitized remove só cookies e cabeçalhos de autenticação, ou mais? | R01, R06.7, R16.5 |
-| Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 |
-| Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 |
-| Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 |
+| Pergunta | Afeta | Situação |
+|---|---|---|
+| Limite do GitHub Advisory sem token; formato de `epss` e `cvss_severities` | seção 7, R04.4 | respondida na T01 (`docs/spike/github-advisory.md`) |
+| Com que frequência o EPSS vem vazio | seção 9, R05.3 | respondida na T01 (`docs/spike/github-advisory.md`) |
+| O HAR do Chrome traz o conteúdo dos scripts? O sanitized remove só cookies e cabeçalhos de autenticação, ou mais? | R01, R06.7, R16.5 | T03 |
+| Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 | T03 |
+| Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 | T02 |
+| Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 | T03 |

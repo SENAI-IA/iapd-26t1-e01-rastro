@@ -19,13 +19,13 @@ _(vazio)_
 
 ## Em revisão
 
+- [ ] **T01** Validar o GitHub Advisory e o EPSS · fase 0 · revisão @cristiano.albino · 06/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
 
 ### Fase 0. Preparar
 
-- [ ] **T01** Validar o GitHub Advisory e o EPSS · fase 0 · 09–13/11 · revisão @cristiano.albino
 - [ ] **T02** Validar as CLIs de IA sem interação · fase 0 · 09–13/11 · revisão @luiz.pagliari
 - [ ] **T03** Validar o HAR real e o bundle do Juice Shop · fase 0 · 09–13/11 · revisão @ali.santos
 - [ ] **T04** Montar a avaliação · fase 0 · 09–13/11 · revisão @geison.santos
