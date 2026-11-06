@@ -108,7 +108,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R18.1, R19.2, R19.3
   - Revisão: @ali.santos
 
-- [ ] **T06 Documentar a verificação local**
+- [x] **T06 Documentar a verificação local**
   - Entrega: seção "Verificação" no README com `ruff check`, `mypy rastro` e `pytest --cov`, para Windows e Linux.
   - Aceite: os três comandos passam no Linux e no Windows, na máquina local, e o resultado de cada sistema fica em `docs/cobertura/`.
   - Arquivos: `README.md`, `docs/cobertura/`

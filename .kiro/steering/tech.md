@@ -48,5 +48,6 @@ Tudo precisa funcionar nos dois.
 ## Testes
 
 - Cobertura mínima de 60% nas regras de negócio (meta 80%), medida com `pytest-cov`. Relatório versionado em `docs/cobertura/`.
+- Verificação: `ruff check`, `mypy rastro` e `pytest --cov=rastro --cov-report=term`, com o `.venv` ativo (comandos na seção "Verificação" do README). O resultado de cada sistema fica em `docs/cobertura/linux.md` e `docs/cobertura/windows.md`. O HTML da cobertura nunca vai direto para `docs/cobertura/`: o `pytest-cov` cria ali um `.gitignore` com `*`.
 - Fonte de dados, registro do npm e IA trocados por dublês: testes não acessam rede (um `conftest.py` bloqueia).
 - Testes de frontend não são obrigatórios.

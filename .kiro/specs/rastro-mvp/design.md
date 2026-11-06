@@ -472,8 +472,8 @@ Código 0 significa que a análise terminou, mesmo com achados. As mensagens vã
   - Travas com casos de invenção: para cada trava, ao menos um teste em que a IA (dublê) inventa algo — versão que não está no trecho, trecho que não foi enviado, pacote que não existe, CVE que não estava na entrada — e a trava barra.
 - **Dados de teste:** `tests/dados/` com HARs mínimos (jQuery por nome, por comentário, bundle, sem JS, sanitized, base64) e respostas gravadas do GitHub Advisory.
 - **Sem rede:** nenhum teste chama a API ou uma CLI de IA de verdade (R19.2).
-- **Cobertura:** `pytest --cov=rastro --cov-report=term --cov-report=html:docs/cobertura`. As regras de negócio (`har`, `identificacao`, `travas`, `fontes`, `risco`, `configuracao`, `acao`, `ia/sanitizacao`) ficam acima de 80%. Os provedores e o `cli.py` contam, mas não são a meta.
-- **Sem CI, verificação local:** `ruff check`, `mypy rastro` e `pytest --cov`, rodados no Windows e no Linux antes de cada entrega. Os comandos ficam na seção "Verificação" do README, e o resultado de cada sistema vai para `docs/cobertura/`.
+- **Cobertura:** `pytest --cov=rastro --cov-report=term`. As regras de negócio (`har`, `identificacao`, `travas`, `fontes`, `risco`, `configuracao`, `acao`, `ia/sanitizacao`) ficam acima de 80%. Os provedores e o `cli.py` contam, mas não são a meta.
+- **Sem CI, verificação local:** `ruff check`, `mypy rastro` e `pytest --cov`, rodados no Windows e no Linux antes de cada entrega. Os comandos ficam na seção "Verificação" do README, e o resultado de cada sistema vai para `docs/cobertura/linux.md` e `docs/cobertura/windows.md` (data, commit, versões e saída dos três comandos). O relatório HTML é da T44, numa subpasta própria: o `pytest-cov` cria na pasta do HTML um `.gitignore` com `*`, que, em `docs/cobertura/`, esconderia do Git também o resultado de cada sistema.
 
 ## 16. Decisões a registrar em `docs/decisoes/`
 
