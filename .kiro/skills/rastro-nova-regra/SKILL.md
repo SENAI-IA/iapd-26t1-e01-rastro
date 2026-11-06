@@ -10,7 +10,7 @@ Cinco pontos de extensão, cada um com lugar fixo (`.kiro/steering/structure.md`
 ## Antes de qualquer caso
 
 1. **Spec primeiro.** A regra nova precisa de um critério `Rxx.y` em `.kiro/specs/rastro-mvp/requirements.md` e de uma task no `tasks.md`. Sem critério, não há teste com ID, então pare e escreva o critério.
-2. **Pasta que ainda não existe:** crie seguindo `structure.md` e o `design.md` (seção 2), com o `tests/` espelhando o `rastro/`. Cada pasta nova em `tests/` leva um `__init__.py`, porque os nomes de arquivo se repetem (`identificacao/test_ia.py`, `explicacao/test_ia.py`).
+2. **Pasta que ainda não existe:** crie seguindo `structure.md` e o `design.md` (seção 2), com o `tests/` espelhando o `rastro/`. Cada pasta nova, em `rastro/` e em `tests/`, leva um `__init__.py` vazio, porque os nomes de arquivo se repetem (`identificacao/test_ia.py`, `explicacao/test_ia.py`).
 3. **Nome do teste** leva o critério e descreve o comportamento: `test_r06_1_csp_ausente_falha`. Cada critério tem pelo menos um teste.
 4. **Nada de rede nem de IA nos testes.** O `tests/conftest.py` bloqueia a rede. Fonte, registro do npm e IA viram dublês (`ConectorFalso`, `ProvedorFalso`, `urlopen` ou `subprocess.run` trocados com `monkeypatch`). Arquivo de entrada de teste (HAR, resposta gravada) fica em `tests/dados/`, feito à mão, pequeno e sem dado real.
 5. **Regra de negócio é função pura:** sem arquivo, rede, IA ou relógio dentro dela. Nomes em português, tipos em tudo, sem comentário: condição composta vira função com nome.
@@ -25,10 +25,10 @@ Cinco pontos de extensão, cada um com lugar fixo (`.kiro/steering/structure.md`
 
 ## Assinatura de biblioteca
 
-1. **Arquivo:** uma linha nova na tabela de `rastro/identificacao/assinaturas.py`: pacote npm, regex do nome do arquivo e regex do comentário de versão. É dado, não função nova.
+1. **Arquivo:** uma linha nova em `ASSINATURAS`, em `rastro/identificacao/assinaturas.py`: pacote npm, nome no arquivo (ex.: `jquery-ui`) e regex do comentário de versão. É dado, não função nova. O separador e a versão do nome do arquivo são comuns a todas as linhas (`design.md`, seção 6): não repita na linha.
 2. **Base real:** o padrão vem de um arquivo de verdade (alvo da `avaliacao/` ou CDN), nunca de memória. Acrescente a linha na tabela do `design.md` (seção 6) e o nome em R02.4.
-3. **Regras do padrão:** o nome inclui `?v=` e `?ver=`; o comentário começa no início de um comentário (`/*`, `/*!`, `//`, `//!`, ` * `); nome e comentário divergentes, vale o comentário.
-4. **Teste** em `tests/identificacao/test_assinaturas.py`: reconhece pela URL (`test_r02_1_*`), pelo comentário (`test_r02_2_*`) e não confunde com menção dentro de outro comentário (ex.: `Requires jQuery v1.7.2`). Conteúdo e URL no próprio teste.
+3. **Regras do padrão:** o nome do arquivo é o caminho com os parâmetros, sem o host, e só de scripts; o `?v=` e o `?ver=` já valem para toda linha pelo separador comum; o comentário começa no início de um comentário (`/*`, `/*!`, `//`, `//!`, ` * `); nome e comentário divergentes, vale o comentário.
+4. **Teste** em `tests/identificacao/test_assinaturas.py`: a biblioteca entra no caso parametrizado `test_r02_4_*` e no conjunto da tabela; reconhece pela URL (`test_r02_1_*`) e não confunde com outro nome que a contém (ex.: `jquery-ui-1.10.4.js` não é jQuery, `react-bootstrap@1.0.0` não é Bootstrap); reconhece pelo comentário (`test_r02_2_*`) e não confunde com menção dentro de outro comentário (ex.: `Requires jQuery v1.7.2`). Monte as `Requisicao` no próprio teste, com URL e conteúdo, sem HAR.
 5. **Cobertura:** acima de 80% em `identificacao/`.
 
 ## Fonte de dados de vulnerabilidades

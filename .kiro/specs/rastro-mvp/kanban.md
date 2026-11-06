@@ -27,7 +27,8 @@ _(vazio)_
 - [ ] **T06** Documentar a verificação local · fase 0 · revisão @luiz.pagliari · commit c39f326 · 06/11 · Windows conferido na T42 (`docs/cobertura/windows.md`)
 - [ ] **T07** Escrever a skill `rastro-nova-regra` · fase 0 · revisão @luiz.pagliari · commit 32e1fb3 · 06/11 · aceite só em T10 e T19 (uso real da skill)
 - [ ] **T08** Ler e validar o HAR · fase 1 · revisão @ali.santos · commit e4e8a26 · 06/11
-- [ ] **T09** Descobrir o site analisado · fase 1 · revisão @ali.santos · 06/11
+- [ ] **T09** Descobrir o site analisado · fase 1 · revisão @ali.santos · commit aa540f5 · 06/11
+- [ ] **T10** Identificar bibliotecas pelo nome do arquivo · fase 1 · revisão @ali.santos · 06/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -38,7 +39,6 @@ _(vazio)_
 
 ### Fase 1. Núcleo determinístico
 
-- [ ] **T10** Identificar bibliotecas pelo nome do arquivo · fase 1 · 16–25/11 · revisão @ali.santos
 - [ ] **T11** Identificar bibliotecas pelo comentário de versão · fase 1 · 16–25/11 · revisão @ali.santos
 - [ ] **T12** Consultar o GitHub Advisory · fase 1 · 16–25/11 · revisão @cristiano.albino
 - [ ] **T13** Conferir a faixa de versão afetada · fase 1 · 16–25/11 · revisão @cristiano.albino

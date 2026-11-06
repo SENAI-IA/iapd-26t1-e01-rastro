@@ -155,17 +155,19 @@ A `situacao` sai só das travas; a IA não tem campo de confiança que decida al
 
 Uma tabela de dados em `assinaturas.py`, uma linha por biblioteca:
 
-| Pacote npm | Nome do arquivo (regex) | Comentário de versão (regex) |
+| Pacote npm | Nome no arquivo | Comentário de versão (regex) |
 |---|---|---|
-| `jquery` | `jquery[-.]?(\d+\.\d+\.\d+)` | `jQuery (?:JavaScript Library )?v(\d+\.\d+\.\d+)` |
-| `jquery-ui` | `jquery-ui[-.]?(\d+\.\d+\.\d+)` | `jQuery UI - v(\d+\.\d+\.\d+)` |
-| `bootstrap` | `bootstrap[-.@/]?(\d+\.\d+\.\d+)` | `Bootstrap v(\d+\.\d+\.\d+)` |
-| `lodash` | `lodash[-.@/]?(\d+\.\d+\.\d+)` | `lodash (?:lodash\.com/license \| )?v?(\d+\.\d+\.\d+)` |
-| `moment` | `moment[-.@/]?(\d+\.\d+\.\d+)` | `//! version : (\d+\.\d+\.\d+)` |
-| `angular` | `angular[-.@/]?(\d+\.\d+\.\d+)` | `AngularJS v(\d+\.\d+\.\d+)` |
-| `underscore` | `underscore[-.@/]?(\d+\.\d+\.\d+)` | `Underscore\.js (\d+\.\d+\.\d+)` |
-| `requirejs` | `requirejs[-.@/]?(\d+\.\d+\.\d+)` | `@license RequireJS (\d+\.\d+\.\d+)` |
-| `ckeditor` | `ckeditor[-.@/]?(\d+\.\d+\.\d+)` ou `ckeditor\.js\?v(?:er)?=(\d+\.\d+\.\d+)` | — |
+| `jquery` | `jquery` | `jQuery (?:JavaScript Library )?v(\d+\.\d+\.\d+)` |
+| `jquery-ui` | `jquery-ui` | `jQuery UI - v(\d+\.\d+\.\d+)` |
+| `bootstrap` | `bootstrap` | `Bootstrap v(\d+\.\d+\.\d+)` |
+| `lodash` | `lodash` | `lodash (?:lodash\.com/license \| )?v?(\d+\.\d+\.\d+)` |
+| `moment` | `moment` | `//! version : (\d+\.\d+\.\d+)` |
+| `angular` | `angular` | `AngularJS v(\d+\.\d+\.\d+)` |
+| `underscore` | `underscore` | `Underscore\.js (\d+\.\d+\.\d+)` |
+| `requirejs` | `requirejs` | `@license RequireJS (\d+\.\d+\.\d+)` |
+| `ckeditor` | `ckeditor` | — |
+
+**Padrão do nome do arquivo**, o mesmo para todas as linhas: `(?<![\w-])` + nome no arquivo + separador `[-.@/]?` ou `(?:\.min)?\.js\?v(?:er)?=` + `(\d+\.\d+\.\d+)`, sem diferenciar maiúsculas, procurado no caminho e nos parâmetros da URL (o host fica de fora) e só em scripts (tipo de conteúdo JavaScript ou caminho terminado em `.js`). Reconhece `jquery-3.4.1.min.js`, `/lodash@4.17.15/`, `/jquery/3.4.1/jquery.min.js`, `ckeditor.js?v=4.10.1` e `jquery.min.js?ver=3.4.1`. O início impede que `react-bootstrap@1.0.0` vire Bootstrap, e `jquery-ui-1.10.4.js` não vira jQuery porque, depois de `jquery`, o separador exige a versão.
 
 As linhas de Underscore, RequireJS e CKEditor vêm da avaliação (T04, `avaliacao/README.md`): as três têm aviso nos alvos. As de Lodash, Moment.js e AngularJS não apareceram nos alvos e ficam como estão.
 

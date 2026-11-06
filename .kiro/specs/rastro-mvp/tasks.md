@@ -142,7 +142,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R01.7
   - Revisão: @ali.santos
 
-- [ ] **T10 Identificar bibliotecas pelo nome do arquivo**
+- [x] **T10 Identificar bibliotecas pelo nome do arquivo**
   - Entrega: tabela de assinaturas e reconhecimento pela URL.
   - Aceite: reconhece as bibliotecas mínimas de R02.4 por URL de arquivo, de CDN (`@versão`) e com `?v=` (`ckeditor.js?v=4.10.1`).
   - Arquivos: `rastro/identificacao/assinaturas.py`, `rastro/identificacao/modelos.py`, `tests/identificacao/test_assinaturas.py`
