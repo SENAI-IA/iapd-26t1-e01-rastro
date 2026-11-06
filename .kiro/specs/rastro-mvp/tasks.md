@@ -126,7 +126,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 ## Fase 1. Núcleo determinístico
 
-- [ ] **T08 Ler e validar o HAR**
+- [x] **T08 Ler e validar o HAR**
   - Entrega: `ler_har(caminho)` devolve a lista de `Requisicao`.
   - Aceite: lê HAR válido, decodifica base64 e falha com mensagem clara para arquivo ausente ou inválido.
   - Arquivos: `rastro/har/leitor.py`, `rastro/har/modelos.py`, `tests/har/test_leitor.py`, `tests/dados/*.har`

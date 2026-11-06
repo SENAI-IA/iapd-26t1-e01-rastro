@@ -25,7 +25,8 @@ _(vazio)_
 - [ ] **T04** Montar a avaliação · fase 0 · revisão @geison.santos · commit 059244b · 06/11 · pendente: exportar do Chrome o HAR sanitized e o completo e conferir (`avaliacao/README.md`)
 - [ ] **T05** Criar o esqueleto Python · fase 0 · revisão @ali.santos · commit 6a52bb3 · 06/11 · Windows conferido na T42
 - [ ] **T06** Documentar a verificação local · fase 0 · revisão @luiz.pagliari · commit c39f326 · 06/11 · Windows conferido na T42 (`docs/cobertura/windows.md`)
-- [ ] **T07** Escrever a skill `rastro-nova-regra` · fase 0 · revisão @luiz.pagliari · 06/11 · aceite só em T10 e T19 (uso real da skill)
+- [ ] **T07** Escrever a skill `rastro-nova-regra` · fase 0 · revisão @luiz.pagliari · commit 32e1fb3 · 06/11 · aceite só em T10 e T19 (uso real da skill)
+- [ ] **T08** Ler e validar o HAR · fase 1 · revisão @ali.santos · 06/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -36,7 +37,6 @@ _(vazio)_
 
 ### Fase 1. Núcleo determinístico
 
-- [ ] **T08** Ler e validar o HAR · fase 1 · 16–25/11 · revisão @ali.santos
 - [ ] **T09** Descobrir o site analisado · fase 1 · 16–25/11 · revisão @ali.santos
 - [ ] **T10** Identificar bibliotecas pelo nome do arquivo · fase 1 · 16–25/11 · revisão @ali.santos
 - [ ] **T11** Identificar bibliotecas pelo comentário de versão · fase 1 · 16–25/11 · revisão @ali.santos
