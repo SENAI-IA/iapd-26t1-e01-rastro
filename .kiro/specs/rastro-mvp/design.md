@@ -283,6 +283,19 @@ No spike, esse critério passou o acerto da IA (`@angular/core@22.2.2`) e barrou
 - `descartar_fora_da_faixa(pacote, versao, avisos)` devolve os avisos mantidos e uma `TravaAcionada` por aviso descartado (alvo `GHSA… em pacote@versão`).
 - Faixa ou versão que não se consegue ler também descarta o aviso, com o motivo registrado: a trava não confirma o que não conseguiu conferir, e o painel da IA mostra o caso.
 
+### Formato fechado
+
+- `conferir_formato(resposta)` devolve as `BibliotecaSugerida` (`pacote`, `versao`, `trecho`) e, se a resposta cair, nenhuma biblioteca e uma `TravaAcionada` (alvo `resposta da IA`) com o motivo.
+- Só espaços em volta são aceitos. Texto antes ou depois do JSON, cerca de código (` ```json `) e dois JSONs seguidos são "texto fora do JSON". Campo a mais, faltando ou repetido, valor que não é texto, nome de pacote npm inválido, versão fora de `x.y.z` (pré-lançamento como `-rc.1` vale; `v` na frente e faixa como `^1.2.3` não) e trecho vazio derrubam a resposta inteira.
+- Lista vazia é resposta válida: a IA não achou nada.
+
+### Trecho real e ancoragem
+
+- `conferir_ancoragem(biblioteca, trechos_enviados)` olha o trecho de cada evidência e, se alguma trava falhar, manda a biblioteca para "a confirmar" e devolve uma `TravaAcionada` por falha.
+- **Trecho real:** o trecho da IA precisa estar, letra por letra, dentro de um dos trechos enviados (é um pedaço da janela de 300 caracteres, como o `` [`ng-version`,`22.2.2`] `` do spike T03). Trecho vazio ou ausente não passa.
+- **Ancoragem:** a versão precisa aparecer inteira no trecho, sem número colado antes nem continuação depois: `2.2.2` não ancora em `22.2.2`, nem `3.4.1` em `3.4.10` ou `1.0.0` em `1.0.0-rc.1`. O `v` na frente (`v3.4.1`) vale.
+- O motivo da ancoragem já diz como confirmar à mão (ex.: "procure `22.2.1` em `main.js`").
+
 ### Explicação sem fato novo
 
 `explicacao.py` extrai do texto da IA todo padrão `CVE-\d+-\d+`, `GHSA-…`, `\d+\.\d+(\.\d+)?` e número com `%`, e exige que cada um esteja na entrada enviada. Qualquer sobra descarta a explicação.

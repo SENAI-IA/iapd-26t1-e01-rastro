@@ -182,7 +182,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R21.4, R21.9, R16.2
   - Revisão: @cristiano.albino
 
-- [ ] **T15 Travar a resposta da IA: formato e ancoragem**
+- [x] **T15 Travar a resposta da IA: formato e ancoragem**
   - Entrega: travas `formato.py` e `ancoragem.py`.
   - Aceite: JSON com campo a mais ou texto fora dele é descartado; trecho não enviado ou versão ausente do trecho manda a biblioteca para "a confirmar".
   - Arquivos: `rastro/travas/formato.py`, `rastro/travas/ancoragem.py`, `tests/travas/test_formato.py`, `tests/travas/test_ancoragem.py`
