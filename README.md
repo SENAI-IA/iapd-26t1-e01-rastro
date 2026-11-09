@@ -107,6 +107,24 @@ Prints do relatório do WebGoat (`avaliacao/webgoat.har`), gerados no Linux em 0
 | ![Modo foco](docs/prints/08-modo-foco.png) **Modo foco** na zona Agir. | ![Glossário](docs/prints/09-glossario.png) **Glossário:** a definição aparece no termo sublinhado. |
 | ![Onde a IA entrou](docs/prints/10-onde-a-ia-entrou.png) **Onde a IA entrou:** chamadas, tempo, tokens e travas acionadas. | |
 
+## Resultados
+
+Medido em 09/11/2026 nos três HARs de [`avaliacao/`](avaliacao/README.md), contra o gabarito. Detalhes, travas por análise e como medir de novo em [`avaliacao/resultados.md`](avaliacao/resultados.md).
+
+| Métrica (PRD) | Sem IA | Com IA (Kiro) | Com IA (Claude) |
+|---|---|---|---|
+| Bibliotecas confirmadas, todas do gabarito | 10 | 11 | 11 |
+| Bibliotecas com aviso confirmadas (gabarito: 11) | 10 | 10 | 10 |
+| Falhas encontradas (gabarito: 30 válidas) | 30 | 30 | 30 |
+| Bibliotecas confirmadas fora do gabarito (falso positivo) | **0** | **0** | **0** |
+| Sugestões da IA barradas pelas travas | — | 1 de 2 (trava 3, ancoragem) | 1 de 2 (trava 3, ancoragem) |
+| Tempo das 3 análises | 14 s | 3 min 29 s | 2 min 15 s |
+| Tokens (13 chamadas) | — | não informado pela CLI | 410 mil (31,5 mil por chamada) |
+| Tempo de triagem manual × Rastro | **pendente**: medir com uma pessoa | | |
+
+- A biblioteca que a IA acrescenta é o `@angular/core` do Juice Shop, num bundle sem comentário de versão. A que falta sem IA e com IA é a jQuery UI 1.10.3 do WebGoat, que não está no npm e fica "a confirmar".
+- O Codex não foi medido: a chave de API da máquina expirou. Com ele, as chamadas falharam e a análise seguiu só com a assinatura.
+
 ## Roteiro de verificação manual
 
 Os critérios marcados *(verificação manual)* na spec só se conferem olhando a tela; os demais têm teste automático com o ID no nome (`pytest`). Gere um relatório com IA e um com `--sem-ia` do mesmo HAR e siga a tabela:
@@ -203,7 +221,7 @@ E no próprio produto a IA tem papel real, mas não decide sozinha: ela sugere b
 | `rastro/` | O pacote Python: núcleo (`har`, `identificacao`, `travas`, `fontes`, `risco`, `configuracao`, `acao`), IA (`ia`, `explicacao`), relatório e CLI. |
 | `frontend/` | Fonte do relatório HTML (React + TypeScript). O build vai pronto em `rastro/relatorio/modelo.html`. |
 | `tests/` | Testes, espelhando `rastro/`, e os dados de teste em `tests/dados/`. |
-| `avaliacao/` | HARs do WebGoat, do Drupal e do Juice Shop e o gabarito das bibliotecas de cada um. |
+| `avaliacao/` | HARs do WebGoat, do Drupal e do Juice Shop, o gabarito das bibliotecas de cada um e os resultados medidos com e sem IA. |
 | `.kiro/steering/` | Padrões de construção que o agente de IA segue: produto, tecnologia, estrutura, processo, Python e React. |
 | `.kiro/specs/rastro-mvp/` | Spec do MVP: requisitos em EARS, design, tasks (com revisor) e kanban. |
 | `.kiro/skills/rastro-nova-regra/` | Skill do projeto: passo a passo para acrescentar checagem, assinatura, fonte de dados, provedor de IA ou trava, com teste, cobertura e verificação. |

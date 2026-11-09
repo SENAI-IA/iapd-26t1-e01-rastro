@@ -17,6 +17,7 @@ O detalhe de cada biblioteca (em arquivo ou em bundle, onde a versão aparece, m
 | Arquivo | Conteúdo |
 |---|---|
 | `gabarito.json` | bibliotecas, versões e avisos de cada alvo |
+| `resultados.md` | o que o Rastro achou em cada alvo, com e sem IA, contra o gabarito (T46) |
 | `webgoat.har` | 72 entradas, 39 scripts, 2,1 MB |
 | `drupal.har` | 157 entradas, 27 scripts, 4,2 MB |
 | `juiceshop.har` | 50 entradas, 7 scripts, 3,0 MB |
