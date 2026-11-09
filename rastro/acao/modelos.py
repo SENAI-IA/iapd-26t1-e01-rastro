@@ -13,6 +13,8 @@ class Acao:
     impacto: str
     quem_resolve: str
     refs: list[str]
+    teste_verificacao: str | None
+    texto_task: str = ""
 
 
 @dataclass(frozen=True)

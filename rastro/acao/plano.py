@@ -1,4 +1,7 @@
+from dataclasses import replace
+
 from rastro.acao.modelos import Acao, CorrecaoDaChecagem
+from rastro.acao.task import gerar_texto_da_task
 from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.conector import Aviso
@@ -63,7 +66,11 @@ def montar_plano_de_acao(
     checagens: list[Checagem],
 ) -> list[Acao]:
     acoes = acoes_das_bibliotecas(achados, explicacoes) + acoes_das_checagens(checagens)
-    return ordenar_acoes(acoes)
+    return [com_texto_da_task(acao) for acao in ordenar_acoes(acoes)]
+
+
+def com_texto_da_task(acao: Acao) -> Acao:
+    return replace(acao, texto_task=gerar_texto_da_task(acao))
 
 
 def chave_da_biblioteca(biblioteca: Biblioteca) -> str:
@@ -103,6 +110,7 @@ def acao_da_biblioteca(
         impacto=impacto_da_biblioteca(avisos, explicacao),
         quem_resolve=QUEM_RESOLVE_A_BIBLIOTECA,
         refs=ids_dos_avisos(avisos),
+        teste_verificacao=teste_sugerido_pela_ia(explicacao),
     )
 
 
@@ -150,6 +158,12 @@ def impacto_da_biblioteca(avisos: list[Aviso], explicacao: Explicacao | None) ->
     return avisos[0].resumo
 
 
+def teste_sugerido_pela_ia(explicacao: Explicacao | None) -> str | None:
+    if explicacao is None or not explicacao.gerada_por_ia or not explicacao.teste_verificacao:
+        return None
+    return explicacao.teste_verificacao
+
+
 def acoes_das_checagens(checagens: list[Checagem]) -> list[Acao]:
     return [acao_da_checagem(checagem) for checagem in checagens if checagem.situacao == "falhou"]
 
@@ -165,6 +179,7 @@ def acao_da_checagem(checagem: Checagem) -> Acao:
         impacto=correcao.impacto,
         quem_resolve=checagem.quem_resolve,
         refs=[checagem.id],
+        teste_verificacao=None,
     )
 
 

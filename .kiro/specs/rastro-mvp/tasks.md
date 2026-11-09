@@ -238,7 +238,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R08.1–R08.5
   - Revisão: @geison.santos
 
-- [ ] **T22 Gerar o texto da task**
+- [x] **T22 Gerar o texto da task**
   - Entrega: `gerar_texto_da_task(acao)` em Markdown, pelo modelo do design.
   - Aceite: o texto tem título, por quê, impacto, o que fazer, critério de aceite e checklist; funciona sem explicação da IA.
   - Arquivos: `rastro/acao/task.py`, `tests/acao/test_task.py`

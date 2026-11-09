@@ -136,7 +136,7 @@ O texto das limitações sai do Python, no campo `limitacoes`. O React só exibe
 | `Achado` | `biblioteca`, `aviso`, `nota` |
 | `Checagem` | `id`, `titulo`, `situacao: "falhou" \| "passou" \| "nao_verificada"`, `severidade: "alta" \| "media" \| "baixa"`, `quem_resolve`, `evidencia: Evidencia \| None`, `detalhe` |
 | `Explicacao` | `o_que_e`, `impacto`, `como_corrigir`, `teste_verificacao`, `gerada_por_ia: bool` |
-| `Acao` | `id`, `prioridade`, `nota`, `o_que_fazer`, `porque`, `impacto`, `quem_resolve`, `texto_task` (entra na T22), `refs: list[str]` (GHSA dos achados ou ID da checagem) |
+| `Acao` | `id`, `prioridade`, `nota`, `o_que_fazer`, `porque`, `impacto`, `quem_resolve`, `refs: list[str]` (GHSA dos achados ou ID da checagem), `teste_verificacao: str \| None` (só o sugerido pela IA), `texto_task` |
 | `ChamadaIA` | `etapa`, `provedor`, `entrada`, `resposta`, `duracao_s`, `tokens: int \| None`, `sucesso: bool` |
 
 A `situacao` sai só das travas; a IA não tem campo de confiança que decida algo. O campo `Nota.conta` guarda a conta escrita, ex.: `10 × (0,5 × 6,1/10 + 0,5 × 0,97) = 7,9`, que o painel de origem mostra (R10.1).
@@ -413,20 +413,21 @@ Antes de qualquer envio: tira query strings das URLs e troca por `[removido]` o 
 - Ação da biblioteca: `id` e chave de `explicacoes` são `pacote@versão`; `nota` é a da biblioteca e a `prioridade` sai dela; `porque` lista os GHSA, a nota e a prioridade ("2 falhas conhecidas (GHSA-…, GHSA-…). Nota 7,9 (alta)."); `impacto` é o da `Explicacao` ou, sem ela, o resumo do aviso de maior nota; quem resolve é "dev front-end"; `refs` são os GHSA, do aviso de maior nota para o de menor.
 - Uma ação por checagem com falha ("passou" e "não verificada" não entram). `id` e `refs` são o ID da checagem; a prioridade é a severidade; sem nota; `porque` traz a regra, a severidade e o detalhe. O que fazer e o impacto são texto fixo por ID (`CORRECOES_DAS_CHECAGENS`, em `plano.py`), sem IA: checagem nova acrescenta a sua linha ali.
 - Ordem: prioridade (alta, média, baixa, a avaliar) e, dentro dela, nota decrescente; ação sem nota (checagem) vem depois das com nota da mesma prioridade, e o empate mantém a ordem de entrada (bibliotecas, depois checagens na ordem recebida).
-- O `texto_task` entra na `Acao` com a T22, que monta o texto a partir da própria ação.
-- O texto da task é montado por modelo fixo em `acao/task.py`, sem IA. A IA só entra nos campos de explicação e teste de verificação.
+- O texto da task é montado por modelo fixo em `acao/task.py` (`gerar_texto_da_task(acao)`), sem IA, a partir da própria ação: `montar_plano_de_acao` preenche o `texto_task` de cada ação. A IA só entra nos campos de explicação e teste de verificação.
+- O `teste_verificacao` da ação vem da `Explicacao` só quando ela foi gerada pela IA e traz o teste; vai para o checklist com "sugerido pela IA: confira antes de usar" (R07.4). Sem ele, o item pede para descrever o teste feito. Checagem não tem teste sugerido.
+- O mesmo modelo serve para biblioteca e checagem: o título e o "O que fazer" são o `o_que_fazer` da ação, o critério de aceite cita os `refs`, e o primeiro item do checklist vale para versão ou configuração.
 
 ```markdown
 ## [Rastro] Atualizar jquery de 3.4.1 para 3.5.0
 
 **Por quê:** 2 falhas conhecidas (GHSA-…, GHSA-…). Nota 7,9 (alta).
 **Impacto:** <explicação da IA ou resumo do aviso>
-**O que fazer:** atualizar o pacote e publicar.
-**Critério de aceite:** novo HAR analisado pelo Rastro sem este achado.
+**O que fazer:** Atualizar jquery de 3.4.1 para 3.5.0. Quem resolve: dev front-end.
+**Critério de aceite:** novo HAR analisado pelo Rastro sem este achado (GHSA-…, GHSA-…).
 
 ### Evidências
-- [ ] Versão antes e depois
-- [ ] Teste de verificação: <teste da IA>
+- [ ] Versão (ou configuração) antes e depois
+- [ ] Teste de verificação: <teste da IA> (sugerido pela IA: confira antes de usar)
 - [ ] Novo HAR sem o achado
 ```
 
