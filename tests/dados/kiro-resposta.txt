@@ -1,0 +1,3 @@
+```json
+{"o_que_e": "A GHSA-gxr4-xjj5-5px2 (CVE-2020-11022) é uma falha de XSS no jQuery anterior à 3.5.0, incluindo a 3.4.1: passar HTML de origem não confiável para métodos de manipulação do DOM, como .html() e .append(), pode executar código malicioso mesmo que esse HTML tenha sido sanitizado antes, porque a expressão regular do jQuery.htmlPrefilter altera o HTML depois da sanitização; a correção está na versão 3.5.0."}
+```

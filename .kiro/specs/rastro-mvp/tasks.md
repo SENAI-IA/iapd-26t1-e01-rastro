@@ -362,7 +362,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R14.4
   - Revisão: @luiz.pagliari
 
-- [ ] **T37 Chamar o Kiro pela CLI**
+- [x] **T37 Chamar o Kiro pela CLI**
   - Entrega: `provedores/kiro.py`.
   - Aceite: igual à T35, com o formato do Kiro.
   - Arquivos: `rastro/ia/provedores/kiro.py`, `tests/ia/provedores/test_kiro.py`

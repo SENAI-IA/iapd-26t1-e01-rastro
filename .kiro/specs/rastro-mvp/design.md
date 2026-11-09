@@ -420,6 +420,12 @@ Decidido na T36:
 - Codex: `tokens` é `input_tokens` + `output_tokens` do último `turn.completed`. `cached_input_tokens` já está dentro de `input_tokens` e `reasoning_output_tokens` dentro de `output_tokens`, por isso não entram na soma. Faltou campo ou valor não inteiro, fica `None` (R11.2), como no Claude.
 - A soma de tokens se repete em `claude.py` e `codex.py` (cada um com os seus campos). Duas cópias curtas não pedem módulo comum; o Kiro não informa tokens.
 
+Decidido na T37:
+
+- Kiro: o texto da resposta é a saída padrão inteira, sem os espaços e quebras de linha em volta. Saída vazia (ou só espaços) vira `FalhaDoProvedor`, mesmo com código de saída 0.
+- Kiro: a resposta pode vir dentro de um bloco de código (` ```json ... ``` `), como na resposta gravada em `tests/dados/kiro-resposta.txt` (kiro-cli 2.31.1, 09/11). O provedor não tira o bloco: achar o objeto JSON no texto é do cliente, igual para os três provedores.
+- Kiro: `tokens` é sempre `None` (R11.2). O `--output-format stream-json` também não traz tokens, só créditos; por isso o Rastro lê o texto puro.
+
 ### Prompts
 
 Em `rastro/ia/prompts/`, um arquivo por tarefa, iguais para os três provedores:
