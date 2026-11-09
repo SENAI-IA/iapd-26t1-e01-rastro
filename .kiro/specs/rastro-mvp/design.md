@@ -101,12 +101,12 @@ def analisar(caminho_har: Path, fonte: ConectorDeAvisos, registro: RegistroDePac
     return Analise(...)
 ```
 
-Esse é o fluxo sem IA, ligado na T23. A IA entra depois sem mudar a ordem: a T33 acrescenta o parâmetro `ia: ClienteDeIA | None` (com `--sem-ia`, `None`), a T41 troca `identificar_por_assinatura` por `identificar_bibliotecas(requisicoes, ia)` (assinatura e bundles) e a T38 troca o dicionário vazio por `explicar_achados(achados, ia)`.
+Esse é o fluxo sem IA, ligado na T23. A IA entra depois sem mudar a ordem: a T33 acrescenta o parâmetro `ia: ClienteDeIA | None` (com `--sem-ia`, `None`), a T41 acrescenta `identificar_em_bundles(requisicoes, por_assinatura, ia)` (`identificacao/ia.py`), cujas bibliotecas entram em `conferir_bibliotecas` junto com as da assinatura, e a T38 troca o dicionário vazio por `explicar_achados(achados, ia)`.
 
 - `consultar_avisos` consulta a fonte para cada biblioteca confirmada; `ConsultaNaoRealizada` vira `nao_consultadas[pacote@versão] = motivo` e a análise segue (R04.3).
 - `conferir_faixas` aplica a trava 6 (`descartar_fora_da_faixa`) biblioteca por biblioteca; `calcular_risco` monta um `Achado` por aviso mantido, com `calcular_nota`, e devolve a lista em `ordenar_achados`.
 - `checar_configuracao(requisicoes, site)`, em `checagens.py`, roda a tupla `CHECAGENS` na ordem dos IDs (C01 a C08).
-- `Analise` (em `fluxo.py`): `har` (nome do arquivo), `site`, `inicio` (hora local), `duracao_s`, `provedor_de_ia: str | None`, `tem_javascript` (R01.6), `bibliotecas` (confirmadas), `a_confirmar`, `nao_consultadas: dict[str, str]`, `achados`, `explicacoes`, `checagens`, `plano_de_acao`, `travas_acionadas` (as do npm, as da faixa e as da explicação) e `chamadas_de_ia` (as `ChamadaIA` do cliente; vazia sem IA, T39).
+- `Analise` (em `fluxo.py`): `har` (nome do arquivo), `site`, `inicio` (hora local), `duracao_s`, `provedor_de_ia: str | None`, `tem_javascript` (R01.6), `bibliotecas` (confirmadas), `a_confirmar`, `nao_consultadas: dict[str, str]`, `achados`, `explicacoes`, `checagens`, `plano_de_acao`, `travas_acionadas` (as da identificação em bundles, as do npm, as da faixa e as da explicação) e `chamadas_de_ia` (as `ChamadaIA` do cliente; vazia sem IA, T39).
 - O `cli.py` monta o relatório (`relatorio/json.py`), escolhe a pasta pelo site e por `analise.inicio` e grava (`relatorio/gravacao.py`). Sem `--sem-ia`, desde a T33 escolhe a IA e procura a CLI dela (código 1 se a IA for inválida ou a CLI faltar); até os provedores (T35–T37), encerra com código 1 e sugere `--sem-ia`.
 
 ### Análise sem IA fica explícita (R14.5–R14.7)
@@ -191,7 +191,10 @@ Bibliotecas iguais são agrupadas por `(pacote, versao)`, juntando as evidência
 2. **Extrair trechos:** comentários de licença `/*!` com conteúdo (`/*!*/` vazio é ignorado) e janelas de 300 caracteres em volta de versões entre aspas (`["'`]v?\d+\.\d+\.\d+(-[\w.]+)?["'`]`). No máximo 5 trechos por bundle. O número solto e a palavra `version` ficaram de fora: no spike T03, só trouxeram coordenadas de SVG e propriedades sem relação.
 3. **Sanitizar** (`ia/sanitizacao.py`) e enviar com o prompt `identificar_bibliotecas.md`.
 4. **Resposta fechada:** JSON `{"bibliotecas": [{"pacote", "versao", "trecho"}]}`, nada além disso. Nome de pacote npm inválido ou versão fora do formato `x.y.z` derrubam a resposta inteira.
-5. **Travas:** cada biblioteca passa pelas travas da seção 8 antes de ser usada.
+5. **Travas:** cada biblioteca passa pelas travas da seção 8 antes de ser usada. Em `identificacao/ia.py`, a resposta passa pela trava 1 (`conferir_formato`, com a mesma tolerância da explicação: a resposta inteira dentro de **um** bloco de código, como o Kiro responde) e cada biblioteca pelas travas 2 e 3 (`conferir_ancoragem`, contra os trechos já sanitizados que foram enviados). Em `travas/conferencia.py`, a biblioteca já barrada segue "a confirmar" sem consultar o npm; as outras passam pela trava 4 e, se vieram da IA, pela 5. A 6 vale para os avisos, como nas da assinatura.
+6. **Uma chamada por bundle**, com no máximo 5 trechos. Bundles com o mesmo conteúdo vão uma vez só; bundle sem trecho não chama a IA. Falha da chamada ou resposta fora do formato num bundle não impede os outros (R03.5).
+7. **Sem repetição:** biblioteca já reconhecida por assinatura ou em outro bundle (mesmo `pacote@versão`) não entra de novo; vale a primeira evidência.
+8. **Conferido de verdade (T41, 09/11, Kiro):** no Juice Shop, `@angular/core@22.2.2` foi confirmada pela IA e pelas travas 1 a 5 com o npm real; no WebGoat, as sugestões `jquery-ui@1.10.3` (não publicado) e `jquery-form@3.51.0` (versão fora do trecho) ficaram "a confirmar"; no Drupal, nenhum script sem assinatura teve trecho para enviar e a IA não foi chamada para identificar.
 
 ## 7. Consultar o GitHub Advisory (R04)
 
@@ -278,7 +281,7 @@ Conferido no spike T03 (`docs/spike/har-e-bundles.md`). O minificador renomeia v
 2. Exige que uma delas contenha a versão e que alguma tenha 3 ou mais caracteres além da versão. Só a versão não prova o pacote.
 3. Exige que cada string do trecho apareça, com o mesmo valor, como string em algum arquivo do pacote. Em vez de ler as strings do pacote inteiro, a trava escreve o valor de volta nas três formas de aspas (`"…"`, `'…'`, `` `…` ``, com `\`, a aspa e quebras de linha escapadas) e procura cada forma no código: é busca de texto, rápida e sem interpretar o JavaScript.
 
-`conferir_codigo_publicado(biblioteca, registro)` devolve `(biblioteca, travas_acionadas)`, como `conferir_ancoragem`: barrada, a biblioteca vai para "a confirmar" com a trava `código confere` e uma `TravaAcionada` por motivo (trecho sem prova do pacote, string que não aparece no código, pacote que não pôde ser lido, IA sem trecho). Só a biblioteca da IA passa por ela; a ligação em `conferencia.py` entra na T41.
+`conferir_codigo_publicado(biblioteca, registro)` devolve `(biblioteca, travas_acionadas)`, como `conferir_ancoragem`: barrada, a biblioteca vai para "a confirmar" com a trava `código confere` e uma `TravaAcionada` por motivo (trecho sem prova do pacote, string que não aparece no código, pacote que não pôde ser lido, IA sem trecho). Só a biblioteca da IA passa por ela, chamada em `conferencia.py` depois da trava 4.
 
 No spike, esse critério passou o acerto da IA (`@angular/core@22.2.2`) e barrou versão vizinha, pacote irmão na mesma versão, trecho inventado e "só a versão". Comparar o trecho com espaços normalizados nunca passou, porque o minificador muda o código. Já aceitar só a versão ou a licença deixou passar invenção.
 

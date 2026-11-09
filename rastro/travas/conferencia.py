@@ -3,6 +3,7 @@ from dataclasses import dataclass, replace
 from rastro.fontes.conector import ConsultaNaoRealizada
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.identificacao.modelos import Biblioteca
+from rastro.travas.codigo_publicado import conferir_codigo_publicado
 from rastro.travas.modelos import TravaAcionada
 
 TRAVA_PACOTE_EXISTE = "pacote existe"
@@ -22,14 +23,26 @@ def conferir_bibliotecas(
     a_confirmar = []
     travas_acionadas = []
     for biblioteca in bibliotecas:
-        conferida, trava_acionada = conferir_pacote_no_npm(biblioteca, registro)
+        conferida, barrados = conferir_biblioteca(biblioteca, registro)
         if conferida.situacao == "confirmada":
             confirmadas.append(conferida)
         else:
             a_confirmar.append(conferida)
-        if trava_acionada is not None:
-            travas_acionadas.append(trava_acionada)
+        travas_acionadas.extend(barrados)
     return BibliotecasConferidas(confirmadas, a_confirmar, travas_acionadas)
+
+
+def conferir_biblioteca(
+    biblioteca: Biblioteca, registro: RegistroDePacotes
+) -> tuple[Biblioteca, list[TravaAcionada]]:
+    if biblioteca.situacao == "a_confirmar":
+        return biblioteca, []
+    conferida, trava_acionada = conferir_pacote_no_npm(biblioteca, registro)
+    if trava_acionada is not None:
+        return conferida, [trava_acionada]
+    if conferida.metodo == "ia":
+        return conferir_codigo_publicado(conferida, registro)
+    return conferida, []
 
 
 def conferir_pacote_no_npm(

@@ -7,7 +7,15 @@ from rastro.fluxo import analisar
 from rastro.har.leitor import HarInvalido, HarNaoEncontrado
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
 from rastro.relatorio.json import montar_relatorio
-from tests.dubles import DADOS, HAR_DA_LOJA, ConectorFalso, ProvedorFalso, RegistroFalso
+from tests.dubles import (
+    DADOS,
+    HAR_DA_LOJA,
+    HAR_DO_JUICE_SHOP,
+    TRECHO_DO_ANGULAR,
+    ConectorFalso,
+    ProvedorFalso,
+    RegistroFalso,
+)
 
 
 def har_da_loja_sem_scripts(pasta: Path) -> Path:
@@ -101,6 +109,36 @@ def test_r07_3_explicacao_barrada_entra_nas_travas_acionadas() -> None:
         "faixa conferida",
         "explicação sem fato novo",
     ]
+
+
+def respostas_do_juice_shop() -> list[RespostaDoProvedor]:
+    angular = {"pacote": "@angular/core", "versao": "22.2.2", "trecho": TRECHO_DO_ANGULAR}
+    font_awesome = {
+        "pacote": "@fortawesome/fontawesome-free",
+        "versao": "5.15.4",
+        "trecho": 'U$1=`FA "5.15.4"`',
+    }
+    return [
+        RespostaDoProvedor(json.dumps({"bibliotecas": [angular]}), None),
+        RespostaDoProvedor(json.dumps({"bibliotecas": [font_awesome]}), None),
+    ]
+
+
+def test_r03_3_biblioteca_da_ia_passa_pelas_travas_antes_do_relatorio() -> None:
+    ia = ClienteDeIA(ProvedorFalso(respostas_do_juice_shop()))
+    conector = ConectorFalso()
+
+    analise = analisar(HAR_DO_JUICE_SHOP, conector, RegistroFalso(), ia)
+
+    assert [(b.pacote, b.metodo) for b in analise.bibliotecas] == [("@angular/core", "ia")]
+    assert [b.pacote for b in analise.a_confirmar] == ["@fortawesome/fontawesome-free"]
+    assert conector.consultas == [("@angular/core", "22.2.2")]
+    assert "código confere" in [trava.trava for trava in analise.travas_acionadas]
+    assert [chamada.etapa for chamada in analise.chamadas_de_ia] == [
+        "identificar_bibliotecas",
+        "identificar_bibliotecas",
+    ]
+    assert montar_relatorio(analise)["resumo"]["encontradas_so_pela_ia"] == 1
 
 
 def test_r21_7_aviso_fora_da_faixa_vira_trava_acionada() -> None:

@@ -394,7 +394,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R21.5
   - Revisão: @ali.santos
 
-- [ ] **T41 Identificar bibliotecas em bundles com IA** · prazo limite 04/12
+- [x] **T41 Identificar bibliotecas em bundles com IA** · prazo limite 04/12
   - Entrega: `bundles.py`, prompt `identificar_bibliotecas.md` e `identificacao/ia.py`.
   - Aceite: no HAR do Juice Shop, confirma ao menos uma biblioteca do gabarito que a assinatura não vê; toda biblioteca da IA passa pelas travas 1 a 6 antes de entrar no relatório.
   - Arquivos: `rastro/identificacao/bundles.py`, `rastro/identificacao/ia.py`, `rastro/ia/prompts/identificar_bibliotecas.md`, `tests/identificacao/test_bundles.py`, `tests/identificacao/test_ia.py`

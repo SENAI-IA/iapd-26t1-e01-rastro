@@ -12,6 +12,7 @@ CAMPOS_DA_BIBLIOTECA = {"pacote", "versao", "trecho"}
 TAMANHO_MAXIMO_DO_PACOTE = 214
 PADRAO_DO_PACOTE = re.compile(r"^(?:@[a-z0-9~-][a-z0-9._~-]*/)?[a-z0-9~-][a-z0-9._~-]*$")
 PADRAO_DA_VERSAO = re.compile(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")
+CERCA_DE_CODIGO = re.compile(r"^```[a-z]*\n(.*)\n```$", re.DOTALL)
 
 
 class ForaDoFormato(Exception):
@@ -99,3 +100,11 @@ def ler_texto(item: dict[str, Any], campo: str) -> str:
 def nome_de_pacote_npm_valido(pacote: str) -> bool:
     cabe_no_limite = len(pacote) <= TAMANHO_MAXIMO_DO_PACOTE
     return cabe_no_limite and PADRAO_DO_PACOTE.match(pacote) is not None
+
+
+def tirar_cerca_de_codigo(resposta: str) -> str:
+    texto = resposta.strip()
+    cercado = CERCA_DE_CODIGO.match(texto)
+    if cercado is None:
+        return texto
+    return cercado.group(1)

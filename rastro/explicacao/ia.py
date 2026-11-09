@@ -1,5 +1,4 @@
 import json
-import re
 from dataclasses import dataclass
 from importlib import resources
 from urllib.parse import urlsplit, urlunsplit
@@ -14,14 +13,19 @@ from rastro.risco.modelos import Achado
 from rastro.risco.prioridade import ordenar_achados
 from rastro.travas import formato
 from rastro.travas.explicacao import conferir_explicacao
-from rastro.travas.formato import ForaDoFormato, exigir_campos, ler_json_sem_texto_fora, ler_texto
+from rastro.travas.formato import (
+    ForaDoFormato,
+    exigir_campos,
+    ler_json_sem_texto_fora,
+    ler_texto,
+    tirar_cerca_de_codigo,
+)
 from rastro.travas.modelos import TravaAcionada
 
 ETAPA = "explicar_achado"
 ARQUIVO_DO_PROMPT = "explicar_achado.md"
 MARCADOR_DA_ENTRADA = "{{entrada}}"
 CAMPOS_DA_EXPLICACAO = ("o_que_e", "impacto", "como_corrigir", "teste_verificacao")
-CERCA_DE_CODIGO = re.compile(r"^```[a-z]*\n(.*)\n```$", re.DOTALL)
 
 
 @dataclass(frozen=True)
@@ -122,11 +126,3 @@ def ler_campos_da_explicacao(resposta: str) -> dict[str, str]:
     if vazios:
         raise ForaDoFormato(f"campo vazio na explicação: {', '.join(vazios)}")
     return explicacao
-
-
-def tirar_cerca_de_codigo(resposta: str) -> str:
-    texto = resposta.strip()
-    cercado = CERCA_DE_CODIGO.match(texto)
-    if cercado is None:
-        return texto
-    return cercado.group(1)

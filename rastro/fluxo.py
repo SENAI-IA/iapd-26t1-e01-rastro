@@ -15,6 +15,7 @@ from rastro.har.leitor import ler_har
 from rastro.har.site import descobrir_site_analisado
 from rastro.ia.cliente import ChamadaIA, ClienteDeIA
 from rastro.identificacao.assinaturas import algum_script_com_conteudo, identificar_por_assinatura
+from rastro.identificacao.ia import identificar_em_bundles
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.modelos import Achado
 from rastro.risco.nota import calcular_nota
@@ -62,7 +63,9 @@ def analisar(
 
     requisicoes = ler_har(caminho_har)
     site = descobrir_site_analisado(requisicoes)
-    bibliotecas = conferir_bibliotecas(identificar_por_assinatura(requisicoes), registro)
+    por_assinatura = identificar_por_assinatura(requisicoes)
+    em_bundles = identificar_em_bundles(requisicoes, por_assinatura, ia)
+    bibliotecas = conferir_bibliotecas(por_assinatura + em_bundles.bibliotecas, registro)
     consultados = consultar_avisos(bibliotecas.confirmadas, fonte)
     avisos_na_faixa, travas_da_faixa = conferir_faixas(consultados.avisos)
     achados = calcular_risco(avisos_na_faixa)
@@ -85,7 +88,10 @@ def analisar(
         checagens=checagens,
         plano_de_acao=plano,
         travas_acionadas=(
-            bibliotecas.travas_acionadas + travas_da_faixa + explicados.travas_acionadas
+            em_bundles.travas_acionadas
+            + bibliotecas.travas_acionadas
+            + travas_da_faixa
+            + explicados.travas_acionadas
         ),
         chamadas_de_ia=chamadas_feitas(ia),
     )
