@@ -4,9 +4,10 @@ import "./ListaFalhas.css";
 
 interface Props {
   achados: Achado[];
+  aoVerOrigem: (achado: Achado) => void;
 }
 
-export default function ListaFalhas({ achados }: Props) {
+export default function ListaFalhas({ achados, aoVerOrigem }: Props) {
   return (
     <div className="lista-falhas">
       <h4>Falhas conhecidas</h4>
@@ -15,7 +16,7 @@ export default function ListaFalhas({ achados }: Props) {
       ) : (
         <ol className="lista-falhas__lista">
           {achados.map((achado) => (
-            <ItemFalha key={achado.aviso.ghsa} achado={achado} />
+            <ItemFalha key={achado.aviso.ghsa} achado={achado} aoVerOrigem={() => aoVerOrigem(achado)} />
           ))}
         </ol>
       )}

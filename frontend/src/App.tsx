@@ -8,6 +8,7 @@ import Indicadores from "./componentes/Indicadores.tsx";
 import ListaAConfirmar from "./componentes/ListaAConfirmar.tsx";
 import ListaBibliotecas from "./componentes/ListaBibliotecas.tsx";
 import ListaChecagens from "./componentes/ListaChecagens.tsx";
+import PainelOrigemDoDado, { type OrigemDoDado } from "./componentes/PainelOrigemDoDado.tsx";
 import PlanoDeAcao from "./componentes/PlanoDeAcao.tsx";
 
 interface Props {
@@ -21,6 +22,7 @@ function temaDoSistema(): Tema {
 export default function App({ relatorio }: Props) {
   const [temaEscolhido, setTemaEscolhido] = useState<Tema | null>(null);
   const tema = temaEscolhido ?? temaDoSistema();
+  const [origemAberta, setOrigemAberta] = useState<OrigemDoDado | null>(null);
 
   useEffect(() => {
     if (temaEscolhido) {
@@ -44,7 +46,11 @@ export default function App({ relatorio }: Props) {
             <CabecalhoAnalise analise={relatorio.analise} />
             <Indicadores resumo={relatorio.resumo} primeiraAcao={relatorio.plano_de_acao[0]} />
             <PlanoDeAcao acoes={relatorio.plano_de_acao} />
-            <ListaBibliotecas bibliotecas={relatorio.bibliotecas} achados={relatorio.achados} />
+            <ListaBibliotecas
+              bibliotecas={relatorio.bibliotecas}
+              achados={relatorio.achados}
+              aoVerOrigem={setOrigemAberta}
+            />
             {relatorio.a_confirmar.length > 0 && (
               <ListaAConfirmar bibliotecas={relatorio.a_confirmar} travasAcionadas={relatorio.ia.travas_acionadas} />
             )}
@@ -56,6 +62,7 @@ export default function App({ relatorio }: Props) {
           </>
         )}
       </main>
+      {origemAberta && <PainelOrigemDoDado origem={origemAberta} aoFechar={() => setOrigemAberta(null)} />}
     </>
   );
 }

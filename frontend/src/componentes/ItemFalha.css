@@ -62,3 +62,26 @@
   margin: 0;
   color: var(--cor-texto);
 }
+
+button.item-falha__nota {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio-pequeno);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  cursor: pointer;
+}
+
+button.item-falha__nota:hover {
+  border-color: var(--cor-destaque);
+}
+
+.item-falha__ver {
+  color: var(--cor-destaque);
+  font-family: var(--fonte-texto);
+  font-size: 12px;
+  font-weight: 500;
+}

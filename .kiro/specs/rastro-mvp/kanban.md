@@ -46,7 +46,8 @@ _(vazio)_
 - [ ] **T25** Embutir o JSON no HTML · fase 2 · revisão @halan.bacca · commit 358fbd6 · 09/11
 - [ ] **T26** Mostrar os indicadores e o plano de ação · fase 2 · revisão @halan.bacca · commit 53a5ed8 · 09/11
 - [ ] **T27** Mostrar o aviso de análise sem IA · fase 2 · revisão @halan.bacca · commit bde4ec8 · 09/11
-- [ ] **T28** Mostrar bibliotecas, falhas e checagens · fase 2 · revisão @halan.bacca · 09/11
+- [ ] **T28** Mostrar bibliotecas, falhas e checagens · fase 2 · revisão @halan.bacca · commit 25a07c8 · 09/11
+- [ ] **T29** Mostrar a origem de cada dado · fase 2 · revisão @halan.bacca · 09/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -61,7 +62,6 @@ _(vazio)_
 
 ### Fase 2. Relatório HTML
 
-- [ ] **T29** Mostrar a origem de cada dado · fase 2 · 23–28/11 · revisão @halan.bacca
 - [ ] **T30** Mostrar o glossário · fase 2 · 23–28/11 · revisão @halan.bacca
 - [ ] **T31** Abrir e copiar a task · fase 2 · 23–28/11 · revisão @halan.bacca
 - [ ] **T32** Ler uma zona por vez (modo foco) · fase 2 · 23–28/11 · revisão @halan.bacca

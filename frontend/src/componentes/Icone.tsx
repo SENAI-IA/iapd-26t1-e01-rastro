@@ -90,6 +90,7 @@ const TRACOS = {
     </>
   ),
   seta: <path d="m9 6 6 6-6 6" />,
+  fechar: <path d="M6 6l12 12M18 6 6 18" />,
   terminal: (
     <>
       <rect x="3" y="4" width="18" height="16" rx="1" />

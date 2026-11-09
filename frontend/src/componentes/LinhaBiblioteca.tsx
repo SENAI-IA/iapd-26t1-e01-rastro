@@ -2,6 +2,7 @@ import type { Achado, Biblioteca } from "../tipos.ts";
 import Evidencias from "./Evidencias.tsx";
 import Icone from "./Icone.tsx";
 import ListaFalhas from "./ListaFalhas.tsx";
+import type { OrigemDoDado } from "./PainelOrigemDoDado.tsx";
 import Selo from "./Selo.tsx";
 import SeloDePrioridade from "./SeloDePrioridade.tsx";
 import SeloDoMetodo from "./SeloDoMetodo.tsx";
@@ -11,9 +12,10 @@ import "./LinhaBiblioteca.css";
 interface Props {
   biblioteca: Biblioteca;
   achados: Achado[];
+  aoVerOrigem: (origem: OrigemDoDado) => void;
 }
 
-export default function LinhaBiblioteca({ biblioteca, achados }: Props) {
+export default function LinhaBiblioteca({ biblioteca, achados, aoVerOrigem }: Props) {
   const naoConsultada = biblioteca.motivo_nao_consultada !== null;
   return (
     <li className="linha-biblioteca">
@@ -54,6 +56,14 @@ export default function LinhaBiblioteca({ biblioteca, achados }: Props) {
           </span>
         </summary>
         <div className="linha-biblioteca__corpo">
+          <button
+            type="button"
+            className="linha-biblioteca__origem"
+            onClick={() => aoVerOrigem({ biblioteca, achados })}
+          >
+            <Icone nome="lupa" />
+            Ver a origem: HAR, identificação, aviso e nota
+          </button>
           {naoConsultada && (
             <p className="linha-biblioteca__alerta">
               <Icone nome="triangulo" />
@@ -76,7 +86,9 @@ export default function LinhaBiblioteca({ biblioteca, achados }: Props) {
             </p>
           )}
           <Evidencias evidencias={biblioteca.evidencias} />
-          {!naoConsultada && <ListaFalhas achados={achados} />}
+          {!naoConsultada && (
+            <ListaFalhas achados={achados} aoVerOrigem={(achado) => aoVerOrigem({ biblioteca, achados: [achado] })} />
+          )}
         </div>
       </details>
     </li>

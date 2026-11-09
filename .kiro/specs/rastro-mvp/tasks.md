@@ -296,7 +296,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R03.4, R04.3, R05.3, R06.7, R21.9
   - Revisão: @halan.bacca
 
-- [ ] **T29 Mostrar a origem de cada dado**
+- [x] **T29 Mostrar a origem de cada dado**
   - Entrega: `PainelOrigemDoDado` com HAR → identificação → aviso → cálculo.
   - Aceite: clique em biblioteca, falha ou nota abre o painel com a conta escrita. *(verificação manual)*
   - Arquivos: `frontend/src/componentes/PainelOrigemDoDado.*`
