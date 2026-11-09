@@ -1,5 +1,6 @@
 import io
 from email.message import Message
+from http.client import IncompleteRead, RemoteDisconnected
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, urlsplit
@@ -177,6 +178,14 @@ def test_r04a_6_falha_do_nvd_mantem_o_aviso_e_registra_o_motivo() -> None:
     [
         (URLError("sem rede"), "sem resposta do NVD: sem rede"),
         (TimeoutError(), "sem resposta do NVD: tempo esgotado"),
+        (
+            RemoteDisconnected("conexão fechada"),
+            "conexão com o NVD interrompida: conexão fechada",
+        ),
+        (
+            IncompleteRead(b"", 10),
+            "conexão com o NVD interrompida: IncompleteRead(0 bytes read, 10 more expected)",
+        ),
         (erro_http(403), "limite de consultas do NVD atingido (HTTP 403)"),
         (erro_http(429), "limite de consultas do NVD atingido (HTTP 429)"),
         (erro_http(503), "erro no servidor do NVD (HTTP 503)"),

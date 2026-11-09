@@ -27,16 +27,22 @@ def identificar_em_bundles(
     if ia is None:
         return BibliotecasDaIA([], [])
     ja_identificadas = {chave(biblioteca) for biblioteca in por_assinatura}
-    bibliotecas: list[Biblioteca] = []
+    da_ia: dict[tuple[str, str], Biblioteca] = {}
     travas_acionadas: list[TravaAcionada] = []
     for bundle in escolher_bundles(requisicoes, por_assinatura):
         do_bundle, barrados = identificar_no_bundle(bundle, ia)
         travas_acionadas.extend(barrados)
         for biblioteca in do_bundle:
             if chave(biblioteca) not in ja_identificadas:
-                ja_identificadas.add(chave(biblioteca))
-                bibliotecas.append(biblioteca)
-    return BibliotecasDaIA(bibliotecas, travas_acionadas)
+                anterior = da_ia.get(chave(biblioteca))
+                da_ia[chave(biblioteca)] = preferir_confirmada(anterior, biblioteca)
+    return BibliotecasDaIA(list(da_ia.values()), travas_acionadas)
+
+
+def preferir_confirmada(atual: Biblioteca | None, nova: Biblioteca) -> Biblioteca:
+    if atual is None or atual.situacao == "a_confirmar":
+        return nova
+    return atual
 
 
 def identificar_no_bundle(

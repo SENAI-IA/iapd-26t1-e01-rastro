@@ -3,6 +3,7 @@ import hashlib
 import io
 import json
 import tarfile
+from http.client import HTTPException
 from typing import Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
@@ -40,6 +41,8 @@ class RegistroNpm:
             raise ConsultaNaoRealizada(motivo_sem_resposta(str(erro.reason))) from erro
         except TimeoutError as erro:
             raise ConsultaNaoRealizada(motivo_sem_resposta("tempo esgotado")) from erro
+        except (HTTPException, OSError) as erro:
+            raise ConsultaNaoRealizada(motivo_de_conexao_interrompida(erro)) from erro
 
     def ler_codigo(self, pacote: str, versao: str) -> list[str]:
         metadados = baixar(montar_requisicao(pacote, versao))
@@ -67,6 +70,8 @@ def baixar(requisicao: Request) -> bytes:
         raise ConsultaNaoRealizada(motivo_sem_resposta(str(erro.reason))) from erro
     except TimeoutError as erro:
         raise ConsultaNaoRealizada(motivo_sem_resposta("tempo esgotado")) from erro
+    except (HTTPException, OSError) as erro:
+        raise ConsultaNaoRealizada(motivo_de_conexao_interrompida(erro)) from erro
     if len(dados) > limite:
         raise ConsultaNaoRealizada(f"pacote acima de {LIMITE_DO_PACOTE_EM_MB} MB")
     return dados
@@ -138,6 +143,10 @@ def publicado_pelo_codigo(codigo: int) -> bool:
 
 def motivo_sem_resposta(detalhe: str) -> str:
     return f"sem resposta do {NOME_DO_REGISTRO}: {detalhe}"
+
+
+def motivo_de_conexao_interrompida(erro: Exception) -> str:
+    return f"conexão com o {NOME_DO_REGISTRO} interrompida: {erro}"
 
 
 def motivo_fora_do_formato() -> str:

@@ -1,4 +1,4 @@
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlunsplit
 
 from rastro.har.modelos import Requisicao
 
@@ -22,3 +22,8 @@ def host_com_porta(url: str) -> str | None:
     endereco = urlsplit(url).netloc
     host = endereco.rsplit("@", 1)[-1].lower()
     return host or None
+
+
+def url_sem_query_string(url: str) -> str:
+    partes = urlsplit(url)
+    return urlunsplit((partes.scheme, partes.netloc, partes.path, "", ""))

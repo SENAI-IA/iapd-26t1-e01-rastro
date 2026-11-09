@@ -27,7 +27,7 @@ Atenção: `/usr/bin/kiro` é o editor Kiro (IDE), não a CLI. O Rastro procura 
 
 | | Claude | Codex | Kiro |
 |---|---|---|---|
-| Comando | `claude -p --output-format json --tools ""` | `codex exec --skip-git-repo-check --sandbox read-only --ephemeral --json -` | `kiro-cli chat --no-interactive --trust-tools=` |
+| Comando | `claude -p --output-format json --tools ""` | `codex exec --skip-git-repo-check --sandbox read-only --disable shell_tool --disable unified_exec --ephemeral --json -` | `kiro-cli chat --no-interactive --trust-tools=` |
 | Prompt pela entrada padrão | funciona | funciona (o `-` manda ler a entrada) | funciona (sem argumento, lê a entrada) |
 | Código de saída | 0 | 0 | 0 |
 | Tempo | 6 a 7 s | 4 a 6 s | 9 a 11 s |
@@ -43,6 +43,7 @@ Atenção: `/usr/bin/kiro` é o editor Kiro (IDE), não a CLI. O Rastro procura 
 - **Claude, `--bare`:** não usar. Ele exige `ANTHROPIC_API_KEY` e ignora o login da CLI, o que vai contra "sem chave no projeto".
 - **Codex, `--skip-git-repo-check`:** sem ele, o Codex se recusa a rodar fora de um repositório Git.
 - **Codex, `--sandbox read-only`:** a IA não grava nada.
+- **Codex, `--disable shell_tool --disable unified_exec`:** tira da IA as ferramentas de comando, como `--tools ""` no Claude e `--trust-tools=` no Kiro. Sem elas, um texto injetado no trecho do bundle não faz a IA ler arquivos da máquina. Conferido na 0.166.0: a CLI aceita as duas opções.
 - **Codex, `--ephemeral`:** não grava a sessão em disco.
 - **Codex, `--json`:** sem ele, a resposta sai limpa na saída padrão, mas os tokens só aparecem na saída de erro, em texto e no formato da localidade (`tokens used` / `12.813`). Com `--json`, os tokens vêm num campo.
 - **Kiro, `--trust-tools=`:** não confia em nenhuma ferramenta. Sem resposta interativa, nenhuma ferramenta roda.

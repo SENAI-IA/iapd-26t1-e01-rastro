@@ -26,6 +26,17 @@ export default function Acao({ acao, posicao, aoAbrirTask }: Props) {
             Quem resolve: {acao.quem_resolve}
           </span>
         </div>
+        {acao.teste_verificacao !== null && (
+          <div className="acao__verificar">
+            <p>
+              <b>Como verificar:</b> {acao.teste_verificacao}
+            </p>
+            <span className="acao__nota-ia">
+              <Icone nome="triangulo" tamanho={12} />
+              Sugerido pela IA: confira antes de usar.
+            </span>
+          </div>
+        )}
         <button type="button" className="acao__abrir-task" onClick={() => aoAbrirTask(acao)}>
           <Icone nome="arquivo" tamanho={14} />
           Abrir task

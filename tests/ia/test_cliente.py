@@ -95,6 +95,17 @@ def test_r16_3_prompt_sai_sanitizado_e_a_chamada_registra_o_que_foi_enviado() ->
     assert ia.chamadas[0].entrada == enviado
 
 
+def test_r16_4_resposta_da_ia_fica_registrada_sem_dado_que_parece_segredo() -> None:
+    jwt = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.assinatura"
+    provedor = ProvedorFalso([RespostaDoProvedor(f"token lido: {jwt}", tokens=1)])
+    ia = ClienteDeIA(provedor)
+
+    resposta = ia.perguntar("identificar_bibliotecas", "trecho")
+
+    assert resposta == f"token lido: {jwt}"
+    assert ia.chamadas[0].resposta == "token lido: [removido]"
+
+
 def test_r11_2_provedor_sem_tokens_registra_none_e_nunca_estima() -> None:
     resposta_longa = "texto " * 500
     ia = ClienteDeIA(ProvedorFalso([RespostaDoProvedor(resposta_longa, tokens=None)], "kiro"))

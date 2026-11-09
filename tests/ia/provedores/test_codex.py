@@ -72,6 +72,10 @@ def test_r14_4_chama_a_cli_so_leitura_sem_gravar_sessao_em_json_com_tempo_limite
             "--skip-git-repo-check",
             "--sandbox",
             "read-only",
+            "--disable",
+            "shell_tool",
+            "--disable",
+            "unified_exec",
             "--ephemeral",
             "--json",
             "-",
@@ -79,6 +83,7 @@ def test_r14_4_chama_a_cli_so_leitura_sem_gravar_sessao_em_json_com_tempo_limite
     ]
     assert falso.opcoes[0]["capture_output"] is True
     assert falso.opcoes[0]["encoding"] == "utf-8"
+    assert falso.opcoes[0]["errors"] == "replace"
     assert falso.opcoes[0]["timeout"] == 120
 
 

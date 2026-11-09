@@ -60,11 +60,24 @@ def entrada_e_valida(entrada: Any) -> bool:
     resposta = entrada.get("response")
     if not isinstance(pedido, dict) or not isinstance(resposta, dict):
         return False
+    return pedido_e_valido(pedido) and resposta_e_valida(resposta)
+
+
+def pedido_e_valido(pedido: dict[str, Any]) -> bool:
+    return isinstance(pedido.get("url"), str) and isinstance(pedido.get("method"), str)
+
+
+def resposta_e_valida(resposta: dict[str, Any]) -> bool:
     return (
-        isinstance(pedido.get("url"), str)
-        and isinstance(pedido.get("method"), str)
-        and isinstance(resposta.get("status"), int)
+        isinstance(resposta.get("status"), int)
+        and isinstance(resposta.get("content") or {}, dict)
+        and lista_de_objetos(resposta.get("headers") or [])
+        and lista_de_objetos(resposta.get("cookies") or [])
     )
+
+
+def lista_de_objetos(valor: Any) -> bool:
+    return isinstance(valor, list) and all(isinstance(item, dict) for item in valor)
 
 
 def converter_entrada(indice: int, entrada: dict[str, Any]) -> Requisicao:
@@ -143,11 +156,12 @@ def ler_cookies(resposta: dict[str, Any]) -> list[Cookie]:
 
 
 def converter_cookie_do_har(cookie: dict[str, Any]) -> Cookie:
+    same_site = cookie.get("sameSite")
     return Cookie(
         nome=str(cookie.get("name", "")),
         http_only=bool(cookie.get("httpOnly", False)),
         secure=bool(cookie.get("secure", False)),
-        same_site=cookie.get("sameSite") or None,
+        same_site=same_site if isinstance(same_site, str) and same_site else None,
     )
 
 

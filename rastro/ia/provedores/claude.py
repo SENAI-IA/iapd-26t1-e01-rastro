@@ -31,6 +31,7 @@ class ProvedorClaude:
                 input=prompt,
                 capture_output=True,
                 encoding="utf-8",
+                errors="replace",
                 timeout=TEMPO_LIMITE_EM_SEGUNDOS,
             )
         except subprocess.TimeoutExpired as erro:

@@ -221,6 +221,17 @@ def test_r03_2_mesma_biblioteca_em_dois_bundles_fica_uma_vez() -> None:
     assert [b.evidencias[0].indice_requisicao for b in resultado.bibliotecas] == [3]
 
 
+def test_r03_4_em_dois_bundles_fica_a_biblioteca_que_passou_nas_travas() -> None:
+    inventado = ("@angular/core", "22.2.2", "[`ng-versao`,`22.2.2`]")
+    copia = bundle_com("let i=e?[`ng-version`,`22.2.2`]:0;", url="https://site/b.js", indice=5)
+    ia, _ = ia_que_responde(resposta(inventado), resposta(ANGULAR))
+
+    resultado = identificar([BUNDLE_DO_ANGULAR, copia], ia)
+
+    assert [b.situacao for b in resultado.bibliotecas] == ["confirmada"]
+    assert resultado.bibliotecas[0].evidencias[0].indice_requisicao == 5
+
+
 def test_r03_2_biblioteca_ja_reconhecida_por_assinatura_nao_se_repete() -> None:
     jquery = ("jquery", "3.4.1", '"3.4.1"')
     por_assinatura = [

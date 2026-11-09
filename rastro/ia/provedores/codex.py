@@ -9,6 +9,10 @@ OPCOES_SEM_GRAVACAO = [
     "--skip-git-repo-check",
     "--sandbox",
     "read-only",
+    "--disable",
+    "shell_tool",
+    "--disable",
+    "unified_exec",
     "--ephemeral",
     "--json",
     "-",
@@ -34,6 +38,7 @@ class ProvedorCodex:
                 input=prompt,
                 capture_output=True,
                 encoding="utf-8",
+                errors="replace",
                 timeout=TEMPO_LIMITE_EM_SEGUNDOS,
             )
         except subprocess.TimeoutExpired as erro:

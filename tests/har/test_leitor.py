@@ -102,6 +102,13 @@ def test_r01_3_arquivo_que_nao_e_utf8_e_har_invalido(tmp_path: Path) -> None:
         ler_har(caminho)
 
 
+def entrada_com_resposta(campos: dict[str, object]) -> dict[str, object]:
+    return {
+        "request": {"url": "https://a.b/", "method": "GET"},
+        "response": {"status": 200, **campos},
+    }
+
+
 @pytest.mark.parametrize(
     "conteudo",
     [
@@ -112,6 +119,10 @@ def test_r01_3_arquivo_que_nao_e_utf8_e_har_invalido(tmp_path: Path) -> None:
         {"log": {"entries": {}}},
         {"log": {"entries": ["texto"]}},
         {"log": {"entries": [{"request": {"url": "https://a.b/"}, "response": {}}]}},
+        {"log": {"entries": [entrada_com_resposta({"content": "texto"})]}},
+        {"log": {"entries": [entrada_com_resposta({"headers": {"name": "x"}})]}},
+        {"log": {"entries": [entrada_com_resposta({"headers": ["x-frame-options"]})]}},
+        {"log": {"entries": [entrada_com_resposta({"cookies": ["sessao=1"]})]}},
     ],
     ids=[
         "lista",
@@ -121,6 +132,10 @@ def test_r01_3_arquivo_que_nao_e_utf8_e_har_invalido(tmp_path: Path) -> None:
         "entries-objeto",
         "entrada-texto",
         "entrada-incompleta",
+        "content-texto",
+        "headers-objeto",
+        "headers-com-texto",
+        "cookies-com-texto",
     ],
 )
 def test_r01_3_json_sem_log_entries_validas_e_har_invalido(
@@ -131,6 +146,15 @@ def test_r01_3_json_sem_log_entries_validas_e_har_invalido(
 
     with pytest.raises(HarInvalido):
         ler_har(caminho)
+
+
+def test_r01_1_samesite_que_nao_e_texto_conta_como_ausente(tmp_path: Path) -> None:
+    cookie = {"name": "sessao", "httpOnly": True, "secure": True, "sameSite": 1}
+    caminho = tmp_path / "cookie.har"
+    conteudo = {"log": {"entries": [entrada_com_resposta({"cookies": [cookie]})]}}
+    caminho.write_text(json.dumps(conteudo), encoding="utf-8")
+
+    assert ler_har(caminho)[0].cookies_resposta[0].same_site is None
 
 
 def test_r01_3_har_sem_entradas_e_valido(tmp_path: Path) -> None:

@@ -113,6 +113,15 @@ def test_r06_1_csp_ausente_falha() -> None:
     assert checagem.titulo == "CSP ausente"
 
 
+def test_r16_4_detalhe_da_falha_traz_a_pagina_sem_a_query_string() -> None:
+    url = f"https://{SITE}/redefinir?token=segredo-ficticio#topo"
+
+    checagem = checar_csp([resposta(0, sem("content-security-policy"), url=url)], SITE)
+
+    assert checagem.detalhe.endswith(f"https://{SITE}/redefinir")
+    assert "segredo-ficticio" not in checagem.detalhe
+
+
 def test_r06_1_csp_so_report_only_falha() -> None:
     cabecalhos = sem("content-security-policy")
     cabecalhos["content-security-policy-report-only"] = "default-src 'self'"

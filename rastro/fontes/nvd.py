@@ -1,6 +1,7 @@
 import json
 import os
 from dataclasses import dataclass, replace
+from http.client import HTTPException
 from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -48,6 +49,8 @@ class Nvd:
             raise ConsultaNaoRealizada(f"sem resposta do {NOME_DA_FONTE}: tempo esgotado") from erro
         except (UnicodeDecodeError, json.JSONDecodeError) as erro:
             raise ConsultaNaoRealizada(f"resposta do {NOME_DA_FONTE} não é JSON") from erro
+        except (HTTPException, OSError) as erro:
+            raise ConsultaNaoRealizada(motivo_de_conexao_interrompida(erro)) from erro
 
 
 def montar_requisicao(cve: str, chave: str | None) -> Request:
@@ -56,6 +59,10 @@ def montar_requisicao(cve: str, chave: str | None) -> Request:
     if chave is not None:
         cabecalhos["apiKey"] = chave
     return Request(endereco, headers=cabecalhos)
+
+
+def motivo_de_conexao_interrompida(erro: Exception) -> str:
+    return f"conexão com o {NOME_DA_FONTE} interrompida: {erro}"
 
 
 def motivo_do_erro_http(codigo: int) -> str:

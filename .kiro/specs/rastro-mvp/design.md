@@ -411,7 +411,7 @@ Conferido no Linux no spike T02 (`docs/spike/clis-de-ia.md`). O Windows é confe
 | Provedor | Comando (prompt pela entrada padrão) | Texto da resposta | Tokens | Linux | Windows |
 |---|---|---|---|---|---|
 | Claude | `claude -p --output-format json --tools ""` | campo `result` do JSON | `usage`: entrada (`input_tokens` + `cache_creation_input_tokens` + `cache_read_input_tokens`) e `output_tokens` | funciona | a conferir (T42) |
-| Codex | `codex exec --skip-git-repo-check --sandbox read-only --ephemeral --json -` | `text` do evento `item.completed` do tipo `agent_message` | `usage` do evento `turn.completed` | funciona | a conferir (T42) |
+| Codex | `codex exec --skip-git-repo-check --sandbox read-only --disable shell_tool --disable unified_exec --ephemeral --json -` | `text` do evento `item.completed` do tipo `agent_message` | `usage` do evento `turn.completed` | funciona | a conferir (T42) |
 | Kiro | `kiro-cli chat --no-interactive --trust-tools=` | a saída padrão inteira | não informa: "não informado" (R11.3) | funciona | a conferir (T42) |
 
 Regras comuns: executável por `shutil.which`, `subprocess.run(..., input=prompt, capture_output=True, encoding="utf-8", timeout=120)`. Falha: código de saída diferente de zero, tempo limite estourado, `is_error: true` no Claude ou nenhum `agent_message` no Codex.

@@ -4,6 +4,7 @@ import io
 import json
 import tarfile
 from email.message import Message
+from http.client import IncompleteRead, RemoteDisconnected
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request
@@ -99,6 +100,15 @@ def test_r16_2_so_le_o_registro_do_npm(monkeypatch: pytest.MonkeyPatch) -> None:
     [
         (URLError("sem rede"), "sem resposta do registro do npm: sem rede"),
         (TimeoutError(), "sem resposta do registro do npm: tempo esgotado"),
+        (
+            RemoteDisconnected("conexão fechada"),
+            "conexão com o registro do npm interrompida: conexão fechada",
+        ),
+        (
+            IncompleteRead(b"", 10),
+            "conexão com o registro do npm interrompida: "
+            "IncompleteRead(0 bytes read, 10 more expected)",
+        ),
         (erro_http(429), "limite de consultas do registro do npm atingido (HTTP 429)"),
         (erro_http(503), "erro no servidor do registro do npm (HTTP 503)"),
         (erro_http(401), "resposta inesperada do registro do npm (HTTP 401)"),
@@ -323,6 +333,15 @@ def test_r21_5_pacote_corrompido_vira_consulta_nao_realizada() -> None:
     [
         (URLError("sem rede"), "sem resposta do registro do npm: sem rede"),
         (TimeoutError(), "sem resposta do registro do npm: tempo esgotado"),
+        (
+            RemoteDisconnected("conexão fechada"),
+            "conexão com o registro do npm interrompida: conexão fechada",
+        ),
+        (
+            IncompleteRead(b"", 10),
+            "conexão com o registro do npm interrompida: "
+            "IncompleteRead(0 bytes read, 10 more expected)",
+        ),
         (erro_http(404), "resposta inesperada do registro do npm (HTTP 404)"),
         (erro_http(503), "erro no servidor do registro do npm (HTTP 503)"),
     ],

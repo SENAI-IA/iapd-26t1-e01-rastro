@@ -65,6 +65,28 @@
   color: var(--cor-texto-fraco);
 }
 
+.acao__verificar {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--cor-ia);
+  background: var(--cor-ia-suave);
+  font-size: 13.5px;
+}
+
+.acao__verificar p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.acao__nota-ia {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: var(--cor-texto-suave);
+  font-size: 12.5px;
+}
+
 @media (max-width: 460px) {
   .acao {
     grid-template-columns: minmax(0, 1fr);

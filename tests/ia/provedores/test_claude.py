@@ -60,6 +60,7 @@ def test_r14_4_chama_a_cli_sem_ferramentas_em_json_com_tempo_limite(
     assert falso.comandos == [[EXECUTAVEL, "-p", "--output-format", "json", "--tools", ""]]
     assert falso.opcoes[0]["capture_output"] is True
     assert falso.opcoes[0]["encoding"] == "utf-8"
+    assert falso.opcoes[0]["errors"] == "replace"
     assert falso.opcoes[0]["timeout"] == 120
 
 

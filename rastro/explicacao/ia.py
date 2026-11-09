@@ -1,11 +1,11 @@
 import json
 from dataclasses import dataclass
 from importlib import resources
-from urllib.parse import urlsplit, urlunsplit
 
 from rastro.acao.plano import agrupar_por_biblioteca
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.conector import Aviso
+from rastro.har.site import url_sem_query_string
 from rastro.ia.cliente import ClienteDeIA
 from rastro.ia.sanitizacao import sanitizar
 from rastro.identificacao.modelos import Biblioteca
@@ -93,11 +93,6 @@ def url_do_script(biblioteca: Biblioteca) -> str | None:
     if not biblioteca.evidencias:
         return None
     return url_sem_query_string(biblioteca.evidencias[0].url)
-
-
-def url_sem_query_string(url: str) -> str:
-    partes = urlsplit(url)
-    return urlunsplit((partes.scheme, partes.netloc, partes.path, "", ""))
 
 
 def aviso_na_entrada(aviso: Aviso) -> dict[str, object]:

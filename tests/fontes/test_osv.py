@@ -1,6 +1,7 @@
 import io
 import json
 from email.message import Message
+from http.client import IncompleteRead, RemoteDisconnected
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
@@ -236,6 +237,14 @@ def test_r04a_1_le_os_eventos_semver_como_faixa_de_versao(
     [
         (URLError("sem rede"), "sem resposta do OSV: sem rede"),
         (TimeoutError(), "sem resposta do OSV: tempo esgotado"),
+        (
+            RemoteDisconnected("conexão fechada"),
+            "conexão com o OSV interrompida: conexão fechada",
+        ),
+        (
+            IncompleteRead(b"", 10),
+            "conexão com o OSV interrompida: IncompleteRead(0 bytes read, 10 more expected)",
+        ),
         (erro_http(429), "limite de consultas do OSV atingido (HTTP 429)"),
         (erro_http(503), "erro no servidor do OSV (HTTP 503)"),
         (erro_http(400), "o OSV recusou a consulta (HTTP 400)"),

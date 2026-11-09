@@ -57,7 +57,8 @@ class ClienteDeIA:
             self.registrar(etapa, entrada, falha.motivo, segundos_desde(inicio), None, False)
             return None
         duracao_s = segundos_desde(inicio)
-        self.registrar(etapa, entrada, resposta.texto, duracao_s, resposta.tokens, True)
+        resposta_registrada = sanitizar(resposta.texto)
+        self.registrar(etapa, entrada, resposta_registrada, duracao_s, resposta.tokens, True)
         return resposta.texto
 
     def registrar(

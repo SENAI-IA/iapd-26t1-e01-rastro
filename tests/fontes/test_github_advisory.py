@@ -1,5 +1,6 @@
 import io
 from email.message import Message
+from http.client import IncompleteRead, RemoteDisconnected
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, urlsplit
@@ -147,6 +148,15 @@ def test_r04_2_sem_avisos_devolve_lista_vazia(monkeypatch: pytest.MonkeyPatch) -
     [
         (URLError("sem rede"), "sem resposta do GitHub Advisory: sem rede"),
         (TimeoutError(), "sem resposta do GitHub Advisory: tempo esgotado"),
+        (
+            RemoteDisconnected("conexão fechada"),
+            "conexão com o GitHub Advisory interrompida: conexão fechada",
+        ),
+        (
+            IncompleteRead(b"", 10),
+            "conexão com o GitHub Advisory interrompida: "
+            "IncompleteRead(0 bytes read, 10 more expected)",
+        ),
         (erro_http(403), "limite de consultas do GitHub Advisory atingido (HTTP 403)"),
         (erro_http(429), "limite de consultas do GitHub Advisory atingido (HTTP 429)"),
         (erro_http(502), "erro no servidor do GitHub Advisory (HTTP 502)"),

@@ -4,7 +4,7 @@ from urllib.parse import urlsplit
 
 from rastro.configuracao.modelos import Checagem, RegraDeChecagem, SituacaoDaChecagem
 from rastro.har.modelos import Cookie, Requisicao
-from rastro.har.site import e_pagina_html, host_com_porta
+from rastro.har.site import e_pagina_html, host_com_porta, url_sem_query_string
 from rastro.identificacao.modelos import Evidencia
 
 CSP_AUSENTE = RegraDeChecagem("C01", "CSP ausente", "media", "infra")
@@ -201,7 +201,8 @@ def checar_paginas_do_site(
             if trecho_da_evidencia is not None:
                 trecho = trecho_da_evidencia(pagina)
             evidencia = Evidencia(pagina.indice, pagina.url, trecho)
-            return montar_checagem(regra, "falhou", evidencia, f"{motivo_da_falha}: {pagina.url}")
+            detalhe = f"{motivo_da_falha}: {url_sem_query_string(pagina.url)}"
+            return montar_checagem(regra, "falhou", evidencia, detalhe)
     primeira = paginas[0]
     evidencia = Evidencia(primeira.indice, primeira.url, None)
     detalhe = f"as {len(paginas)} respostas HTML do site conferidas passaram"
