@@ -150,7 +150,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R02.1, R02.4, R02.5
   - Revisão: @ali.santos
 
-- [ ] **T11 Identificar bibliotecas pelo comentário de versão**
+- [x] **T11 Identificar bibliotecas pelo comentário de versão**
   - Entrega: reconhecimento pelo comentário no conteúdo inteiro, a partir do início do comentário, e agrupamento das repetidas.
   - Aceite: a mesma biblioteca em duas requisições aparece uma vez, com duas evidências; um bundle com vários comentários registra cada biblioteca; `Requires jQuery v1.7.2` não vira jQuery; com nome e comentário divergentes, vale o comentário (casos do `avaliacao/gabarito.json`).
   - Arquivos: `rastro/identificacao/assinaturas.py`, `tests/identificacao/test_assinaturas.py`

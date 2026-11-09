@@ -160,23 +160,23 @@ Uma tabela de dados em `assinaturas.py`, uma linha por biblioteca:
 | `jquery` | `jquery` | `jQuery (?:JavaScript Library )?v(\d+\.\d+\.\d+)` |
 | `jquery-ui` | `jquery-ui` | `jQuery UI - v(\d+\.\d+\.\d+)` |
 | `bootstrap` | `bootstrap` | `Bootstrap v(\d+\.\d+\.\d+)` |
-| `lodash` | `lodash` | `lodash (?:lodash\.com/license \| )?v?(\d+\.\d+\.\d+)` |
-| `moment` | `moment` | `//! version : (\d+\.\d+\.\d+)` |
-| `angular` | `angular` | `AngularJS v(\d+\.\d+\.\d+)` |
+| `lodash` | `lodash` | `lodash (\d+\.\d+\.\d+)` |
+| `moment` | `moment` | `moment\.js\s*//! version : (\d+\.\d+\.\d+)` |
+| `angular` | `angular` | `(?:@license )?AngularJS v(\d+\.\d+\.\d+)` |
 | `underscore` | `underscore` | `Underscore\.js (\d+\.\d+\.\d+)` |
 | `requirejs` | `requirejs` | `@license RequireJS (\d+\.\d+\.\d+)` |
 | `ckeditor` | `ckeditor` | — |
 
 **Padrão do nome do arquivo**, o mesmo para todas as linhas: `(?<![\w-])` + nome no arquivo + separador `[-.@/]?` ou `(?:\.min)?\.js\?v(?:er)?=` + `(\d+\.\d+\.\d+)`, sem diferenciar maiúsculas, procurado no caminho e nos parâmetros da URL (o host fica de fora) e só em scripts (tipo de conteúdo JavaScript ou caminho terminado em `.js`). Reconhece `jquery-3.4.1.min.js`, `/lodash@4.17.15/`, `/jquery/3.4.1/jquery.min.js`, `ckeditor.js?v=4.10.1` e `jquery.min.js?ver=3.4.1`. O início impede que `react-bootstrap@1.0.0` vire Bootstrap, e `jquery-ui-1.10.4.js` não vira jQuery porque, depois de `jquery`, o separador exige a versão.
 
-As linhas de Underscore, RequireJS e CKEditor vêm da avaliação (T04, `avaliacao/README.md`): as três têm aviso nos alvos. As de Lodash, Moment.js e AngularJS não apareceram nos alvos e ficam como estão.
+As linhas de Underscore, RequireJS e CKEditor vêm da avaliação (T04, `avaliacao/README.md`): as três têm aviso nos alvos. Lodash, Moment.js e AngularJS não aparecem nos alvos; os padrões deles foram conferidos na T11 em arquivos publicados no npm (jsDelivr e cdnjs): ` * lodash 3.10.1` (Lodash 3 e 4.0.0; na 4.17.15 e na 4.18.1 o comentário não traz versão e só cita `Underscore.js 1.8.3`, que não pode virar Underscore), `//! moment.js` seguido de `//! version : 2.18.1` (o `moment.min.js` 2.29.1 não tem cabeçalho) e `/*\n AngularJS v1.8.2` no `.min.js` ou ` * @license AngularJS v1.8.2` no completo. Sem versão no comentário, vale o nome do arquivo ou a IA.
 
 - **O comentário é procurado no conteúdo inteiro**, e cada comentário encontrado registra uma biblioteca. Um bundle agregado (Drupal) junta várias bibliotecas e cada uma mantém o seu `/*!`: jQuery no início, Underscore no byte 86 mil e jQuery UI no 136 mil. No WebGoat, o `//     Underscore.js` vem depois do *wrapper* UMD.
-- **O padrão do comentário começa no início de um comentário** (`/*`, `/*!`, `//`, `//!` ou ` * ` no começo da linha). Assim, `Requires jQuery v1.7.2`, dentro do comentário do jQuery Form, não vira jQuery 1.7.2.
+- **O padrão do comentário começa no início de um comentário**: a coluna da tabela é o texto logo depois da abertura, e a abertura, comum a todas as linhas, é `/*`, `/**` ou `/*!` (seguidos de espaços ou quebra de linha), `//` ou `//!` (seguidos de espaços) ou ` * ` no começo da linha (`(?:/\*[*!]?\s*|//!?[ \t]*|^[ \t]*\*[ \t]*)`, com `re.MULTILINE`). Assim, `Requires jQuery v1.7.2`, dentro do comentário do jQuery Form, não vira jQuery 1.7.2, e o `Underscore.js 1.8.3` do cabeçalho do Lodash não vira Underscore. A evidência guarda o trecho encontrado (ex.: `/*! jQuery v3.4.1`).
 - **O nome do arquivo inclui o `?v=` e o `?ver=` da URL**, onde o Drupal e o WordPress põem a versão (`ckeditor.js?v=4.10.1`).
 - **Nome e comentário divergentes: vale o comentário**, que é o código que rodou. O nome entra na evidência. No WebGoat, `jquery-ui-1.10.4.js` traz a jQuery UI 1.10.3.
 
-Bibliotecas iguais são agrupadas por `(pacote, versao)`.
+Bibliotecas iguais são agrupadas por `(pacote, versao)`, juntando as evidências na ordem das requisições, uma por requisição (os 22 comentários da jQuery UI num bundle do Drupal viram uma evidência). A entrada é `identificar_por_assinatura(requisicoes)`, pura: nome, comentário e agrupamento.
 
 ### Em bundles, com IA (R03)
 
