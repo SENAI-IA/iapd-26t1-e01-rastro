@@ -13,6 +13,7 @@ from rastro.cli import AVISO_SEM_IA, executar
 from rastro.fluxo import Analise, analisar
 from rastro.fontes.conector import ConectorDeAvisos
 from rastro.fontes.registro_npm import RegistroDePacotes
+from rastro.ia import cliente
 from tests.dubles import DADOS, HAR_DA_LOJA, ConectorFalso, RegistroFalso
 
 MOMENTO = datetime(2026, 11, 20, 14, 3, 0)
@@ -168,13 +169,108 @@ def test_r13_8_resumo_sem_achados_fala_sem_nota(
     assert "nota máxima: sem nota" in capsys.readouterr().out
 
 
+@pytest.fixture
+def clis_procuradas(monkeypatch: pytest.MonkeyPatch) -> list[str]:
+    procuradas: list[str] = []
+
+    def which_falso(nome: str) -> str:
+        procuradas.append(nome)
+        return f"/usr/local/bin/{nome}"
+
+    monkeypatch.delenv("RASTRO_IA", raising=False)
+    monkeypatch.setattr(cliente.shutil, "which", which_falso)
+    return procuradas
+
+
+@pytest.fixture
+def nenhuma_cli_instalada(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("RASTRO_IA", raising=False)
+    monkeypatch.setattr(cliente.shutil, "which", lambda _nome: None)
+
+
 def test_analisar_com_ia_ainda_nao_disponivel_encerra_com_1_e_sugere_sem_ia(
-    capsys: pytest.CaptureFixture[str], tmp_path: Path
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, clis_procuradas: list[str]
 ) -> None:
     assert executar(["analisar", str(HAR_DA_LOJA), "--saida", str(tmp_path)]) == 1
 
     assert "--sem-ia" in capsys.readouterr().err
     assert list(tmp_path.iterdir()) == []
+
+
+def test_r14_1_sem_ia_e_sem_variavel_procura_a_cli_do_kiro(
+    tmp_path: Path, clis_procuradas: list[str]
+) -> None:
+    executar(["analisar", str(HAR_DA_LOJA), "--saida", str(tmp_path)])
+
+    assert clis_procuradas == ["kiro-cli"]
+
+
+def test_r14_1_variavel_rastro_ia_escolhe_a_ia(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, clis_procuradas: list[str]
+) -> None:
+    monkeypatch.setenv("RASTRO_IA", "codex")
+
+    executar(["analisar", str(HAR_DA_LOJA), "--saida", str(tmp_path)])
+
+    assert clis_procuradas == ["codex"]
+
+
+def test_r14_1_opcao_ia_vale_antes_da_variavel(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, clis_procuradas: list[str]
+) -> None:
+    monkeypatch.setenv("RASTRO_IA", "codex")
+
+    executar(["analisar", str(HAR_DA_LOJA), "--ia", "claude", "--saida", str(tmp_path)])
+
+    assert clis_procuradas == ["claude"]
+
+
+def test_r14_2_ia_invalida_encerra_com_1_listando_as_opcoes(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, clis_procuradas: list[str]
+) -> None:
+    resultado = executar(["analisar", str(HAR_DA_LOJA), "--ia", "gpt", "--saida", str(tmp_path)])
+
+    assert resultado == 1
+    assert "Opções válidas: kiro, claude, codex." in capsys.readouterr().err
+    assert clis_procuradas == []
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_r14_2_rastro_ia_invalida_encerra_com_1(
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    clis_procuradas: list[str],
+) -> None:
+    monkeypatch.setenv("RASTRO_IA", "gemini")
+
+    assert executar(["analisar", str(HAR_DA_LOJA), "--saida", str(tmp_path)]) == 1
+
+    assert "RASTRO_IA" in capsys.readouterr().err
+
+
+@pytest.mark.usefixtures("nenhuma_cli_instalada")
+def test_r14_3_cli_ausente_encerra_com_1_antes_de_ler_o_har(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    har_que_nao_existe = tmp_path / "nao-existe.har"
+
+    assert executar(["analisar", str(har_que_nao_existe), "--saida", str(tmp_path)]) == 1
+
+    erro = capsys.readouterr().err
+    assert "kiro-cli" in erro
+    assert "--sem-ia" in erro
+    assert "não procura bibliotecas em bundles e não explica os achados" in erro
+    assert str(har_que_nao_existe) not in erro
+
+
+@pytest.mark.usefixtures("fontes_falsas", "nenhuma_cli_instalada")
+def test_r14_5_sem_ia_nao_procura_a_cli_nem_confere_rastro_ia(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("RASTRO_IA", "gemini")
+
+    assert analisar_loja(tmp_path) == 0
 
 
 @pytest.mark.usefixtures("fontes_falsas")

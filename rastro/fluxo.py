@@ -12,6 +12,7 @@ from rastro.fontes.conector import Aviso, ConectorDeAvisos, ConsultaNaoRealizada
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.har.leitor import ler_har
 from rastro.har.site import descobrir_site_analisado
+from rastro.ia.cliente import ClienteDeIA
 from rastro.identificacao.assinaturas import algum_script_com_conteudo, identificar_por_assinatura
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.modelos import Achado
@@ -49,7 +50,10 @@ class AvisosConsultados:
 
 
 def analisar(
-    caminho_har: Path, fonte: ConectorDeAvisos, registro: RegistroDePacotes
+    caminho_har: Path,
+    fonte: ConectorDeAvisos,
+    registro: RegistroDePacotes,
+    ia: ClienteDeIA | None = None,
 ) -> Analise:
     inicio = datetime.now()
     cronometro = time.perf_counter()
@@ -69,7 +73,7 @@ def analisar(
         site=site,
         inicio=inicio,
         duracao_s=round(time.perf_counter() - cronometro, 1),
-        provedor_de_ia=None,
+        provedor_de_ia=nome_do_provedor(ia),
         tem_javascript=algum_script_com_conteudo(requisicoes),
         bibliotecas=bibliotecas.confirmadas,
         a_confirmar=bibliotecas.a_confirmar,
@@ -80,6 +84,12 @@ def analisar(
         plano_de_acao=plano,
         travas_acionadas=bibliotecas.travas_acionadas + travas_da_faixa,
     )
+
+
+def nome_do_provedor(ia: ClienteDeIA | None) -> str | None:
+    if ia is None:
+        return None
+    return ia.provedor.nome
 
 
 def consultar_avisos(bibliotecas: list[Biblioteca], fonte: ConectorDeAvisos) -> AvisosConsultados:

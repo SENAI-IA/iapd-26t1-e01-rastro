@@ -330,7 +330,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 ## Fase 3. IA
 
-- [ ] **T33 Criar o cliente de IA e a escolha do provedor**
+- [x] **T33 Criar o cliente de IA e a escolha do provedor**
   - Entrega: `ProvedorDeIA`, `ClienteDeIA` e a escolha por `--ia`, `RASTRO_IA` ou padrão.
   - Aceite: com `ProvedorFalso`, cada chamada fica registrada com tempo e tokens; IA inválida ou CLI ausente encerram com código 1.
   - Arquivos: `rastro/ia/cliente.py`, `rastro/cli.py`, `tests/ia/test_cliente.py`

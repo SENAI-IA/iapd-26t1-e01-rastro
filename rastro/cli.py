@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -8,6 +9,14 @@ from rastro.fluxo import analisar
 from rastro.fontes.github_advisory import GitHubAdvisory
 from rastro.fontes.registro_npm import RegistroNpm
 from rastro.har.leitor import ErroAoLerHar
+from rastro.ia.cliente import (
+    IA_PADRAO,
+    VARIAVEL_DA_IA,
+    CliDaIaAusente,
+    IaInvalida,
+    escolher_ia,
+    localizar_cli,
+)
 from rastro.relatorio.gravacao import (
     RelatorioGravado,
     RelatorioJaExiste,
@@ -33,9 +42,13 @@ AVISO_SEM_IA = (
     "Atenção: análise sem IA. Bibliotecas em bundles não foram procuradas; "
     "podem existir falhas que não aparecem aqui."
 )
+AJUDA_IA = (
+    f"IA usada: kiro, claude ou codex (sem a opção, vale {VARIAVEL_DA_IA}; "
+    f"sem os dois, {IA_PADRAO})"
+)
+SUGESTAO_SEM_IA = f"Use --sem-ia ({AJUDA_SEM_IA})."
 MENSAGEM_IA_INDISPONIVEL = (
-    "a análise com IA ainda não está disponível nesta versão. "
-    f"Use --sem-ia ({AJUDA_SEM_IA})."
+    f"a análise com IA ainda não está disponível nesta versão. {SUGESTAO_SEM_IA}"
 )
 
 
@@ -48,6 +61,7 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         description="Analisa um HAR e grava o relatório numa pasta nova.",
     )
     analisar_har.add_argument("har", type=Path, help="arquivo HAR exportado do navegador")
+    analisar_har.add_argument("--ia", metavar="NOME", help=AJUDA_IA)
     analisar_har.add_argument("--sem-ia", action="store_true", help=AJUDA_SEM_IA)
     analisar_har.add_argument(
         "--saida",
@@ -64,12 +78,23 @@ def executar(argumentos: list[str] | None = None) -> int:
     if opcoes.comando is None:
         leitor.print_help()
         return 0
-    return executar_analise(opcoes.har, opcoes.sem_ia, opcoes.saida)
+    if opcoes.sem_ia:
+        return analisar_sem_ia(opcoes.har, opcoes.saida)
+    return analisar_com_ia(opcoes.ia)
 
 
-def executar_analise(caminho_har: Path, sem_ia: bool, saida: Path | None) -> int:
-    if not sem_ia:
-        return encerrar_com_erro(MENSAGEM_IA_INDISPONIVEL)
+def analisar_com_ia(opcao_ia: str | None) -> int:
+    try:
+        nome_da_ia = escolher_ia(opcao_ia, os.environ.get(VARIAVEL_DA_IA))
+        localizar_cli(nome_da_ia)
+    except IaInvalida as erro:
+        return encerrar_com_erro(str(erro))
+    except CliDaIaAusente as erro:
+        return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
+    return encerrar_com_erro(MENSAGEM_IA_INDISPONIVEL)
+
+
+def analisar_sem_ia(caminho_har: Path, saida: Path | None) -> int:
     avisar_analise_sem_ia()
     try:
         analise = analisar(caminho_har, GitHubAdvisory(), RegistroNpm())

@@ -3,6 +3,7 @@ from pathlib import Path
 
 from rastro.fontes.conector import Aviso, ConsultaNaoRealizada
 from rastro.fontes.github_advisory import converter_resposta
+from rastro.ia.cliente import FalhaDoProvedor, RespostaDoProvedor
 
 DADOS = Path(__file__).parent / "dados"
 HAR_DA_LOJA = DADOS / "loja.har"
@@ -35,3 +36,21 @@ class RegistroFalso:
     def existe(self, pacote: str, versao: str) -> bool:
         self.consultas.append((pacote, versao))
         return pacote not in self.nao_publicados
+
+
+class ProvedorFalso:
+    def __init__(
+        self,
+        respostas: list[RespostaDoProvedor | FalhaDoProvedor] | None = None,
+        nome: str = "falso",
+    ) -> None:
+        self.nome = nome
+        self.respostas = list(respostas or [])
+        self.prompts: list[str] = []
+
+    def executar(self, prompt: str) -> RespostaDoProvedor:
+        self.prompts.append(prompt)
+        resposta = self.respostas.pop(0)
+        if isinstance(resposta, FalhaDoProvedor):
+            raise resposta
+        return resposta

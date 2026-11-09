@@ -107,7 +107,7 @@ Esse é o fluxo sem IA, ligado na T23. A IA entra depois sem mudar a ordem: a T3
 - `conferir_faixas` aplica a trava 6 (`descartar_fora_da_faixa`) biblioteca por biblioteca; `calcular_risco` monta um `Achado` por aviso mantido, com `calcular_nota`, e devolve a lista em `ordenar_achados`.
 - `checar_configuracao(requisicoes, site)`, em `checagens.py`, roda a tupla `CHECAGENS` na ordem dos IDs (C01 a C08).
 - `Analise` (em `fluxo.py`): `har` (nome do arquivo), `site`, `inicio` (hora local), `duracao_s`, `provedor_de_ia: str | None`, `tem_javascript` (R01.6), `bibliotecas` (confirmadas), `a_confirmar`, `nao_consultadas: dict[str, str]`, `achados`, `explicacoes`, `checagens`, `plano_de_acao` e `travas_acionadas` (as do npm e as da faixa).
-- O `cli.py` monta o relatório (`relatorio/json.py`), escolhe a pasta pelo site e por `analise.inicio` e grava (`relatorio/gravacao.py`). Sem `--sem-ia`, até a T33, encerra com código 1 e sugere `--sem-ia`.
+- O `cli.py` monta o relatório (`relatorio/json.py`), escolhe a pasta pelo site e por `analise.inicio` e grava (`relatorio/gravacao.py`). Sem `--sem-ia`, desde a T33 escolhe a IA e procura a CLI dela (código 1 se a IA for inválida ou a CLI faltar); até os provedores (T35–T37), encerra com código 1 e sugere `--sem-ia`.
 
 ### Análise sem IA fica explícita (R14.5–R14.7)
 
@@ -380,6 +380,15 @@ class ClienteDeIA:
 ```
 
 `perguntar` sanitiza, mede o tempo com `time.perf_counter`, chama o provedor, registra a `ChamadaIA` e devolve `None` em caso de falha. Só ele conversa com os provedores.
+
+Decidido na T33:
+
+- `rastro/ia/cliente.py` traz `RespostaDoProvedor` (`texto`, `tokens: int | None`), `FalhaDoProvedor(motivo)`, `ProvedorDeIA`, `ChamadaIA` e `ClienteDeIA`. O provedor transforma toda falha (código de saída, tempo limite, `is_error`, resposta sem texto) em `FalhaDoProvedor`; o cliente não captura outra exceção.
+- `ClienteDeIA.chamadas` guarda as `ChamadaIA` na ordem. Na falha, `resposta` traz o motivo, `tokens` fica `None` e `sucesso`, `False`. `duracao_s` tem uma casa, como a da análise.
+- Tokens que o provedor não informa ficam `None`, nunca estimados (R11.2); o "não informado" é do painel (T39). A sanitização entra no `perguntar` na T34.
+- Escolha (R14.1–R14.3): `escolher_ia(opcao_ia, variavel_de_ambiente)` é pura: `--ia`, senão `RASTRO_IA` (vazia conta como ausente), senão `kiro`; aceita maiúsculas e espaços em volta. Nome fora de `EXECUTAVEIS_DAS_IAS` levanta `IaInvalida`, com a origem (`--ia` ou `RASTRO_IA`) e as opções. `localizar_cli(nome)` procura o executável da tabela com `shutil.which` e levanta `CliDaIaAusente` com o nome do executável. As duas são filhas de `ErroNaEscolhaDaIa`.
+- `--ia` não usa `choices` do `argparse`, que encerraria com código 2; a validação é do Rastro, com código 1. Com `--sem-ia`, `--ia` e `RASTRO_IA` são ignorados e nenhuma CLI é procurada.
+- Até os provedores (T35–T37), com IA válida e CLI instalada o `cli.py` encerra com código 1 e sugere `--sem-ia`. `fluxo.analisar` já recebe `ia: ClienteDeIA | None = None` e preenche `provedor_de_ia` com o nome do provedor (R14.8). As chamadas entram no JSON (`ia.chamadas`) na T39.
 
 ### Provedores
 

@@ -5,7 +5,9 @@ import pytest
 
 from rastro.fluxo import analisar
 from rastro.har.leitor import HarInvalido, HarNaoEncontrado
-from tests.dubles import DADOS, HAR_DA_LOJA, ConectorFalso, RegistroFalso
+from rastro.ia.cliente import ClienteDeIA
+from rastro.relatorio.json import montar_relatorio
+from tests.dubles import DADOS, HAR_DA_LOJA, ConectorFalso, ProvedorFalso, RegistroFalso
 
 
 def har_da_loja_sem_scripts(pasta: Path) -> Path:
@@ -43,6 +45,15 @@ def test_r14_5_sem_ia_nao_ha_provedor_nem_explicacao() -> None:
     assert analise.provedor_de_ia is None
     assert analise.explicacoes == {}
     assert all(acao.teste_verificacao is None for acao in analise.plano_de_acao)
+
+
+def test_r14_8_com_ia_o_relatorio_informa_o_provedor_usado() -> None:
+    ia = ClienteDeIA(ProvedorFalso(nome="claude"))
+
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
+
+    assert analise.provedor_de_ia == "claude"
+    assert montar_relatorio(analise)["analise"]["ia"] == "claude"
 
 
 def test_r21_7_aviso_fora_da_faixa_vira_trava_acionada() -> None:
