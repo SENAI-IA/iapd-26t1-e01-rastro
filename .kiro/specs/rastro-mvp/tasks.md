@@ -190,7 +190,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R21.1–R21.3
   - Revisão: @cristiano.albino
 
-- [ ] **T16 Barrar explicação com fato novo**
+- [x] **T16 Barrar explicação com fato novo**
   - Entrega: trava `travas/explicacao.py`.
   - Aceite: explicação que cita CVE, GHSA, versão ou porcentagem fora da entrada é descartada; a que só repete a entrada passa.
   - Arquivos: `rastro/travas/explicacao.py`, `tests/travas/test_explicacao.py`

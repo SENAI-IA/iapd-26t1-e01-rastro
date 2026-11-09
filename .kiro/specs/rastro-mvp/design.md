@@ -300,6 +300,10 @@ No spike, esse critério passou o acerto da IA (`@angular/core@22.2.2`) e barrou
 
 `explicacao.py` extrai do texto da IA todo padrão `CVE-\d+-\d+`, `GHSA-…`, `\d+\.\d+(\.\d+)?` e número com `%`, e exige que cada um esteja na entrada enviada. Qualquer sobra descarta a explicação.
 
+- `conferir_explicacao(pacote, versao, explicacao, entrada_enviada)` recebe os campos da explicação (`{"o_que_e": …}`) e o texto que foi para a IA; devolve a explicação, ou `None` e uma `TravaAcionada` (alvo `explicação de pacote@versão`) que lista cada fato novo e o campo onde apareceu.
+- Os fatos da entrada saem pelo mesmo extrator, então a comparação é fato a fato, não pedaço de texto: `3.4` e `3.4.10` não valem por `3.4.1`, nem `3.5.0-rc.1` por `3.5.0`. CVE e GHSA não diferenciam maiúsculas; `v3.4.1`, `3.5.0.` no fim da frase e a versão dentro da URL do script valem.
+- Decimal com vírgula (`6,9`) também conta, porque é como a IA escreve CVSS e nota em português (R21.8). Porcentagem (`95%`, `95 %`, `0,95%`) é um fato só, sem contar de novo o número dentro dela.
+
 ## 9. Calcular o risco (R05)
 
 ```python
