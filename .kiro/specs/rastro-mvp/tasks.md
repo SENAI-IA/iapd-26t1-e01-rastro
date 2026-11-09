@@ -421,7 +421,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R14.4, R17.2, R18.1, R20.1–R20.3
   - Revisão: @ali.santos
 
-- [ ] **T43 Escrever o README de uso**
+- [x] **T43 Escrever o README de uso**
   - Entrega: instalação, uso e roteiro de verificação manual, com comandos Windows e Linux lado a lado e prints; seção "Desenvolvido com IA".
   - Aceite: outra pessoa do grupo segue o README do zero e gera o relatório.
   - Arquivos: `README.md`, `docs/prints/*`

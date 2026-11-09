@@ -36,6 +36,7 @@ frontend/                  React (ver frontend-react.md)
 docs/
   decisoes/                um arquivo por decisão importante
   cobertura/               resultado da verificação (linux.md, windows.md) e html/ (relatório do pytest-cov)
+  prints/                  telas do relatório usadas no README
 .kiro/                     specs (com tasks e kanban), steering, skills
 ```
 
