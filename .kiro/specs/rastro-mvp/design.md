@@ -254,6 +254,8 @@ GET <dist.tarball>                                     → pacote .tgz, só para
 ```
 
 - Pacotes com escopo (`@angular/core`) levam a barra codificada como `%2F`.
+- `RegistroDePacotes` (interface) e `RegistroNpm` ficam em `fontes/registro_npm.py`: `existe(pacote, versao) -> bool`. 200 é `True`, 404 é `False`; sem rede, tempo esgotado, limite, 5xx ou outro código viram `ConsultaNaoRealizada(motivo)`, como nas fontes.
+- `travas/conferencia.py` chama o registro e devolve `BibliotecasConferidas` (`confirmadas`, `a_confirmar`, `travas_acionadas`). Barrada pela trava 4, a biblioteca ganha `travas_que_falharam=["pacote existe"]` e uma `TravaAcionada`; `conferida_no_npm` fica `True` (publicado), `False` (não publicado) ou `None` (sem resposta: o selo "não conferida no npm").
 - O `.tgz` é lido **em memória**: `tarfile.open(fileobj=io.BytesIO(dados), mode="r:gz")` e `extractfile` só nos `.js`, `.mjs` e `.cjs` (o Angular só publica `.mjs`). Nunca `extract` nem `extractall`, nada gravado em disco, nada executado.
 - A integridade do pacote é conferida com `hashlib.sha512` contra `dist.integrity` antes da leitura.
 - Limite de 10 MB por pacote e tempo limite de 15 s. Acima disso, a trava 5 não roda e a biblioteca fica "a confirmar".

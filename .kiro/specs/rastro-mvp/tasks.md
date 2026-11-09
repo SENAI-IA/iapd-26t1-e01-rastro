@@ -174,7 +174,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R21.7
   - Revisão: @cristiano.albino
 
-- [ ] **T14 Conferir no npm se o pacote existe**
+- [x] **T14 Conferir no npm se o pacote existe**
   - Entrega: `RegistroDePacotes`, `registro_npm.existe(pacote, versao)` e a trava 4 aplicada às bibliotecas por assinatura.
   - Aceite: 200 confirma, 404 manda para "a confirmar", sem rede dá "não conferida no npm"; pacote com escopo usa `%2F`.
   - Arquivos: `rastro/fontes/registro_npm.py`, `rastro/travas/conferencia.py`, `tests/fontes/test_registro_npm.py`, `tests/travas/test_conferencia.py`
