@@ -67,6 +67,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T44** Publicar o relatório de cobertura · fase 4 · 04–08/12 · revisão @geison.santos · 09/11 · commit e62f34c
 - [ ] **T45** Registrar as decisões · fase 4 · 04–08/12 · revisão @cristiano.albino · 09/11 · commit d142645
 - [ ] **T43** Escrever o README de uso · fase 4 · 04–08/12 · revisão @cristiano.albino · 09/11
+- [ ] **T54** Rever a visita num radar · fase 2 · revisão @halan.bacca · 09/11 · spec 1647696
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -81,7 +82,7 @@ _(vazio)_
 
 ### Fase 2. Relatório HTML
 
-- [ ] **T54** Rever a visita num radar · fase 2 · revisão @halan.bacca · POC aprovada pelo time em 09/11
+_(vazio)_
 
 ### Fase 3. IA
 

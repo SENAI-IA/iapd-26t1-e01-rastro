@@ -17,7 +17,7 @@
 rastro/
   cli.py                   lê os argumentos e chama o fluxo
   fluxo.py                 orquestra as etapas, sem regra própria; define a Analise
-  har/                     leitor.py, modelos.py, site.py
+  har/                     leitor.py, modelos.py, site.py, visita.py
   identificacao/           modelos.py, assinaturas.py, bundles.py, ia.py
   travas/                  formato.py, ancoragem.py, codigo_publicado.py, faixa_de_versao.py, explicacao.py, conferencia.py
   fontes/                  conector.py (interface), github_advisory.py, registro_npm.py, consulta.py; opcionais: osv.py, nvd.py, juncao.py

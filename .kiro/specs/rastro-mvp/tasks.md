@@ -328,7 +328,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R15.1–R15.7
   - Revisão: @halan.bacca
 
-- [ ] **T54 Rever a visita num radar**
+- [x] **T54 Rever a visita num radar**
   - Entrega: `har/visita.py` e a `visita` no JSON; no relatório, `ReplayDaVisita` e `RadarDaVisita` na zona Rastreado, a partir da POC aprovada pelo time (branch `poc/replay-do-rastro`, que não vai para o `main`).
   - Aceite: o JSON do WebGoat traz a visita em ordem, com camada, bibliotecas e prioridade; o radar toca, pausa, recomeça e abre a biblioteca nos Detalhes; cabe na primeira dobra em 1366×768 e 1280×720, também em foco; claro, escuro e 400px conferidos; sem animação com `prefers-reduced-motion`. *(verificação manual na tela)*
   - Arquivos: `rastro/har/modelos.py`, `rastro/har/leitor.py`, `rastro/har/visita.py`, `rastro/fluxo.py`, `rastro/relatorio/json.py`, `rastro/relatorio/modelo.html`, `tests/har/test_leitor.py`, `tests/har/test_visita.py`, `tests/relatorio/test_json.py`, `frontend/src/App.tsx`, `frontend/src/tipos.ts`, `frontend/src/componentes/ReplayDaVisita.*`, `frontend/src/componentes/RadarDaVisita.*`, `frontend/src/componentes/{usarRelogioDoReplay,usarAlturaAteADobra,chegadasDaVisita,geometriaDoRadar}.ts`, `frontend/src/componentes/Icone.tsx`, `frontend/src/componentes/LinhaBiblioteca.tsx`, `.kiro/steering/structure.md`, `.kiro/steering/frontend-react.md`

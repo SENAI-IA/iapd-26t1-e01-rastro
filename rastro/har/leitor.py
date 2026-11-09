@@ -1,6 +1,7 @@
 import base64
 import binascii
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -94,7 +95,26 @@ def converter_entrada(indice: int, entrada: dict[str, Any]) -> Requisicao:
         cabecalhos_resposta=cabecalhos,
         cookies_resposta=ler_cookies(resposta),
         conteudo=ler_conteudo(conteudo_da_resposta),
+        inicio=ler_inicio(entrada),
+        duracao_ms=ler_duracao_ms(entrada),
     )
+
+
+def ler_inicio(entrada: dict[str, Any]) -> datetime | None:
+    inicio = entrada.get("startedDateTime")
+    if not isinstance(inicio, str):
+        return None
+    try:
+        return datetime.fromisoformat(inicio.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def ler_duracao_ms(entrada: dict[str, Any]) -> float | None:
+    duracao = entrada.get("time")
+    if isinstance(duracao, bool) or not isinstance(duracao, (int, float)) or duracao < 0:
+        return None
+    return float(duracao)
 
 
 def ler_cabecalhos(resposta: dict[str, Any]) -> dict[str, str]:

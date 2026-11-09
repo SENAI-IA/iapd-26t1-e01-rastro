@@ -10,10 +10,12 @@ import Indicadores from "./componentes/Indicadores.tsx";
 import ListaAConfirmar from "./componentes/ListaAConfirmar.tsx";
 import ListaBibliotecas from "./componentes/ListaBibliotecas.tsx";
 import ListaChecagens from "./componentes/ListaChecagens.tsx";
+import { idDaLinhaDaBiblioteca } from "./componentes/LinhaBiblioteca.tsx";
 import ModalTask from "./componentes/ModalTask.tsx";
 import PainelIA from "./componentes/PainelIA.tsx";
 import PainelOrigemDoDado, { type OrigemDoDado } from "./componentes/PainelOrigemDoDado.tsx";
 import PlanoDeAcao from "./componentes/PlanoDeAcao.tsx";
+import ReplayDaVisita from "./componentes/ReplayDaVisita.tsx";
 import Zona from "./componentes/Zona.tsx";
 
 interface Props {
@@ -36,6 +38,17 @@ function rolarAteAZona(zona: NomeDaZona, topo: HTMLElement | null) {
   const alturaDoTopo = topo?.offsetHeight ?? 0;
   window.scrollTo({ top: elemento.getBoundingClientRect().top + window.scrollY - alturaDoTopo - 12 });
   elemento.querySelector<HTMLButtonElement>(".zona__focar")?.focus({ preventScroll: true });
+}
+
+function abrirBiblioteca(id: string, topo: HTMLElement | null) {
+  const linha = document.getElementById(idDaLinhaDaBiblioteca(id));
+  if (!linha) {
+    return;
+  }
+  linha.querySelector("details")?.setAttribute("open", "");
+  const alturaDoTopo = topo?.offsetHeight ?? 0;
+  window.scrollTo({ top: linha.getBoundingClientRect().top + window.scrollY - alturaDoTopo - 12, behavior: "smooth" });
+  linha.querySelector<HTMLElement>("summary")?.focus({ preventScroll: true });
 }
 
 export default function App({ relatorio }: Props) {
@@ -84,11 +97,23 @@ export default function App({ relatorio }: Props) {
     setZonaEmFoco(null);
   };
 
+  const irParaBiblioteca = (id: string) => {
+    setZonaEmFoco(null);
+    requestAnimationFrame(() => abrirBiblioteca(id, topo.current));
+  };
+
   const conteudoDaZona = (zona: NomeDaZona, relatorio: Relatorio): ReactNode => {
     switch (zona) {
       case "rastreado":
         return (
           <>
+            {relatorio.visita && relatorio.visita.length > 0 && (
+              <ReplayDaVisita
+                passos={relatorio.visita}
+                bibliotecas={relatorio.bibliotecas}
+                aoIrParaBiblioteca={irParaBiblioteca}
+              />
+            )}
             <Indicadores resumo={relatorio.resumo} primeiraAcao={relatorio.plano_de_acao[0]} />
             <PainelIA ia={relatorio.ia} provedor={relatorio.analise.ia} />
           </>

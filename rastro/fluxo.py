@@ -15,6 +15,7 @@ from rastro.fontes.nvd import BuscaDeCvss
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.har.leitor import ler_har
 from rastro.har.site import descobrir_site_analisado
+from rastro.har.visita import PassoDaVisita, montar_visita
 from rastro.ia.cliente import ChamadaIA, ClienteDeIA
 from rastro.identificacao.assinaturas import algum_script_com_conteudo, identificar_por_assinatura
 from rastro.identificacao.ia import identificar_em_bundles
@@ -44,6 +45,7 @@ class Analise:
     plano_de_acao: list[Acao]
     travas_acionadas: list[TravaAcionada]
     chamadas_de_ia: list[ChamadaIA]
+    visita: list[PassoDaVisita]
 
 
 def analisar(
@@ -91,6 +93,7 @@ def analisar(
             + explicados.travas_acionadas
         ),
         chamadas_de_ia=chamadas_feitas(ia),
+        visita=montar_visita(requisicoes),
     )
 
 

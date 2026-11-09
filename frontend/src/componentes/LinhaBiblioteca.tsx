@@ -17,10 +17,14 @@ interface Props {
   aoVerOrigem: (origem: OrigemDoDado) => void;
 }
 
+export function idDaLinhaDaBiblioteca(idDaBiblioteca: string): string {
+  return `biblioteca-${idDaBiblioteca}`;
+}
+
 export default function LinhaBiblioteca({ biblioteca, achados, aoVerOrigem }: Props) {
   const naoConsultada = biblioteca.motivo_nao_consultada !== null;
   return (
-    <li className="linha-biblioteca">
+    <li className="linha-biblioteca" id={idDaLinhaDaBiblioteca(biblioteca.id)}>
       <details>
         <summary className="linha-biblioteca__resumo">
           <span className="linha-biblioteca__seta">

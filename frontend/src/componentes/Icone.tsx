@@ -97,6 +97,14 @@ const TRACOS = {
       <path d="m7 9 3 3-3 3M12 15h5" />
     </>
   ),
+  tocar: <path d="M8 5.5v13l10-6.5-10-6.5Z" />,
+  pausar: <path d="M9 5.5v13M15 5.5v13" />,
+  reiniciar: (
+    <>
+      <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" />
+      <path d="M4.5 4.5v4h4" />
+    </>
+  ),
   alvo: (
     <>
       <circle cx="12" cy="12" r="9" />

@@ -1,6 +1,7 @@
 import json
 import shutil
 import stat
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import IO, Any
 
@@ -36,6 +37,8 @@ def test_r01_1_extrai_a_pagina_e_ignora_as_chaves_com_sublinhado() -> None:
             Cookie(nome="carrinho", http_only=True, secure=True, same_site="Strict"),
         ],
         conteudo="<html><body>Loja de exemplo</body></html>",
+        inicio=datetime(2026, 11, 6, 12, 0, tzinfo=timezone.utc),
+        duracao_ms=10.0,
     )
 
 
@@ -162,6 +165,36 @@ def test_r01_3_har_sem_entradas_e_valido(tmp_path: Path) -> None:
     caminho.write_text('{"log": {"entries": []}}', encoding="utf-8")
 
     assert ler_har(caminho) == []
+
+
+def test_r22_1_le_o_inicio_e_a_duracao_de_cada_requisicao() -> None:
+    pagina = ler_har(DADOS / "har-valido.har")[0]
+
+    assert pagina.inicio == datetime(2026, 11, 6, 12, 0, tzinfo=timezone.utc)
+    assert pagina.duracao_ms == 10.0
+
+
+@pytest.mark.parametrize(
+    "horario",
+    [
+        {},
+        {"startedDateTime": 123, "time": "10"},
+        {"startedDateTime": "ontem", "time": -1},
+        {"startedDateTime": None, "time": True},
+    ],
+    ids=["ausente", "tipo-errado", "invalido", "nulo-e-booleano"],
+)
+def test_r22_1_horario_ausente_ou_invalido_fica_vazio_e_o_har_segue(
+    tmp_path: Path, horario: dict[str, object]
+) -> None:
+    caminho = tmp_path / "horario.har"
+    conteudo = {"log": {"entries": [{**entrada_com_resposta({}), **horario}]}}
+    caminho.write_text(json.dumps(conteudo), encoding="utf-8")
+
+    requisicao = ler_har(caminho)[0]
+
+    assert requisicao.inicio is None
+    assert requisicao.duracao_ms is None
 
 
 def test_r01_4_decodifica_o_conteudo_em_base64() -> None:

@@ -165,4 +165,17 @@ export interface Relatorio {
   checagens: Checagem[];
   plano_de_acao: Acao[];
   ia: DadosDaIA;
+  visita?: PassoDaVisita[];
+}
+
+export type Camada = "pagina" | "script" | "estilo" | "dados" | "midia";
+
+export interface PassoDaVisita {
+  indice_requisicao: number;
+  url: string;
+  camada: Camada;
+  inicio_ms: number;
+  duracao_ms: number;
+  bibliotecas: string[];
+  prioridade: Prioridade | null;
 }

@@ -14,6 +14,7 @@ O relatório abre offline com duplo clique. O React monta a tela a partir do JSO
 - **Não calcula regra de negócio.** Nota, prioridade e contagens já vêm no JSON.
 - **Eventos sobem por props** (`aoClicarFalha(id)`). Só `App.tsx` liga os componentes.
 - **Estado só com o React:** `useState` e `useReducer`. O tema escolhido fica no `App` e desce por props; contexto só quando mais de um componente precisar dele.
+- **Lógica de tela fora do componente:** hook próprio (`usarRelogioDoReplay.ts`) e conta de desenho (`geometriaDoRadar.ts`) ficam em `.ts` ao lado dos componentes. É posição, tempo e tamanho na tela, nunca regra de negócio.
 - **Formatação de apresentação** (nota com vírgula, data, plural) em `componentes/formato.ts`, com `Intl` em pt-BR. Formatar não é calcular: nada de regra de negócio ali.
 - **Tipos do JSON num único `tipos.ts`**, espelhando os modelos do Python. Mudou o JSON, muda o `tipos.ts` no mesmo commit.
 - **Tokens em português** (`--cor-destaque`, `--fonte-mono`, `--raio`) em `tokens.css`. O tema segue o sistema; `data-tema="claro"` ou `"escuro"` no `<html>` força um deles.
@@ -22,7 +23,7 @@ O relatório abre offline com duplo clique. O React monta a tela a partir do JSO
 ## Organização da tela
 
 1. **Indicadores:** risco do site, bibliotecas vulneráveis, encontradas só pela IA, primeira ação.
-2. **Rastreado:** gravidade × chance de exploração, plano de correção, onde a IA entrou.
+2. **Rastreado:** replay da visita, gravidade × chance de exploração, plano de correção, onde a IA entrou.
 3. **Agir:** "O que fazer agora", com cada ação, o porquê, o impacto, quem resolve, "Como verificar" e "Abrir task".
 4. **Detalhes:** bibliotecas e checagens.
 
@@ -48,4 +49,4 @@ Clique em qualquer dado abre a origem dele num painel lateral (`PainelOrigemDoDa
 - Estado nunca só por cor: sempre com ícone e texto.
 - Foco visível, navegação por teclado, `prefers-reduced-motion` respeitado.
 - Funciona a partir de 400px de largura, sem rolagem lateral.
-- Animação só para orientar: entrada dos blocos, reordenação, abertura de painéis.
+- Animação só para orientar: entrada dos blocos, reordenação, abertura de painéis. A exceção é o replay da visita (`ReplayDaVisita`), a única animação contínua, que para no fim, tem pausa e com `prefers-reduced-motion` já abre parada no fim.

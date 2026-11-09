@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 
 @dataclass(frozen=True)
@@ -19,3 +20,5 @@ class Requisicao:
     cabecalhos_resposta: dict[str, str]
     cookies_resposta: list[Cookie]
     conteudo: str | None
+    inicio: datetime | None = None
+    duracao_ms: float | None = None
