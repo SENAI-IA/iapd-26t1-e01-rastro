@@ -24,3 +24,5 @@ relatorio*.html
 .vscode/
 .DS_Store
 Thumbs.db
+
+docs/code-review/
