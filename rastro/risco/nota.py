@@ -1,25 +1,35 @@
-from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
+
+from rastro.risco.modelos import Nota
+from rastro.risco.prioridade import classificar_prioridade
 
 PESO_DO_CVSS = Decimal("0.5")
 PESO_DO_EPSS = Decimal("0.5")
 UMA_CASA_DECIMAL = Decimal("0.1")
 
 
-@dataclass(frozen=True)
-class Nota:
-    valor: float | None
-    conta: str
-    sem_epss: bool
-
-
 def calcular_nota(cvss: float | None, percentil_epss: float | None) -> Nota:
     if cvss is None:
-        return Nota(valor=None, conta="sem CVSS: sem nota", sem_epss=percentil_epss is None)
+        return Nota(
+            valor=None,
+            prioridade=classificar_prioridade(None),
+            conta="sem CVSS: sem nota",
+            sem_epss=percentil_epss is None,
+        )
     if percentil_epss is None:
-        return Nota(valor=cvss, conta=conta_sem_epss(cvss), sem_epss=True)
+        return Nota(
+            valor=cvss,
+            prioridade=classificar_prioridade(cvss),
+            conta=conta_sem_epss(cvss),
+            sem_epss=True,
+        )
     nota = calcular_nota_de_risco(cvss, percentil_epss)
-    return Nota(valor=nota, conta=conta_da_formula(cvss, percentil_epss, nota), sem_epss=False)
+    return Nota(
+        valor=nota,
+        prioridade=classificar_prioridade(nota),
+        conta=conta_da_formula(cvss, percentil_epss, nota),
+        sem_epss=False,
+    )
 
 
 def calcular_nota_de_risco(cvss: float, percentil_epss: float) -> float:

@@ -21,7 +21,7 @@ rastro/
   identificacao/           modelos.py, assinaturas.py, bundles.py, ia.py
   travas/                  formato.py, ancoragem.py, codigo_publicado.py, faixa_de_versao.py, explicacao.py, conferencia.py
   fontes/                  conector.py (interface), github_advisory.py, registro_npm.py; opcionais: osv.py, nvd.py, juncao.py
-  risco/                   nota.py, prioridade.py
+  risco/                   modelos.py, nota.py, prioridade.py
   configuracao/            checagens.py (uma função por checagem)
   explicacao/              ia.py
   acao/                    plano.py, task.py

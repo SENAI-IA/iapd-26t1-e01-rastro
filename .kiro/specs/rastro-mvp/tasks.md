@@ -206,7 +206,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R05.1, R05.3, R05.4, R10.1
   - Revisão: @geison.santos
 
-- [ ] **T18 Classificar a prioridade e ordenar**
+- [x] **T18 Classificar a prioridade e ordenar**
   - Entrega: faixas, nota da biblioteca e ordem dos achados.
   - Aceite: 7,5 é alta, 7,4 é média, 6,5 é média, 6,4 é baixa; empate desfeito pelo CVSS.
   - Arquivos: `rastro/risco/prioridade.py`, `tests/risco/test_prioridade.py`

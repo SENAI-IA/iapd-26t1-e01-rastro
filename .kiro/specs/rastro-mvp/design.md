@@ -63,8 +63,9 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/travas/faixa_de_versao.py` | confere se a versão está na faixa afetada | R21.7 |
 | `rastro/travas/explicacao.py` | barra explicação com fato que não estava na entrada | R21.6 |
 | `rastro/travas/conferencia.py` | aplica as travas e decide "confirmada" ou "a confirmar" | R03.3, R03.4, R21.10 |
+| `rastro/risco/modelos.py` | `Nota`, `Achado`, `Prioridade` | R05 |
 | `rastro/risco/nota.py` | fórmula da nota | R05.1, R05.3, R05.4 |
-| `rastro/risco/prioridade.py` | faixas e ordenação | R05.2, R05.5, R05.6 |
+| `rastro/risco/prioridade.py` | faixas, nota da biblioteca e ordenação | R05.2, R05.5, R05.6, R05.7 |
 | `rastro/configuracao/checagens.py` | uma função por checagem | R06 |
 | `rastro/explicacao/ia.py` | pede explicação e teste de verificação | R07 |
 | `rastro/acao/plano.py` | monta e ordena as ações | R08 |
@@ -316,7 +317,10 @@ def calcular_nota_de_risco(cvss: float, percentil_epss: float) -> float:
 
 - A conta usa `Decimal` e arredonda meio para cima, como na conta feita à mão: CVSS 6,1 e percentil 0 dão 3,1. Com `float` e `round` daria 3,0 (3,05 vira 3,0499…), e a nota mostrada não bateria com a conta escrita.
 - `calcular_nota(cvss, percentil_epss)` devolve a `Nota` com a conta escrita (R10.1): `10 × (0,5 × 6,1/10 + 0,5 × 0,97) = 7,9`, `sem EPSS: nota = CVSS = 6,1` ou `sem CVSS: sem nota`. CVSS e nota com uma casa; o percentil como veio da fonte (`0,21662`).
-- A `prioridade` da `Nota` entra com as faixas, em `prioridade.py` (T18).
+- `calcular_nota` já preenche a `prioridade` da `Nota` com `classificar_prioridade(valor)`, de `prioridade.py`. `Nota` e `Achado` ficam em `risco/modelos.py`, para `nota.py` e `prioridade.py` usarem sem import circular.
+- `nota_da_biblioteca(achados_da_biblioteca)` devolve a maior nota; achado sem nota não conta, e biblioteca só com achados sem nota fica sem nota (`None`).
+- `ordenar_achados(achados)` devolve uma lista nova: nota decrescente, empate pelo CVSS decrescente e achados sem nota no fim, sem sumir (R05.4).
+- Nenhuma dessas funções recebe nada da IA: nota, prioridade e ordem saem só de CVSS e EPSS (R05.7).
 
 | Situação | Nota | Prioridade |
 |---|---|---|
