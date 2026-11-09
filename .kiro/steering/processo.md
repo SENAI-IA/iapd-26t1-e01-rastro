@@ -61,7 +61,7 @@ E gere de novo os PDFs do PRD e do pitch.
 
 ## Decisões
 
-- Cada decisão importante vira um arquivo em `docs/decisoes/`: contexto, decisão, alternativas consideradas.
+- Cada decisão importante vira um arquivo em `docs/decisoes/` (`NN-<tema>.md`, com o próximo número): contexto, decisão, alternativas consideradas.
 - Exemplos: fórmula da nota, uma só fonte de dados, papel da IA, IA por CLI, React no relatório.
 - São as respostas prontas para a banca. O porquê fica aqui, não em comentário no código.
 

@@ -348,7 +348,7 @@ def calcular_nota_de_risco(cvss: float, percentil_epss: float) -> float:
 
 No spike T01, 8,8% dos avisos vieram sem EPSS (todos sem CVE, porque o EPSS só existe para CVE) e 5,9% sem CVSS.
 
-Faixas: alta ≥ 7,5; média ≥ 6,5; baixa no resto. Nota da biblioteca = maior nota dos seus achados. Ordem: nota decrescente e, no empate, CVSS decrescente. O porquê dos pesos 0,5 / 0,5 vai para `docs/decisoes/`.
+Faixas: alta ≥ 7,5; média ≥ 6,5; baixa no resto. Nota da biblioteca = maior nota dos seus achados. Ordem: nota decrescente e, no empate, CVSS decrescente. O porquê dos pesos 0,5 / 0,5 está em `docs/decisoes/01-formula-da-nota.md`.
 
 ## 10. Checar a configuração (R06)
 
@@ -621,17 +621,21 @@ Código 0 significa que a análise terminou, mesmo com achados. As mensagens vã
 - **Cobertura:** `pytest --cov=rastro --cov-report=term`. As regras de negócio (`har`, `identificacao`, `travas`, `fontes`, `risco`, `configuracao`, `acao`, `ia/sanitizacao`) ficam acima de 80%. Os provedores e o `cli.py` contam, mas não são a meta.
 - **Sem CI, verificação local:** `ruff check`, `mypy rastro` e `pytest --cov`, rodados no Windows e no Linux antes de cada entrega. Os comandos ficam na seção "Verificação" do README, e o resultado de cada sistema vai para `docs/cobertura/linux.md` e `docs/cobertura/windows.md` (data, commit, versões e saída dos três comandos). O relatório HTML é da T44, na subpasta `docs/cobertura/html/`, com um `.gitignore` versionado que não ignora nada: o `pytest-cov` cria na pasta do HTML um `.gitignore` com `*`, que, em `docs/cobertura/`, esconderia do Git também o resultado de cada sistema.
 
-## 16. Decisões a registrar em `docs/decisoes/`
+## 16. Decisões registradas em `docs/decisoes/`
 
-1. Fórmula da nota e pesos 0,5 / 0,5.
-2. Uma fonte só: GitHub Advisory.
-3. Papel da IA: identifica e explica, não decide.
-4. IA por CLI, sem SDK nem chave.
-5. React num único HTML, com o JSON embutido.
-6. Travas contra invenção: a IA sugere, a regra confirma; conferência só com leitura no registro do npm.
-7. EPSS ausente: nota igual ao CVSS.
-8. Análise sem IA permitida, mas sempre marcada como incompleta.
-9. HAR sanitized como recomendado: o completo só acrescenta as três checagens de cookie e traz segredos para a máquina de quem audita. Na avaliação e no repo, só HAR sanitized.
+Um arquivo por decisão, com contexto, decisão e alternativas (T45):
+
+1. Fórmula da nota e pesos 0,5 / 0,5: `01-formula-da-nota.md`.
+2. GitHub Advisory como fonte principal; OSV e NVD como extensão, com ordem fixa: `02-github-advisory-como-fonte.md`.
+3. Papel da IA: identifica e explica, não decide: `03-papel-da-ia.md`.
+4. IA por CLI, sem SDK nem chave: `04-ia-por-cli.md`.
+5. React num único HTML, com o JSON embutido: `05-react-num-html-unico.md`.
+6. Travas contra invenção: a IA sugere, a regra confirma; conferência só com leitura no registro do npm: `06-travas-contra-invencao.md`.
+7. EPSS ausente: nota igual ao CVSS: `07-epss-ausente.md`.
+8. Análise sem IA permitida, mas sempre marcada como incompleta: `08-analise-sem-ia.md`.
+9. HAR sanitized como recomendado: o completo só acrescenta as três checagens de cookie e traz segredos para a máquina de quem audita. Na avaliação e no repo, só HAR sanitized: `09-har-sanitized.md`.
+
+Decisão nova ganha o próximo número (`10-<tema>.md`), com as mesmas três seções.
 
 ## 17. A validar no spike
 

@@ -437,7 +437,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R19.1
   - Revisão: @geison.santos
 
-- [ ] **T45 Registrar as decisões**
+- [x] **T45 Registrar as decisões**
   - Entrega: um arquivo por decisão da seção 16 do design.
   - Aceite: cada arquivo tem contexto, decisão e alternativas.
   - Arquivos: `docs/decisoes/*.md`

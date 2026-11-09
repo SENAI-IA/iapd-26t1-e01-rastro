@@ -13,7 +13,7 @@ Projeto final do curso de IA aplicada (tema Produtividade do SENAI) · grupo E01
 | `.kiro/steering/` | Padrões de construção que o agente de IA segue: produto, tecnologia, estrutura, processo, Python e React. |
 | `.kiro/specs/rastro-mvp/` | Spec do MVP: requisitos em EARS, design, tasks (com revisor) e kanban. |
 | `.kiro/skills/rastro-nova-regra/` | Skill do projeto: passo a passo para acrescentar checagem, assinatura, fonte de dados, provedor de IA ou trava, com teste, cobertura e verificação. |
-| `docs/` | Entregáveis: `pitch-inicial.pdf`, `spike/` (validações da fase 0) e `cobertura/` (resultado da verificação em cada sistema e relatório HTML da cobertura). Depois: decisões. |
+| `docs/` | Entregáveis: `pitch-inicial.pdf`, `spike/` (validações da fase 0) `cobertura/` (resultado da verificação em cada sistema e relatório HTML da cobertura) e `decisoes/` (um arquivo por decisão, com contexto, decisão e alternativas). |
 
 ## Verificação
 
