@@ -35,7 +35,7 @@ tests/                     mesma estrutura de rastro/
 frontend/                  React (ver frontend-react.md)
 docs/
   decisoes/                um arquivo por decisão importante
-  cobertura/               relatório de cobertura (Windows e Linux)
+  cobertura/               resultado da verificação (linux.md, windows.md) e html/ (relatório do pytest-cov)
 .kiro/                     specs (com tasks e kanban), steering, skills
 ```
 

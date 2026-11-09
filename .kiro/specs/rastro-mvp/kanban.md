@@ -63,7 +63,8 @@ _(vazio)_
 - [ ] **T52** Ligar a IA na linha de comando · fase 3 · revisão @luiz.pagliari · 09/11 · commit 57d2cbe
 - [ ] **T49** Consultar o OSV · extensão · revisão @cristiano.albino · 09/11 · commit 2b374fd
 - [ ] **T50** Completar o CVSS pelo NVD · extensão · revisão @ali.santos · 09/11 · commit d8d87aa
-- [ ] **T51** Juntar avisos de fontes diferentes · extensão · revisão @geison.santos · 09/11
+- [ ] **T51** Juntar avisos de fontes diferentes · extensão · revisão @geison.santos · 09/11 · commit a61e8f8
+- [ ] **T44** Publicar o relatório de cobertura · fase 4 · 04–08/12 · revisão @geison.santos · 09/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -88,7 +89,6 @@ _(vazio)_
 
 - [ ] **T42** Instalar do zero no Windows e no Linux · fase 4 · 04–08/12 · revisão @ali.santos
 - [ ] **T43** Escrever o README de uso · fase 4 · 04–08/12 · revisão @cristiano.albino
-- [ ] **T44** Publicar o relatório de cobertura · fase 4 · 04–08/12 · revisão @geison.santos
 - [ ] **T45** Registrar as decisões · fase 4 · 04–08/12 · revisão @cristiano.albino
 - [ ] **T46** Medir com e sem IA · fase 4 · 04–08/12 · revisão @luiz.pagliari
 - [ ] **T47** Gravar a apresentação e o demo · fase 4 · 04–08/12 · revisão @halan.bacca

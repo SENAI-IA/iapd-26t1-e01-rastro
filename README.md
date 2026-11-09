@@ -13,7 +13,7 @@ Projeto final do curso de IA aplicada (tema Produtividade do SENAI) · grupo E01
 | `.kiro/steering/` | Padrões de construção que o agente de IA segue: produto, tecnologia, estrutura, processo, Python e React. |
 | `.kiro/specs/rastro-mvp/` | Spec do MVP: requisitos em EARS, design, tasks (com revisor) e kanban. |
 | `.kiro/skills/rastro-nova-regra/` | Skill do projeto: passo a passo para acrescentar checagem, assinatura, fonte de dados, provedor de IA ou trava, com teste, cobertura e verificação. |
-| `docs/` | Entregáveis: `pitch-inicial.pdf`, `spike/` (validações da fase 0) e `cobertura/` (resultado da verificação em cada sistema). Depois: decisões. |
+| `docs/` | Entregáveis: `pitch-inicial.pdf`, `spike/` (validações da fase 0) e `cobertura/` (resultado da verificação em cada sistema e relatório HTML da cobertura). Depois: decisões. |
 
 ## Verificação
 
@@ -33,6 +33,22 @@ Na raiz do projeto:
 - Se o PowerShell recusar a ativação, libere só para a janela aberta: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`.
 - Passou quando o `ruff` mostra `All checks passed!`, o `mypy` mostra `Success` e o `pytest` termina sem falhas. Os testes não acessam a rede.
 - O resultado de cada sistema fica em `docs/cobertura/linux.md` e `docs/cobertura/windows.md`: data, commit, versões e a saída dos três comandos.
+
+### Cobertura
+
+| Medida (Linux, 09/11/2026, commit a61e8f8) | Cobertura |
+|---|---|
+| Regras de negócio (`har`, `identificacao`, `travas`, `fontes`, `risco`, `configuracao`, `acao`, `ia/sanitizacao`) | **99%** (1582 linhas, 3 sem teste) |
+| Total do pacote `rastro` | 99% (2279 linhas, 6 sem teste) |
+
+O mínimo é 60% nas regras de negócio, com meta de 80% (R19.1). O relatório HTML, arquivo por arquivo e linha por linha, fica em [`docs/cobertura/html/index.html`](docs/cobertura/html/index.html). Para atualizá-lo, com o `.venv` ativo:
+
+```
+pytest --cov=rastro --cov-report=term --cov-report=html:docs/cobertura/html
+```
+
+- O número das regras de negócio sai de `coverage report --include="rastro/har/*,rastro/identificacao/*,rastro/travas/*,rastro/fontes/*,rastro/risco/*,rastro/configuracao/*,rastro/acao/*,rastro/ia/sanitizacao.py"`, logo depois do `pytest`.
+- O `.gitignore` versionado em `docs/cobertura/html/` não ignora nada e precisa ficar lá: o `pytest-cov`, ao achar a pasta vazia, criaria um `.gitignore` com `*` que esconderia o relatório do Git.
 
 ## Como trabalhamos
 

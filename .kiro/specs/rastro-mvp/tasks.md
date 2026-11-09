@@ -429,7 +429,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R20.1–R20.4
   - Revisão: @cristiano.albino
 
-- [ ] **T44 Publicar o relatório de cobertura**
+- [x] **T44 Publicar o relatório de cobertura**
   - Entrega: relatório HTML do `pytest-cov` em `docs/cobertura/`.
   - Aceite: regras de negócio ≥ 60% (meta 80%); o número está no README.
   - Arquivos: `docs/cobertura/*`, `README.md`
