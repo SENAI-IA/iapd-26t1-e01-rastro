@@ -35,7 +35,7 @@ Na pasta onde quer o projeto:
 - `<url-do-repositorio>` é o endereço do repositório na org SENAI-IA. Sem Git, baixe o ZIP pelo navegador e extraia.
 - Passou quando o passo 4 mostra `usage: rastro [-h] comando ...`.
 - Os comandos rodam **na raiz do projeto** (a pasta que tem `rastro/` e `README.md`). O HAR pode estar em qualquer lugar.
-- Para a IA, confira que a CLI responde no terminal antes: `kiro-cli --version`, `claude --version` ou `codex --version`. No Windows ainda não foi conferido se existe `kiro-cli`; se não houver, use `--ia claude` ou `--ia codex`.
+- Para a IA, confira que a CLI responde no terminal antes: `kiro-cli --version`, `claude --version` ou `codex --version`. No Windows ainda não foi conferido se existe `kiro-cli`; se não houver, use `--ia claude`.
 
 ## Uso
 
@@ -64,7 +64,7 @@ Para testar sem gravar nada, use os HARs da pasta [`avaliacao/`](avaliacao/READM
 
 | Opção ou variável | O que faz |
 |---|---|
-| `--ia NOME` | `kiro`, `claude` ou `codex`. Sem a opção, vale `RASTRO_IA`; sem as duas, `kiro`. |
+| `--ia NOME` | `kiro`, `claude` ou `codex`. Sem a opção, vale `RASTRO_IA`; sem as duas, `kiro`. O Codex roda com as opções que tiram dele as ferramentas de comando, mas esse efeito não foi conferido (sem chave de API no grupo): para HAR de terceiros, prefira o Kiro ou o Claude. |
 | `--sem-ia` | Não chama a IA: não procura bibliotecas escondidas em bundles e não explica os achados. Nota, prioridade, checagens e plano de ação são os mesmos. |
 | `--saida PASTA` | Troca a pasta dos relatórios. Padrão: `~/Rastro/relatorios` no Linux e `C:\Users\<nome>\Rastro\relatorios` no Windows. |
 | `GITHUB_TOKEN` (opcional) | Sem token, o GitHub Advisory aceita 60 consultas por hora (uma por biblioteca); com token, 5.000. |
@@ -123,7 +123,7 @@ Medido em 09/11/2026 nos três HARs de [`avaliacao/`](avaliacao/README.md), cont
 | Tempo de triagem manual × Rastro | **pendente**: medir com uma pessoa | | |
 
 - A biblioteca que a IA acrescenta é o `@angular/core` do Juice Shop, num bundle sem comentário de versão. A que falta sem IA e com IA é a jQuery UI 1.10.3 do WebGoat, que não está no npm e fica "a confirmar".
-- O Codex não foi medido: a chave de API da máquina expirou. Com ele, as chamadas falharam e a análise seguiu só com a assinatura.
+- O Codex não foi medido: a chave de API expirou e depois foi removida, e o grupo não tem outra. Com ele, as chamadas falharam e a análise seguiu só com a assinatura.
 
 ## Roteiro de verificação manual
 

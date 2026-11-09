@@ -43,7 +43,7 @@ Atenção: `/usr/bin/kiro` é o editor Kiro (IDE), não a CLI. O Rastro procura 
 - **Claude, `--bare`:** não usar. Ele exige `ANTHROPIC_API_KEY` e ignora o login da CLI, o que vai contra "sem chave no projeto".
 - **Codex, `--skip-git-repo-check`:** sem ele, o Codex se recusa a rodar fora de um repositório Git.
 - **Codex, `--sandbox read-only`:** a IA não grava nada.
-- **Codex, `--disable shell_tool --disable unified_exec`:** tira da IA as ferramentas de comando, como `--tools ""` no Claude e `--trust-tools=` no Kiro. Sem elas, um texto injetado no trecho do bundle não faz a IA ler arquivos da máquina. Conferido na 0.166.0: a CLI aceita as duas opções.
+- **Codex, `--disable shell_tool --disable unified_exec`:** tira da IA as ferramentas de comando, como `--tools ""` no Claude e `--trust-tools=` no Kiro. Sem elas, um texto injetado no trecho do bundle não faz a IA ler arquivos da máquina. Na 0.166.0, a CLI aceita as duas opções sem erro, mas o efeito (a IA sem shell) **não foi conferido**: a chave de API do Codex do grupo foi removida antes do teste. Até ser conferido, para HAR de terceiros prefira o Kiro ou o Claude.
 - **Codex, `--ephemeral`:** não grava a sessão em disco.
 - **Codex, `--json`:** sem ele, a resposta sai limpa na saída padrão, mas os tokens só aparecem na saída de erro, em texto e no formato da localidade (`tokens used` / `12.813`). Com `--json`, os tokens vêm num campo.
 - **Kiro, `--trust-tools=`:** não confia em nenhuma ferramenta. Sem resposta interativa, nenhuma ferramenta roda.

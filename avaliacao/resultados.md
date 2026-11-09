@@ -19,7 +19,7 @@ Os números saem do `relatorio.json` de cada análise: `bibliotecas`, `a_confirm
 |---|---|---|
 | Kiro | `kiro-cli 2.31.1` | o padrão da CLI |
 | Claude | `claude 2.1.319` (Claude Code) | o padrão da CLI |
-| Codex | `codex-cli 0.166.0` | não rodou: a chave de API da máquina expirou (ver "Codex") |
+| Codex | `codex-cli 0.166.0` | não rodou: a chave de API expirou e foi removida (ver "Codex") |
 
 ## Confiança: falso positivo confirmado
 
@@ -78,7 +78,7 @@ Sugestões da IA (identificação em bundles e explicações), por análise:
 
 ## Codex
 
-Não medido. A CLI está instalada, mas a chave de API da máquina expirou: `codex exec` responde `401 Unauthorized ... expired_secret_key`. O Rastro rodou o Juice Shop e o Drupal com `--ia codex` mesmo assim: as 6 chamadas falharam (`a CLI do Codex terminou com código de saída 1`, registrado em `ia.chamadas`), a análise terminou com código 0 e o resultado foi o da assinatura (Juice Shop sem bibliotecas; Drupal com as 4 e o resumo do aviso no lugar da explicação). Na época, o relatório não avisava; desde o commit 061f1b1, o terminal e a faixa do topo dizem quantas chamadas falharam e o que ficou sem IA. Falta medir com a chave renovada.
+Não medido. A CLI está instalada, mas a chave de API da máquina expirou: `codex exec` responde `401 Unauthorized ... expired_secret_key`. O Rastro rodou o Juice Shop e o Drupal com `--ia codex` mesmo assim: as 6 chamadas falharam (`a CLI do Codex terminou com código de saída 1`, registrado em `ia.chamadas`), a análise terminou com código 0 e o resultado foi o da assinatura (Juice Shop sem bibliotecas; Drupal com as 4 e o resumo do aviso no lugar da explicação). Na época, o relatório não avisava; desde o commit 061f1b1, o terminal e a faixa do topo dizem quantas chamadas falharam e o que ficou sem IA. Depois a chave foi removida e o grupo não tem outra, então o Codex fica fora da medição. Pelo mesmo motivo, não foi conferido que as opções `--disable shell_tool --disable unified_exec` (code review, commit d803278) tiram da IA as ferramentas de comando: a CLI as aceita, mas o efeito ficou sem teste (`docs/spike/clis-de-ia.md`).
 
 ## Tempo de triagem
 
