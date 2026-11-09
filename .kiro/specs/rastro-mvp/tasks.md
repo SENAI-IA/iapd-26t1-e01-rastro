@@ -473,7 +473,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 Começa só se as fases 1 e 2 estiverem fechadas. Prazo limite: 02/12. O que não fechar vai para os planos futuros, e a análise segue só com o GitHub Advisory.
 
-- [ ] **T49 Consultar o OSV**
+- [x] **T49 Consultar o OSV**
   - Entrega: `fontes/osv.py` implementando `ConectorDeAvisos` e a leitura da faixa `SEMVER` do OSV.
   - Aceite: converte uma resposta gravada do OSV em `Aviso` com apelidos; falha do OSV não para a análise.
   - Arquivos: `rastro/fontes/osv.py`, `rastro/travas/faixa_de_versao.py`, `tests/fontes/test_osv.py`, `tests/dados/osv-*.json`

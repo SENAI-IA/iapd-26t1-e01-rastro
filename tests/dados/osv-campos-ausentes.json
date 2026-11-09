@@ -1,0 +1,51 @@
+{
+  "vulns": [
+    {
+      "id": "MAL-2099-0001",
+      "details": "Aviso sem GHSA, sem CVE, sem resumo e sem apelidos (exemplo feito à mão)",
+      "affected": [
+        {
+          "package": {"name": "pacote-exemplo", "ecosystem": "npm"},
+          "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}]}]
+        }
+      ]
+    },
+    {
+      "id": "OSV-2099-0002",
+      "summary": "Aviso com duas faixas e último afetado (exemplo feito à mão)",
+      "aliases": ["CVE-2099-0002", "GHSA-gggg-hhhh-iiii"],
+      "affected": [
+        {
+          "package": {"name": "pacote-exemplo", "ecosystem": "npm"},
+          "ranges": [
+            {"type": "SEMVER", "events": [
+              {"introduced": "0"}, {"fixed": "0.9.0"},
+              {"introduced": "1.0.0"}, {"last_affected": "1.0.5"}
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "OSV-2099-0003",
+      "summary": "Aviso só com lista de versões, sem faixa SEMVER (exemplo feito à mão)",
+      "affected": [
+        {
+          "package": {"name": "pacote-exemplo", "ecosystem": "npm"},
+          "versions": ["1.0.0"]
+        }
+      ]
+    },
+    {
+      "id": "OSV-2099-0004",
+      "summary": "Aviso retirado pela fonte (exemplo feito à mão)",
+      "withdrawn": "2099-01-01T00:00:00Z",
+      "affected": [
+        {
+          "package": {"name": "pacote-exemplo", "ecosystem": "npm"},
+          "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "2.0.0"}]}]
+        }
+      ]
+    }
+  ]
+}
