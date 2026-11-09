@@ -7,6 +7,7 @@ import Selo from "./Selo.tsx";
 import SeloDePrioridade from "./SeloDePrioridade.tsx";
 import SeloDoMetodo from "./SeloDoMetodo.tsx";
 import { formatarNota, plural } from "./formato.ts";
+import Termo from "./Termo.tsx";
 import "./LinhaBiblioteca.css";
 
 interface Props {
@@ -77,11 +78,11 @@ export default function LinhaBiblioteca({ biblioteca, achados, aoVerOrigem }: Pr
             <p className="linha-biblioteca__alerta">
               <Icone nome="pacote" />
               <span>
-                O registro do npm não respondeu, então não deu para conferir que{" "}
+                O registro do <Termo nome="npm" /> não respondeu, então não deu para conferir que{" "}
                 <code>
                   {biblioteca.pacote}@{biblioteca.versao}
                 </code>{" "}
-                foi publicado. A identificação vem da assinatura.
+                foi publicado. A identificação vem da <Termo nome="Assinatura">assinatura</Termo>.
               </span>
             </p>
           )}

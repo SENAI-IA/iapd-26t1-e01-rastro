@@ -5,6 +5,7 @@ import Icone from "./Icone.tsx";
 import SeloDePrioridade from "./SeloDePrioridade.tsx";
 import SeloDoMetodo from "./SeloDoMetodo.tsx";
 import { formatarNota, formatarPercentil } from "./formato.ts";
+import Termo from "./Termo.tsx";
 import "./PainelOrigemDoDado.css";
 
 export interface OrigemDoDado {
@@ -84,7 +85,9 @@ export default function PainelOrigemDoDado({ origem, aoFechar }: Props) {
                   {biblioteca.pacote}@{biblioteca.versao}
                 </code>
               </dd>
-              <dt>Registro do npm</dt>
+              <dt>
+                Registro do <Termo nome="npm" />
+              </dt>
               <dd>{textoDoNpm(biblioteca.conferida_no_npm)}</dd>
             </dl>
             {trechosSemRepeticao(biblioteca).map((trecho) => (
@@ -119,9 +122,13 @@ export default function PainelOrigemDoDado({ origem, aoFechar }: Props) {
                       <dd>
                         {aviso.versao_corrigida === null ? "sem versão corrigida" : <code>{aviso.versao_corrigida}</code>}
                       </dd>
-                      <dt>CVSS</dt>
+                      <dt>
+                        <Termo nome="CVSS" />
+                      </dt>
                       <dd>{aviso.cvss === null ? "sem CVSS" : formatarNota(aviso.cvss)}</dd>
-                      <dt>Percentil EPSS</dt>
+                      <dt>
+                        Percentil <Termo nome="EPSS" />
+                      </dt>
                       <dd>{aviso.percentil_epss === null ? "sem EPSS" : formatarPercentil(aviso.percentil_epss)}</dd>
                     </dl>
                   </li>

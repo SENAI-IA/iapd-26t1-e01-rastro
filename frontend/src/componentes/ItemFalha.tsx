@@ -2,6 +2,7 @@ import type { Achado } from "../tipos.ts";
 import Selo from "./Selo.tsx";
 import SeloDePrioridade from "./SeloDePrioridade.tsx";
 import { formatarNota, formatarPercentil } from "./formato.ts";
+import Termo from "./Termo.tsx";
 import "./ItemFalha.css";
 
 interface Props {
@@ -39,11 +40,15 @@ export default function ItemFalha({ achado, aoVerOrigem }: Props) {
       <p className="item-falha__resumo">{aviso.resumo}</p>
       <dl className="item-falha__dados">
         <div>
-          <dt>CVSS</dt>
+          <dt>
+            <Termo nome="CVSS" />
+          </dt>
           <dd>{aviso.cvss === null ? "sem CVSS" : formatarNota(aviso.cvss)}</dd>
         </div>
         <div>
-          <dt>Percentil EPSS</dt>
+          <dt>
+            Percentil <Termo nome="EPSS" />
+          </dt>
           <dd>{aviso.percentil_epss === null ? "sem EPSS" : formatarPercentil(aviso.percentil_epss)}</dd>
         </div>
         <div>

@@ -3,6 +3,7 @@ import Indicador from "./Indicador.tsx";
 import Selo from "./Selo.tsx";
 import SeloDePrioridade from "./SeloDePrioridade.tsx";
 import { formatarNota, plural } from "./formato.ts";
+import Termo from "./Termo.tsx";
 import "./Indicadores.css";
 
 interface Props {
@@ -42,8 +43,8 @@ export default function Indicadores({ resumo, primeiraAcao }: Props) {
         }
         descricao={
           resumo.encontradas_so_pela_ia === null
-            ? "Análise sem IA: bibliotecas escondidas em bundles não foram procuradas."
-            : "Bibliotecas escondidas em bundles, que só a IA reconheceu."
+            ? <>Análise sem IA: bibliotecas escondidas em <Termo nome="Bundle">bundles</Termo> não foram procuradas.</>
+            : <>Bibliotecas escondidas em <Termo nome="Bundle">bundles</Termo>, que só a IA reconheceu.</>
         }
       />
       <Indicador

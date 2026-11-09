@@ -44,7 +44,7 @@ Clique em qualquer dado abre a origem dele num painel lateral (`PainelOrigemDoDa
 
 ## UX e acessibilidade
 
-- Quem usa não é especialista: termos técnicos com explicação ao passar o mouse ou tocar.
+- Quem usa não é especialista: termos técnicos com explicação ao passar o mouse, focar ou tocar. A definição fica só em `src/dados/glossario.ts`; na tela, `<Termo nome="…">` (nunca dentro de botão ou link). Termo novo: uma linha no glossário.
 - Estado nunca só por cor: sempre com ícone e texto.
 - Foco visível, navegação por teclado, `prefers-reduced-motion` respeitado.
 - Funciona a partir de 400px de largura, sem rolagem lateral.

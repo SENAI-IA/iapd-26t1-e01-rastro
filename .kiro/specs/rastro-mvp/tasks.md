@@ -304,7 +304,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R10.2
   - Revisão: @halan.bacca
 
-- [ ] **T30 Mostrar o glossário**
+- [x] **T30 Mostrar o glossário**
   - Entrega: `Termo`, `Dica` e `dados/glossario.ts`.
   - Aceite: definição aparece com mouse, teclado e toque. *(verificação manual)*
   - Arquivos: `frontend/src/componentes/Termo.*`, `Dica.*`, `frontend/src/dados/glossario.ts`

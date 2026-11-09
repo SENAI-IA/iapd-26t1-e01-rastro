@@ -1,6 +1,7 @@
 import type { Achado, Biblioteca } from "../tipos.ts";
 import LinhaBiblioteca from "./LinhaBiblioteca.tsx";
 import type { OrigemDoDado } from "./PainelOrigemDoDado.tsx";
+import Termo from "./Termo.tsx";
 import "./ListaBibliotecas.css";
 
 interface Props {
@@ -14,7 +15,7 @@ export default function ListaBibliotecas({ bibliotecas, achados, aoVerOrigem }: 
     <section className="lista-bibliotecas" aria-labelledby="lista-bibliotecas-titulo">
       <div>
         <h2 id="lista-bibliotecas-titulo">Bibliotecas encontradas</h2>
-        <p>Abra uma biblioteca para ver onde ela apareceu no HAR e as falhas conhecidas. Clique na nota para ver a conta.</p>
+        <p>Abra uma biblioteca para ver onde ela apareceu no <Termo nome="HAR" /> e as falhas conhecidas. Clique na nota para ver a conta.</p>
       </div>
       {bibliotecas.length === 0 ? (
         <p className="lista-bibliotecas__vazio">Nenhuma biblioteca confirmada nesta gravação.</p>

@@ -1,0 +1,16 @@
+.termo {
+  border-bottom: 1.5px dotted var(--cor-texto-fraco);
+  cursor: help;
+}
+
+.termo:hover,
+.termo:focus-visible {
+  color: var(--cor-destaque);
+  border-bottom-color: var(--cor-destaque);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .termo {
+    transition: color .15s ease, border-color .15s ease;
+  }
+}

@@ -1,4 +1,5 @@
 import type { Evidencia } from "../tipos.ts";
+import Termo from "./Termo.tsx";
 import "./Evidencias.css";
 
 interface Props {
@@ -8,7 +9,9 @@ interface Props {
 export default function Evidencias({ evidencias }: Props) {
   return (
     <div className="evidencias">
-      <h4>Onde apareceu no HAR</h4>
+      <h4>
+        Onde apareceu no <Termo nome="HAR" />
+      </h4>
       <ul>
         {evidencias.map((evidencia) => (
           <li key={evidencia.indice_requisicao}>
