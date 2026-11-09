@@ -14,7 +14,7 @@ Ordem: spike → núcleo determinístico → relatório HTML → explicação po
 |---|---|---|
 | 0. Preparar | 09–13/11 | T01–T07 |
 | 1. Núcleo determinístico | 16–25/11 | T08–T23 |
-| 2. Relatório HTML | 23–28/11 | T24–T32 |
+| 2. Relatório HTML | 23–28/11 | T24–T32, T54 |
 | 3. IA | 30/11–04/12 | T33–T41 |
 | 4. Entregar | 04–08/12 | T42–T48 |
 | Extensão: OSV e NVD (só se houver tempo) | até 02/12 | T49–T51 |
@@ -30,7 +30,7 @@ O Paulo escreve todas as tasks com o agente e é o autor dos commits. Os revisor
 | @ali.santos | Entrada e identificação: HAR, assinaturas, bundles, instalação, NVD | T03, T05, T08–T11, T40–T42, T50 | 10 |
 | @cristiano.albino | Fontes e travas: GitHub Advisory, OSV, npm, travas, privacidade, decisões | T01, T12–T16, T34, T43, T45, T49 | 10 |
 | @geison.santos | Risco e ação: nota, prioridade, checagens, plano, task, relatório JSON, junção de fontes | T04, T17–T23, T44, T51 | 10 |
-| @halan.bacca | Relatório HTML: frontend, origem do dado, glossário, modo foco | T24–T32, T47 | 10 |
+| @halan.bacca | Relatório HTML: frontend, origem do dado, glossário, modo foco | T24–T32, T47, T54 | 11 |
 | @luiz.pagliari | IA: CLIs, cliente, provedores, explicação, painel, medição, versão final | T02, T06, T07, T33, T35–T39, T46, T48 | 11 |
 
 ## Como cada task chega ao `main`
@@ -326,6 +326,14 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Arquivos: `frontend/src/App.tsx`, `frontend/src/componentes/BarraDeFoco.*`
   - Teste: verificação manual.
   - Requisito: R15.1–R15.7
+  - Revisão: @halan.bacca
+
+- [ ] **T54 Rever a visita num radar**
+  - Entrega: `har/visita.py` e a `visita` no JSON; no relatório, `ReplayDaVisita` e `RadarDaVisita` na zona Rastreado, a partir da POC aprovada pelo time (branch `poc/replay-do-rastro`, que não vai para o `main`).
+  - Aceite: o JSON do WebGoat traz a visita em ordem, com camada, bibliotecas e prioridade; o radar toca, pausa, recomeça e abre a biblioteca nos Detalhes; cabe na primeira dobra em 1366×768 e 1280×720, também em foco; claro, escuro e 400px conferidos; sem animação com `prefers-reduced-motion`. *(verificação manual na tela)*
+  - Arquivos: `rastro/har/modelos.py`, `rastro/har/leitor.py`, `rastro/har/visita.py`, `rastro/fluxo.py`, `rastro/relatorio/json.py`, `rastro/relatorio/modelo.html`, `tests/har/test_leitor.py`, `tests/har/test_visita.py`, `tests/relatorio/test_json.py`, `frontend/src/App.tsx`, `frontend/src/tipos.ts`, `frontend/src/componentes/ReplayDaVisita.*`, `frontend/src/componentes/RadarDaVisita.*`, `frontend/src/componentes/{usarRelogioDoReplay,usarAlturaAteADobra,chegadasDaVisita,geometriaDoRadar}.ts`, `frontend/src/componentes/Icone.tsx`, `frontend/src/componentes/LinhaBiblioteca.tsx`, `.kiro/steering/structure.md`, `.kiro/steering/frontend-react.md`
+  - Teste: `test_r22_1_*` a `test_r22_3_*`; o radar, verificação manual.
+  - Requisito: R22.1–R22.8
   - Revisão: @halan.bacca
 
 ## Fase 3. IA

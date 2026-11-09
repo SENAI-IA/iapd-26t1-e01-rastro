@@ -81,7 +81,7 @@ _(vazio)_
 
 ### Fase 2. Relatório HTML
 
-_(vazio)_
+- [ ] **T54** Rever a visita num radar · fase 2 · revisão @halan.bacca · POC aprovada pelo time em 09/11
 
 ### Fase 3. IA
 

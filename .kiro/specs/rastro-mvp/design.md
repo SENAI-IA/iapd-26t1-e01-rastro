@@ -49,6 +49,7 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/har/leitor.py` | lê e valida o HAR, decodifica base64 | R01 |
 | `rastro/har/modelos.py` | `Requisicao`, `Cookie` | R01 |
 | `rastro/har/site.py` | descobre o site analisado | R01.7 |
+| `rastro/har/visita.py` | monta a visita: tempo desde a primeira requisição e camada de cada uma | R22.2, R22.3 |
 | `rastro/identificacao/assinaturas.py` | reconhece por nome de arquivo e comentário | R02 |
 | `rastro/identificacao/bundles.py` | escolhe bundles e extrai trechos | R03.1 |
 | `rastro/identificacao/ia.py` | pede à IA e valida a resposta | R03 |
@@ -81,7 +82,7 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/relatorio/json.py` | monta o dicionário do relatório | R13.7 |
 | `rastro/relatorio/html.py` | embute o JSON no HTML do build | R13.5 |
 | `rastro/relatorio/gravacao.py` | monta a pasta da análise (aplicação, data e hora) e grava os dois arquivos sem sobrescrever | R13.1–R13.4, R17 |
-| `frontend/` | React: só exibe o JSON | R09.2, R10.2, R12, R13.5, R13.6 |
+| `frontend/` | React: só exibe o JSON | R09.2, R10.2, R12, R13.5, R13.6, R22.4–R22.7 |
 
 **Diferenças em relação ao `structure.md`:** entram `acao/` (plano e task não cabem em `risco/`), `travas/`, `fontes/registro_npm.py`, `har/site.py`, `identificacao/bundles.py`, `ia/sanitizacao.py` e `relatorio/gravacao.py`. Se aprovadas, o steering é atualizado no mesmo commit.
 
@@ -134,7 +135,7 @@ Com IA, chamada que falha também é limitação: `ia_falhou_identificacao` (bun
 
 | Modelo | Campos |
 |---|---|
-| `Requisicao` | `indice`, `url`, `metodo`, `status`, `tipo_conteudo`, `cabecalhos_resposta: dict[str, str]`, `cookies_resposta: list[Cookie]`, `conteudo: str \| None` |
+| `Requisicao` | `indice`, `url`, `metodo`, `status`, `tipo_conteudo`, `cabecalhos_resposta: dict[str, str]`, `cookies_resposta: list[Cookie]`, `conteudo: str \| None`, `inicio: datetime \| None`, `duracao_ms: float \| None` |
 | `Cookie` | `nome`, `http_only`, `secure`, `same_site: str \| None` (sem o valor) |
 | `Evidencia` | `indice_requisicao`, `url`, `trecho: str \| None` |
 | `Biblioteca` | `pacote`, `versao`, `metodo: "assinatura" \| "ia"`, `situacao: "confirmada" \| "a_confirmar"`, `conferida_no_npm: bool \| None`, `travas_que_falharam: list[str]`, `evidencias: list[Evidencia]` |
@@ -146,6 +147,7 @@ Com IA, chamada que falha também é limitação: `ia_falhou_identificacao` (bun
 | `Checagem` | `id`, `titulo`, `situacao: "falhou" \| "passou" \| "nao_verificada"`, `severidade: "alta" \| "media" \| "baixa"`, `quem_resolve`, `evidencia: Evidencia \| None`, `detalhe` |
 | `Explicacao` | `o_que_e`, `impacto`, `como_corrigir`, `teste_verificacao`, `gerada_por_ia: bool` |
 | `Acao` | `id`, `prioridade`, `nota`, `o_que_fazer`, `porque`, `impacto`, `quem_resolve`, `refs: list[str]` (GHSA dos achados ou ID da checagem), `teste_verificacao: str \| None` (só o sugerido pela IA), `texto_task` |
+| `PassoDaVisita` | `indice_requisicao`, `url`, `camada: "pagina" \| "script" \| "estilo" \| "dados" \| "midia"`, `inicio_ms` (desde a primeira requisição), `duracao_ms` |
 | `ChamadaIA` | `etapa`, `provedor`, `entrada`, `resposta`, `duracao_s`, `tokens: int \| None`, `sucesso: bool` |
 
 A `situacao` sai só das travas; a IA não tem campo de confiança que decida algo. O campo `Nota.conta` guarda a conta escrita, ex.: `10 × (0,5 × 6,1/10 + 0,5 × 0,97) = 7,9`, que o painel de origem mostra (R10.1).
@@ -159,6 +161,8 @@ A `situacao` sai só das travas; a IA não tem campo de confiança que decida al
 - Cabeçalhos: nome em minúsculas; nome repetido junta os valores com `, `. O `Set-Cookie` não entra em `cabecalhos_resposta`: o cookie fica só em `cookies_resposta`, sem o valor.
 - `tipo_conteudo`: `content.mimeType` (ou o `Content-Type`) sem parâmetros e em minúsculas, ex.: `text/html`.
 - Erros: `HarNaoEncontrado` (caminho que não é arquivo) e `HarInvalido` (não é UTF-8, não é JSON, sem `log.entries` em lista ou entrada sem `request.url`, `request.method` e `response.status`), filhas de `ErroAoLerHar`. O `cli.py` transforma em código 1 (T23). Base64 corrompido deixa a entrada sem conteúdo.
+- **Horário (R22.1):** `startedDateTime` vira `inicio` (`datetime`; o `Z` vira `+00:00`, que o `fromisoformat` do Python 3.10 não aceita) e `time` vira `duracao_ms` quando é número não negativo. Ausente ou inválido fica `None`, sem barrar o HAR.
+- **Visita (R22.2, R22.3):** `har/visita.py` (puro) conta o tempo de cada requisição desde a primeira, ordena por tempo e índice e tira a camada do `tipo_conteudo`. Sem horário, a requisição fica fora da visita.
 - **Site analisado:** host da primeira resposta com `tipo_conteudo` `text/html` que não seja redirecionamento (3xx), em minúsculas e com a porta (`localhost:3000`). Sem resposta HTML, `None` (R13.3 usa o nome do HAR).
 
 ## 6. Identificar bibliotecas
@@ -521,7 +525,8 @@ Decidido na T34:
   "ia": { "chamadas": [], "travas_acionadas": [],
           "com_e_sem_ia": { "bibliotecas": { "so_por_assinatura": 7, "com_ia": 9 },
                             "achados": { "so_por_assinatura": 5, "com_ia": 8 } },
-          "tokens_total": null }
+          "tokens_total": null },
+  "visita": []
 }
 ```
 
@@ -536,6 +541,7 @@ Toda contagem que a tela mostra já vem no `resumo`. O React não calcula nada (
   - `ia.chamadas`: cada `ChamadaIA` como veio do cliente (`etapa`, `provedor`, `entrada` e `resposta` já sanitizadas, `duracao_s`, `tokens`, `sucesso`). Chamada que falhou leva o motivo em `resposta`.
   - `ia.com_e_sem_ia` (R11.3): com nomes em vez de pares, para ler sem consultar a ordem. `so_por_assinatura` conta as bibliotecas confirmadas com `metodo` "assinatura" e os achados delas; `com_ia` é o total da análise (assinatura + IA). Bibliotecas "a confirmar" não contam. Sem IA, `null` ("sem a comparação").
   - `ia.tokens_total`: soma dos `tokens` das chamadas; `null` sem IA ou quando alguma chamada não informou tokens (somar só as que informaram seria uma estimativa para menos, R11.2). Com IA e nenhuma chamada, `0`.
+- **Visita** (R22.2): cada `PassoDaVisita`, com a `url` sem os valores da query, mais `bibliotecas` (os `id` das bibliotecas com evidência naquela requisição) e `prioridade` (a mais alta delas, na ordem de R05.2, ou `null`).
 - `analise.data` é a hora local do início, sem fração de segundo, e é a mesma que dá o nome da pasta da análise.
 - Nada do HAR além de URL, nome e atributos de cookie e os trechos de evidência vai para o relatório: o leitor já não guarda valor de cookie nem cabeçalho de pedido (R16.4). A URL das evidências (bibliotecas e checagens) sai com a query string trocada por `[removido]`, e o detalhe da checagem leva a página sem a query string: tokens de redefinição de senha, `code` de OAuth e URLs assinadas não chegam ao relatório nem à task.
 
@@ -594,6 +600,17 @@ Componentes do MVP (padrões em `.kiro/steering/frontend-react.md`):
 - Painéis e modais (`PainelOrigemDoDado`, `ModalTask`, `Dica`) ficam fora das zonas, então funcionam igual. O `AvisoSemIA` aparece em versão compacta, numa linha.
 - Nenhum componente de zona sabe que está em foco. Só o `App` decide o que mostrar, o que mantém a regra de que eventos sobem por props.
 - Decidido na T32: o `App` embrulha cada zona numa `Zona` (nome + "Focar"); em foco, a `Zona` vem sem o cabeçalho e o `CabecalhoAnalise` sai de vista. As zonas mantêm a `key`, então o que estava aberto (`<details>`) continua aberto ao entrar e sair do foco. Ao entrar, o foco do teclado vai para a zona atual na `BarraDeFoco`; ao sair, para o "Focar" da zona, e a página rola até ela descontando o topo fixo. Esc não sai do foco com um `<dialog>` aberto ou quando a `Dica` já tratou o Esc (`defaultPrevented`). O `AvisoSemIA` recebe `recolhido` e fica na linha do título, com "Ver o que falta". A zona Rastreado traz os `Indicadores` e o `PainelIA` (T39); o `GraficoDispersao` ainda não tem task.
+
+**Replay da visita (R22).** Na zona Rastreado, antes dos `Indicadores`, só quando `visita` tem passos.
+
+- `ReplayDaVisita` tem o texto, a manchete, os contadores (arquivos e com falha), os controles e a legenda; `RadarDaVisita` é o desenho em SVG. Lado a lado a partir de 900px; abaixo disso, empilhados.
+- Os anéis são as camadas, não os domínios: os HARs da avaliação vêm de um host só.
+- O ângulo segue a ordem de chegada, não o tempo real: no tempo real quase tudo chega no primeiro décimo de segundo e os pontos se amontoam. O relógio do centro mostra o tempo real do HAR.
+- O replay dura 100 ms por requisição, entre 5 e 9 s. O relógio (`usarRelogioDoReplay`) anda com `requestAnimationFrame`; com `prefers-reduced-motion`, começa no fim e não toca.
+- Cada biblioteca com falha aparece uma vez, na primeira requisição em que chegou (`chegadasDaVisita.ts`, que só cruza `visita` com `bibliotecas`), com um rótulo ao lado do radar. Os rótulos se empilham sem sobrepor e o recorte do SVG só abre espaço do lado que tem rótulo (`geometriaDoRadar.ts`).
+- O rótulo é botão (clique, Enter ou espaço): o `App` sai do foco, abre o `<details>` da biblioteca e rola até ela, descontando o topo fixo.
+- A partir de 900px, a altura do radar vai até a dobra (`usarAlturaAteADobra`, que mede de novo quando a página muda de tamanho), também em foco.
+- É a única animação contínua do relatório, e só enquanto o replay toca.
 
 Ficam fora do MVP: `Tour`, `GuiaComoUsar`, `ModalPedidoFalsoPositivo`, `PainelBaseFalsosPositivos` e o vínculo de task.
 

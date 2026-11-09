@@ -1,6 +1,6 @@
 # Requisitos: Rastro MVP
 
-**O quê e por quê.** Este arquivo diz o que o MVP faz, sem dizer como. Ele parte do PRD (`docs/prd.pdf`, RF01 a RF16) e do que ele define como escopo do MVP.
+**O quê e por quê.** Este arquivo diz o que o MVP faz, sem dizer como. Ele parte do PRD (`docs/prd.pdf`, RF01 a RF17) e do que ele define como escopo do MVP.
 
 ## Como ler
 
@@ -255,6 +255,19 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 8. **Fatos só da fonte:** versão-alvo, CVE, GHSA, CVSS, EPSS, links, nota e prioridade DEVEM vir só das fontes de avisos (GitHub Advisory e, como complemento, OSV e NVD), do registro do npm e da fórmula. A IA nunca preenche esses campos.
 9. SE o registro do npm não responder, ENTÃO o Rastro DEVE manter a biblioteca por assinatura com o selo "não conferida no npm" e mandar a da IA para "a confirmar".
 10. O Rastro DEVE registrar no painel da IA cada vez que uma trava barrar algo: qual trava, o que foi barrado e por quê.
+
+## R22 Rever a visita (RF17)
+
+**Como** auditor, dev ou PO, **quero** ver a visita gravada no HAR tocada de novo, com cada biblioteca com falha aparecendo no momento em que chegou ao navegador, **para** entender num relance o que quem acessou o site recebeu.
+
+1. O Rastro DEVE ler de cada requisição do HAR o início (`startedDateTime`) e a duração (`time`). SE um deles faltar ou for inválido, ENTÃO a requisição fica sem esse dado e a leitura do HAR continua.
+2. O JSON DEVE trazer `visita`: um passo por requisição com início, em ordem de chegada, com o tempo em milissegundos desde a primeira requisição, a duração, a camada, a URL sem os valores da query, as bibliotecas identificadas naquela requisição e a prioridade mais alta entre elas. Requisição sem início fica de fora; sem nenhum início, `visita` vem vazia.
+3. A camada DEVE sair do tipo de conteúdo: `text/html` é página; JavaScript, script; `text/css`, estilo; imagem, fonte, vídeo e áudio, mídia; o resto, dados.
+4. QUANDO `visita` tiver passos, o relatório DEVE mostrar na zona Rastreado, antes dos indicadores, um radar que toca a visita: cada requisição aparece no anel da sua camada, na ordem de chegada, e cada biblioteca com falha aparece com nome, versão e prioridade no momento em que chegou. *(verificação manual)*
+5. O auditor DEVE poder tocar, pausar, recomeçar e escolher o ponto da visita numa linha do tempo, com mouse e teclado. ENQUANTO o sistema pedir menos movimento, o radar DEVE abrir já no fim, sem animação. *(verificação manual)*
+6. QUANDO o auditor acionar uma biblioteca no radar, o relatório DEVE abrir essa biblioteca nos Detalhes, saindo do modo foco se estiver nele. *(verificação manual)*
+7. O radar DEVE caber inteiro na primeira dobra em tela de computador (a partir de 900px de largura), também no modo foco, e funcionar no tema claro, no escuro e em 400px. *(verificação manual)*
+8. O radar DEVE mostrar só o que vem no JSON: tempo e ordem são os do HAR, e a prioridade é a das bibliotecas (R05.2).
 
 ---
 
