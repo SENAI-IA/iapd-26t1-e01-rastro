@@ -60,7 +60,7 @@ Sugestões da IA (identificação em bundles e explicações), por análise:
 | **Sugestões confirmadas / barradas** | | 1 / 1 | 1 / 1 |
 
 - A IA sugeriu 2 bibliotecas por provedor: o `@angular/core` 22.2.2 (confirmado) e o `jquery-form` 3.51.0 (barrado). O jQuery Form 3.51.0 está mesmo no WebGoat, mas a versão não aparece no trecho enviado, e ele nunca foi publicado no npm: se passasse da trava 3, a trava 4 o barraria.
-- Fora da IA, as travas também rodam sem IA: a trava 4 barrou a jQuery UI 1.10.3 (assinatura), e a trava 6 (faixa conferida) registrou 5 faixas que não valem para a versão no WebGoat (4 do Bootstrap 3.1.1 e 1 do jQuery 2.1.4). Esses 5 avisos continuam no relatório, porque outra faixa do mesmo aviso cobre a versão.
+- Fora da IA, as travas também rodam sem IA: a trava 4 barrou a jQuery UI 1.10.3 (assinatura), e a trava 6 (faixa conferida) registrava 5 faixas que não valem para a versão no WebGoat (4 do Bootstrap 3.1.1 e 1 do jQuery 2.1.4), embora esses 5 avisos continuassem no relatório, porque outra faixa do mesmo aviso cobre a versão. Desde o commit 1dc4d05, a trava 6 só registra o aviso quando nenhuma faixa dele vale; os números de bibliotecas e falhas não mudam.
 
 ## Custo da IA: tempo e tokens por provedor
 
@@ -78,7 +78,7 @@ Sugestões da IA (identificação em bundles e explicações), por análise:
 
 ## Codex
 
-Não medido. A CLI está instalada, mas a chave de API da máquina expirou: `codex exec` responde `401 Unauthorized ... expired_secret_key`. O Rastro rodou o Juice Shop e o Drupal com `--ia codex` mesmo assim: as 6 chamadas falharam (`a CLI do Codex terminou com código de saída 1`, registrado em `ia.chamadas`), a análise terminou com código 0 e o resultado foi o da assinatura (Juice Shop sem bibliotecas; Drupal com as 4 e o resumo do aviso no lugar da explicação). Falta medir com a chave renovada.
+Não medido. A CLI está instalada, mas a chave de API da máquina expirou: `codex exec` responde `401 Unauthorized ... expired_secret_key`. O Rastro rodou o Juice Shop e o Drupal com `--ia codex` mesmo assim: as 6 chamadas falharam (`a CLI do Codex terminou com código de saída 1`, registrado em `ia.chamadas`), a análise terminou com código 0 e o resultado foi o da assinatura (Juice Shop sem bibliotecas; Drupal com as 4 e o resumo do aviso no lugar da explicação). Na época, o relatório não avisava; desde o commit 061f1b1, o terminal e a faixa do topo dizem quantas chamadas falharam e o que ficou sem IA. Falta medir com a chave renovada.
 
 ## Tempo de triagem
 
