@@ -280,7 +280,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R08.3, R13.6
   - Revisão: @halan.bacca
 
-- [ ] **T27 Mostrar o aviso de análise sem IA**
+- [x] **T27 Mostrar o aviso de análise sem IA**
   - Entrega: componente `AvisoSemIA` e o indicador "encontradas só pela IA" como "não procurado".
   - Aceite: com `limitacoes` preenchido, a faixa aparece no topo e continua visível ao rolar; sem limitações, não aparece. *(verificação manual)*
   - Arquivos: `frontend/src/componentes/AvisoSemIA.*`, `frontend/src/App.tsx`

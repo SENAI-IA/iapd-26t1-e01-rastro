@@ -34,13 +34,17 @@ export default function Indicadores({ resumo, primeiraAcao }: Props) {
       <Indicador
         titulo="Encontradas só pela IA"
         icone="ia"
-        valor={resumo.encontradas_so_pela_ia === null ? "–" : String(resumo.encontradas_so_pela_ia)}
+        valor={resumo.encontradas_so_pela_ia === null ? "Não procurado" : String(resumo.encontradas_so_pela_ia)}
         selo={
           <Selo tom="ia" icone="ia">
             IA
           </Selo>
         }
-        descricao="Bibliotecas escondidas em bundles, que só a IA reconheceu."
+        descricao={
+          resumo.encontradas_so_pela_ia === null
+            ? "Análise sem IA: bibliotecas escondidas em bundles não foram procuradas."
+            : "Bibliotecas escondidas em bundles, que só a IA reconheceu."
+        }
       />
       <Indicador
         titulo="Primeira ação"

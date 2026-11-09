@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import type { Relatorio } from "./tipos.ts";
+import AvisoSemIA from "./componentes/AvisoSemIA.tsx";
 import BarraSuperior, { type Tema } from "./componentes/BarraSuperior.tsx";
 import CabecalhoAnalise from "./componentes/CabecalhoAnalise.tsx";
 import Indicadores from "./componentes/Indicadores.tsx";
@@ -28,7 +29,10 @@ export default function App({ relatorio }: Props) {
 
   return (
     <>
-      <BarraSuperior tema={tema} aoTrocarTema={trocarTema} />
+      <div className="app__topo">
+        <BarraSuperior tema={tema} aoTrocarTema={trocarTema} />
+        {relatorio && relatorio.analise.limitacoes.length > 0 && <AvisoSemIA analise={relatorio.analise} />}
+      </div>
       <main className="app">
         {relatorio === null ? (
           <p>Este arquivo não traz os dados de uma análise. Gere o relatório com o Rastro.</p>

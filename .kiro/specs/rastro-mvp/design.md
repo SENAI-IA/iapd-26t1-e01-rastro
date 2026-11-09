@@ -118,7 +118,7 @@ A análise sem IA é útil (máquina sem CLI de IA, primeira execução, testes)
 | `--help` | `--sem-ia  analisa sem IA: não procura bibliotecas em bundles e não explica os achados` |
 | Terminal, no início e no resumo final | `Atenção: análise sem IA. Bibliotecas em bundles não foram procuradas; podem existir falhas que não aparecem aqui.` |
 | JSON | `analise.ia: null`, `analise.limitacoes` com `bundles_nao_procurados` e `achados_sem_explicacao` (cada uma `{"id", "texto"}`), `analise.continua_igual` com o texto do que não muda e `resumo.encontradas_so_pela_ia: null` |
-| Relatório, no topo | faixa fixa `AvisoSemIA`: o que não foi feito, o que continua igual (nota, prioridade, checagens, plano) e o comando para rodar com IA |
+| Relatório, no topo | faixa fixa `AvisoSemIA`: o que não foi feito, o que continua igual (nota, prioridade, checagens, plano) e o comando para rodar com IA (`python -m rastro analisar <har>`) |
 | Indicador "encontradas só pela IA" | "não procurado", e não zero |
 | Painel "Onde a IA entrou" | "IA desligada nesta análise", sem a comparação com e sem IA |
 
@@ -504,7 +504,7 @@ Componentes do MVP (padrões em `.kiro/steering/frontend-react.md`):
 | Agir | `PlanoDeAcao` → `Acao`, `ModalTask` |
 | Detalhes | `ListaBibliotecas` → `LinhaBiblioteca` → `ExplicacaoIA`, `ListaFalhas` → `ItemFalha`; `ListaChecagens` → `ItemChecagem` |
 | Sob demanda | `PainelOrigemDoDado` |
-| Avisos | `AvisoSemIA` (só quando `analise.ia` é `null`); as outras `limitacoes` (ex.: `sem_javascript`) aparecem como aviso simples |
+| Avisos | `AvisoSemIA`: faixa no topo sempre que `analise.limitacoes` vier preenchido, presa junto da `BarraSuperior` ao rolar; lista cada limitação com o ícone do seu `id` e, quando `analise.ia` é `null`, o título "Análise sem IA", o `continua_igual` e o comando para rodar com IA. Com IA e só `sem_javascript`, a mesma faixa diz "Análise incompleta". Recolhível (`<details>`, aberta por padrão), para não tomar a tela em 400px. Decidido na T27. |
 | Apoio | `Termo` + `Dica`, `Selo` (e `SeloDePrioridade`), `Icone`; `formato.ts` só formata número, data e plural em pt-BR |
 | Modo foco | `BarraDeFoco`, e o botão "Focar" no cabeçalho de cada zona |
 

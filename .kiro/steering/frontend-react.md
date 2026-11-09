@@ -29,7 +29,7 @@ O relatório abre offline com duplo clique. O React monta a tela a partir do JSO
 Clique em qualquer dado abre a origem dele num painel lateral.
 
 - **Modo foco:** botão "Focar" em cada zona (Rastreado, Agir, Detalhes). O layout completo é o padrão; o foco é só um estado no `App.tsx` (`zonaEmFoco`), com `BarraDeFoco` no topo e Esc para sair. Nenhum componente de zona sabe que está em foco.
-- **Análise sem IA:** `AvisoSemIA` no topo, sempre visível, quando o JSON traz `limitacoes`. O indicador "encontradas só pela IA" mostra "não procurado", nunca zero.
+- **Análise sem IA:** `AvisoSemIA` no topo, sempre visível, quando o JSON traz `limitacoes`. Fica presa junto da `BarraSuperior` num único bloco fixo (`app__topo`, no `App.css`), para as duas não se sobreporem. O indicador "encontradas só pela IA" mostra "não procurado", nunca zero.
 - **A confirmar:** bibliotecas barradas pelas travas aparecem numa lista separada, com a trava que falhou e como conferir à mão.
 
 ## Identidade visual

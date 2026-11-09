@@ -1,3 +1,9 @@
+.app__topo {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
 .app {
   display: grid;
   gap: 20px;

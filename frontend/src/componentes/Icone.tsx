@@ -76,6 +76,13 @@ const TRACOS = {
       <path d="m4 7.5 8 4.5 8-4.5M12 12v9" />
     </>
   ),
+  certo: <path d="m5 12.5 4.5 4.5L19 7.5" />,
+  terminal: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="1" />
+      <path d="m7 9 3 3-3 3M12 15h5" />
+    </>
+  ),
   alvo: (
     <>
       <circle cx="12" cy="12" r="9" />

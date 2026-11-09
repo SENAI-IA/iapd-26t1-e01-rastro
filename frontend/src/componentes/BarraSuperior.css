@@ -1,7 +1,4 @@
 .barra-superior {
-  position: sticky;
-  top: 0;
-  z-index: 5;
   background: var(--cor-superficie);
   border-bottom: 1px solid var(--cor-linha);
 }
