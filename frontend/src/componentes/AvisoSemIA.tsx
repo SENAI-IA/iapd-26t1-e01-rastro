@@ -4,6 +4,7 @@ import "./AvisoSemIA.css";
 
 interface Props {
   analise: DadosDaAnalise;
+  recolhido?: boolean;
 }
 
 const ICONE_DA_LIMITACAO: Record<string, NomeDoIcone> = {
@@ -12,11 +13,11 @@ const ICONE_DA_LIMITACAO: Record<string, NomeDoIcone> = {
   sem_javascript: "arquivo",
 };
 
-export default function AvisoSemIA({ analise }: Props) {
+export default function AvisoSemIA({ analise, recolhido = false }: Props) {
   const semIA = analise.ia === null;
   return (
     <aside className="aviso-sem-ia" aria-label="Limitações da análise">
-      <details className="aviso-sem-ia__conteudo" open>
+      <details className="aviso-sem-ia__conteudo" open={!recolhido}>
         <summary className="aviso-sem-ia__titulo">
           <Icone nome="triangulo" tamanho={16} />
           {semIA ? "Análise sem IA: o resultado está incompleto." : "Análise incompleta."}

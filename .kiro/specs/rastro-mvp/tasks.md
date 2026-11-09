@@ -320,7 +320,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R09.2
   - Revisão: @halan.bacca
 
-- [ ] **T32 Ler uma zona por vez (modo foco)**
+- [x] **T32 Ler uma zona por vez (modo foco)**
   - Entrega: estado `zonaEmFoco` no `App`, botão "Focar" em cada zona e `BarraDeFoco`.
   - Aceite: o relatório abre como hoje; cada zona entra em foco e sai com Esc ou botão; painel de origem, glossário e task funcionam em foco; teclado e 400px conferidos. *(verificação manual)*
   - Arquivos: `frontend/src/App.tsx`, `frontend/src/componentes/BarraDeFoco.*`

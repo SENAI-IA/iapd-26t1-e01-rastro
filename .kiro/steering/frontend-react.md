@@ -28,7 +28,7 @@ O relatório abre offline com duplo clique. O React monta a tela a partir do JSO
 
 Clique em qualquer dado abre a origem dele num painel lateral (`PainelOrigemDoDado`, um `<dialog>` modal nativo: Esc, foco preso e devolvido sem código próprio). O painel só mostra o que o JSON traz: a conta da nota é `nota.conta`, nunca refeita no frontend.
 
-- **Modo foco:** botão "Focar" em cada zona (Rastreado, Agir, Detalhes). O layout completo é o padrão; o foco é só um estado no `App.tsx` (`zonaEmFoco`), com `BarraDeFoco` no topo e Esc para sair. Nenhum componente de zona sabe que está em foco.
+- **Modo foco:** botão "Focar" em cada zona (Rastreado, Agir, Detalhes). O layout completo é o padrão; o foco é só um estado no `App.tsx` (`zonaEmFoco`), com `BarraDeFoco` no topo e Esc para sair. O `App` embrulha cada zona numa `Zona` (nome e "Focar"); as zonas ficam em `dados/zonas.ts`. Nenhum componente de zona sabe que está em foco.
 - **Análise sem IA:** `AvisoSemIA` no topo, sempre visível, quando o JSON traz `limitacoes`. Fica presa junto da `BarraSuperior` num único bloco fixo (`app__topo`, no `App.css`), para as duas não se sobreporem. O indicador "encontradas só pela IA" mostra "não procurado", nunca zero.
 - **A confirmar:** bibliotecas barradas pelas travas aparecem numa lista separada (`ListaAConfirmar`), com a trava que falhou, o motivo e como conferir à mão. O "como conferir" é texto fixo por nome de trava, em `ItemAConfirmar.tsx`: trava nova que manda para "a confirmar" ganha a sua linha ali.
 - **Detalhes recolhidos:** biblioteca e checagem abrem fechadas (`<details>`); o resumo mostra o estado com selo (ícone + texto) e o corpo traz evidência e detalhe. Selo de estado só aparece quando o JSON traz o estado; o frontend não deduz estado.
