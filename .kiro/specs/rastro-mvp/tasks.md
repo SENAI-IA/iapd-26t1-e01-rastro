@@ -354,7 +354,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R14.4
   - Revisão: @luiz.pagliari
 
-- [ ] **T36 Chamar o Codex pela CLI**
+- [x] **T36 Chamar o Codex pela CLI**
   - Entrega: `provedores/codex.py`.
   - Aceite: igual à T35, com o formato do Codex.
   - Arquivos: `rastro/ia/provedores/codex.py`, `tests/ia/provedores/test_codex.py`

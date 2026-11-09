@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"o_que_e\": \"O jQuery 3.4.1 tem uma falha de XSS na função htmlPrefilter.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12692,"cached_input_tokens":0,"output_tokens":152,"reasoning_output_tokens":57}}

@@ -413,6 +413,13 @@ Decidido na T35:
 - Claude: saída que não é objeto JSON, `is_error: true` ou `result` vazio viram `FalhaDoProvedor` com o motivo em português.
 - A ligação dos provedores ao `cli.py` não está em nenhuma das T35–T37 (nenhuma lista o `cli.py`); até ela, o `cli.py` segue encerrando com código 1 e sugerindo `--sem-ia`.
 
+Decidido na T36:
+
+- Codex: a saída tem um evento JSON por linha. Linha que não é objeto JSON é ignorada (a CLI pode soltar aviso em texto); o que decide é achar o `agent_message`.
+- Codex: com mais de um `agent_message` no turno, vale o último, que é a resposta final. Sem nenhum (ou com `text` vazio), vira `FalhaDoProvedor`, mesmo com código de saída 0.
+- Codex: `tokens` é `input_tokens` + `output_tokens` do último `turn.completed`. `cached_input_tokens` já está dentro de `input_tokens` e `reasoning_output_tokens` dentro de `output_tokens`, por isso não entram na soma. Faltou campo ou valor não inteiro, fica `None` (R11.2), como no Claude.
+- A soma de tokens se repete em `claude.py` e `codex.py` (cada um com os seus campos). Duas cópias curtas não pedem módulo comum; o Kiro não informa tokens.
+
 ### Prompts
 
 Em `rastro/ia/prompts/`, um arquivo por tarefa, iguais para os três provedores:
