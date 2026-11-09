@@ -47,6 +47,6 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
 - **IA nova:** um arquivo em `ia/provedores/`.
 - **Assinatura nova:** em `identificacao/assinaturas.py`.
-- **Trava nova:** um arquivo em `travas/`, chamado por `conferencia.py`, com teste em que a IA (dublê) inventa algo e a trava barra.
+- **Trava nova:** um arquivo em `travas/`, chamado por `conferencia.py` (trava sobre biblioteca) ou direto pelo fluxo (trava sobre aviso ou explicação), com teste em que a IA (dublê) inventa algo e a trava barra.
 
 A skill `rastro-nova-regra` (`.kiro/skills/rastro-nova-regra/SKILL.md`) descreve o passo a passo.

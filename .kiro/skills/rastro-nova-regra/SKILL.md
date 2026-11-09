@@ -50,8 +50,8 @@ Cinco pontos de extensão, cada um com lugar fixo (`.kiro/steering/structure.md`
 
 ## Trava contra invenção
 
-1. **Arquivo:** `rastro/travas/<nome>.py`, uma função pura que responde a uma pergunta só (ex.: "a versão aparece no trecho?"). Chame-a em `rastro/travas/conferencia.py`, que decide "confirmada" ou "a confirmar".
-2. **O que barra fica registrado** como `TravaAcionada` (trava, alvo, motivo) no painel da IA (R21.10). A IA nunca preenche CVE, versão, CVSS, EPSS, nota ou versão-alvo (R21.8).
+1. **Arquivo:** `rastro/travas/<nome>.py`, uma função pura que responde a uma pergunta só (ex.: "a versão aparece no trecho?"). Trava sobre biblioteca é chamada em `rastro/travas/conferencia.py`, que decide "confirmada" ou "a confirmar". Trava sobre aviso ou explicação é chamada direto no fluxo e devolve o que passou e as `TravaAcionada` (ex.: `descartar_fora_da_faixa` em `faixa_de_versao.py`).
+2. **O que barra fica registrado** como `TravaAcionada` (trava, alvo, motivo), de `rastro/travas/modelos.py`, no painel da IA (R21.10). Dado que a trava não consegue ler (faixa, versão) também barra, com o motivo: o que não foi conferido não passa. A IA nunca preenche CVE, versão, CVSS, EPSS, nota ou versão-alvo (R21.8).
 3. **Spec:** acrescente a linha na tabela de travas do `design.md` (seção 8) e o critério em R21.
 4. **Teste** em `tests/travas/test_<nome>.py`: pelo menos um caso em que a IA (dublê) inventa algo e a trava barra, e um em que o dado verdadeiro passa. Se a trava consulta o npm, use o `RegistroDePacotes` dublê.
 5. **Cobertura:** acima de 80% em `travas/`.

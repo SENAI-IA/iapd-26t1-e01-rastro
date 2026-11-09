@@ -276,6 +276,11 @@ No spike, esse critério passou o acerto da IA (`@angular/core@22.2.2`) e barrou
 
 `vulnerable_version_range` do GitHub vem como `>= 1.2.0, < 3.5.0` ou `<= 2.1.0`. `faixa_de_versao.py` separa por vírgula, compara `x.y.z` como tupla de inteiros e trata pré-lançamento (`-beta`) como menor que a versão final. É só isso, sem biblioteca de semver.
 
+- Operadores: `<`, `<=`, `>`, `>=`, `=` (sem operador vale `=`). Versão com dois números completa com zero: o GitHub manda `>= 1.2, < 3.5.0` para o jQuery.
+- Entre pré-lançamentos vale a ordem do semver (`alpha` < `alpha.1` < `beta.2` < `beta.11` < `rc.1` < final); `+build` não conta.
+- `descartar_fora_da_faixa(pacote, versao, avisos)` devolve os avisos mantidos e uma `TravaAcionada` por aviso descartado (alvo `GHSA… em pacote@versão`).
+- Faixa ou versão que não se consegue ler também descarta o aviso, com o motivo registrado: a trava não confirma o que não conseguiu conferir, e o painel da IA mostra o caso.
+
 ### Explicação sem fato novo
 
 `explicacao.py` extrai do texto da IA todo padrão `CVE-\d+-\d+`, `GHSA-…`, `\d+\.\d+(\.\d+)?` e número com `%`, e exige que cada um esteja na entrada enviada. Qualquer sobra descarta a explicação.

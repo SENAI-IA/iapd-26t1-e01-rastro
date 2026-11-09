@@ -166,7 +166,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R04.1–R04.6
   - Revisão: @cristiano.albino
 
-- [ ] **T13 Conferir a faixa de versão afetada**
+- [x] **T13 Conferir a faixa de versão afetada**
   - Entrega: trava `faixa_de_versao.py`, aplicada a cada aviso.
   - Aceite: `>= 1.2.0, < 3.5.0` contém 3.4.1 e não contém 3.5.0; pré-lançamento é menor que a final; aviso fora da faixa é descartado e registrado.
   - Arquivos: `rastro/travas/faixa_de_versao.py`, `rastro/travas/modelos.py`, `tests/travas/test_faixa_de_versao.py`
