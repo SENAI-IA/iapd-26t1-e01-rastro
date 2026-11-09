@@ -20,6 +20,7 @@ Cinco pontos de extensão, cada um com lugar fixo (`.kiro/steering/structure.md`
 1. **Arquivo:** uma função pura nova em `rastro/configuracao/checagens.py`, assinatura `(requisicoes, site) -> Checagem`, com o próximo ID livre (`C09`…).
 2. **Dados fixos da regra:** uma `RegraDeChecagem` (ID, título, severidade, quem resolve) no topo de `checagens.py`, como na tabela do `design.md` (seção 10). Acrescente a linha nessa tabela.
 3. **Só o site analisado:** ignore respostas de outros hosts. Cabeçalho falha se alguma resposta HTML do site falha, e a evidência é a primeira delas. Use `paginas_html_do_site` e `checar_paginas_do_site`, que já dão o "não verificada" quando não há página HTML do site e a evidência do "passou"; a checagem nova só escreve a função que diz se uma página falha. Regra que não se aplica ao site (ex.: HSTS sem HTTPS) fica "não verificada", nunca "passou".
+   Checagem de cookie olha as respostas do site com cookie, de qualquer tipo: use `respostas_do_site_com_cookies` e `checar_cookies_do_site`, que dão o "não verificada" do HAR sem cookies (R06.7) e listam só o nome do cookie, nunca o valor; a checagem nova só escreve a função que diz se um `Cookie` falha.
 4. **Teste** em `tests/configuracao/test_checagens.py`: um caso que falha, um que passa e um com resposta de outro host que não conta. Monte as `Requisicao` no próprio teste, sem HAR.
 5. **Cobertura:** acima de 80% em `configuracao/`.
 

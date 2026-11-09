@@ -3,7 +3,7 @@ from collections.abc import Callable
 from urllib.parse import urlsplit
 
 from rastro.configuracao.modelos import Checagem, RegraDeChecagem, SituacaoDaChecagem
-from rastro.har.modelos import Requisicao
+from rastro.har.modelos import Cookie, Requisicao
 from rastro.har.site import e_pagina_html, host_com_porta
 from rastro.identificacao.modelos import Evidencia
 
@@ -12,13 +12,22 @@ HSTS_AUSENTE = RegraDeChecagem("C02", "HSTS ausente", "media", "infra")
 NOSNIFF_AUSENTE = RegraDeChecagem("C03", "nosniff ausente", "baixa", "infra")
 FRAME_SEM_PROTECAO = RegraDeChecagem("C04", "proteção contra frame ausente", "baixa", "infra")
 SERVIDOR_EXPOE_VERSAO = RegraDeChecagem("C05", "servidor expõe versão", "baixa", "infra")
+COOKIE_SEM_HTTPONLY = RegraDeChecagem("C06", "cookie sem HttpOnly", "media", "dev back-end")
+COOKIE_SEM_SECURE = RegraDeChecagem("C07", "cookie sem Secure", "media", "dev back-end")
+COOKIE_SEM_SAMESITE = RegraDeChecagem("C08", "cookie sem SameSite", "baixa", "dev back-end")
 
 CABECALHOS_DE_SERVIDOR = ("server", "x-powered-by")
 PADRAO_DE_VERSAO = re.compile(r"\d+\.\d+|/v?\d+")
 SEPARADOR_DE_DIRETIVAS_CSP = re.compile(r"[;,]")
 
+MOTIVO_SEM_COOKIES = (
+    "o HAR não traz cookies do site analisado (ex.: exportado no modo sanitized); "
+    "exportar o HAR completo inclui as checagens de cookie C06 a C08"
+)
+
 TesteDeFalha = Callable[[Requisicao], bool]
 TrechoDaEvidencia = Callable[[Requisicao], str | None]
+TesteDeCookie = Callable[[Cookie], bool]
 
 
 def checar_csp(requisicoes: list[Requisicao], site: str | None) -> Checagem:
@@ -69,6 +78,84 @@ def checar_versao_do_servidor(requisicoes: list[Requisicao], site: str | None) -
         "o cabeçalho mostra a versão do servidor",
         cabecalhos_com_versao,
     )
+
+
+def checar_cookie_sem_httponly(requisicoes: list[Requisicao], site: str | None) -> Checagem:
+    return checar_cookies_do_site(
+        COOKIE_SEM_HTTPONLY,
+        respostas_do_site_com_cookies(requisicoes, site),
+        sem_httponly,
+        "cookies sem HttpOnly",
+    )
+
+
+def checar_cookie_sem_secure(requisicoes: list[Requisicao], site: str | None) -> Checagem:
+    respostas = respostas_do_site_com_cookies(requisicoes, site)
+    respostas_em_https = [resposta for resposta in respostas if usa_https(resposta)]
+    if respostas and not respostas_em_https:
+        return nao_verificada(COOKIE_SEM_SECURE, "o site não usa HTTPS; Secure só vale em HTTPS")
+    return checar_cookies_do_site(
+        COOKIE_SEM_SECURE,
+        respostas_em_https,
+        sem_secure,
+        "cookies em HTTPS sem Secure",
+    )
+
+
+def checar_cookie_sem_samesite(requisicoes: list[Requisicao], site: str | None) -> Checagem:
+    return checar_cookies_do_site(
+        COOKIE_SEM_SAMESITE,
+        respostas_do_site_com_cookies(requisicoes, site),
+        sem_samesite,
+        "cookies sem SameSite",
+    )
+
+
+def respostas_do_site_com_cookies(
+    requisicoes: list[Requisicao], site: str | None
+) -> list[Requisicao]:
+    respostas = []
+    for requisicao in requisicoes:
+        if requisicao.cookies_resposta and e_do_site(requisicao, site):
+            respostas.append(requisicao)
+    return respostas
+
+
+def checar_cookies_do_site(
+    regra: RegraDeChecagem,
+    respostas: list[Requisicao],
+    falha: TesteDeCookie,
+    motivo_da_falha: str,
+) -> Checagem:
+    if not respostas:
+        return nao_verificada(regra, MOTIVO_SEM_COOKIES)
+    respostas_que_falham = [
+        resposta for resposta in respostas if tem_cookie_que_falha(resposta, falha)
+    ]
+    if respostas_que_falham:
+        nomes = nomes_dos_cookies(respostas_que_falham, falha)
+        primeira = respostas_que_falham[0]
+        evidencia = Evidencia(primeira.indice, primeira.url, f"cookie: {nomes[0]}")
+        detalhe = f"{motivo_da_falha}: {', '.join(nomes)}"
+        return montar_checagem(regra, "falhou", evidencia, detalhe)
+    primeira = respostas[0]
+    evidencia = Evidencia(primeira.indice, primeira.url, None)
+    quantidade = len(nomes_dos_cookies(respostas, qualquer_cookie))
+    detalhe = f"os {quantidade} cookies do site conferidos passaram"
+    return montar_checagem(regra, "passou", evidencia, detalhe)
+
+
+def tem_cookie_que_falha(resposta: Requisicao, falha: TesteDeCookie) -> bool:
+    return any(falha(cookie) for cookie in resposta.cookies_resposta)
+
+
+def nomes_dos_cookies(respostas: list[Requisicao], filtro: TesteDeCookie) -> list[str]:
+    nomes: list[str] = []
+    for resposta in respostas:
+        for cookie in resposta.cookies_resposta:
+            if filtro(cookie) and cookie.nome not in nomes:
+                nomes.append(cookie.nome)
+    return nomes
 
 
 def paginas_html_do_site(requisicoes: list[Requisicao], site: str | None) -> list[Requisicao]:
@@ -177,3 +264,19 @@ def cabecalhos_com_versao(pagina: Requisicao) -> str | None:
         if PADRAO_DE_VERSAO.search(valor):
             return f"{nome}: {valor}"
     return None
+
+
+def qualquer_cookie(_cookie: Cookie) -> bool:
+    return True
+
+
+def sem_httponly(cookie: Cookie) -> bool:
+    return not cookie.http_only
+
+
+def sem_secure(cookie: Cookie) -> bool:
+    return not cookie.secure
+
+
+def sem_samesite(cookie: Cookie) -> bool:
+    return not (cookie.same_site or "").strip()

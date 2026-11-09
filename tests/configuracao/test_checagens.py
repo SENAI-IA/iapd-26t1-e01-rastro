@@ -1,8 +1,12 @@
 from collections.abc import Callable
+from pathlib import Path
 
 import pytest
 
 from rastro.configuracao.checagens import (
+    checar_cookie_sem_httponly,
+    checar_cookie_sem_samesite,
+    checar_cookie_sem_secure,
     checar_csp,
     checar_hsts,
     checar_nosniff,
@@ -10,9 +14,13 @@ from rastro.configuracao.checagens import (
     checar_versao_do_servidor,
 )
 from rastro.configuracao.modelos import Checagem
-from rastro.har.modelos import Requisicao
+from rastro.har.leitor import ler_har
+from rastro.har.modelos import Cookie, Requisicao
+from rastro.har.site import descobrir_site_analisado
 
 SITE = "loja.exemplo:8443"
+RAIZ_DO_PROJETO = Path(__file__).resolve().parents[2]
+COOKIE_SEGURO = Cookie("sessao", http_only=True, secure=True, same_site="Lax")
 
 CABECALHOS_SEGUROS = {
     "content-security-policy": "default-src 'self'",
@@ -32,6 +40,12 @@ TODAS_AS_CHECAGENS: list[Checar] = [
     checar_versao_do_servidor,
 ]
 
+CHECAGENS_DE_COOKIE: list[Checar] = [
+    checar_cookie_sem_httponly,
+    checar_cookie_sem_secure,
+    checar_cookie_sem_samesite,
+]
+
 
 def resposta(
     indice: int,
@@ -39,6 +53,7 @@ def resposta(
     url: str = f"https://{SITE}/",
     tipo_conteudo: str = "text/html",
     status: int = 200,
+    cookies: list[Cookie] | None = None,
 ) -> Requisicao:
     return Requisicao(
         indice=indice,
@@ -47,7 +62,7 @@ def resposta(
         status=status,
         tipo_conteudo=tipo_conteudo,
         cabecalhos_resposta=cabecalhos,
-        cookies_resposta=[],
+        cookies_resposta=cookies or [],
         conteudo=None,
     )
 
@@ -277,3 +292,146 @@ def test_r06_1_sem_site_analisado_nao_verificada() -> None:
     checagem = checar_csp([resposta(0, {})], None)
 
     assert checagem.situacao == "nao_verificada"
+
+
+def com_cookies(indice: int, *cookies: Cookie, url: str = f"https://{SITE}/api") -> Requisicao:
+    return resposta(indice, {}, url=url, tipo_conteudo="application/json", cookies=list(cookies))
+
+
+@pytest.mark.parametrize("checar", CHECAGENS_DE_COOKIE)
+def test_r06_6_cookie_com_todos_os_atributos_passa(checar: Checar) -> None:
+    checagem = checar([com_cookies(2, COOKIE_SEGURO)], SITE)
+
+    assert checagem.situacao == "passou"
+    assert checagem.evidencia is not None
+    assert checagem.evidencia.indice_requisicao == 2
+
+
+@pytest.mark.parametrize(
+    ("checar", "cookie"),
+    [
+        (checar_cookie_sem_httponly, Cookie("sessao", False, True, "Lax")),
+        (checar_cookie_sem_secure, Cookie("sessao", True, False, "Lax")),
+        (checar_cookie_sem_samesite, Cookie("sessao", True, True, None)),
+        (checar_cookie_sem_samesite, Cookie("sessao", True, True, " ")),
+    ],
+)
+def test_r06_6_atributo_ausente_falha_com_o_nome_do_cookie(checar: Checar, cookie: Cookie) -> None:
+    checagem = checar([com_cookies(4, COOKIE_SEGURO, cookie)], SITE)
+
+    assert checagem.situacao == "falhou"
+    assert checagem.evidencia is not None
+    assert checagem.evidencia.indice_requisicao == 4
+    assert checagem.evidencia.trecho == "cookie: sessao"
+    assert checagem.detalhe.endswith(": sessao")
+
+
+def test_r06_6_um_cookie_sem_httponly_nao_derruba_as_outras_checagens() -> None:
+    sem_httponly = Cookie("preferencia", http_only=False, secure=True, same_site="Strict")
+    requisicoes = [com_cookies(0, sem_httponly)]
+
+    assert checar_cookie_sem_httponly(requisicoes, SITE).situacao == "falhou"
+    assert checar_cookie_sem_secure(requisicoes, SITE).situacao == "passou"
+    assert checar_cookie_sem_samesite(requisicoes, SITE).situacao == "passou"
+
+
+def test_r06_6_lista_cada_cookie_que_falha_uma_vez_e_evidencia_e_a_primeira() -> None:
+    sessao = Cookie("sessao", http_only=False, secure=True, same_site="Lax")
+    rastreio = Cookie("rastreio", http_only=False, secure=True, same_site="Lax")
+    requisicoes = [
+        com_cookies(0, COOKIE_SEGURO),
+        com_cookies(1, sessao),
+        com_cookies(2, sessao, rastreio),
+    ]
+
+    checagem = checar_cookie_sem_httponly(requisicoes, SITE)
+
+    assert checagem.detalhe == "cookies sem HttpOnly: sessao, rastreio"
+    assert checagem.evidencia is not None
+    assert checagem.evidencia.indice_requisicao == 1
+
+
+@pytest.mark.parametrize("checar", CHECAGENS_DE_COOKIE)
+def test_r06_6_cookie_de_outro_host_nao_conta(checar: Checar) -> None:
+    inseguro = Cookie("anuncio", http_only=False, secure=False, same_site=None)
+    requisicoes = [
+        com_cookies(0, COOKIE_SEGURO),
+        com_cookies(1, inseguro, url="https://anuncios.exemplo/pixel"),
+    ]
+
+    assert checar(requisicoes, SITE).situacao == "passou"
+
+
+def test_r06_6_cookie_sem_secure_em_http_nao_conta_quando_o_site_usa_https() -> None:
+    inseguro = Cookie("sessao", http_only=True, secure=False, same_site="Lax")
+    requisicoes = [
+        com_cookies(0, inseguro, url=f"http://{SITE}/"),
+        com_cookies(1, COOKIE_SEGURO),
+    ]
+
+    assert checar_cookie_sem_secure(requisicoes, SITE).situacao == "passou"
+
+
+def test_r06_6_site_so_em_http_deixa_secure_nao_verificada() -> None:
+    inseguro = Cookie("sessao", http_only=True, secure=False, same_site="Lax")
+
+    checagem = checar_cookie_sem_secure([com_cookies(0, inseguro, url=f"http://{SITE}/")], SITE)
+
+    assert checagem.situacao == "nao_verificada"
+    assert checagem.evidencia is None
+
+
+@pytest.mark.parametrize(
+    ("checar", "id_da_checagem", "severidade"),
+    [
+        (checar_cookie_sem_httponly, "C06", "media"),
+        (checar_cookie_sem_secure, "C07", "media"),
+        (checar_cookie_sem_samesite, "C08", "baixa"),
+    ],
+)
+def test_r06_6_checagem_traz_severidade_e_quem_resolve(
+    checar: Checar, id_da_checagem: str, severidade: str
+) -> None:
+    checagem = checar([com_cookies(0, Cookie("sessao", False, False, None))], SITE)
+
+    assert checagem.id == id_da_checagem
+    assert checagem.severidade == severidade
+    assert checagem.quem_resolve == "dev back-end"
+
+
+@pytest.mark.parametrize("checar", CHECAGENS_DE_COOKIE)
+def test_r06_7_sem_cookies_do_site_nao_verificada_e_sugere_har_completo(checar: Checar) -> None:
+    requisicoes = [resposta(0, CABECALHOS_SEGUROS)]
+
+    checagem = checar(requisicoes, SITE)
+
+    assert checagem.situacao == "nao_verificada"
+    assert checagem.evidencia is None
+    assert "HAR completo" in checagem.detalhe
+
+
+@pytest.mark.parametrize("checar", CHECAGENS_DE_COOKIE)
+def test_r06_7_sem_site_analisado_nao_verificada(checar: Checar) -> None:
+    assert checar([com_cookies(0, COOKIE_SEGURO)], None).situacao == "nao_verificada"
+
+
+@pytest.mark.parametrize("checar", CHECAGENS_DE_COOKIE)
+def test_r06_7_har_sanitized_real_da_nao_verificada(checar: Checar) -> None:
+    requisicoes = ler_har(RAIZ_DO_PROJETO / "avaliacao" / "webgoat.har")
+
+    checagem = checar(requisicoes, descobrir_site_analisado(requisicoes))
+
+    assert checagem.situacao == "nao_verificada"
+
+
+def test_r06_6_valor_do_cookie_nunca_aparece_no_resultado() -> None:
+    requisicoes = ler_har(RAIZ_DO_PROJETO / "tests" / "dados" / "har-valido.har")
+    site = descobrir_site_analisado(requisicoes)
+
+    checagens = [checar(requisicoes, site) for checar in CHECAGENS_DE_COOKIE]
+
+    assert [checagem.situacao for checagem in checagens] == ["falhou", "falhou", "passou"]
+    assert "idioma" in checagens[0].detalhe
+    for checagem in checagens:
+        assert "valor-ficticio" not in repr(checagem)
+        assert "pt-BR" not in repr(checagem)

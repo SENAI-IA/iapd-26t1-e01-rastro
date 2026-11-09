@@ -353,7 +353,10 @@ Só as respostas do site analisado. Cada checagem é uma função pura `(requisi
 - C04 aceita `frame-ancestors` como diretiva da CSP (separada por `;` ou `,`), não como texto em outro valor.
 - C05 procura versão no padrão `\d+\.\d+` ou `/` seguido de dígito (`PHP/7.3.12`, `nginx/1`); o trecho da evidência é o cabeçalho, ex.: `x-powered-by: PHP/7.3.12`.
 - Severidade e quem resolve ficam numa `RegraDeChecagem` fixa por ID, em `checagens.py`.
-- C06 a C08 viram "não verificada" quando não há nenhum cookie do site (R06.7).
+- C06 a C08 viram "não verificada" quando não há nenhum cookie do site (R06.7), com o detalhe dizendo que o HAR completo inclui essas checagens.
+- Cookie do site é o de qualquer resposta do host do site analisado (HTML, API ou redirecionamento), não só das páginas HTML. Falha se algum cookie falha: o detalhe lista os nomes, sem repetir; a evidência é a primeira resposta com cookie que falha, com o trecho `cookie: <nome>`. Nunca o valor (R16.4), que nem chega ao `Cookie`.
+- C07 só confere cookies de respostas em HTTPS; site só em HTTP deixa a C07 "não verificada", como a C02.
+- C08 aceita qualquer valor de `SameSite`, inclusive `None`: a regra é sobre o atributo ausente.
 - A severidade da checagem vira a prioridade da ação. Checagens não têm nota.
 
 ## 11. IA

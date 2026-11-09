@@ -222,7 +222,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R06.1–R06.5, R06.8
   - Revisão: @geison.santos
 
-- [ ] **T20 Checar os cookies**
+- [x] **T20 Checar os cookies**
   - Entrega: checagens C06 a C08 e o estado "não verificada".
   - Aceite: HAR sanitized dá "não verificada"; o valor do cookie nunca aparece no resultado.
   - Arquivos: `rastro/configuracao/checagens.py`, `tests/configuracao/test_checagens.py`
