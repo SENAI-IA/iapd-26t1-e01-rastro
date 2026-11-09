@@ -158,7 +158,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R02.2, R02.3
   - Revisão: @ali.santos
 
-- [ ] **T12 Consultar o GitHub Advisory**
+- [x] **T12 Consultar o GitHub Advisory**
   - Entrega: `ConectorDeAvisos` e `GitHubAdvisory.consultar(pacote, versao)`.
   - Aceite: converte uma resposta gravada em `Aviso`; usa o token quando existe; erro de rede vira "não consultada"; descarta aviso retirado; CVSS com `score: 0.0` e vetor nulo conta como ausente; sem a chave `epss`, o percentil fica `None`.
   - Arquivos: `rastro/fontes/conector.py`, `rastro/fontes/github_advisory.py`, `tests/fontes/test_github_advisory.py`, `tests/dados/advisory-*.json`

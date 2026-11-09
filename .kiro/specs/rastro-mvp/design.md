@@ -201,14 +201,15 @@ Formato conferido no spike T01 (`docs/spike/github-advisory.md`).
 | `ghsa`, `cve`, `resumo`, `link` | `ghsa_id`, `cve_id` (pode ser `null`), `summary`, `html_url` |
 | `cvss` | `cvss_severities.cvss_v3.score`; senão, `cvss_v4.score`; senão, nenhum. Cada um só vale com `vector_string` preenchido: CVSS ausente vem como `score: 0.0` e vetor `null`. O campo legado `cvss` não é usado. |
 | `percentil_epss` | `epss.percentile` (0 a 1). Sem EPSS, a chave `epss` não vem na resposta. |
-| `versoes_afetadas`, `versao_corrigida` | itens de `vulnerabilities` com `package.ecosystem == "npm"` e `package.name == pacote`; vale o item cuja `vulnerable_version_range` contém a versão (trava 6). `first_patched_version` pode ser `null`. |
+| `versoes_afetadas`, `versao_corrigida` | itens de `vulnerabilities` com `package.ecosystem == "npm"` e `package.name == pacote`, um `Aviso` por item (`vulnerable_version_range` e `first_patched_version`, que pode ser `null`); a trava 6 fica com o item cuja faixa contém a versão. |
+| `apelidos` | valores de `identifiers` diferentes do GHSA (o CVE, quando há) |
 
 - Aviso com `withdrawn_at` preenchido (retirado) é descartado (R04.6).
 - `urllib.request` com tempo limite de 15 s. Sem token, o limite é de 60 requisições por hora por IP, uma por biblioteca: uma análise cabe nele; várias na mesma hora dividem as 60. Com `GITHUB_TOKEN`, 5.000 por hora.
 - Sem paginação: com `per_page=100`, nenhuma resposta do spike passou de 26 avisos.
 - Lista vazia não prova que o pacote existe; isso é da trava 4.
 - Erro de rede, HTTP 403/429 ou 5xx → biblioteca "não consultada" com o motivo (R04.3). A análise continua.
-- `ConectorDeAvisos.consultar(pacote, versao) -> list[Aviso]`. Nos testes, `ConectorFalso` devolve avisos fixos.
+- `ConectorDeAvisos.consultar(pacote, versao) -> list[Aviso]`, em `fontes/conector.py`, junto com o `Aviso` e a exceção `ConsultaNaoRealizada(motivo)`. A falha (rede, tempo esgotado, HTTP de erro, resposta que não é JSON ou fora do formato) vira essa exceção com o motivo pronto; o fluxo a captura e marca a biblioteca como "não consultada" (R04.3). Nos testes, `ConectorFalso` devolve avisos fixos.
 
 ### OSV e NVD, extensão opcional (R04A)
 

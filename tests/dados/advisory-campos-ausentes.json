@@ -1,0 +1,50 @@
+[
+  {
+    "ghsa_id": "GHSA-aaaa-bbbb-cccc",
+    "cve_id": null,
+    "html_url": "https://github.com/advisories/GHSA-aaaa-bbbb-cccc",
+    "summary": "Aviso sem CVE, sem CVSS e sem EPSS (exemplo feito à mão)",
+    "type": "reviewed",
+    "identifiers": [
+      {"value": "GHSA-aaaa-bbbb-cccc", "type": "GHSA"}
+    ],
+    "withdrawn_at": null,
+    "vulnerabilities": [
+      {
+        "package": {"ecosystem": "npm", "name": "pacote-exemplo"},
+        "vulnerable_version_range": "<= 1.0.0",
+        "first_patched_version": null
+      }
+    ],
+    "cvss": null,
+    "cvss_severities": {
+      "cvss_v3": {"vector_string": null, "score": 0.0},
+      "cvss_v4": {"vector_string": null, "score": 0.0}
+    }
+  },
+  {
+    "ghsa_id": "GHSA-dddd-eeee-ffff",
+    "cve_id": "CVE-2099-0001",
+    "html_url": "https://github.com/advisories/GHSA-dddd-eeee-ffff",
+    "summary": "Aviso só com CVSS v4 (exemplo feito à mão)",
+    "type": "reviewed",
+    "identifiers": [
+      {"value": "GHSA-dddd-eeee-ffff", "type": "GHSA"},
+      {"value": "CVE-2099-0001", "type": "CVE"}
+    ],
+    "withdrawn_at": null,
+    "vulnerabilities": [
+      {
+        "package": {"ecosystem": "npm", "name": "pacote-exemplo"},
+        "vulnerable_version_range": ">= 0.5.0, < 1.2.0",
+        "first_patched_version": "1.2.0"
+      }
+    ],
+    "cvss": null,
+    "cvss_severities": {
+      "cvss_v3": {"vector_string": null, "score": 0.0},
+      "cvss_v4": {"vector_string": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N", "score": 8.7}
+    },
+    "epss": {"percentage": 0.001, "percentile": 0.4}
+  }
+]

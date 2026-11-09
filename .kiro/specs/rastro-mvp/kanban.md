@@ -29,7 +29,8 @@ _(vazio)_
 - [ ] **T08** Ler e validar o HAR · fase 1 · revisão @ali.santos · commit e4e8a26 · 06/11
 - [ ] **T09** Descobrir o site analisado · fase 1 · revisão @ali.santos · commit aa540f5 · 06/11
 - [ ] **T10** Identificar bibliotecas pelo nome do arquivo · fase 1 · revisão @ali.santos · commit 10dfc8e · 06/11
-- [ ] **T11** Identificar bibliotecas pelo comentário de versão · fase 1 · revisão @ali.santos · 09/11
+- [ ] **T11** Identificar bibliotecas pelo comentário de versão · fase 1 · revisão @ali.santos · commit 42ae31a · 09/11
+- [ ] **T12** Consultar o GitHub Advisory · fase 1 · revisão @cristiano.albino · 09/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -40,7 +41,6 @@ _(vazio)_
 
 ### Fase 1. Núcleo determinístico
 
-- [ ] **T12** Consultar o GitHub Advisory · fase 1 · 16–25/11 · revisão @cristiano.albino
 - [ ] **T13** Conferir a faixa de versão afetada · fase 1 · 16–25/11 · revisão @cristiano.albino
 - [ ] **T14** Conferir no npm se o pacote existe · fase 1 · 16–25/11 · revisão @cristiano.albino
 - [ ] **T15** Travar a resposta da IA: formato e ancoragem · fase 1 · 16–25/11 · revisão @cristiano.albino

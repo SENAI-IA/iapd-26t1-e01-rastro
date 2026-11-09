@@ -34,9 +34,9 @@ Cinco pontos de extensão, cada um com lugar fixo (`.kiro/steering/structure.md`
 ## Fonte de dados de vulnerabilidades
 
 1. **Arquivo:** `rastro/fontes/<nome>.py`, uma classe que implementa `ConectorDeAvisos` (`rastro/fontes/conector.py`): `consultar(pacote, versao) -> list[Aviso]`. Fonte que só completa um campo, sem buscar avisos (como o NVD), não usa a interface.
-2. **Só fonte oficial** (R04.5), com `urllib.request` e tempo limite. Erro de rede, limite ou 5xx vira "não consultada" com o motivo, e a análise segue (R04.3).
+2. **Só fonte oficial** (R04.5), com `urllib.request` e tempo limite. Erro de rede, tempo esgotado, limite, 5xx ou resposta fora do formato vira `ConsultaNaoRealizada(motivo)` (de `conector.py`), com o motivo pronto em português; o fluxo marca a biblioteca "não consultada" e a análise segue (R04.3). A leitura dos campos fica em funções puras no mesmo arquivo (`converter_resposta`), separadas da chamada à rede. Faixa de versão: um `Aviso` por faixa do pacote; quem escolhe é a trava 6.
 3. **Junção:** avisos iguais de fontes diferentes se juntam em `fontes/juncao.py`, pela ordem fixa de fontes (R04A.4). A faixa de versão passa pela trava 6.
-4. **Teste** em `tests/fontes/test_<nome>.py`: troque `urlopen` por uma função que devolve uma resposta gravada em `tests/dados/`. Cubra a conversão dos campos, a falha de rede e o aviso retirado.
+4. **Teste** em `tests/fontes/test_<nome>.py`: troque `urlopen` (importado no módulo da fonte com `from urllib.request import urlopen`) por um dublê que guarda a `Request` e devolve uma resposta gravada em `tests/dados/<fonte>-*.json`. Cubra a URL e os cabeçalhos enviados, a conversão dos campos (inclusive os ausentes), a falha de rede, os códigos HTTP de erro e o aviso retirado. Variável de ambiente (token) com `monkeypatch.setenv`/`delenv`.
 5. **Cobertura:** acima de 80% em `fontes/`.
 6. **Steering:** acrescente o domínio na seção "Rede" do `tech.md` e registre a decisão em `docs/decisoes/`.
 
