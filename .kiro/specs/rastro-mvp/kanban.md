@@ -36,7 +36,8 @@ _(vazio)_
 - [ ] **T15** Travar a resposta da IA: formato e ancoragem · fase 1 · revisão @cristiano.albino · commit 0169a38 · 09/11
 - [ ] **T16** Barrar explicação com fato novo · fase 1 · revisão @cristiano.albino · commit 8c9fdd2 · 09/11
 - [ ] **T17** Calcular a nota de risco · fase 1 · revisão @geison.santos · commit 2da7b15 · 09/11
-- [ ] **T18** Classificar a prioridade e ordenar · fase 1 · revisão @geison.santos · 09/11
+- [ ] **T18** Classificar a prioridade e ordenar · fase 1 · revisão @geison.santos · commit 11d7443 · 09/11
+- [ ] **T19** Checar os cabeçalhos de segurança · fase 1 · revisão @geison.santos · 09/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -47,7 +48,6 @@ _(vazio)_
 
 ### Fase 1. Núcleo determinístico
 
-- [ ] **T19** Checar os cabeçalhos de segurança · fase 1 · 16–25/11 · revisão @geison.santos
 - [ ] **T20** Checar os cookies · fase 1 · 16–25/11 · revisão @geison.santos
 - [ ] **T21** Montar o plano de ação · fase 1 · 16–25/11 · revisão @geison.santos
 - [ ] **T22** Gerar o texto da task · fase 1 · 16–25/11 · revisão @geison.santos

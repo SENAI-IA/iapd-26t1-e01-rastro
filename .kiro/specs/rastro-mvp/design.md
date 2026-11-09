@@ -132,7 +132,7 @@ O texto das limitações sai do Python, no campo `limitacoes`. O React só exibe
 | `Aviso` | `fontes: list[str]`, `apelidos: list[str]`, `ghsa`, `cve`, `resumo`, `cvss: float \| None`, `percentil_epss: float \| None`, `versoes_afetadas`, `versao_corrigida: str \| None`, `link` |
 | `Nota` | `valor: float \| None`, `prioridade: "alta" \| "media" \| "baixa" \| "a avaliar"`, `conta: str`, `sem_epss: bool` |
 | `Achado` | `biblioteca`, `aviso`, `nota` |
-| `Checagem` | `id`, `titulo`, `situacao: "falhou" \| "passou" \| "nao_verificada"`, `severidade`, `quem_resolve`, `evidencia`, `detalhe` |
+| `Checagem` | `id`, `titulo`, `situacao: "falhou" \| "passou" \| "nao_verificada"`, `severidade: "alta" \| "media" \| "baixa"`, `quem_resolve`, `evidencia: Evidencia \| None`, `detalhe` |
 | `Explicacao` | `o_que_e`, `impacto`, `como_corrigir`, `teste_verificacao`, `gerada_por_ia: bool` |
 | `Acao` | `id`, `prioridade`, `nota`, `o_que_fazer`, `porque`, `impacto`, `quem_resolve`, `texto_task`, `refs` (achados ou checagem) |
 | `ChamadaIA` | `etapa`, `provedor`, `entrada`, `resposta`, `duracao_s`, `tokens: int \| None`, `sucesso: bool` |
@@ -348,6 +348,11 @@ Só as respostas do site analisado. Cada checagem é uma função pura `(requisi
 | C08 | cookie sem SameSite | cookie sem `SameSite` | baixa | dev back-end |
 
 - Checagem de cabeçalho: falha se **alguma** resposta HTML do site falha; a evidência é a primeira delas.
+- Resposta HTML é a de `e_pagina_html` (`text/html`, sem redirecionamento) do host do site analisado. Passou: a evidência é a primeira resposta conferida. Sem nenhuma resposta HTML do site, a checagem fica "não verificada", sem evidência.
+- C02 só confere as respostas em HTTPS; site só em HTTP deixa a C02 "não verificada" (HSTS não se aplica), e não aprovada.
+- C04 aceita `frame-ancestors` como diretiva da CSP (separada por `;` ou `,`), não como texto em outro valor.
+- C05 procura versão no padrão `\d+\.\d+` ou `/` seguido de dígito (`PHP/7.3.12`, `nginx/1`); o trecho da evidência é o cabeçalho, ex.: `x-powered-by: PHP/7.3.12`.
+- Severidade e quem resolve ficam numa `RegraDeChecagem` fixa por ID, em `checagens.py`.
 - C06 a C08 viram "não verificada" quando não há nenhum cookie do site (R06.7).
 - A severidade da checagem vira a prioridade da ação. Checagens não têm nota.
 

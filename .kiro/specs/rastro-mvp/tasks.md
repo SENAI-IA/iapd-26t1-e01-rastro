@@ -214,7 +214,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R05.2, R05.5, R05.6, R05.7
   - Revisão: @geison.santos
 
-- [ ] **T19 Checar os cabeçalhos de segurança**
+- [x] **T19 Checar os cabeçalhos de segurança**
   - Entrega: checagens C01 a C05, uma função cada.
   - Aceite: cada checagem tem um caso que falha e um que passa; só olha respostas do site analisado.
   - Arquivos: `rastro/configuracao/checagens.py`, `rastro/configuracao/modelos.py`, `tests/configuracao/test_checagens.py`
