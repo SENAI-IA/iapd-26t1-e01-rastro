@@ -1,4 +1,5 @@
 import json
+from dataclasses import replace
 from pathlib import Path
 
 from rastro.fontes import osv
@@ -24,6 +25,18 @@ def avisos_gravados_do_jquery() -> list[Aviso]:
         return converter_resposta(json.load(arquivo), "jquery")
 
 
+def aviso_do_jquery_fora_da_faixa() -> Aviso:
+    return replace(
+        avisos_gravados_do_jquery()[0],
+        ghsa="GHSA-rmxg-73gg-4p98",
+        apelidos=[],
+        cve=None,
+        versoes_afetadas="< 1.9.0",
+        versao_corrigida="1.9.0",
+        link="https://github.com/advisories/GHSA-rmxg-73gg-4p98",
+    )
+
+
 class ConectorFalso:
     def __init__(self, sem_resposta_para: frozenset[str] = frozenset()) -> None:
         self.sem_resposta_para = sem_resposta_para
@@ -34,7 +47,7 @@ class ConectorFalso:
         if pacote in self.sem_resposta_para:
             raise ConsultaNaoRealizada("sem resposta do GitHub Advisory: tempo esgotado")
         if pacote == "jquery":
-            return avisos_gravados_do_jquery()
+            return [*avisos_gravados_do_jquery(), aviso_do_jquery_fora_da_faixa()]
         return []
 
 

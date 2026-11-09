@@ -148,7 +148,14 @@ def test_r21_7_aviso_fora_da_faixa_vira_trava_acionada() -> None:
     analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso())
 
     assert [trava.trava for trava in analise.travas_acionadas] == ["faixa conferida"]
-    assert analise.travas_acionadas[0].alvo == "GHSA-jpcq-cgw6-v4j6 em jquery@3.4.1"
+    assert analise.travas_acionadas[0].alvo == "GHSA-rmxg-73gg-4p98 em jquery@3.4.1"
+
+
+def test_r21_7_aviso_com_uma_faixa_valida_nao_vira_trava_acionada() -> None:
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso())
+
+    assert "GHSA-jpcq-cgw6-v4j6" in [achado.aviso.ghsa for achado in analise.achados]
+    assert all("GHSA-jpcq" not in trava.alvo for trava in analise.travas_acionadas)
 
 
 def test_r21_4_pacote_nao_publicado_vai_para_a_confirmar_e_nao_e_consultado() -> None:
@@ -224,7 +231,7 @@ def test_r04a_3_fluxo_junta_github_e_osv_antes_da_trava_da_faixa() -> None:
     ]
     assert all(achado.aviso.fontes == ["GitHub Advisory", "OSV"] for achado in analise.achados)
     assert [trava.alvo for trava in analise.travas_acionadas] == [
-        "GHSA-jpcq-cgw6-v4j6 em jquery@3.4.1"
+        "GHSA-rmxg-73gg-4p98 em jquery@3.4.1"
     ]
     assert analise.fontes_sem_resposta == []
 

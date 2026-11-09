@@ -119,7 +119,28 @@ def test_r21_7_escolhe_a_faixa_que_contem_a_versao_no_aviso_com_varias_faixas() 
     mantidos, travas_acionadas = descartar_fora_da_faixa("jquery", "3.4.1", avisos)
 
     assert mantidos == [segunda_faixa]
-    assert [trava.alvo for trava in travas_acionadas] == ["GHSA-6c3j-c64m-qhgq em jquery@3.4.1"]
+    assert travas_acionadas == []
+
+
+def test_r21_7_aviso_com_todas_as_faixas_fora_e_registrado_uma_vez() -> None:
+    primeira_faixa = aviso("GHSA-6c3j-c64m-qhgq", "< 1.0.3")
+    segunda_faixa = aviso("GHSA-6c3j-c64m-qhgq", ">= 1.0.3, < 3.4.0")
+
+    mantidos, travas_acionadas = descartar_fora_da_faixa(
+        "jquery", "3.4.1", [primeira_faixa, segunda_faixa]
+    )
+
+    assert mantidos == []
+    assert travas_acionadas == [
+        TravaAcionada(
+            trava="faixa conferida",
+            alvo="GHSA-6c3j-c64m-qhgq em jquery@3.4.1",
+            motivo=(
+                "a versão 3.4.1 está fora da faixa afetada `< 1.0.3`; "
+                "a versão 3.4.1 está fora da faixa afetada `>= 1.0.3, < 3.4.0`"
+            ),
+        )
+    ]
 
 
 def test_r21_7_versao_inventada_fora_da_faixa_barra_o_aviso() -> None:

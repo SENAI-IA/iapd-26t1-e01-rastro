@@ -299,7 +299,7 @@ No spike, esse critério passou o acerto da IA (`@angular/core@22.2.2`) e barrou
 
 - Operadores: `<`, `<=`, `>`, `>=`, `=` (sem operador vale `=`). Versão com dois números completa com zero: o GitHub manda `>= 1.2, < 3.5.0` para o jQuery.
 - Entre pré-lançamentos vale a ordem do semver (`alpha` < `alpha.1` < `beta.2` < `beta.11` < `rc.1` < final); `+build` não conta.
-- `descartar_fora_da_faixa(pacote, versao, avisos)` devolve os avisos mantidos e uma `TravaAcionada` por aviso descartado (alvo `GHSA… em pacote@versão`).
+- `descartar_fora_da_faixa(pacote, versao, avisos)` devolve os avisos mantidos e uma `TravaAcionada` por aviso descartado (alvo `GHSA… em pacote@versão`). Aviso com várias faixas só é registrado quando nenhuma delas contém a versão, uma vez, com o motivo de cada faixa; se uma faixa vale, as outras saem sem registro, porque o aviso fica.
 - Faixa ou versão que não se consegue ler também descarta o aviso, com o motivo registrado: a trava não confirma o que não conseguiu conferir, e o painel da IA mostra o caso.
 
 ### Formato fechado

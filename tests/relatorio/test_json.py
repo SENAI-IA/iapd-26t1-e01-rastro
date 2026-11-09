@@ -198,8 +198,8 @@ def test_r21_10_travas_acionadas_vao_para_o_painel_da_ia() -> None:
     assert ia["travas_acionadas"] == [
         {
             "trava": "faixa conferida",
-            "alvo": "GHSA-jpcq-cgw6-v4j6 em jquery@3.4.1",
-            "motivo": "a versão 3.4.1 está fora da faixa afetada `< 1.0.3`",
+            "alvo": "GHSA-rmxg-73gg-4p98 em jquery@3.4.1",
+            "motivo": "a versão 3.4.1 está fora da faixa afetada `< 1.9.0`",
         }
     ]
     assert ia["chamadas"] == []
