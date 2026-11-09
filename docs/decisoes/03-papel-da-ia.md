@@ -4,7 +4,7 @@ Requisitos: R03, R07, R11 e R21. Código: `rastro/identificacao/ia.py`, `rastro/
 
 ## Contexto
 
-O curso pede que a IA tenha papel real no produto. Mas o relatório vira task para um dev, e o auditor precisa defender cada linha diante do time. A IA pode errar: inventar uma versão, um pacote ou um CVE, ou dar respostas diferentes para a mesma pergunta.
+Só com regra fixa, o Rastro não acha biblioteca em bundle nem explica a falha para quem não é de segurança. Mas o relatório vira task para um dev, e o auditor precisa defender cada linha diante do time. A IA pode errar: inventar uma versão, um pacote ou um CVE, ou dar respostas diferentes para a mesma pergunta.
 
 Há duas coisas que regra fixa não faz bem:
 
@@ -32,4 +32,4 @@ Há duas coisas que regra fixa não faz bem:
 | Agente de IA que pesquisa, prioriza e escreve o relatório | Não é reproduzível nem explicável, e pode inventar CVE e versão. O auditor não teria como defender o resultado. |
 | IA ajusta a prioridade pelo contexto do site | A nota deixaria de ser refeita à mão. Proibido por R05.7. |
 | IA escreve a task inteira | O texto da task cita versão, GHSA e versão-alvo. Com modelo fixo, esses dados vêm só das fontes. |
-| Sem IA | Perde as bibliotecas em bundles e a explicação simples, e o curso pede IA com papel real. Fica como opção, não como padrão. |
+| Sem IA | Perde as bibliotecas em bundles e a explicação simples. Fica como opção, não como padrão. |

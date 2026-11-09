@@ -149,7 +149,7 @@ O GitHub Advisory é a fonte do MVP. OSV e NVD entram **só se** as fases 1 e 2 
 
 ## R11 Mostrar o que a IA fez (RF11)
 
-**Como** auditor e banca, **quero** ver o que a IA recebeu e devolveu **para** saber quanto ela ajudou e quanto custou.
+**Como** auditor, **quero** ver o que a IA recebeu e devolveu **para** saber quanto ela ajudou e quanto custou.
 
 1. O Rastro DEVE registrar cada chamada à IA com etapa, provedor, entrada enviada, resposta, duração e tokens.
 2. SE o provedor não informar tokens, ENTÃO o Rastro DEVE registrar "não informado", nunca uma estimativa.
@@ -236,7 +236,7 @@ O GitHub Advisory é a fonte do MVP. OSV e NVD entram **só se** as fases 1 e 2 
 1. O repositório DEVE ter um README que outra pessoa consegue seguir para instalar e rodar o Rastro na própria máquina, com comandos para Windows e Linux.
 2. Para usar, o Rastro DEVE precisar só de Python. O HTML do relatório já vai pronto no repositório; Node só é preciso para quem desenvolve o frontend.
 3. Para a IA, o Rastro DEVE usar a CLI (Kiro, Claude ou Codex) já instalada e autenticada no sistema de quem usa. O Rastro não instala nem autentica CLI.
-4. Sem Docker: o requisito do curso ("Docker ou vídeo") é atendido pela gravação do demo.
+4. Sem Docker: o Rastro roda com o Python da máquina, e o demo fica gravado em vídeo.
 5. Código, spec, steering, README e relatório NÃO DEVEM depender de arquivo fora do repositório; os entregáveis ficam em `docs/`.
 
 ## R21 Travas contra invenção (RF16)

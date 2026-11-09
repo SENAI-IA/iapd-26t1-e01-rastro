@@ -35,7 +35,7 @@ Toda saída da IA passa por **travas determinísticas**, funções puras com nom
 | Alternativa | Por que não |
 |---|---|
 | Confiar na IA, com o aviso "confira" | Empurra a conferência para o auditor, que não é especialista e não teria como fazê-la. |
-| Uma segunda IA revisa a primeira | Mesma fonte de erro, sem resultado repetível. Não dá para explicar na banca por que algo passou. |
+| Uma segunda IA revisa a primeira | Mesma fonte de erro, sem resultado repetível. Não dá para explicar ao time por que algo passou. |
 | `npm install` do pacote para comparar o código | Roda scripts de instalação de terceiros, grava em disco e exige Node. Vai contra R17. |
 | Comparar o trecho com espaços normalizados | No spike, nunca passou: o minificador renomeia variáveis e troca as aspas. A trava 5 compara o valor das strings. |
 | Aceitar "a versão aparece no pacote" | No spike, deixou passar invenção: só a versão não prova o pacote. |

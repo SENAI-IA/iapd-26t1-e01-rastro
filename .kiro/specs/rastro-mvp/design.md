@@ -558,7 +558,7 @@ Toda contagem que a tela mostra já vem no `resumo`. O React não calcula nada (
       relatorio.json
     2026-11-27_09-41-12/
       ...
-  intranet.senai.br_8443/
+  intranet.exemplo.com.br_8443/
     ...
 ```
 

@@ -2,8 +2,6 @@
 
 Rastro lê um arquivo HAR, identifica as bibliotecas front-end do site, cruza com o GitHub Advisory (CVE, CVSS, EPSS) e gera um relatório de risco explicado por IA. Só análise passiva: o site analisado nunca é acessado.
 
-Projeto final do curso de IA aplicada (tema Produtividade do SENAI) · grupo E01 IA SEC.
-
 > **Status:** MVP funcionando no Linux (fases 0 a 3 e extensão OSV e NVD). A instalação do zero no Windows ainda não foi conferida (T42): os comandos do Windows abaixo seguem a convenção do projeto e estão marcados como **a conferir**. Andamento no [kanban](.kiro/specs/rastro-mvp/kanban.md).
 
 ![Relatório do WebGoat, gerado com a IA Kiro](docs/prints/01-relatorio-claro.png)
@@ -236,3 +234,8 @@ E no próprio produto a IA tem papel real, mas não decide sozinha: ela sugere b
 ## Links
 
 - Pitch: [`docs/pitch-inicial.pdf`](docs/pitch-inicial.pdf)
+- Telas do relatório: [`docs/prints/`](docs/prints/)
+
+## Créditos
+
+Projeto final do curso de IA aplicada (tema Produtividade do SENAI) · grupo E01 IA SEC.

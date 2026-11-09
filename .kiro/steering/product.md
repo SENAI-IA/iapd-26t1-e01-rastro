@@ -1,6 +1,6 @@
 # Produto
 
-**Rastro** lê a navegação gravada de um site (arquivo HAR) e diz quais bibliotecas com falhas conhecidas ele usa e o que corrigir primeiro. Projeto final do grupo E01 IA SEC, tema Produtividade do SENAI.
+**Rastro** lê a navegação gravada de um site (arquivo HAR) e diz quais bibliotecas com falhas conhecidas ele usa e o que corrigir primeiro.
 
 ## Para quem
 
