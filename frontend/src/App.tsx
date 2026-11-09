@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import type { Relatorio } from "./tipos.ts";
+import type { Acao, Relatorio } from "./tipos.ts";
 import AvisoSemIA from "./componentes/AvisoSemIA.tsx";
 import BarraSuperior, { type Tema } from "./componentes/BarraSuperior.tsx";
 import CabecalhoAnalise from "./componentes/CabecalhoAnalise.tsx";
@@ -8,6 +8,7 @@ import Indicadores from "./componentes/Indicadores.tsx";
 import ListaAConfirmar from "./componentes/ListaAConfirmar.tsx";
 import ListaBibliotecas from "./componentes/ListaBibliotecas.tsx";
 import ListaChecagens from "./componentes/ListaChecagens.tsx";
+import ModalTask from "./componentes/ModalTask.tsx";
 import PainelOrigemDoDado, { type OrigemDoDado } from "./componentes/PainelOrigemDoDado.tsx";
 import PlanoDeAcao from "./componentes/PlanoDeAcao.tsx";
 
@@ -23,6 +24,7 @@ export default function App({ relatorio }: Props) {
   const [temaEscolhido, setTemaEscolhido] = useState<Tema | null>(null);
   const tema = temaEscolhido ?? temaDoSistema();
   const [origemAberta, setOrigemAberta] = useState<OrigemDoDado | null>(null);
+  const [taskAberta, setTaskAberta] = useState<Acao | null>(null);
 
   useEffect(() => {
     if (temaEscolhido) {
@@ -45,7 +47,7 @@ export default function App({ relatorio }: Props) {
           <>
             <CabecalhoAnalise analise={relatorio.analise} />
             <Indicadores resumo={relatorio.resumo} primeiraAcao={relatorio.plano_de_acao[0]} />
-            <PlanoDeAcao acoes={relatorio.plano_de_acao} />
+            <PlanoDeAcao acoes={relatorio.plano_de_acao} aoAbrirTask={setTaskAberta} />
             <ListaBibliotecas
               bibliotecas={relatorio.bibliotecas}
               achados={relatorio.achados}
@@ -63,6 +65,7 @@ export default function App({ relatorio }: Props) {
         )}
       </main>
       {origemAberta && <PainelOrigemDoDado origem={origemAberta} aoFechar={() => setOrigemAberta(null)} />}
+      {taskAberta && <ModalTask acao={taskAberta} aoFechar={() => setTaskAberta(null)} />}
     </>
   );
 }

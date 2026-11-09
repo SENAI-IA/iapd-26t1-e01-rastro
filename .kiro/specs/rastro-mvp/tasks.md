@@ -312,7 +312,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R12.1, R12.2
   - Revisão: @halan.bacca
 
-- [ ] **T31 Abrir e copiar a task**
+- [x] **T31 Abrir e copiar a task**
   - Entrega: `ModalTask` com o texto da task e botão de copiar.
   - Aceite: o texto copiado é igual ao do JSON. *(verificação manual)*
   - Arquivos: `frontend/src/componentes/ModalTask.*`

@@ -4,9 +4,10 @@ import "./PlanoDeAcao.css";
 
 interface Props {
   acoes: DadosDaAcao[];
+  aoAbrirTask: (acao: DadosDaAcao) => void;
 }
 
-export default function PlanoDeAcao({ acoes }: Props) {
+export default function PlanoDeAcao({ acoes, aoAbrirTask }: Props) {
   return (
     <section className="plano-de-acao" aria-labelledby="plano-de-acao-titulo">
       <div>
@@ -18,7 +19,7 @@ export default function PlanoDeAcao({ acoes }: Props) {
       ) : (
         <ol className="plano-de-acao__lista">
           {acoes.map((acao, indice) => (
-            <Acao key={acao.id} acao={acao} posicao={indice + 1} />
+            <Acao key={acao.id} acao={acao} posicao={indice + 1} aoAbrirTask={aoAbrirTask} />
           ))}
         </ol>
       )}

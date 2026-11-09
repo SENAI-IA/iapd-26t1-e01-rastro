@@ -7,9 +7,10 @@ import "./Acao.css";
 interface Props {
   acao: DadosDaAcao;
   posicao: number;
+  aoAbrirTask: (acao: DadosDaAcao) => void;
 }
 
-export default function Acao({ acao, posicao }: Props) {
+export default function Acao({ acao, posicao, aoAbrirTask }: Props) {
   return (
     <li className={`acao acao--${acao.prioridade.replace(" ", "-")}`}>
       <span className="acao__posicao">{posicao}</span>
@@ -25,6 +26,10 @@ export default function Acao({ acao, posicao }: Props) {
             Quem resolve: {acao.quem_resolve}
           </span>
         </div>
+        <button type="button" className="acao__abrir-task" onClick={() => aoAbrirTask(acao)}>
+          <Icone nome="arquivo" tamanho={14} />
+          Abrir task
+        </button>
       </div>
     </li>
   );
