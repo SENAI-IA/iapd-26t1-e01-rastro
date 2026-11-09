@@ -14,7 +14,7 @@
 - **Python em produção:** nenhuma. Nada de SDK de IA nem chave de API no projeto.
 - **Python em desenvolvimento:** `pytest`, `pytest-cov`, `ruff`, `mypy`, com versão fixa em `requirements-dev.txt`, instalados num `.venv` na raiz do projeto.
 - **Configuração:** `ruff`, `mypy` (modo `strict`), `pytest` e cobertura no `pyproject.toml`.
-- **Frontend:** `react`, `react-dom`; em desenvolvimento, `vite`, `typescript`, `vite-plugin-singlefile`. Sem biblioteca de componentes, de estado ou de gráficos.
+- **Frontend:** `react`, `react-dom`; em desenvolvimento, `vite`, `typescript`, `vite-plugin-singlefile` e o que o template `react-ts` do Vite já traz (`@vitejs/plugin-react` e os pacotes `@types/*`). O linter do template (`oxlint`) fica de fora: o `tsc` do build já confere os tipos. Sem biblioteca de componentes, de estado ou de gráficos. `package-lock.json` versionado.
 - Qualquer dependência nova precisa resolver algo que o padrão não resolve. Justifique antes de adicionar.
 
 ## Comandos

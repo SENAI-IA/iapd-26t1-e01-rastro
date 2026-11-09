@@ -468,8 +468,9 @@ Toda contagem que a tela mostra já vem no `resumo`. O React não calcula nada (
 1. `npm run build` em `frontend/` gera `frontend/dist/index.html` com JS, CSS e fontes embutidos (`vite-plugin-singlefile`).
 2. Esse arquivo vai para o pacote Python como `rastro/relatorio/modelo.html` e é **versionado**, para quem usa precisar só de Python (R20.2). Mudou o frontend, o build é refeito e o `modelo.html` entra no mesmo commit.
 3. `html.py` troca o conteúdo de `<script id="dados" type="application/json"></script>` pelo JSON, escapando `</` como `<\/`.
-4. **Favicon e logo** vêm de `frontend/src/assets/` (cópia do logo da identidade visual).
-5. Sem requisição externa (R13.5): as fontes IBM Plex vão embutidas em woff2 ou caem para as fontes do sistema. **[decidir]** O tamanho decide.
+4. **Favicon e logo** vêm de `frontend/src/assets/` (cópia do logo da identidade visual). O Vite não embute `<link rel="icon">`, então o `vite.config.ts` troca o caminho do favicon pelo SVG em `data:` (plugin `embutirFavicon`).
+5. Sem requisição externa (R13.5): as fontes IBM Plex vão **embutidas** em woff2, só o subconjunto latin e os pesos usados no relatório (Sans 400, 500 e 600; Condensed 500 e 600; Mono 400 e 500), copiadas do `@fontsource` 5.3.0 para `frontend/src/assets/fontes/` com a licença OFL ao lado, sem virar dependência. São ~141 KB de fonte, e o `index.html` vazio fica com ~413 KB (~225 KB sem as fontes). Se faltar uma letra, cai para a fonte do sistema. Decidido na T24.
+6. O `index.html` traz a tag `dados` vazia antes da raiz do React; `src/dados.ts` (`lerRelatorio`) lê e converte o JSON. Tag vazia ou JSON inválido mostra o aviso de que o arquivo não traz dados de uma análise.
 
 ### Gravação
 

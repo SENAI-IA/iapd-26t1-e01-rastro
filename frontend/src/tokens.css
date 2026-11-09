@@ -1,0 +1,89 @@
+:root {
+  color-scheme: light;
+  --cor-fundo: #ECEFEF;
+  --cor-superficie: #FAFBFB;
+  --cor-superficie-2: #E3E9EA;
+  --cor-texto: #0D1B1F;
+  --cor-texto-suave: #4E6167;
+  --cor-texto-fraco: #84979C;
+  --cor-linha: #D2DBDD;
+  --cor-grade: #E1E8E9;
+  --cor-destaque: #0F5F7A;
+  --cor-destaque-suave: #D6E8EE;
+  --cor-ia: #5B47C7;
+  --cor-ia-suave: #E9E5FA;
+  --cor-critico: #B42E2A;
+  --cor-critico-suave: #F7E2E0;
+  --cor-critico-zona: rgba(180, 46, 42, .07);
+  --cor-serio: #9E560C;
+  --cor-serio-suave: #F6E9D8;
+  --cor-bom: #2E7A3C;
+  --cor-bom-suave: #DFF0E2;
+  --cor-nota-fundo: #F8F0D2;
+  --cor-nota-texto: #5E4A00;
+  --cor-veu: rgba(6, 14, 17, .55);
+  --sombra: 0 1px 0 rgba(13, 27, 31, .04), 0 6px 18px rgba(13, 27, 31, .07);
+
+  --fonte-texto: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fonte-titulo: "IBM Plex Sans Condensed", "IBM Plex Sans", "Arial Narrow", system-ui, sans-serif;
+  --fonte-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --raio: 4px;
+  --raio-pequeno: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    color-scheme: dark;
+    --cor-fundo: #0A1316;
+    --cor-superficie: #0F1B1F;
+    --cor-superficie-2: #15242A;
+    --cor-texto: #E2ECEE;
+    --cor-texto-suave: #8EA4AA;
+    --cor-texto-fraco: #5F777D;
+    --cor-linha: #20343A;
+    --cor-grade: #17292E;
+    --cor-destaque: #5BB9D4;
+    --cor-destaque-suave: #11303A;
+    --cor-ia: #AE9CFF;
+    --cor-ia-suave: #221D3D;
+    --cor-critico: #FF7A6E;
+    --cor-critico-suave: #3A1B19;
+    --cor-critico-zona: rgba(255, 122, 110, .07);
+    --cor-serio: #F0A456;
+    --cor-serio-suave: #36260F;
+    --cor-bom: #67C98C;
+    --cor-bom-suave: #13301F;
+    --cor-nota-fundo: #29230F;
+    --cor-nota-texto: #E9D38A;
+    --cor-veu: rgba(0, 0, 0, .62);
+    --sombra: 0 1px 0 rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+  }
+}
+
+:root[data-tema="escuro"] {
+  color-scheme: dark;
+  --cor-fundo: #0A1316;
+  --cor-superficie: #0F1B1F;
+  --cor-superficie-2: #15242A;
+  --cor-texto: #E2ECEE;
+  --cor-texto-suave: #8EA4AA;
+  --cor-texto-fraco: #5F777D;
+  --cor-linha: #20343A;
+  --cor-grade: #17292E;
+  --cor-destaque: #5BB9D4;
+  --cor-destaque-suave: #11303A;
+  --cor-ia: #AE9CFF;
+  --cor-ia-suave: #221D3D;
+  --cor-critico: #FF7A6E;
+  --cor-critico-suave: #3A1B19;
+  --cor-critico-zona: rgba(255, 122, 110, .07);
+  --cor-serio: #F0A456;
+  --cor-serio-suave: #36260F;
+  --cor-bom: #67C98C;
+  --cor-bom-suave: #13301F;
+  --cor-nota-fundo: #29230F;
+  --cor-nota-texto: #E9D38A;
+  --cor-veu: rgba(0, 0, 0, .62);
+  --sombra: 0 1px 0 rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+}

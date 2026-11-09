@@ -14,7 +14,8 @@ O relatório abre offline com duplo clique. O React monta a tela a partir do JSO
 - **Não calcula regra de negócio.** Nota, prioridade e contagens já vêm no JSON.
 - **Eventos sobem por props** (`aoClicarFalha(id)`). Só `App.tsx` liga os componentes.
 - **Estado só com o React:** `useState`, `useReducer` e um contexto para o tema.
-- **Tipos do JSON num único `tipos.ts`**, espelhando os modelos do Python.
+- **Tipos do JSON num único `tipos.ts`**, espelhando os modelos do Python. Mudou o JSON, muda o `tipos.ts` no mesmo commit.
+- **Tokens em português** (`--cor-destaque`, `--fonte-mono`, `--raio`) em `tokens.css`. O tema segue o sistema; `data-tema="claro"` ou `"escuro"` no `<html>` força um deles.
 - Mesmas regras de legibilidade do Python: nomes em português, funções curtas, sem comentários.
 
 ## Organização da tela
@@ -35,9 +36,9 @@ Clique em qualquer dado abre a origem dele num painel lateral.
 - **Cores só por tokens** em `tokens.css`, com tema claro e escuro. Nenhuma cor literal em componente.
 - Paleta petróleo (`#0F5F7A` claro / `#5BB9D4` escuro); violeta só para IA; vermelho, laranja e verde só para estado.
 - Cantos retos: 3 a 4px.
-- Fontes: IBM Plex Sans (texto), IBM Plex Sans Condensed (títulos e números), IBM Plex Mono (código e dados). O relatório abre offline: as fontes vão embutidas (só os pesos usados) ou caem para as do sistema; nada de Google Fonts no build. Decisão na T24.
+- Fontes: IBM Plex Sans (texto), IBM Plex Sans Condensed (títulos e números), IBM Plex Mono (código e dados). O relatório abre offline: as fontes vão embutidas em woff2 (`src/fontes.css` e `src/assets/fontes/`, subconjunto latin, só os pesos usados, licença OFL ao lado); nada de Google Fonts no build. Peso novo só se a tela usar: um arquivo e um `@font-face` a mais.
 - Ícones em traço. Logo: quadrado com dois pontos de rastro até um X.
-- Favicon é o logo (`frontend/src/assets/logo-claro.svg` e `logo-escuro.svg`, copiados da identidade visual), embutido no HTML do build.
+- Favicon é o logo (`frontend/src/assets/logo-claro.svg` e `logo-escuro.svg`, copiados da identidade visual), embutido no HTML do build pelo `vite.config.ts` (o Vite não embute `<link rel="icon">` sozinho).
 
 ## UX e acessibilidade
 

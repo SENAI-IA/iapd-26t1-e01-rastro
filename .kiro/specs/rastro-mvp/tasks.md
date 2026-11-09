@@ -256,7 +256,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 ## Fase 2. Relatório HTML
 
-- [ ] **T24 Criar o projeto do frontend**
+- [x] **T24 Criar o projeto do frontend**
   - Entrega: React + TypeScript (template do Vite) com `vite-plugin-singlefile`, `tokens.css` claro e escuro e `tipos.ts`.
   - Aceite: `npm run build` gera um único `index.html` que lê o JSON da tag `dados`.
   - Arquivos: `frontend/*`
