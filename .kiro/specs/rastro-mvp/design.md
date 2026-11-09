@@ -263,9 +263,10 @@ GET <dist.tarball>                                     → pacote .tgz, só para
 - Pacotes com escopo (`@angular/core`) levam a barra codificada como `%2F`.
 - `RegistroDePacotes` (interface) e `RegistroNpm` ficam em `fontes/registro_npm.py`: `existe(pacote, versao) -> bool`. 200 é `True`, 404 é `False`; sem rede, tempo esgotado, limite, 5xx ou outro código viram `ConsultaNaoRealizada(motivo)`, como nas fontes.
 - `travas/conferencia.py` chama o registro e devolve `BibliotecasConferidas` (`confirmadas`, `a_confirmar`, `travas_acionadas`). Barrada pela trava 4, a biblioteca ganha `travas_que_falharam=["pacote existe"]` e uma `TravaAcionada`; `conferida_no_npm` fica `True` (publicado), `False` (não publicado) ou `None` (sem resposta: o selo "não conferida no npm").
-- O `.tgz` é lido **em memória**: `tarfile.open(fileobj=io.BytesIO(dados), mode="r:gz")` e `extractfile` só nos `.js`, `.mjs` e `.cjs` (o Angular só publica `.mjs`). Nunca `extract` nem `extractall`, nada gravado em disco, nada executado.
-- A integridade do pacote é conferida com `hashlib.sha512` contra `dist.integrity` antes da leitura.
-- Limite de 10 MB por pacote e tempo limite de 15 s. Acima disso, a trava 5 não roda e a biblioteca fica "a confirmar".
+- `ler_codigo(pacote, versao) -> list[str]`, também em `RegistroDePacotes`, devolve o texto dos arquivos de código do pacote: lê `dist.tarball` e `dist.integrity` da resposta da versão e baixa o `.tgz`, só se ele estiver no próprio `registry.npmjs.org`.
+- O `.tgz` é lido **em memória**: `tarfile.open(fileobj=io.BytesIO(dados), mode="r:gz")` e `extractfile` só nos arquivos comuns `.js`, `.mjs` e `.cjs` (o Angular só publica `.mjs`); pasta e atalho ficam de fora. Nunca `extract` nem `extractall`, nada gravado em disco, nada executado.
+- A integridade do pacote é conferida com `hashlib.sha512` contra `dist.integrity` antes da leitura. Sem hash `sha512-` (pacote antigo só com `shasum`), o pacote não é lido.
+- Limite de 10 MB por pacote baixado (lê no máximo 10 MB + 1 byte), 50 MB de código desempacotado (contra pacote que infla ao abrir) e tempo limite de 15 s. Acima disso, falha de rede, integridade diferente ou pacote ilegível viram `ConsultaNaoRealizada(motivo)`: a trava 5 não roda e a biblioteca fica "a confirmar" com o motivo.
 - Cada `pacote@versão` é consultado uma vez por análise.
 - Sem resposta do registro (R21.9): biblioteca por assinatura segue com o selo "não conferida no npm"; da IA vai para "a confirmar".
 
@@ -275,7 +276,9 @@ Conferido no spike T03 (`docs/spike/har-e-bundles.md`). O minificador renomeia v
 
 1. Tira do trecho todas as strings (entre `"`, `'` ou `` ` ``) e resolve os escapes.
 2. Exige que uma delas contenha a versão e que alguma tenha 3 ou mais caracteres além da versão. Só a versão não prova o pacote.
-3. Exige que cada string do trecho apareça, com o mesmo valor, como string em algum arquivo do pacote.
+3. Exige que cada string do trecho apareça, com o mesmo valor, como string em algum arquivo do pacote. Em vez de ler as strings do pacote inteiro, a trava escreve o valor de volta nas três formas de aspas (`"…"`, `'…'`, `` `…` ``, com `\`, a aspa e quebras de linha escapadas) e procura cada forma no código: é busca de texto, rápida e sem interpretar o JavaScript.
+
+`conferir_codigo_publicado(biblioteca, registro)` devolve `(biblioteca, travas_acionadas)`, como `conferir_ancoragem`: barrada, a biblioteca vai para "a confirmar" com a trava `código confere` e uma `TravaAcionada` por motivo (trecho sem prova do pacote, string que não aparece no código, pacote que não pôde ser lido, IA sem trecho). Só a biblioteca da IA passa por ela; a ligação em `conferencia.py` entra na T41.
 
 No spike, esse critério passou o acerto da IA (`@angular/core@22.2.2`) e barrou versão vizinha, pacote irmão na mesma versão, trecho inventado e "só a versão". Comparar o trecho com espaços normalizados nunca passou, porque o minificador muda o código. Já aceitar só a versão ou a licença deixou passar invenção.
 

@@ -386,7 +386,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R11.3, R21.10
   - Revisão: @luiz.pagliari
 
-- [ ] **T40 Conferir o trecho no código publicado**
+- [x] **T40 Conferir o trecho no código publicado**
   - Entrega: leitura do `.tgz` do npm em memória (com conferência de integridade) e trava `codigo_publicado.py`.
   - Aceite: trecho real do pacote passa; trecho inventado não passa; nada é extraído em disco nem executado; pacote acima de 10 MB fica "a confirmar".
   - Arquivos: `rastro/fontes/registro_npm.py`, `rastro/travas/codigo_publicado.py`, `tests/fontes/test_registro_npm.py`, `tests/travas/test_codigo_publicado.py`
