@@ -481,7 +481,7 @@ Começa só se as fases 1 e 2 estiverem fechadas. Prazo limite: 02/12. O que nã
   - Requisito: R04A.1, R04A.6
   - Revisão: @cristiano.albino
 
-- [ ] **T50 Completar o CVSS pelo NVD**
+- [x] **T50 Completar o CVSS pelo NVD**
   - Entrega: `fontes/nvd.py`, chamado só para aviso com CVE e sem CVSS.
   - Aceite: aviso sem CVSS ganha o do NVD, com a fonte registrada; usa `NVD_API_KEY` quando existe; uma consulta por CVE.
   - Arquivos: `rastro/fontes/nvd.py`, `tests/fontes/test_nvd.py`, `tests/dados/nvd-*.json`

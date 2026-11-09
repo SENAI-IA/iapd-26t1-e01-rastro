@@ -1,0 +1,31 @@
+{
+  "resultsPerPage": 1,
+  "startIndex": 0,
+  "totalResults": 1,
+  "format": "NVD_CVE",
+  "version": "2.0",
+  "vulnerabilities": [
+    {
+      "cve": {
+        "id": "CVE-2099-0001",
+        "descriptions": [{"lang": "en", "value": "CVE só com CVSS v4 de fonte secundária e v2 (exemplo feito à mão)"}],
+        "metrics": {
+          "cvssMetricV40": [
+            {
+              "source": "security-advisories@github.com",
+              "type": "Secondary",
+              "cvssData": {"version": "4.0", "vectorString": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N", "baseScore": 9.3}
+            }
+          ],
+          "cvssMetricV2": [
+            {
+              "source": "nvd@nist.gov",
+              "type": "Primary",
+              "cvssData": {"version": "2.0", "vectorString": "AV:N/AC:L/Au:N/C:P/I:P/A:P", "baseScore": 7.5}
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

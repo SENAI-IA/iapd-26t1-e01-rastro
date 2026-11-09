@@ -61,7 +61,8 @@ _(vazio)_
 - [ ] **T40** Conferir o trecho no código publicado · fase 3 · revisão @ali.santos · commit 6237dda · 09/11
 - [ ] **T41** Identificar bibliotecas em bundles com IA · fase 3 · revisão @ali.santos · commit 6d3d16c · 09/11
 - [ ] **T52** Ligar a IA na linha de comando · fase 3 · revisão @luiz.pagliari · 09/11 · commit 57d2cbe
-- [ ] **T49** Consultar o OSV · extensão · revisão @cristiano.albino · 09/11
+- [ ] **T49** Consultar o OSV · extensão · revisão @cristiano.albino · 09/11 · commit 2b374fd
+- [ ] **T50** Completar o CVSS pelo NVD · extensão · revisão @ali.santos · 09/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -94,7 +95,6 @@ _(vazio)_
 
 ### Extensão: OSV e NVD (só se houver tempo, até 02/12)
 
-- [ ] **T50** Completar o CVSS pelo NVD · extensão · até 02/12 · revisão @ali.santos
 - [ ] **T51** Juntar avisos de fontes diferentes · extensão · até 02/12 · revisão @geison.santos
 
 ## Feito
