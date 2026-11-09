@@ -56,7 +56,8 @@ _(vazio)_
 - [ ] **T35** Chamar o Claude pela CLI · fase 3 · revisão @luiz.pagliari · commit 23ad977 · 09/11
 - [ ] **T36** Chamar o Codex pela CLI · fase 3 · revisão @luiz.pagliari · commit 6fe0ef6 · 09/11
 - [ ] **T37** Chamar o Kiro pela CLI · fase 3 · revisão @luiz.pagliari · commit c473589 · 09/11
-- [ ] **T38** Explicar cada achado com IA · fase 3 · revisão @luiz.pagliari · 09/11
+- [ ] **T38** Explicar cada achado com IA · fase 3 · revisão @luiz.pagliari · commit ae0c9cf · 09/11
+- [ ] **T39** Mostrar onde a IA entrou · fase 3 · revisão @luiz.pagliari · 09/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -75,7 +76,6 @@ _(vazio)_
 
 ### Fase 3. IA
 
-- [ ] **T39** Mostrar onde a IA entrou · fase 3 · 30/11–04/12 · revisão @luiz.pagliari
 - [ ] **T40** Conferir o trecho no código publicado · fase 3 · 30/11–04/12 · revisão @ali.santos
 - [ ] **T41** Identificar bibliotecas em bundles com IA · fase 3 · 30/11–04/12 · revisão @ali.santos · prazo limite 04/12
 

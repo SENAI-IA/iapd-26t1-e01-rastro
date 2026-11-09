@@ -378,7 +378,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R07.1–R07.4
   - Revisão: @luiz.pagliari
 
-- [ ] **T39 Mostrar onde a IA entrou**
+- [x] **T39 Mostrar onde a IA entrou**
   - Entrega: contagem com IA × sem IA no JSON e os componentes `PainelIA` e `ExplicacaoIA`.
   - Aceite: o painel mostra chamadas, entrada, resposta, tempo e tokens, ou "não informado" quando faltar; numa análise sem IA, mostra "IA desligada nesta análise"; lista as travas acionadas, com o que barraram e por quê.
   - Arquivos: `rastro/relatorio/json.py`, `frontend/src/componentes/PainelIA.*`, `ExplicacaoIA.*`, `tests/relatorio/test_json.py`

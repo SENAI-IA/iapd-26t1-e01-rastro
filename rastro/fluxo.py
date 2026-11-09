@@ -13,7 +13,7 @@ from rastro.fontes.conector import Aviso, ConectorDeAvisos, ConsultaNaoRealizada
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.har.leitor import ler_har
 from rastro.har.site import descobrir_site_analisado
-from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.cliente import ChamadaIA, ClienteDeIA
 from rastro.identificacao.assinaturas import algum_script_com_conteudo, identificar_por_assinatura
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.modelos import Achado
@@ -42,6 +42,7 @@ class Analise:
     checagens: list[Checagem]
     plano_de_acao: list[Acao]
     travas_acionadas: list[TravaAcionada]
+    chamadas_de_ia: list[ChamadaIA]
 
 
 @dataclass(frozen=True)
@@ -86,6 +87,7 @@ def analisar(
         travas_acionadas=(
             bibliotecas.travas_acionadas + travas_da_faixa + explicados.travas_acionadas
         ),
+        chamadas_de_ia=chamadas_feitas(ia),
     )
 
 
@@ -93,6 +95,12 @@ def nome_do_provedor(ia: ClienteDeIA | None) -> str | None:
     if ia is None:
         return None
     return ia.provedor.nome
+
+
+def chamadas_feitas(ia: ClienteDeIA | None) -> list[ChamadaIA]:
+    if ia is None:
+        return []
+    return list(ia.chamadas)
 
 
 def consultar_avisos(bibliotecas: list[Biblioteca], fonte: ConectorDeAvisos) -> AvisosConsultados:

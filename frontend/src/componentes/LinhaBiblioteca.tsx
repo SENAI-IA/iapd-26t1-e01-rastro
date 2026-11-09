@@ -1,5 +1,6 @@
 import type { Achado, Biblioteca } from "../tipos.ts";
 import Evidencias from "./Evidencias.tsx";
+import ExplicacaoIA from "./ExplicacaoIA.tsx";
 import Icone from "./Icone.tsx";
 import ListaFalhas from "./ListaFalhas.tsx";
 import type { OrigemDoDado } from "./PainelOrigemDoDado.tsx";
@@ -86,6 +87,7 @@ export default function LinhaBiblioteca({ biblioteca, achados, aoVerOrigem }: Pr
               </span>
             </p>
           )}
+          {biblioteca.explicacao && <ExplicacaoIA explicacao={biblioteca.explicacao} />}
           <Evidencias evidencias={biblioteca.evidencias} />
           {!naoConsultada && (
             <ListaFalhas achados={achados} aoVerOrigem={(achado) => aoVerOrigem({ biblioteca, achados: [achado] })} />

@@ -1,5 +1,6 @@
 const NUMERO = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const PERCENTIL = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 5 });
+const INTEIRO = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
 const DATA = new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" });
 
 export function formatarNota(nota: number): string {
@@ -21,4 +22,8 @@ export function formatarData(dataIso: string): string {
 
 export function plural(quantidade: number, singular: string, varios: string): string {
   return `${quantidade} ${quantidade === 1 ? singular : varios}`;
+}
+
+export function formatarTokens(tokens: number | null): string {
+  return tokens === null ? "não informado" : INTEIRO.format(tokens);
 }

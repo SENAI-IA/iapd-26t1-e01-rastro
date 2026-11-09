@@ -1,0 +1,47 @@
+.explicacao-ia {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--cor-ia);
+  background: var(--cor-ia-suave);
+  font-size: 14px;
+}
+
+.explicacao-ia--sem-ia {
+  border-left-color: var(--cor-linha);
+  background: var(--cor-superficie-2);
+}
+
+.explicacao-ia p {
+  margin: 0;
+}
+
+.explicacao-ia dl {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.explicacao-ia dt {
+  margin-top: 6px;
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.explicacao-ia dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.explicacao-ia__nota {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: var(--cor-texto-suave);
+  font-size: 12.5px;
+}

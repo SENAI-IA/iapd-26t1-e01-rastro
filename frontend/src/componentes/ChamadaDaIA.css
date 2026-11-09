@@ -1,0 +1,78 @@
+.chamada-da-ia {
+  border: 1px solid var(--cor-linha);
+  border-left: 4px solid var(--cor-ia);
+}
+
+.chamada-da-ia__resumo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 14px;
+}
+
+.chamada-da-ia__resumo::-webkit-details-marker {
+  display: none;
+}
+
+.chamada-da-ia__resumo:hover {
+  background: var(--cor-superficie-2);
+}
+
+.chamada-da-ia__seta {
+  display: inline-flex;
+  color: var(--cor-texto-fraco);
+  transition: transform .2s ease;
+}
+
+details[open] > .chamada-da-ia__resumo .chamada-da-ia__seta {
+  transform: rotate(90deg);
+}
+
+.chamada-da-ia__medidas {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-left: auto;
+  color: var(--cor-texto-suave);
+  font-family: var(--fonte-mono);
+  font-size: 12.5px;
+}
+
+.chamada-da-ia__medidas > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chamada-da-ia__corpo {
+  display: grid;
+  gap: 6px;
+  padding: 0 12px 12px;
+}
+
+.chamada-da-ia__corpo h4 {
+  margin: 6px 0 0;
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.chamada-da-ia__corpo pre {
+  max-height: 280px;
+  margin: 0;
+  padding: 8px 10px;
+  overflow: auto;
+  border: 1px solid var(--cor-linha);
+  background: var(--cor-fundo);
+  font-family: var(--fonte-mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+

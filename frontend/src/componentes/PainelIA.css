@@ -1,0 +1,136 @@
+.painel-ia {
+  display: grid;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--cor-linha);
+  border-top: 3px solid var(--cor-ia);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+}
+
+.painel-ia h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.painel-ia__cabecalho p,
+.painel-ia__bloco > p {
+  margin: 2px 0 0;
+  color: var(--cor-texto-suave);
+  font-size: 13px;
+}
+
+.painel-ia__desligada {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--cor-ia);
+  background: var(--cor-ia-suave);
+  font-size: 14px;
+}
+
+.painel-ia__desligada .icone {
+  position: relative;
+  top: 2px;
+  flex: none;
+  color: var(--cor-ia);
+}
+
+.painel-ia__tabela {
+  overflow-x: auto;
+}
+
+.painel-ia__tabela table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.painel-ia__tabela th,
+.painel-ia__tabela td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--cor-linha);
+  text-align: left;
+}
+
+.painel-ia__tabela thead th {
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.painel-ia__tabela tbody th {
+  font-weight: 500;
+}
+
+.painel-ia__tabela td {
+  font-family: var(--fonte-titulo);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.painel-ia__tabela td:last-child {
+  color: var(--cor-ia);
+}
+
+.painel-ia__oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.painel-ia__bloco {
+  display: grid;
+  gap: 8px;
+}
+
+.painel-ia__bloco h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.painel-ia__bloco code {
+  overflow-wrap: anywhere;
+}
+
+.painel-ia__vazio {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 13.5px;
+}
+
+.painel-ia__lista {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.painel-ia__trava {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--cor-linha);
+  border-left: 4px solid var(--cor-serio);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.painel-ia__trava .selo {
+  white-space: normal;
+}

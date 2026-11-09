@@ -121,15 +121,20 @@ export interface ChamadaIA {
   etapa: string;
   provedor: string;
   entrada: string;
-  resposta: string | null;
+  resposta: string;
   duracao_s: number;
   tokens: number | null;
   sucesso: boolean;
 }
 
+export interface Contagem {
+  so_por_assinatura: number;
+  com_ia: number;
+}
+
 export interface ComESemIA {
-  bibliotecas: [number, number];
-  achados: [number, number];
+  bibliotecas: Contagem;
+  achados: Contagem;
 }
 
 export interface DadosDaIA {

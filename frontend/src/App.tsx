@@ -11,6 +11,7 @@ import ListaAConfirmar from "./componentes/ListaAConfirmar.tsx";
 import ListaBibliotecas from "./componentes/ListaBibliotecas.tsx";
 import ListaChecagens from "./componentes/ListaChecagens.tsx";
 import ModalTask from "./componentes/ModalTask.tsx";
+import PainelIA from "./componentes/PainelIA.tsx";
 import PainelOrigemDoDado, { type OrigemDoDado } from "./componentes/PainelOrigemDoDado.tsx";
 import PlanoDeAcao from "./componentes/PlanoDeAcao.tsx";
 import Zona from "./componentes/Zona.tsx";
@@ -86,7 +87,12 @@ export default function App({ relatorio }: Props) {
   const conteudoDaZona = (zona: NomeDaZona, relatorio: Relatorio): ReactNode => {
     switch (zona) {
       case "rastreado":
-        return <Indicadores resumo={relatorio.resumo} primeiraAcao={relatorio.plano_de_acao[0]} />;
+        return (
+          <>
+            <Indicadores resumo={relatorio.resumo} primeiraAcao={relatorio.plano_de_acao[0]} />
+            <PainelIA ia={relatorio.ia} provedor={relatorio.analise.ia} />
+          </>
+        );
       case "agir":
         return <PlanoDeAcao acoes={relatorio.plano_de_acao} aoAbrirTask={setTaskAberta} />;
       case "detalhes":

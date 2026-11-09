@@ -7,6 +7,10 @@ export const glossario = {
   Assinatura:
     "Padrão conhecido que identifica uma biblioteca, como o nome do arquivo ou o comentário de versão no topo dele.",
   npm: "Registro público dos pacotes de JavaScript. O Rastro só lê o registro, para conferir que o pacote e a versão existem.",
+  Token:
+    "Pedaço de texto que a IA lê ou escreve, mais ou menos uma sílaba. É a medida de uso que os provedores cobram.",
+  Trava:
+    "Regra fixa que confere um dado antes de ele entrar no relatório: o que a IA devolveu, o pacote no npm, a faixa de versão afetada. O que não passa é barrado e fica registrado.",
 } as const satisfies Record<string, string>;
 
 export type NomeDoTermo = keyof typeof glossario;
