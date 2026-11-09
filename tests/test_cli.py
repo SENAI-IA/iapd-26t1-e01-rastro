@@ -325,13 +325,32 @@ def test_r14_com_ia_procura_bibliotecas_em_bundles(
 
 @pytest.mark.usefixtures("fontes_falsas", "clis_procuradas")
 def test_r14_falha_da_ia_nao_derruba_a_analise(
-    tmp_path: Path, provedores: ProvedoresFalsos
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, provedores: ProvedoresFalsos
 ) -> None:
     assert analisar_com_ia(HAR_DA_LOJA, tmp_path) == 0
 
     relatorio = ler_relatorio(tmp_path / PASTA_DA_LOJA / "relatorio.json")
     assert relatorio["bibliotecas"][0]["explicacao"]["gerada_por_ia"] is False
     assert relatorio["ia"]["chamadas"][0]["resposta"] == "o dublê não responde"
+    [limitacao] = relatorio["analise"]["limitacoes"]
+    assert limitacao["id"] == "ia_falhou_explicacao"
+    assert limitacao["texto"].startswith("A IA (kiro) falhou em 1 de 1 chamadas para explicar")
+    assert f"Atenção: {limitacao['texto']}" in capsys.readouterr().out
+
+
+@pytest.mark.usefixtures("fontes_falsas", "clis_procuradas")
+def test_r14_falha_da_ia_nos_bundles_avisa_que_ficaram_sem_analise(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, provedores: ProvedoresFalsos
+) -> None:
+    provedores.respostas = [FalhaDoProvedor("sem resposta"), FalhaDoProvedor("sem resposta")]
+
+    assert analisar_com_ia(HAR_DO_JUICE_SHOP, tmp_path) == 0
+
+    [relatorio_json] = tmp_path.rglob("relatorio.json")
+    limitacoes = ler_relatorio(relatorio_json)["analise"]["limitacoes"]
+    assert [limitacao["id"] for limitacao in limitacoes] == ["ia_falhou_identificacao"]
+    assert "procurar bibliotecas em bundles" in limitacoes[0]["texto"]
+    assert "Atenção: A IA (kiro) falhou" in capsys.readouterr().out
 
 
 @pytest.mark.usefixtures("provedores")

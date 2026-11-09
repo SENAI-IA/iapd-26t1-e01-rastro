@@ -154,6 +154,13 @@ def mostrar_resultado(pasta: Path, gravado: RelatorioGravado, relatorio: dict[st
     print(f"Resumo: {resumo_de_uma_linha(relatorio)}")
     if relatorio["analise"]["ia"] is None:
         print(AVISO_SEM_IA)
+    for texto in falhas_da_ia(relatorio):
+        print(f"Atenção: {texto}")
+
+
+def falhas_da_ia(relatorio: dict[str, Any]) -> list[str]:
+    limitacoes = relatorio["analise"]["limitacoes"]
+    return [item["texto"] for item in limitacoes if item["id"].startswith("ia_falhou_")]
 
 
 def resumo_de_uma_linha(relatorio: dict[str, Any]) -> str:

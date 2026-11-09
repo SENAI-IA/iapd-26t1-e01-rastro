@@ -31,6 +31,17 @@ TEXTO_SEM_JAVASCRIPT = (
     "analisada. O HAR pode ter sido gravado sem o conteúdo das respostas, ou o site não "
     "carrega scripts. As checagens de cabeçalhos e cookies foram feitas."
 )
+CONSEQUENCIA_DA_IA_QUE_FALHOU = {
+    "identificar_bibliotecas": (
+        "ia_falhou_identificacao",
+        "procurar bibliotecas em bundles: esses bundles ficaram sem análise e podem "
+        "esconder falhas que não aparecem aqui.",
+    ),
+    "explicar_achado": (
+        "ia_falhou_explicacao",
+        "explicar achados: esses achados trazem só o resumo do próprio aviso.",
+    ),
+}
 CONSEQUENCIA_DA_FONTE_SEM_RESPOSTA = {
     "OSV": "Esses avisos vêm só do GitHub Advisory.",
     "NVD": "Esses avisos seguem sem o CVSS do NVD.",
@@ -70,9 +81,24 @@ def listar_limitacoes(analise: Analise) -> list[dict[str, str]]:
         limitacoes.append(limitacao("achados_sem_explicacao", TEXTO_ACHADOS_SEM_EXPLICACAO))
     if not analise.tem_javascript:
         limitacoes.append(limitacao("sem_javascript", TEXTO_SEM_JAVASCRIPT))
+    limitacoes.extend(limitacoes_da_ia_que_falhou(analise))
     for fonte in fontes_que_nao_responderam(analise.fontes_sem_resposta):
         texto = texto_da_fonte_sem_resposta(fonte, analise.fontes_sem_resposta)
         limitacoes.append(limitacao(f"fonte_sem_resposta_{fonte.lower()}", texto))
+    return limitacoes
+
+
+def limitacoes_da_ia_que_falhou(analise: Analise) -> list[dict[str, str]]:
+    limitacoes = []
+    for etapa, (identificador, consequencia) in CONSEQUENCIA_DA_IA_QUE_FALHOU.items():
+        chamadas = [chamada for chamada in analise.chamadas_de_ia if chamada.etapa == etapa]
+        falhas = [chamada for chamada in chamadas if not chamada.sucesso]
+        if falhas:
+            texto = (
+                f"A IA ({analise.provedor_de_ia}) falhou em {len(falhas)} de {len(chamadas)} "
+                f"chamadas para {consequencia} O motivo está no painel da IA."
+            )
+            limitacoes.append(limitacao(identificador, texto))
     return limitacoes
 
 

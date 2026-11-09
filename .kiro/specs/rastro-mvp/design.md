@@ -124,6 +124,8 @@ A análise sem IA é útil (máquina sem CLI de IA, primeira execução, testes)
 
 O texto das limitações sai do Python, no campo `limitacoes` (`id` para o React escolher o ícone, `texto` para exibir). O React só exibe. A mesma lista leva `sem_javascript` quando nenhuma resposta do HAR trouxe conteúdo JavaScript (R01.6), com ou sem IA.
 
+Com IA, chamada que falha também é limitação: `ia_falhou_identificacao` (bundles que ficaram sem análise) e `ia_falhou_explicacao` (achados só com o resumo do aviso), uma por etapa com ao menos uma falha, com o provedor e quantas das chamadas falharam. O terminal repete esses textos no fim, com `Atenção:`, e a faixa do topo aparece como "Análise incompleta.". Antes, uma análise com todas as chamadas falhando parecia completa.
+
 ## 4. Modelos
 
 `dataclass(frozen=True)` em todos os modelos.

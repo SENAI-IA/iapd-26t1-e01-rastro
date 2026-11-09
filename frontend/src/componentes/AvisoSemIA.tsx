@@ -11,6 +11,8 @@ const ICONE_DA_LIMITACAO: Record<string, NomeDoIcone> = {
   bundles_nao_procurados: "pacote",
   achados_sem_explicacao: "ia",
   sem_javascript: "arquivo",
+  ia_falhou_identificacao: "pacote",
+  ia_falhou_explicacao: "ia",
 };
 
 export default function AvisoSemIA({ analise, recolhido = false }: Props) {
