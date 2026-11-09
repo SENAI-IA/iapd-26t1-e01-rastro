@@ -7,6 +7,7 @@ from rastro.acao.modelos import Acao
 from rastro.acao.plano import chave_da_biblioteca, montar_plano_de_acao
 from rastro.configuracao.checagens import checar_configuracao
 from rastro.configuracao.modelos import Checagem
+from rastro.explicacao.ia import explicar_achados
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.conector import Aviso, ConectorDeAvisos, ConsultaNaoRealizada
 from rastro.fontes.registro_npm import RegistroDePacotes
@@ -64,9 +65,9 @@ def analisar(
     consultados = consultar_avisos(bibliotecas.confirmadas, fonte)
     avisos_na_faixa, travas_da_faixa = conferir_faixas(consultados.avisos)
     achados = calcular_risco(avisos_na_faixa)
-    explicacoes: dict[str, Explicacao] = {}
+    explicados = explicar_achados(achados, ia)
     checagens = checar_configuracao(requisicoes, site)
-    plano = montar_plano_de_acao(achados, explicacoes, checagens)
+    plano = montar_plano_de_acao(achados, explicados.explicacoes, checagens)
 
     return Analise(
         har=caminho_har.name,
@@ -79,10 +80,12 @@ def analisar(
         a_confirmar=bibliotecas.a_confirmar,
         nao_consultadas=consultados.nao_consultadas,
         achados=achados,
-        explicacoes=explicacoes,
+        explicacoes=explicados.explicacoes,
         checagens=checagens,
         plano_de_acao=plano,
-        travas_acionadas=bibliotecas.travas_acionadas + travas_da_faixa,
+        travas_acionadas=(
+            bibliotecas.travas_acionadas + travas_da_faixa + explicados.travas_acionadas
+        ),
     )
 
 

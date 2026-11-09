@@ -1,0 +1,8 @@
+```json
+{
+  "o_que_e": "O jQuery 3.4.1, carregado em https://loja.exemplo.com/js/jquery-3.4.1.min.js, tem dois avisos de possível falha de cross-site scripting (XSS), registrados como GHSA-jpcq-cgw6-v4j6 (CVE-2020-11023) e GHSA-gxr4-xjj5-5px2 (CVE-2020-11022). Nesse tipo de falha, código malicioso escondido em um conteúdo pode acabar sendo executado pela página.",
+  "impacto": "Os avisos descrevem uma possível falha de XSS. Se ela for explorada, um atacante pode rodar código no navegador de quem acessa o site, por exemplo para agir em nome da pessoa.",
+  "como_corrigir": "Atualizar o jQuery para a versão 3.5.0, que corrige os dois avisos. Depois, trocar a referência ao arquivo jquery-3.4.1.min.js pelo arquivo novo e publicar o site de novo.",
+  "teste_verificacao": "Abrir o site no navegador e, nas ferramentas de desenvolvedor, confirmar na aba Rede (Network) que o arquivo jquery-3.4.1.min.js não é mais baixado. Em seguida, digitar jQuery.fn.jquery na aba Console e conferir que o resultado é 3.5.0."
+}
+```

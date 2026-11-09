@@ -435,6 +435,14 @@ Em `rastro/ia/prompts/`, um arquivo por tarefa, iguais para os três provedores:
 
 Cada prompt pede **só JSON**, em português simples, e traz um exemplo de entrada e saída. A resposta é lida pelo primeiro objeto JSON do texto e validada campo a campo.
 
+Decidido na T38:
+
+- `explicacao/ia.py`: `explicar_achados(achados, ia)` devolve `ExplicacoesDosAchados` (`explicacoes` por `pacote@versão` e `travas_acionadas`). Sem IA (`None`), nada é pedido e o dicionário fica vazio, como antes. Com IA, uma chamada por biblioteca confirmada com achados (etapa `explicar_achado`), com os avisos da maior nota para a menor; o fluxo soma as travas às da análise.
+- Entrada enviada (R07.2), em JSON dentro do bloco `{{entrada}}` do prompt: `pacote`, `versao`, `url_do_script` (a URL da primeira evidência, sem query string nem fragmento; `null` sem evidência) e `avisos` com `ids` (GHSA e, se houver, CVE), `resumo`, `versoes_afetadas` e `versao_corrigida`. CVSS, EPSS, nota e link não vão.
+- Resposta: só os quatro campos, todos texto não vazio (espaços em volta são tirados). A leitura usa as funções do formato fechado (`travas/formato.py`): texto fora do JSON, JSON inválido, campo a mais, faltando ou repetido e valor que não é texto derrubam a explicação, com `TravaAcionada` "formato fechado" (alvo `explicação de pacote@versão`). Única tolerância: a resposta inteira dentro de **um** bloco de código (` ```json ... ``` `), que é como o Kiro responde (`tests/dados/kiro-explicacao-jquery.txt`, chamada real de 09/11). Texto antes ou depois do bloco continua derrubando.
+- A trava 7 compara com a entrada de dados já sanitizada, não com o prompt inteiro: assim, CVE, GHSA ou versão copiados do exemplo do prompt contam como fato novo.
+- Falha (IA não respondeu, fora do formato ou barrada pela trava 7): `Explicacao` com `gerada_por_ia=False`, `o_que_e` e `impacto` com o resumo do aviso de maior nota e `como_corrigir` e `teste_verificacao` vazios. O selo "sem explicação da IA" sai de `gerada_por_ia: false` no JSON (componente `ExplicacaoIA`, T39). Falha do provedor não gera trava: já fica na `ChamadaIA` com `sucesso: false`.
+
 ### Sanitização (R16.3)
 
 Antes de qualquer envio: tira query strings das URLs e troca por `[removido]` o que casar com JWT (`eyJ…\.…\.…`), `Bearer …` e sequências hexadecimais ou base64 com mais de 32 caracteres. Cabeçalhos, cookies e corpos de requisição nunca entram no prompt.

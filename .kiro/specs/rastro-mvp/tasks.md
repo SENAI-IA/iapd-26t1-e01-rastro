@@ -370,7 +370,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R14.4
   - Revisão: @luiz.pagliari
 
-- [ ] **T38 Explicar cada achado com IA**
+- [x] **T38 Explicar cada achado com IA**
   - Entrega: prompt `explicar_achado.md` e `explicacao/ia.py`, ligados ao fluxo e à task.
   - Aceite: resposta válida vira `Explicacao` marcada como IA; resposta inválida usa o resumo do aviso e o selo "sem explicação da IA".
   - Arquivos: `rastro/ia/prompts/explicar_achado.md`, `rastro/explicacao/ia.py`, `rastro/fluxo.py`, `tests/explicacao/test_ia.py`

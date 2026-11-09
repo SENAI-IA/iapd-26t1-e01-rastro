@@ -22,6 +22,7 @@ O código será defendido na banca. Qualquer pessoa deve entender um arquivo sem
 - Entrada e saída só nas bordas (`cli.py`, `har/leitor.py`, `fontes/`, `ia/`, `relatorio/`).
 - A IA é chamada só por `ia/cliente.py`, e o que ela devolve passa por `travas/` antes de virar dado. A IA nunca preenche CVE, versão, CVSS, EPSS, nota ou versão-alvo.
 - Prompts ficam em `ia/prompts/`, nunca como texto solto no meio do código.
+- O prompt é lido com `importlib.resources` e os dados entram no marcador `{{entrada}}` (`str.replace`, não `format`, porque o exemplo do prompt tem chaves de JSON).
 - Erro que encerra a análise é uma exceção da borda com a mensagem pronta (ex.: `HarInvalido`). Só o `cli.py` a transforma em mensagem na saída de erro e código 1.
 
 ## Portabilidade e segurança

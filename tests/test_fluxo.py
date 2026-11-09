@@ -5,7 +5,7 @@ import pytest
 
 from rastro.fluxo import analisar
 from rastro.har.leitor import HarInvalido, HarNaoEncontrado
-from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
 from rastro.relatorio.json import montar_relatorio
 from tests.dubles import DADOS, HAR_DA_LOJA, ConectorFalso, ProvedorFalso, RegistroFalso
 
@@ -48,12 +48,59 @@ def test_r14_5_sem_ia_nao_ha_provedor_nem_explicacao() -> None:
 
 
 def test_r14_8_com_ia_o_relatorio_informa_o_provedor_usado() -> None:
-    ia = ClienteDeIA(ProvedorFalso(nome="claude"))
+    ia = ClienteDeIA(ProvedorFalso([FalhaDoProvedor("sem resposta")], nome="claude"))
 
     analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
 
     assert analise.provedor_de_ia == "claude"
     assert montar_relatorio(analise)["analise"]["ia"] == "claude"
+
+
+EXPLICACAO_DO_JQUERY = {
+    "o_que_e": "O jquery 3.4.1 tem falhas de XSS (GHSA-jpcq-cgw6-v4j6, GHSA-gxr4-xjj5-5px2).",
+    "impacto": "Um atacante pode rodar código no navegador de quem acessa o site.",
+    "como_corrigir": "Atualizar o jquery para a versão 3.5.0.",
+    "teste_verificacao": "Abrir o site e conferir que o jquery carregado é o 3.5.0.",
+}
+
+
+def test_r07_1_com_ia_o_achado_e_explicado_e_o_teste_vai_para_a_task() -> None:
+    resposta = RespostaDoProvedor(json.dumps(EXPLICACAO_DO_JQUERY, ensure_ascii=False), None)
+    ia = ClienteDeIA(ProvedorFalso([resposta]))
+
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
+
+    explicacao = analise.explicacoes["jquery@3.4.1"]
+    assert explicacao.gerada_por_ia is True
+    assert analise.plano_de_acao[0].impacto == EXPLICACAO_DO_JQUERY["impacto"]
+    assert "sugerido pela IA: confira antes de usar" in analise.plano_de_acao[0].texto_task
+    assert [chamada.etapa for chamada in ia.chamadas] == ["explicar_achado"]
+
+
+def test_r07_1_resposta_real_do_kiro_vira_explicacao_da_ia() -> None:
+    gravada = (DADOS / "kiro-explicacao-jquery.txt").read_text(encoding="utf-8")
+    ia = ClienteDeIA(ProvedorFalso([RespostaDoProvedor(gravada, None)], nome="kiro"))
+
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
+
+    assert analise.explicacoes["jquery@3.4.1"].gerada_por_ia is True
+    assert analise.explicacoes["jquery@3.4.1"].como_corrigir.startswith("Atualizar o jQuery")
+    assert [trava.trava for trava in analise.travas_acionadas] == ["faixa conferida"]
+
+
+def test_r07_3_explicacao_barrada_entra_nas_travas_acionadas() -> None:
+    inventada = {**EXPLICACAO_DO_JQUERY, "impacto": "Nota 9,8 no CVSS."}
+    resposta = RespostaDoProvedor(json.dumps(inventada, ensure_ascii=False), None)
+    ia = ClienteDeIA(ProvedorFalso([resposta]))
+
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
+
+    assert analise.explicacoes["jquery@3.4.1"].gerada_por_ia is False
+    assert analise.plano_de_acao[0].teste_verificacao is None
+    assert [trava.trava for trava in analise.travas_acionadas] == [
+        "faixa conferida",
+        "explicação sem fato novo",
+    ]
 
 
 def test_r21_7_aviso_fora_da_faixa_vira_trava_acionada() -> None:
