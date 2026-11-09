@@ -2,6 +2,8 @@ from urllib.parse import urlsplit, urlunsplit
 
 from rastro.har.modelos import Requisicao
 
+MARCADOR_DA_QUERY_REMOVIDA = "[removido]"
+
 
 def descobrir_site_analisado(requisicoes: list[Requisicao]) -> str | None:
     for requisicao in requisicoes:
@@ -22,6 +24,12 @@ def host_com_porta(url: str) -> str | None:
     endereco = urlsplit(url).netloc
     host = endereco.rsplit("@", 1)[-1].lower()
     return host or None
+
+
+def url_sem_valores_da_query(url: str) -> str:
+    partes = urlsplit(url)
+    query = MARCADOR_DA_QUERY_REMOVIDA if partes.query else ""
+    return urlunsplit((partes.scheme, partes.netloc, partes.path, query, ""))
 
 
 def url_sem_query_string(url: str) -> str:

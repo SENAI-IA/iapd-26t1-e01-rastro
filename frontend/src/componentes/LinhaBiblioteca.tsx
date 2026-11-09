@@ -37,25 +37,7 @@ export default function LinhaBiblioteca({ biblioteca, achados, aoVerOrigem }: Pr
               </Selo>
             )}
           </span>
-          <span className="linha-biblioteca__risco">
-            {naoConsultada ? (
-              <Selo tom="serio" icone="triangulo">
-                Não consultada
-              </Selo>
-            ) : achados.length === 0 ? (
-              <Selo tom="bom" icone="certo">
-                Sem falhas conhecidas
-              </Selo>
-            ) : (
-              <>
-                <span>{plural(achados.length, "falha", "falhas")}</span>
-                <span className="linha-biblioteca__nota">
-                  {biblioteca.nota === null ? "Sem nota" : `Nota ${formatarNota(biblioteca.nota)}`}
-                </span>
-                <SeloDePrioridade prioridade={achados[0].nota.prioridade} />
-              </>
-            )}
-          </span>
+          <span className="linha-biblioteca__risco">{riscoDaBiblioteca(biblioteca, achados)}</span>
         </summary>
         <div className="linha-biblioteca__corpo">
           <button
@@ -95,5 +77,31 @@ export default function LinhaBiblioteca({ biblioteca, achados, aoVerOrigem }: Pr
         </div>
       </details>
     </li>
+  );
+}
+
+function riscoDaBiblioteca(biblioteca: Biblioteca, achados: Achado[]) {
+  if (biblioteca.motivo_nao_consultada !== null) {
+    return (
+      <Selo tom="serio" icone="triangulo">
+        Não consultada
+      </Selo>
+    );
+  }
+  if (achados.length === 0 || biblioteca.prioridade === null) {
+    return (
+      <Selo tom="bom" icone="certo">
+        Sem falhas conhecidas
+      </Selo>
+    );
+  }
+  return (
+    <>
+      <span>{plural(achados.length, "falha", "falhas")}</span>
+      <span className="linha-biblioteca__nota">
+        {biblioteca.nota === null ? "Sem nota" : `Nota ${formatarNota(biblioteca.nota)}`}
+      </span>
+      <SeloDePrioridade prioridade={biblioteca.prioridade} />
+    </>
   );
 }

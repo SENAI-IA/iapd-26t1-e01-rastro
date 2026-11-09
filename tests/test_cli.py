@@ -63,7 +63,7 @@ def ler_relatorio(caminho: Path) -> dict[str, Any]:
     return dados
 
 
-def test_ajuda_abre_e_retorna_0(capsys: pytest.CaptureFixture[str]) -> None:
+def test_r14_7_ajuda_abre_e_retorna_0(capsys: pytest.CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as saida:
         executar(["--help"])
 
@@ -71,12 +71,14 @@ def test_ajuda_abre_e_retorna_0(capsys: pytest.CaptureFixture[str]) -> None:
     assert "usage: rastro" in capsys.readouterr().out
 
 
-def test_sem_argumentos_mostra_a_ajuda_e_retorna_0(capsys: pytest.CaptureFixture[str]) -> None:
+def test_r14_7_sem_argumentos_mostra_a_ajuda_e_retorna_0(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     assert executar([]) == 0
     assert "HAR" in capsys.readouterr().out
 
 
-def test_python_m_rastro_help_retorna_0() -> None:
+def test_r14_7_python_m_rastro_help_retorna_0() -> None:
     resultado = subprocess.run(
         [sys.executable, "-m", "rastro", "--help"],
         capture_output=True,
@@ -236,7 +238,7 @@ def analisar_com_ia(har: Path, saida: Path, *opcoes: str) -> int:
     return executar(["analisar", str(har), *opcoes, "--saida", str(saida)])
 
 
-def test_r14_cada_ia_tem_o_seu_provedor() -> None:
+def test_r14_1_cada_ia_tem_o_seu_provedor() -> None:
     assert set(cli.PROVEDORES_DAS_IAS) == set(cliente.EXECUTAVEIS_DAS_IAS)
 
 
@@ -303,7 +305,7 @@ def test_r14_8_com_ia_explica_os_achados_e_grava_provedor_e_chamadas_no_json(
 
 
 @pytest.mark.usefixtures("fontes_falsas", "clis_procuradas")
-def test_r14_com_ia_procura_bibliotecas_em_bundles(
+def test_r03_1_com_ia_procura_bibliotecas_em_bundles(
     tmp_path: Path, provedores: ProvedoresFalsos
 ) -> None:
     angular = {"pacote": "@angular/core", "versao": "22.2.2", "trecho": TRECHO_DO_ANGULAR}
@@ -324,7 +326,7 @@ def test_r14_com_ia_procura_bibliotecas_em_bundles(
 
 
 @pytest.mark.usefixtures("fontes_falsas", "clis_procuradas")
-def test_r14_falha_da_ia_nao_derruba_a_analise(
+def test_r07_3_falha_da_ia_nao_derruba_a_analise(
     capsys: pytest.CaptureFixture[str], tmp_path: Path, provedores: ProvedoresFalsos
 ) -> None:
     assert analisar_com_ia(HAR_DA_LOJA, tmp_path) == 0
@@ -339,7 +341,7 @@ def test_r14_falha_da_ia_nao_derruba_a_analise(
 
 
 @pytest.mark.usefixtures("fontes_falsas", "clis_procuradas")
-def test_r14_falha_da_ia_nos_bundles_avisa_que_ficaram_sem_analise(
+def test_r03_5_falha_da_ia_nos_bundles_avisa_que_ficaram_sem_analise(
     capsys: pytest.CaptureFixture[str], tmp_path: Path, provedores: ProvedoresFalsos
 ) -> None:
     provedores.respostas = [FalhaDoProvedor("sem resposta"), FalhaDoProvedor("sem resposta")]

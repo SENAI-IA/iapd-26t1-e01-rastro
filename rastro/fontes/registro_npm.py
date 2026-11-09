@@ -19,6 +19,7 @@ HTTP_NAO_PUBLICADO = 404
 MEGABYTE = 1024 * 1024
 LIMITE_DO_PACOTE_EM_MB = 10
 LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MB = 50
+LIMITE_DE_ARQUIVOS_NO_PACOTE = 20_000
 EXTENSOES_DE_CODIGO = (".js", ".mjs", ".cjs")
 PREFIXO_DO_SHA512 = "sha512-"
 
@@ -106,11 +107,23 @@ def conferir_integridade(dados: bytes, integridade: str) -> None:
 def ler_arquivos_de_codigo(dados: bytes) -> list[str]:
     try:
         with tarfile.open(fileobj=io.BytesIO(dados), mode="r:gz") as pacote:
-            membros = [membro for membro in pacote.getmembers() if e_arquivo_de_codigo(membro)]
+            membros = membros_de_codigo(pacote)
             conferir_tamanho_desempacotado(membros)
             return [ler_membro(pacote, membro) for membro in membros]
     except (tarfile.TarError, OSError, EOFError) as erro:
         raise ConsultaNaoRealizada(f"pacote ilegível: {erro}") from erro
+
+
+def membros_de_codigo(pacote: tarfile.TarFile) -> list[tarfile.TarInfo]:
+    membros = []
+    for quantidade, membro in enumerate(pacote, start=1):
+        if quantidade > LIMITE_DE_ARQUIVOS_NO_PACOTE:
+            raise ConsultaNaoRealizada(
+                f"pacote com mais de {LIMITE_DE_ARQUIVOS_NO_PACOTE} arquivos"
+            )
+        if e_arquivo_de_codigo(membro):
+            membros.append(membro)
+    return membros
 
 
 def e_arquivo_de_codigo(membro: tarfile.TarInfo) -> bool:

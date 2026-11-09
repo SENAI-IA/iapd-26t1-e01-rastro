@@ -298,6 +298,15 @@ def test_r21_5_codigo_desempacotado_acima_do_limite_nao_e_lido(
     assert falha.value.motivo == "código do pacote acima de 0 MB desempacotado"
 
 
+def test_r21_5_pacote_com_arquivos_demais_nao_e_lido(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(registro_npm, "LIMITE_DE_ARQUIVOS_NO_PACOTE", 2)
+
+    with pytest.raises(ConsultaNaoRealizada) as falha:
+        ler_codigo(monkeypatch, registro_com_pacote(montar_tgz(ARQUIVOS_DO_PACOTE)))
+
+    assert falha.value.motivo == "pacote com mais de 2 arquivos"
+
+
 def test_r21_5_pacote_fora_do_registro_nao_e_baixado(monkeypatch: pytest.MonkeyPatch) -> None:
     fora = "https://exemplo.com/core-22.2.2.tgz"
     urlopen_falso = registro_com_pacote(b"", metadados(fora, "sha512-x"))

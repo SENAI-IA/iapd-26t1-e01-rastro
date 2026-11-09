@@ -257,7 +257,7 @@ def bibliotecas_do_gabarito(metodo_esperado: str) -> set[tuple[str, str]]:
     }
 
 
-def test_r03_no_juice_shop_confirma_pela_ia_o_que_a_assinatura_nao_ve() -> None:
+def test_r03_2_no_juice_shop_confirma_pela_ia_o_que_a_assinatura_nao_ve() -> None:
     requisicoes = ler_har(HAR_DO_JUICE_SHOP)
     font_awesome = ("@fortawesome/fontawesome-free", "5.15.4", TRECHO_DO_FONT_AWESOME)
     ia, provedor = ia_que_responde(resposta(ANGULAR), resposta(font_awesome))

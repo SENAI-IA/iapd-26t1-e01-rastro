@@ -4,21 +4,14 @@ from datetime import datetime
 from pathlib import Path
 
 from rastro.acao.modelos import Acao
-from rastro.acao.plano import chave_da_biblioteca, montar_plano_de_acao
+from rastro.acao.plano import montar_plano_de_acao
 from rastro.configuracao.checagens import checar_configuracao
 from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.ia import explicar_achados
 from rastro.explicacao.modelos import Explicacao
-from rastro.fontes import nvd as fonte_nvd
-from rastro.fontes import osv as fonte_osv
-from rastro.fontes.conector import (
-    Aviso,
-    ConectorDeAvisos,
-    ConsultaNaoRealizada,
-    FonteSemResposta,
-)
-from rastro.fontes.juncao import juntar_avisos
-from rastro.fontes.nvd import BuscaDeCvss, completar_cvss
+from rastro.fontes.conector import ConectorDeAvisos, FonteSemResposta
+from rastro.fontes.consulta import AvisosDaBiblioteca, consultar_avisos
+from rastro.fontes.nvd import BuscaDeCvss
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.har.leitor import ler_har
 from rastro.har.site import descobrir_site_analisado
@@ -26,14 +19,11 @@ from rastro.ia.cliente import ChamadaIA, ClienteDeIA
 from rastro.identificacao.assinaturas import algum_script_com_conteudo, identificar_por_assinatura
 from rastro.identificacao.ia import identificar_em_bundles
 from rastro.identificacao.modelos import Biblioteca
+from rastro.risco.achados import calcular_risco
 from rastro.risco.modelos import Achado
-from rastro.risco.nota import calcular_nota
-from rastro.risco.prioridade import ordenar_achados
 from rastro.travas.conferencia import conferir_bibliotecas
 from rastro.travas.faixa_de_versao import descartar_fora_da_faixa
 from rastro.travas.modelos import TravaAcionada
-
-AvisosDaBiblioteca = tuple[Biblioteca, list[Aviso]]
 
 
 @dataclass(frozen=True)
@@ -54,19 +44,6 @@ class Analise:
     plano_de_acao: list[Acao]
     travas_acionadas: list[TravaAcionada]
     chamadas_de_ia: list[ChamadaIA]
-
-
-@dataclass(frozen=True)
-class AvisosConsultados:
-    avisos: list[AvisosDaBiblioteca]
-    nao_consultadas: dict[str, str]
-    fontes_sem_resposta: list[FonteSemResposta]
-
-
-@dataclass(frozen=True)
-class AvisosDeUmaFonte:
-    avisos: list[Aviso]
-    sem_resposta: list[FonteSemResposta]
 
 
 def analisar(
@@ -129,49 +106,6 @@ def chamadas_feitas(ia: ClienteDeIA | None) -> list[ChamadaIA]:
     return list(ia.chamadas)
 
 
-def consultar_avisos(
-    bibliotecas: list[Biblioteca],
-    fonte: ConectorDeAvisos,
-    osv: ConectorDeAvisos | None = None,
-    nvd: BuscaDeCvss | None = None,
-) -> AvisosConsultados:
-    avisos: list[AvisosDaBiblioteca] = []
-    nao_consultadas: dict[str, str] = {}
-    fontes_sem_resposta: list[FonteSemResposta] = []
-    for biblioteca in bibliotecas:
-        try:
-            do_github = fonte.consultar(biblioteca.pacote, biblioteca.versao)
-        except ConsultaNaoRealizada as erro:
-            nao_consultadas[chave_da_biblioteca(biblioteca)] = erro.motivo
-            continue
-        do_osv = consultar_osv(biblioteca, osv)
-        com_cvss = completar_cvss_pelo_nvd(juntar_avisos(do_github + do_osv.avisos), nvd)
-        avisos.append((biblioteca, com_cvss.avisos))
-        fontes_sem_resposta.extend(do_osv.sem_resposta + com_cvss.sem_resposta)
-    return AvisosConsultados(avisos, nao_consultadas, fontes_sem_resposta)
-
-
-def consultar_osv(biblioteca: Biblioteca, osv: ConectorDeAvisos | None) -> AvisosDeUmaFonte:
-    if osv is None:
-        return AvisosDeUmaFonte([], [])
-    try:
-        return AvisosDeUmaFonte(osv.consultar(biblioteca.pacote, biblioteca.versao), [])
-    except ConsultaNaoRealizada as erro:
-        alvo = chave_da_biblioteca(biblioteca)
-        return AvisosDeUmaFonte([], [FonteSemResposta(fonte_osv.NOME_DA_FONTE, alvo, erro.motivo)])
-
-
-def completar_cvss_pelo_nvd(avisos: list[Aviso], nvd: BuscaDeCvss | None) -> AvisosDeUmaFonte:
-    if nvd is None:
-        return AvisosDeUmaFonte(avisos, [])
-    completado = completar_cvss(avisos, nvd)
-    sem_resposta = [
-        FonteSemResposta(fonte_nvd.NOME_DA_FONTE, cve, motivo)
-        for cve, motivo in completado.nao_responderam.items()
-    ]
-    return AvisosDeUmaFonte(completado.avisos, sem_resposta)
-
-
 def conferir_faixas(
     avisos: list[AvisosDaBiblioteca],
 ) -> tuple[list[AvisosDaBiblioteca], list[TravaAcionada]]:
@@ -184,12 +118,3 @@ def conferir_faixas(
         mantidos.append((biblioteca, na_faixa))
         travas_acionadas.extend(barrados)
     return mantidos, travas_acionadas
-
-
-def calcular_risco(avisos: list[AvisosDaBiblioteca]) -> list[Achado]:
-    achados = []
-    for biblioteca, avisos_da_biblioteca in avisos:
-        for aviso in avisos_da_biblioteca:
-            nota = calcular_nota(aviso.cvss, aviso.percentil_epss)
-            achados.append(Achado(biblioteca, aviso, nota))
-    return ordenar_achados(achados)

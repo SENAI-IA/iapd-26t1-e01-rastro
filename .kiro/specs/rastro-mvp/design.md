@@ -55,6 +55,7 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/identificacao/modelos.py` | `Biblioteca`, `Evidencia` | R02.5 |
 | `rastro/fontes/conector.py` | interface `ConectorDeAvisos` | R04 |
 | `rastro/fontes/github_advisory.py` | consulta e converte a resposta | R04 |
+| `rastro/fontes/consulta.py` | consulta cada biblioteca no GitHub, depois no OSV e completa o CVSS pelo NVD | R04.3, R04A.6 |
 | `rastro/fontes/osv.py`, `nvd.py`, `juncao.py` | extensão opcional: OSV, CVSS do NVD e junção dos avisos | R04A |
 | `rastro/fontes/registro_npm.py` | confere se `pacote@versão` existe e lê o pacote publicado em memória | R21.4, R21.5, R21.9 |
 | `rastro/travas/formato.py` | aceita só o JSON fechado da IA | R21.1 |
@@ -66,6 +67,7 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/risco/modelos.py` | `Nota`, `Achado`, `Prioridade` | R05 |
 | `rastro/risco/nota.py` | fórmula da nota | R05.1, R05.3, R05.4 |
 | `rastro/risco/prioridade.py` | faixas, nota da biblioteca e ordenação | R05.2, R05.5, R05.6, R05.7 |
+| `rastro/risco/achados.py` | um `Achado` por aviso, com a nota, em ordem | R05.1, R05.6 |
 | `rastro/configuracao/checagens.py` | uma função por checagem | R06 |
 | `rastro/explicacao/modelos.py` | `Explicacao` | R07 |
 | `rastro/explicacao/ia.py` | pede explicação e teste de verificação | R07 |
@@ -103,8 +105,8 @@ def analisar(caminho_har: Path, fonte: ConectorDeAvisos, registro: RegistroDePac
 
 Esse é o fluxo sem IA, ligado na T23. A IA entra depois sem mudar a ordem: a T33 acrescenta o parâmetro `ia: ClienteDeIA | None` (com `--sem-ia`, `None`), a T41 acrescenta `identificar_em_bundles(requisicoes, por_assinatura, ia)` (`identificacao/ia.py`), cujas bibliotecas entram em `conferir_bibliotecas` junto com as da assinatura, e a T38 troca o dicionário vazio por `explicar_achados(achados, ia)`.
 
-- `consultar_avisos` consulta a fonte para cada biblioteca confirmada; `ConsultaNaoRealizada` vira `nao_consultadas[pacote@versão] = motivo` e a análise segue (R04.3). Desde a T51, com `osv` e `nvd` (parâmetros opcionais de `analisar`; o `cli.py` passa `Osv()` e `Nvd()`), cada biblioteca respondida pelo GitHub passa por: OSV, `juntar_avisos` e `completar_cvss`, antes da trava 6 (ver R04A).
-- `conferir_faixas` aplica a trava 6 (`descartar_fora_da_faixa`) biblioteca por biblioteca; `calcular_risco` monta um `Achado` por aviso mantido, com `calcular_nota`, e devolve a lista em `ordenar_achados`.
+- `consultar_avisos` (`fontes/consulta.py`) consulta a fonte para cada biblioteca confirmada; `ConsultaNaoRealizada` vira `nao_consultadas[pacote@versão] = motivo` e a análise segue (R04.3). Desde a T51, com `osv` e `nvd` (parâmetros opcionais de `analisar`; o `cli.py` passa `Osv()` e `Nvd()`), cada biblioteca respondida pelo GitHub passa por: OSV, `juntar_avisos` e `completar_cvss`, antes da trava 6 (ver R04A).
+- `conferir_faixas` aplica a trava 6 (`descartar_fora_da_faixa`) biblioteca por biblioteca; `calcular_risco` (`risco/achados.py`) monta um `Achado` por aviso mantido, com `calcular_nota`, e devolve a lista em `ordenar_achados`.
 - `checar_configuracao(requisicoes, site)`, em `checagens.py`, roda a tupla `CHECAGENS` na ordem dos IDs (C01 a C08).
 - `Analise` (em `fluxo.py`): `har` (nome do arquivo), `site`, `inicio` (hora local), `duracao_s`, `provedor_de_ia: str | None`, `tem_javascript` (R01.6), `bibliotecas` (confirmadas), `a_confirmar`, `nao_consultadas: dict[str, str]`, `fontes_sem_resposta: list[FonteSemResposta]` (T51), `achados`, `explicacoes`, `checagens`, `plano_de_acao`, `travas_acionadas` (as da identificação em bundles, as do npm, as da faixa e as da explicação) e `chamadas_de_ia` (as `ChamadaIA` do cliente; vazia sem IA, T39).
 - O `cli.py` monta o relatório (`relatorio/json.py`), escolhe a pasta pelo site e por `analise.inicio` e grava (`relatorio/gravacao.py`). Sem `--sem-ia`, escolhe a IA e procura a CLI dela (código 1 se a IA for inválida ou a CLI faltar, T33) e, desde a T52, monta o `ClienteDeIA` com o provedor e o passa ao `fluxo.analisar`.
@@ -277,7 +279,7 @@ GET <dist.tarball>                                     → pacote .tgz, só para
 - `ler_codigo(pacote, versao) -> list[str]`, também em `RegistroDePacotes`, devolve o texto dos arquivos de código do pacote: lê `dist.tarball` e `dist.integrity` da resposta da versão e baixa o `.tgz`, só se ele estiver no próprio `registry.npmjs.org`.
 - O `.tgz` é lido **em memória**: `tarfile.open(fileobj=io.BytesIO(dados), mode="r:gz")` e `extractfile` só nos arquivos comuns `.js`, `.mjs` e `.cjs` (o Angular só publica `.mjs`); pasta e atalho ficam de fora. Nunca `extract` nem `extractall`, nada gravado em disco, nada executado.
 - A integridade do pacote é conferida com `hashlib.sha512` contra `dist.integrity` antes da leitura. Sem hash `sha512-` (pacote antigo só com `shasum`), o pacote não é lido.
-- Limite de 10 MB por pacote baixado (lê no máximo 10 MB + 1 byte), 50 MB de código desempacotado (contra pacote que infla ao abrir) e tempo limite de 15 s. Acima disso, falha de rede, integridade diferente ou pacote ilegível viram `ConsultaNaoRealizada(motivo)`: a trava 5 não roda e a biblioteca fica "a confirmar" com o motivo.
+- Limite de 10 MB por pacote baixado (lê no máximo 10 MB + 1 byte), 50 MB de código desempacotado (contra pacote que infla ao abrir), 20 mil arquivos no pacote (contra milhões de entradas pequenas) e tempo limite de 15 s. Acima disso, falha de rede, integridade diferente ou pacote ilegível viram `ConsultaNaoRealizada(motivo)`: a trava 5 não roda e a biblioteca fica "a confirmar" com o motivo.
 - Cada `pacote@versão` é consultado uma vez por análise.
 - Sem resposta do registro (R21.9): biblioteca por assinatura segue com o selo "não conferida no npm"; da IA vai para "a confirmar".
 
@@ -474,6 +476,7 @@ Decidido na T34:
 - Ordem: `Bearer` e o token que vem depois (sem diferenciar maiúsculas) viram `[removido]` inteiros; depois o JWT; depois a query string de qualquer URL com esquema (`https://loja/a.js?v=1` vira `https://loja/a.js?[removido]`, para mostrar que havia uma); por fim as chaves longas.
 - O token do `Bearer` só leva caracteres de token (`A-Za-z0-9._~+/=-`): `` `Bearer ${localStorage.getItem(`token`)}` ``, que aparece em bundles reais da avaliação, fica intacto.
 - Chave longa: 33 ou mais caracteres de `[A-Za-z0-9+_-]` (com até dois `=` no fim) que tenham letra **e** dígito. A `/` fica de fora e o dígito é exigido porque, nos trechos dos HARs de `avaliacao/`, a regra sem isso apagava caminhos (`github.com/twbs/bootstrap/blob/master/LICENSE`, `malsup/form`) e nomes como o `__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED` do React, que ajudam a identificar a biblioteca. Com a regra, sobram hashes de commit, endereços de carteira, IDs de cliente OAuth e alfabetos de base64.
+- Base64 com `/` (segredo em base64 padrão): 33 ou mais caracteres em blocos de pelo menos 4 de `[A-Za-z0-9+]` ligados por `/`, que tenham maiúscula, minúscula **e** dígito, e não comecem logo depois de outra `/`. A exigência das três classes e do começo do bloco deixa os caminhos de fora (`assets/images/products/banana2024/thumbnail`); nos trechos dos HARs de `avaliacao/`, a regra não apaga nada.
 - **Efeito nas travas:** o que conta como "trecho enviado" para a trava 2 (trecho real) é o trecho sanitizado, igual ao que está em `ChamadaIA.entrada`. A `conferir_ancoragem` (T15) recebe os `trechos_enviados`; a identificação por IA (T41) passa cada trecho por `sanitizar` antes de montar o prompt e entrega à trava esses trechos já sanitizados.
 
 ## 12. Plano de ação e task (R08, R09)
@@ -525,16 +528,16 @@ Decidido na T34:
 Toda contagem que a tela mostra já vem no `resumo`. O React não calcula nada (R13.7).
 
 - `relatorio/json.py` tem uma função pura, `montar_relatorio(analise) -> dict`. Os modelos entram com `dataclasses.asdict`, com os mesmos nomes de campo da seção 4.
-- **Biblioteca** (em `bibliotecas` e `a_confirmar`): `id` (`pacote@versão`, a mesma chave do plano de ação), os campos de `Biblioteca`, `nota` (a maior dos achados, ou `null`), `achados` (os GHSA, do de maior nota para o de menor), `motivo_nao_consultada` (R04.3) e `explicacao` (`null` sem IA).
+- **Biblioteca** (em `bibliotecas` e `a_confirmar`): `id` (`pacote@versão`, a mesma chave do plano de ação), os campos de `Biblioteca`, `nota` (a maior dos achados, ou `null`), `prioridade` (a da `nota`, ou `null` sem achados), `achados` (os GHSA, do de maior nota para o de menor), `motivo_nao_consultada` (R04.3) e `explicacao` (`null` sem IA).
 - **Achado:** `biblioteca` (o `id`), `aviso` e `nota` (com a `conta`, R10.1), na ordem de R05.6.
 - `checagens` e `plano_de_acao` vão como os modelos, com o `texto_task` de cada ação.
 - `ia.travas_acionadas` traz todas as travas acionadas, também na análise sem IA (as travas 4 e 6 rodam sempre).
 - Decidido na T39 (R11, R21.10):
-  - `ia.chamadas`: cada `ChamadaIA` como veio do cliente (`etapa`, `provedor`, `entrada` já sanitizada, `resposta`, `duracao_s`, `tokens`, `sucesso`). Chamada que falhou leva o motivo em `resposta`.
+  - `ia.chamadas`: cada `ChamadaIA` como veio do cliente (`etapa`, `provedor`, `entrada` e `resposta` já sanitizadas, `duracao_s`, `tokens`, `sucesso`). Chamada que falhou leva o motivo em `resposta`.
   - `ia.com_e_sem_ia` (R11.3): com nomes em vez de pares, para ler sem consultar a ordem. `so_por_assinatura` conta as bibliotecas confirmadas com `metodo` "assinatura" e os achados delas; `com_ia` é o total da análise (assinatura + IA). Bibliotecas "a confirmar" não contam. Sem IA, `null` ("sem a comparação").
   - `ia.tokens_total`: soma dos `tokens` das chamadas; `null` sem IA ou quando alguma chamada não informou tokens (somar só as que informaram seria uma estimativa para menos, R11.2). Com IA e nenhuma chamada, `0`.
 - `analise.data` é a hora local do início, sem fração de segundo, e é a mesma que dá o nome da pasta da análise.
-- Nada do HAR além de URL, nome e atributos de cookie e os trechos de evidência vai para o relatório: o leitor já não guarda valor de cookie nem cabeçalho de pedido (R16.4).
+- Nada do HAR além de URL, nome e atributos de cookie e os trechos de evidência vai para o relatório: o leitor já não guarda valor de cookie nem cabeçalho de pedido (R16.4). A URL das evidências (bibliotecas e checagens) sai com a query string trocada por `[removido]`, e o detalhe da checagem leva a página sem a query string: tokens de redefinição de senha, `code` de OAuth e URLs assinadas não chegam ao relatório nem à task.
 
 ### HTML
 
@@ -636,8 +639,9 @@ Um arquivo por decisão, com contexto, decisão e alternativas (T45):
 7. EPSS ausente: nota igual ao CVSS: `07-epss-ausente.md`.
 8. Análise sem IA permitida, mas sempre marcada como incompleta: `08-analise-sem-ia.md`.
 9. HAR sanitized como recomendado: o completo só acrescenta as três checagens de cookie e traz segredos para a máquina de quem audita. Na avaliação e no repo, só HAR sanitized: `09-har-sanitized.md`.
+10. O NVD ganha a interface `BuscaDeCvss`, a quarta troca real ao lado das outras três: `10-interface-do-nvd.md`.
 
-Decisão nova ganha o próximo número (`10-<tema>.md`), com as mesmas três seções.
+Decisão nova ganha o próximo número (`11-<tema>.md`), com as mesmas três seções.
 
 ## 17. A validar no spike
 

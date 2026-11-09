@@ -30,7 +30,7 @@ def har_da_loja_sem_scripts(pasta: Path) -> Path:
     return caminho
 
 
-def test_analisar_segue_as_etapas_do_har_ao_plano() -> None:
+def test_r01_1_analisar_segue_as_etapas_do_har_ao_plano() -> None:
     analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso())
 
     assert analise.har == "loja.har"

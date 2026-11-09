@@ -242,7 +242,7 @@ def test_r07_3_fato_do_exemplo_do_prompt_nao_conta_como_entrada() -> None:
     assert "`1.3.0` (como_corrigir)" in resultado.travas_acionadas[0].motivo
 
 
-def test_r07_sem_ia_nao_ha_explicacao() -> None:
+def test_r14_5_sem_ia_nao_ha_explicacao() -> None:
     resultado = explicar_achados([achado(biblioteca())], None)
 
     assert resultado.explicacoes == {}

@@ -56,10 +56,18 @@ def test_r16_3_url_sem_query_string_fica_como_esta() -> None:
         "0x8343d2eb2B13A2495De435a1b15e85b98115Ce05",
         "chave_ficticia_0123456789abcdefABCDEF",
         "ZmljdGljaW8tY2hhdmUtYmFzZTY0LWRlLXRlc3Rl==",
+        "q8Zr1Xk2Lm9Pq3Rt5Vw7Yz0Ab4Cd6Ef/Gh8Ij2Kl4Mn6=",
+        "Zm1jdGljaW8Y2hhdmUt/YmFzZTY0LWRlLXRl/c3Rl+w==",
     ],
 )
 def test_r16_3_chave_hexadecimal_ou_base64_longa_vira_removido(chave: str) -> None:
     assert sanitizar(f"chave: '{chave}'") == "chave: '[removido]'"
+
+
+def test_r16_3_caminho_de_arquivo_longo_fica_como_esta() -> None:
+    caminho = '"assets/images/products/banana2024/thumbnail.png"'
+
+    assert sanitizar(caminho) == caminho
 
 
 def test_r16_3_sequencia_de_32_caracteres_fica_como_esta() -> None:

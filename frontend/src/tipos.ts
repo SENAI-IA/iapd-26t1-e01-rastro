@@ -57,6 +57,7 @@ export interface Biblioteca {
   travas_que_falharam: string[];
   evidencias: Evidencia[];
   nota: number | null;
+  prioridade: Prioridade | null;
   achados: string[];
   motivo_nao_consultada: string | null;
   explicacao: Explicacao | null;

@@ -135,4 +135,4 @@ TOTAL                                  2279      6    99%
 ============================= 695 passed in 12.15s =============================
 ```
 
-O `__main__.py` aparece com 0% porque o teste `test_python_m_rastro_help_retorna_0` o executa em outro processo, que o `pytest-cov` não mede.
+O `__main__.py` aparece com 0% porque o teste `test_r14_7_python_m_rastro_help_retorna_0` o executa em outro processo, que o `pytest-cov` não mede.

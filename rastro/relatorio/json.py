@@ -1,15 +1,16 @@
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from typing import Any
 
 from rastro.acao.modelos import Acao
 from rastro.acao.plano import chave_da_biblioteca
-from rastro.configuracao.modelos import SituacaoDaChecagem
+from rastro.configuracao.modelos import Checagem, SituacaoDaChecagem
 from rastro.fluxo import Analise
 from rastro.fontes.conector import FonteSemResposta
+from rastro.har.site import url_sem_valores_da_query
 from rastro.ia.cliente import ChamadaIA
-from rastro.identificacao.modelos import Biblioteca
+from rastro.identificacao.modelos import Biblioteca, Evidencia
 from rastro.risco.modelos import Achado, Prioridade
-from rastro.risco.prioridade import nota_da_biblioteca
+from rastro.risco.prioridade import classificar_prioridade, nota_da_biblioteca
 
 VERSAO_FORMATO = 1
 PRIORIDADES: tuple[Prioridade, ...] = ("alta", "media", "baixa", "a avaliar")
@@ -56,7 +57,7 @@ def montar_relatorio(analise: Analise) -> dict[str, Any]:
         "bibliotecas": [biblioteca_no_relatorio(b, analise) for b in analise.bibliotecas],
         "a_confirmar": [biblioteca_no_relatorio(b, analise) for b in analise.a_confirmar],
         "achados": [achado_no_relatorio(achado) for achado in analise.achados],
-        "checagens": [asdict(checagem) for checagem in analise.checagens],
+        "checagens": [checagem_no_relatorio(checagem) for checagem in analise.checagens],
         "plano_de_acao": [asdict(acao) for acao in analise.plano_de_acao],
         "ia": dados_da_ia(analise),
     }
@@ -162,14 +163,30 @@ def biblioteca_no_relatorio(biblioteca: Biblioteca, analise: Analise) -> dict[st
     chave = chave_da_biblioteca(biblioteca)
     achados = achados_da_biblioteca(chave, analise.achados)
     explicacao = analise.explicacoes.get(chave)
+    nota = nota_da_biblioteca(achados)
     return {
         "id": chave,
-        **asdict(biblioteca),
-        "nota": nota_da_biblioteca(achados),
+        **asdict(replace(biblioteca, evidencias=evidencias_sem_valores(biblioteca.evidencias))),
+        "nota": nota,
+        "prioridade": classificar_prioridade(nota) if achados else None,
         "achados": [achado.aviso.ghsa for achado in achados],
         "motivo_nao_consultada": analise.nao_consultadas.get(chave),
         "explicacao": asdict(explicacao) if explicacao is not None else None,
     }
+
+
+def evidencias_sem_valores(evidencias: list[Evidencia]) -> list[Evidencia]:
+    return [evidencia_sem_valores(evidencia) for evidencia in evidencias]
+
+
+def evidencia_sem_valores(evidencia: Evidencia) -> Evidencia:
+    return replace(evidencia, url=url_sem_valores_da_query(evidencia.url))
+
+
+def checagem_no_relatorio(checagem: Checagem) -> dict[str, Any]:
+    if checagem.evidencia is None:
+        return asdict(checagem)
+    return asdict(replace(checagem, evidencia=evidencia_sem_valores(checagem.evidencia)))
 
 
 def achados_da_biblioteca(chave: str, achados: list[Achado]) -> list[Achado]:

@@ -9,9 +9,14 @@ from urllib.request import Request
 
 import pytest
 
-from rastro.fluxo import consultar_avisos
 from rastro.fontes import osv
-from rastro.fontes.conector import Aviso, ConectorDeAvisos, ConsultaNaoRealizada
+from rastro.fontes.conector import (
+    Aviso,
+    ConectorDeAvisos,
+    ConsultaNaoRealizada,
+    FonteSemResposta,
+)
+from rastro.fontes.consulta import consultar_avisos
 from rastro.fontes.osv import Osv
 from rastro.identificacao.modelos import Biblioteca
 from rastro.travas.faixa_de_versao import (
@@ -19,6 +24,7 @@ from rastro.travas.faixa_de_versao import (
     descartar_fora_da_faixa,
     faixas_dos_eventos_semver,
 )
+from tests.dubles import ConectorFalso
 
 PASTA_DE_DADOS = Path(__file__).resolve().parents[1] / "dados"
 AVISO_SEM_TEXTO = (
@@ -276,12 +282,15 @@ def test_r04a_6_resposta_ilegivel_do_osv_vira_nao_consultada(
     assert falha.value.motivo == motivo
 
 
-def test_r04a_6_falha_do_osv_nao_para_a_consulta_das_bibliotecas(
+def test_r04a_6_falha_do_osv_segue_so_com_o_github_e_registra_a_fonte(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(osv, "urlopen", UrlopenFalso(erro=URLError("sem rede")))
 
-    consultados = consultar_avisos([JQUERY], Osv())
+    consultados = consultar_avisos([JQUERY], ConectorFalso(), osv=Osv())
 
-    assert consultados.avisos == []
-    assert consultados.nao_consultadas == {"jquery@3.4.1": "sem resposta do OSV: sem rede"}
+    assert consultados.avisos[0][1] != []
+    assert consultados.nao_consultadas == {}
+    assert consultados.fontes_sem_resposta == [
+        FonteSemResposta("OSV", "jquery@3.4.1", "sem resposta do OSV: sem rede")
+    ]

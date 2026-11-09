@@ -128,6 +128,35 @@ def test_r10_1_biblioteca_traz_origem_nota_e_achados() -> None:
     assert jquery["motivo_nao_consultada"] is None
 
 
+def test_r05_5_biblioteca_traz_pronta_a_prioridade_da_sua_nota() -> None:
+    jquery, lodash = relatorio_da_loja()["bibliotecas"][:2]
+
+    assert jquery["prioridade"] == "alta"
+    assert lodash["achados"] == []
+    assert lodash["prioridade"] is None
+
+
+def test_r16_4_evidencias_saem_sem_os_valores_da_query_string() -> None:
+    analise = analise_da_loja()
+    jquery = analise.bibliotecas[0]
+    com_token = replace(jquery.evidencias[0], url="https://loja.exemplo.com/a.js?token=segredo#x")
+    checagem = next(c for c in analise.checagens if c.evidencia is not None)
+    na_pagina = replace(checagem.evidencia, url="https://loja.exemplo.com/?code=segredo")
+    analise = replace(
+        analise,
+        bibliotecas=[replace(jquery, evidencias=[com_token]), *analise.bibliotecas[1:]],
+        checagens=[replace(checagem, evidencia=na_pagina)],
+    )
+
+    relatorio = montar_relatorio(analise)
+
+    assert relatorio["bibliotecas"][0]["evidencias"][0]["url"] == (
+        "https://loja.exemplo.com/a.js?[removido]"
+    )
+    assert relatorio["checagens"][0]["evidencia"]["url"] == "https://loja.exemplo.com/?[removido]"
+    assert "segredo" not in json.dumps(relatorio)
+
+
 def test_r10_1_achado_traz_aviso_e_conta_da_nota() -> None:
     achado = relatorio_da_loja()["achados"][0]
 
@@ -217,7 +246,7 @@ def test_r16_4_relatorio_nao_traz_valor_de_cookie_nem_token_do_har() -> None:
     assert "sessao" in texto
 
 
-def test_r08_plano_de_acao_vai_inteiro_com_o_texto_da_task() -> None:
+def test_r08_5_plano_de_acao_vai_inteiro_na_ordem_com_o_texto_da_task() -> None:
     plano = relatorio_da_loja()["plano_de_acao"]
 
     assert plano[0]["id"] == "jquery@3.4.1"

@@ -51,7 +51,10 @@ export default function AvisoSemIA({ analise, recolhido = false }: Props) {
   );
 }
 
+const NOME_SEGURO_NO_TERMINAL = /^[A-Za-z0-9._/-]+$/;
+const MARCADOR_DO_HAR = "<caminho do HAR>";
+
 function comandoComIA(har: string): string {
-  const arquivo = har.includes(" ") ? `"${har}"` : har;
+  const arquivo = NOME_SEGURO_NO_TERMINAL.test(har) ? har : MARCADOR_DO_HAR;
   return `python -m rastro analisar ${arquivo}`;
 }

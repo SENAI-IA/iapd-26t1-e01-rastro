@@ -5,7 +5,7 @@
 - **Clareza e qualidade, sem over engineering.** Só existe abstração que resolve um problema de hoje. Na dúvida, a solução simples.
 - **Responsabilidade única (SRP) em pasta, arquivo e função.** Se a descrição precisa de "e", está fazendo coisas demais.
 - **Núcleo puro, entrada e saída nas bordas.** Ler arquivo, chamar API, chamar IA e gravar relatório ficam nas bordas. Nota, prioridade, checagens e travas são funções puras.
-- **Interface só onde há troca real:** a fonte de dados (`ConectorDeAvisos`), o registro do npm (`RegistroDePacotes`) e o cliente da IA (`ProvedorDeIA`, com três provedores reais). Nos testes, os três viram dublês. Nenhuma outra parte ganha interface.
+- **Interface só onde há troca real:** a fonte de dados (`ConectorDeAvisos`), o registro do npm (`RegistroDePacotes`), o cliente da IA (`ProvedorDeIA`, com três provedores reais) e o CVSS do NVD (`BuscaDeCvss`, ver `docs/decisoes/10-interface-do-nvd.md`). Nos testes, os quatro viram dublês. Nenhuma outra parte ganha interface.
 - **A IA sugere, a regra confirma:** toda saída da IA passa por `travas/` antes de virar dado.
 - **Um único ponto de chamada à IA**, que mede tempo e tokens.
 - **Dados separados da apresentação.** O núcleo gera JSON; o React só exibe.
@@ -20,8 +20,8 @@ rastro/
   har/                     leitor.py, modelos.py, site.py
   identificacao/           modelos.py, assinaturas.py, bundles.py, ia.py
   travas/                  formato.py, ancoragem.py, codigo_publicado.py, faixa_de_versao.py, explicacao.py, conferencia.py
-  fontes/                  conector.py (interface), github_advisory.py, registro_npm.py; opcionais: osv.py, nvd.py, juncao.py
-  risco/                   modelos.py, nota.py, prioridade.py
+  fontes/                  conector.py (interface), github_advisory.py, registro_npm.py, consulta.py; opcionais: osv.py, nvd.py, juncao.py
+  risco/                   modelos.py, nota.py, prioridade.py, achados.py
   configuracao/            checagens.py (uma função por checagem)
   explicacao/              modelos.py, ia.py
   acao/                    modelos.py, plano.py, task.py
