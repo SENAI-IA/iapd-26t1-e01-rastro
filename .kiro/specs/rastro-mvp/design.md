@@ -88,22 +88,26 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 `fluxo.py` lê como a apresentação:
 
 ```python
-def analisar(caminho_har: Path, fonte: ConectorDeAvisos, registro: RegistroDePacotes,
-             ia: ClienteDeIA | None) -> Analise:
+def analisar(caminho_har: Path, fonte: ConectorDeAvisos, registro: RegistroDePacotes) -> Analise:
     requisicoes = ler_har(caminho_har)
     site = descobrir_site_analisado(requisicoes)
-    bibliotecas = identificar_bibliotecas(requisicoes, ia)
-    bibliotecas = conferir_bibliotecas(bibliotecas, registro)
-    achados = consultar_avisos(bibliotecas.confirmadas, fonte)
-    achados = descartar_fora_da_faixa(achados)
-    achados = calcular_risco(achados)
-    explicacoes = explicar_achados(achados, ia)
+    bibliotecas = conferir_bibliotecas(identificar_por_assinatura(requisicoes), registro)
+    consultados = consultar_avisos(bibliotecas.confirmadas, fonte)
+    avisos_na_faixa, travas_da_faixa = conferir_faixas(consultados.avisos)
+    achados = calcular_risco(avisos_na_faixa)
+    explicacoes: dict[str, Explicacao] = {}
     checagens = checar_configuracao(requisicoes, site)
     plano = montar_plano_de_acao(achados, explicacoes, checagens)
-    return Analise(site, bibliotecas, achados, checagens, plano, chamadas_de_ia(ia), travas_acionadas())
+    return Analise(...)
 ```
 
-Com `--sem-ia`, `ia` é `None`: `identificar_bibliotecas` usa só assinatura e `explicar_achados` devolve as explicações vazias.
+Esse é o fluxo sem IA, ligado na T23. A IA entra depois sem mudar a ordem: a T33 acrescenta o parâmetro `ia: ClienteDeIA | None` (com `--sem-ia`, `None`), a T41 troca `identificar_por_assinatura` por `identificar_bibliotecas(requisicoes, ia)` (assinatura e bundles) e a T38 troca o dicionário vazio por `explicar_achados(achados, ia)`.
+
+- `consultar_avisos` consulta a fonte para cada biblioteca confirmada; `ConsultaNaoRealizada` vira `nao_consultadas[pacote@versão] = motivo` e a análise segue (R04.3).
+- `conferir_faixas` aplica a trava 6 (`descartar_fora_da_faixa`) biblioteca por biblioteca; `calcular_risco` monta um `Achado` por aviso mantido, com `calcular_nota`, e devolve a lista em `ordenar_achados`.
+- `checar_configuracao(requisicoes, site)`, em `checagens.py`, roda a tupla `CHECAGENS` na ordem dos IDs (C01 a C08).
+- `Analise` (em `fluxo.py`): `har` (nome do arquivo), `site`, `inicio` (hora local), `duracao_s`, `provedor_de_ia: str | None`, `tem_javascript` (R01.6), `bibliotecas` (confirmadas), `a_confirmar`, `nao_consultadas: dict[str, str]`, `achados`, `explicacoes`, `checagens`, `plano_de_acao` e `travas_acionadas` (as do npm e as da faixa).
+- O `cli.py` monta o relatório (`relatorio/json.py`), escolhe a pasta pelo site e por `analise.inicio` e grava (`relatorio/gravacao.py`). Sem `--sem-ia`, até a T33, encerra com código 1 e sugere `--sem-ia`.
 
 ### Análise sem IA fica explícita (R14.5–R14.7)
 
@@ -113,12 +117,12 @@ A análise sem IA é útil (máquina sem CLI de IA, primeira execução, testes)
 |---|---|
 | `--help` | `--sem-ia  analisa sem IA: não procura bibliotecas em bundles e não explica os achados` |
 | Terminal, no início e no resumo final | `Atenção: análise sem IA. Bibliotecas em bundles não foram procuradas; podem existir falhas que não aparecem aqui.` |
-| JSON | `analise.ia: null` e `analise.limitacoes: ["bundles_nao_procurados", "achados_sem_explicacao"]` |
+| JSON | `analise.ia: null`, `analise.limitacoes` com `bundles_nao_procurados` e `achados_sem_explicacao` (cada uma `{"id", "texto"}`), `analise.continua_igual` com o texto do que não muda e `resumo.encontradas_so_pela_ia: null` |
 | Relatório, no topo | faixa fixa `AvisoSemIA`: o que não foi feito, o que continua igual (nota, prioridade, checagens, plano) e o comando para rodar com IA |
 | Indicador "encontradas só pela IA" | "não procurado", e não zero |
 | Painel "Onde a IA entrou" | "IA desligada nesta análise", sem a comparação com e sem IA |
 
-O texto das limitações sai do Python, no campo `limitacoes`. O React só exibe.
+O texto das limitações sai do Python, no campo `limitacoes` (`id` para o React escolher o ícone, `texto` para exibir). O React só exibe. A mesma lista leva `sem_javascript` quando nenhuma resposta do HAR trouxe conteúdo JavaScript (R01.6), com ou sem IA.
 
 ## 4. Modelos
 
@@ -355,6 +359,7 @@ Só as respostas do site analisado. Cada checagem é uma função pura `(requisi
 - C04 aceita `frame-ancestors` como diretiva da CSP (separada por `;` ou `,`), não como texto em outro valor.
 - C05 procura versão no padrão `\d+\.\d+` ou `/` seguido de dígito (`PHP/7.3.12`, `nginx/1`); o trecho da evidência é o cabeçalho, ex.: `x-powered-by: PHP/7.3.12`.
 - Severidade e quem resolve ficam numa `RegraDeChecagem` fixa por ID, em `checagens.py`.
+- A tupla `CHECAGENS`, em `checagens.py`, lista as funções na ordem dos IDs; `checar_configuracao(requisicoes, site)` roda todas e é o que o fluxo chama. Checagem nova entra na tupla.
 - C06 a C08 viram "não verificada" quando não há nenhum cookie do site (R06.7), com o detalhe dizendo que o HAR completo inclui essas checagens.
 - Cookie do site é o de qualquer resposta do host do site analisado (HTML, API ou redirecionamento), não só das páginas HTML. Falha se algum cookie falha: o detalhe lista os nomes, sem repetir; a evidência é a primeira resposta com cookie que falha, com o trecho `cookie: <nome>`. Nunca o valor (R16.4), que nem chega ao `Cookie`.
 - C07 só confere cookies de respostas em HTTPS; site só em HTTP deixa a C07 "não verificada", como a C02.
@@ -438,15 +443,25 @@ Antes de qualquer envio: tira query strings das URLs e troca por `[removido]` o 
 ```json
 {
   "versao_formato": 1,
-  "analise": { "har": "loja.har", "site": "loja.exemplo.com", "data": "2026-11-20T14:03:00", "ia": "kiro", "limitacoes": [], "duracao_s": 41.2 },
-  "resumo": { "nota_maxima": 7.9, "acoes_por_prioridade": { "alta": 1, "media": 3, "baixa": 4 },
-              "bibliotecas": 9, "bibliotecas_vulneraveis": 4, "encontradas_so_pela_ia": 2 },
+  "analise": { "har": "loja.har", "site": "loja.exemplo.com", "data": "2026-11-20T14:03:00", "ia": "kiro",
+               "limitacoes": [], "continua_igual": null, "duracao_s": 41.2 },
+  "resumo": { "nota_maxima": 7.9, "acoes": 8, "acoes_por_prioridade": { "alta": 1, "media": 3, "baixa": 4, "a avaliar": 0 },
+              "bibliotecas": 9, "bibliotecas_vulneraveis": 4, "bibliotecas_a_confirmar": 1, "bibliotecas_nao_consultadas": 0,
+              "achados": 8, "checagens_com_falha": 5, "checagens_nao_verificadas": 3, "encontradas_so_pela_ia": 2 },
   "bibliotecas": [], "a_confirmar": [], "achados": [], "checagens": [], "plano_de_acao": [],
   "ia": { "chamadas": [], "travas_acionadas": [], "com_e_sem_ia": { "bibliotecas": [7, 9], "achados": [5, 8] }, "tokens_total": null }
 }
 ```
 
 Toda contagem que a tela mostra já vem no `resumo`. O React não calcula nada (R13.7).
+
+- `relatorio/json.py` tem uma função pura, `montar_relatorio(analise) -> dict`. Os modelos entram com `dataclasses.asdict`, com os mesmos nomes de campo da seção 4.
+- **Biblioteca** (em `bibliotecas` e `a_confirmar`): `id` (`pacote@versão`, a mesma chave do plano de ação), os campos de `Biblioteca`, `nota` (a maior dos achados, ou `null`), `achados` (os GHSA, do de maior nota para o de menor), `motivo_nao_consultada` (R04.3) e `explicacao` (`null` sem IA).
+- **Achado:** `biblioteca` (o `id`), `aviso` e `nota` (com a `conta`, R10.1), na ordem de R05.6.
+- `checagens` e `plano_de_acao` vão como os modelos, com o `texto_task` de cada ação.
+- `ia.travas_acionadas` traz todas as travas acionadas, também na análise sem IA (as travas 4 e 6 rodam sempre). Até a T33, `chamadas` vai vazio e `com_e_sem_ia` e `tokens_total`, `null`.
+- `analise.data` é a hora local do início, sem fração de segundo, e é a mesma que dá o nome da pasta da análise.
+- Nada do HAR além de URL, nome e atributos de cookie e os trechos de evidência vai para o relatório: o leitor já não guarda valor de cookie nem cabeçalho de pedido (R16.4).
 
 ### HTML
 
@@ -471,9 +486,9 @@ Toda contagem que a tela mostra já vem no `resumo`. O React não calcula nada (
 ```
 
 - **Pasta padrão:** `Path.home() / "Rastro" / "relatorios"`. Fica visível e é igual nos dois sistemas, sem depender do nome localizado de "Documentos". `--saida` troca só a raiz.
-- **Nome da aplicação:** o host do site analisado; sem site, o nome do HAR. `nome_de_pasta_seguro()` troca por `_` o que o Windows não aceita (`<>:"/\|?*`).
+- **Nome da aplicação:** o host do site analisado; sem site, o nome do HAR sem a extensão (`intranet.har` → `intranet`). `nome_de_pasta_seguro()` troca por `_` o que o Windows não aceita (`<>:"/\|?*` e caracteres de controle), tira ponto e espaço do fim (`..` vira `_`, nunca sobe de pasta) e põe `_` na frente de nome reservado do Windows (`CON`, `NUL`, `COM1`…).
 - **Data e hora:** hora local, `AAAA-MM-DD_HH-MM-SS`, sem `:` (o Windows não aceita). Ordena certo por nome.
-- **Gravação:** cria as pastas do site e da raiz se faltarem (`mkdir(parents=True, exist_ok=True)`), mas a pasta da análise com `exist_ok=False`. Os dois arquivos são abertos com `open(caminho, "x", encoding="utf-8")`. Se a pasta da análise já existir, nada é gravado (R13.4).
+- **Gravação:** cria as pastas do site e da raiz se faltarem (`mkdir(parents=True, exist_ok=True)`), mas a pasta da análise com `exist_ok=False`. Os dois arquivos são abertos com `open(caminho, "x", encoding="utf-8")`. Se a pasta da análise já existir, nada é gravado: `RelatorioJaExiste`, com a pasta na mensagem, e o `cli.py` encerra com código 1 (R13.4). Na T23 só o `relatorio.json` é gravado; o `relatorio.html` entra na T25.
 - A regra de montar o caminho é pura (`caminho_do_relatorio(raiz, site, momento)`) e testada; só a gravação toca o disco.
 
 ### Frontend
@@ -488,7 +503,7 @@ Componentes do MVP (padrões em `.kiro/steering/frontend-react.md`):
 | Agir | `PlanoDeAcao` → `Acao`, `ModalTask` |
 | Detalhes | `ListaBibliotecas` → `LinhaBiblioteca` → `ExplicacaoIA`, `ListaFalhas` → `ItemFalha`; `ListaChecagens` → `ItemChecagem` |
 | Sob demanda | `PainelOrigemDoDado` |
-| Avisos | `AvisoSemIA` (só quando `limitacoes` não está vazio) |
+| Avisos | `AvisoSemIA` (só quando `analise.ia` é `null`); as outras `limitacoes` (ex.: `sem_javascript`) aparecem como aviso simples |
 | Apoio | `Termo` + `Dica`, `Selo`, `Icone` |
 | Modo foco | `BarraDeFoco`, e o botão "Focar" no cabeçalho de cada zona |
 
@@ -524,7 +539,7 @@ Código 0 significa que a análise terminou, mesmo com achados. As mensagens vã
 - **Pirâmide:**
   - Unitários puros: `assinaturas`, `bundles`, todas as `travas`, `nota`, `prioridade`, `checagens`, `plano`, `task`, `sanitizacao`, `relatorio/json`. São a maior parte e não usam dublê.
   - Bordas com dublê: `leitor` (HARs pequenos em `tests/dados/`), `github_advisory` e `registro_npm` (troca `urlopen` por uma função que devolve resposta gravada; o `.tgz` de teste é montado no próprio teste), `cliente` (com `ProvedorFalso`), provedores (troca `subprocess.run`), `gravacao` (em `tmp_path`).
-  - Ponta a ponta: `fluxo.analisar` com um HAR de exemplo, `ConectorFalso` e `ProvedorFalso`, comparando o JSON com um esperado.
+  - Ponta a ponta: `fluxo.analisar` e o comando `analisar` com `tests/dados/loja.har`, `ConectorFalso` e `RegistroFalso` (em `tests/dubles.py`, compartilhados) e, a partir da T33, `ProvedorFalso`, conferindo o JSON campo a campo.
   - Travas com casos de invenção: para cada trava, ao menos um teste em que a IA (dublê) inventa algo — versão que não está no trecho, trecho que não foi enviado, pacote que não existe, CVE que não estava na entrada — e a trava barra.
 - **Dados de teste:** `tests/dados/` com HARs mínimos (jQuery por nome, por comentário, bundle, sem JS, sanitized, base64) e respostas gravadas do GitHub Advisory.
 - **Sem rede:** nenhum teste chama a API ou uma CLI de IA de verdade (R19.2).

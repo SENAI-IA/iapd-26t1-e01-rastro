@@ -16,7 +16,7 @@
 ```
 rastro/
   cli.py                   lê os argumentos e chama o fluxo
-  fluxo.py                 orquestra as etapas, sem regra própria
+  fluxo.py                 orquestra as etapas, sem regra própria; define a Analise
   har/                     leitor.py, modelos.py, site.py
   identificacao/           modelos.py, assinaturas.py, bundles.py, ia.py
   travas/                  formato.py, ancoragem.py, codigo_publicado.py, faixa_de_versao.py, explicacao.py, conferencia.py
@@ -43,7 +43,7 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 
 ## Onde colocar algo novo
 
-- **Checagem nova:** uma função em `configuracao/checagens.py` e seu teste, e o que fazer e o impacto dela em `acao/plano.py`.
+- **Checagem nova:** uma função em `configuracao/checagens.py` (e na tupla `CHECAGENS`) e seu teste, e o que fazer e o impacto dela em `acao/plano.py`.
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
 - **IA nova:** um arquivo em `ia/provedores/`.
 - **Assinatura nova:** em `identificacao/assinaturas.py`.

@@ -120,6 +120,14 @@ def requisicao_ja_esta_nas_evidencias(evidencia: Evidencia, evidencias: list[Evi
     return False
 
 
+def algum_script_com_conteudo(requisicoes: list[Requisicao]) -> bool:
+    return any(e_script_com_conteudo(requisicao) for requisicao in requisicoes)
+
+
+def e_script_com_conteudo(requisicao: Requisicao) -> bool:
+    return e_script(requisicao) and bool(requisicao.conteudo)
+
+
 def e_script(requisicao: Requisicao) -> bool:
     tipo_conteudo = requisicao.tipo_conteudo or ""
     caminho = urlsplit(requisicao.url).path.lower()

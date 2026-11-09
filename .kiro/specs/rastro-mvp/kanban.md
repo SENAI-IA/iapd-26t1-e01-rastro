@@ -40,7 +40,8 @@ _(vazio)_
 - [ ] **T19** Checar os cabeçalhos de segurança · fase 1 · revisão @geison.santos · commit f6eb8cf · 09/11
 - [ ] **T20** Checar os cookies · fase 1 · revisão @geison.santos · commit d914873 · 09/11
 - [ ] **T21** Montar o plano de ação · fase 1 · revisão @geison.santos · commit 0a77e09 · 09/11
-- [ ] **T22** Gerar o texto da task · fase 1 · revisão @geison.santos · 09/11
+- [ ] **T22** Gerar o texto da task · fase 1 · revisão @geison.santos · commit 461d80f · 09/11
+- [ ] **T23** Gravar o relatório JSON e ligar o fluxo sem IA · fase 1 · revisão @geison.santos · 09/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -51,7 +52,7 @@ _(vazio)_
 
 ### Fase 1. Núcleo determinístico
 
-- [ ] **T23** Gravar o relatório JSON e ligar o fluxo sem IA · fase 1 · 16–25/11 · revisão @geison.santos
+_(vazio)_
 
 ### Fase 2. Relatório HTML
 

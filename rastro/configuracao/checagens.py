@@ -111,6 +111,22 @@ def checar_cookie_sem_samesite(requisicoes: list[Requisicao], site: str | None) 
     )
 
 
+CHECAGENS: tuple[Callable[[list[Requisicao], str | None], Checagem], ...] = (
+    checar_csp,
+    checar_hsts,
+    checar_nosniff,
+    checar_protecao_contra_frame,
+    checar_versao_do_servidor,
+    checar_cookie_sem_httponly,
+    checar_cookie_sem_secure,
+    checar_cookie_sem_samesite,
+)
+
+
+def checar_configuracao(requisicoes: list[Requisicao], site: str | None) -> list[Checagem]:
+    return [checar(requisicoes, site) for checar in CHECAGENS]
+
+
 def respostas_do_site_com_cookies(
     requisicoes: list[Requisicao], site: str | None
 ) -> list[Requisicao]:

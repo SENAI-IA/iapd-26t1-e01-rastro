@@ -246,7 +246,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R09.1
   - Revisão: @geison.santos
 
-- [ ] **T23 Gravar o relatório JSON e ligar o fluxo sem IA**
+- [x] **T23 Gravar o relatório JSON e ligar o fluxo sem IA**
   - Entrega: `fluxo.analisar`, `relatorio/json.py`, `relatorio/gravacao.py` e o comando `analisar --sem-ia` de ponta a ponta.
   - Aceite: `python -m rastro analisar tests/dados/loja.har --sem-ia` grava `relatorio.json` em `~/Rastro/relatorios/<site>/<AAAA-MM-DD_HH-MM-SS>/` (ou em `--saida`), com `resumo` e `limitacoes` preenchidos, e avisa no terminal que a análise está incompleta; com a pasta da análise já existente, para sem gravar; nomes de pasta válidos no Windows.
   - Arquivos: `rastro/fluxo.py`, `rastro/cli.py`, `rastro/relatorio/json.py`, `rastro/relatorio/gravacao.py`, `tests/test_fluxo.py`, `tests/relatorio/*`

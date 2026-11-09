@@ -6,7 +6,11 @@ import pytest
 
 from rastro.har.leitor import ler_har
 from rastro.har.modelos import Requisicao
-from rastro.identificacao.assinaturas import ASSINATURAS, identificar_por_assinatura
+from rastro.identificacao.assinaturas import (
+    ASSINATURAS,
+    algum_script_com_conteudo,
+    identificar_por_assinatura,
+)
 from rastro.identificacao.modelos import Biblioteca, Evidencia
 
 PASTA_DA_AVALIACAO = Path(__file__).resolve().parents[2] / "avaliacao"
@@ -424,3 +428,14 @@ def test_r02_2_e_r02_3_reconhece_nos_alvos_o_que_o_gabarito_espera(alvo: dict[st
     reconhecidas = [(biblioteca.pacote, biblioteca.versao) for biblioteca in bibliotecas]
     assert len(reconhecidas) == len(set(reconhecidas))
     assert set(reconhecidas) == bibliotecas_por_assinatura_no_gabarito(alvo)
+
+
+def test_r01_6_har_com_script_com_conteudo_tem_javascript() -> None:
+    assert algum_script_com_conteudo([script(SCRIPT_QUALQUER, conteudo="var a = 1;")])
+
+
+def test_r01_6_script_sem_conteudo_ou_conteudo_que_nao_e_script_nao_contam() -> None:
+    sem_conteudo = script(SCRIPT_QUALQUER, conteudo=None)
+    pagina = script("https://loja.exemplo.com.br/", tipo_conteudo="text/html", conteudo="<p>")
+
+    assert not algum_script_com_conteudo([sem_conteudo, pagina])

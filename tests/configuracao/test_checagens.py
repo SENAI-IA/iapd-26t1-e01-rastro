@@ -4,6 +4,8 @@ from pathlib import Path
 import pytest
 
 from rastro.configuracao.checagens import (
+    CHECAGENS,
+    checar_configuracao,
     checar_cookie_sem_httponly,
     checar_cookie_sem_samesite,
     checar_cookie_sem_secure,
@@ -435,3 +437,12 @@ def test_r06_6_valor_do_cookie_nunca_aparece_no_resultado() -> None:
     for checagem in checagens:
         assert "valor-ficticio" not in repr(checagem)
         assert "pt-BR" not in repr(checagem)
+
+
+def test_r06_8_checar_configuracao_roda_todas_as_regras_na_ordem_dos_ids() -> None:
+    requisicoes = ler_har(RAIZ_DO_PROJETO / "tests" / "dados" / "loja.har")
+
+    checagens = checar_configuracao(requisicoes, descobrir_site_analisado(requisicoes))
+
+    assert [checagem.id for checagem in checagens] == [f"C0{numero}" for numero in range(1, 9)]
+    assert list(CHECAGENS) == TODAS_AS_CHECAGENS + CHECAGENS_DE_COOKIE
