@@ -1,0 +1,5 @@
+{"type": "result", "subtype": "success", "is_error": false, "duration_ms": 3026,
+ "result": "{\"o_que_e\": \"O jQuery 3.4.1 tem uma falha de XSS na função htmlPrefilter.\"}",
+ "usage": {"input_tokens": 2, "cache_creation_input_tokens": 15903,
+           "cache_read_input_tokens": 11873, "output_tokens": 204},
+ "total_cost_usd": 0.1337}

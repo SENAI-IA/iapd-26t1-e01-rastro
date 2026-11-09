@@ -406,6 +406,13 @@ Regras comuns: executável por `shutil.which`, `subprocess.run(..., input=prompt
 - Sem `--bare` no Claude: ele exige `ANTHROPIC_API_KEY`, e o Rastro não usa chave.
 - O Rastro não escolhe o modelo: vale o padrão de cada CLI. Cada CLI soma o próprio prompt de sistema (de 12 mil a 27 mil tokens de entrada por chamada no spike), e o custo entra na medição da T46.
 
+Decidido na T35:
+
+- Cada provedor recebe no construtor o caminho do executável que `localizar_cli` achou (`ProvedorClaude(executavel)`); o provedor não chama `shutil.which` de novo. CLI que some depois de localizada (`OSError` no `subprocess.run`) também vira `FalhaDoProvedor`.
+- Claude: `tokens` é a soma dos quatro campos do `usage` (entrada com e sem cache mais saída). Se faltar algum campo ou vier um valor que não é inteiro, fica `None`: soma parcial seria estimativa (R11.2).
+- Claude: saída que não é objeto JSON, `is_error: true` ou `result` vazio viram `FalhaDoProvedor` com o motivo em português.
+- A ligação dos provedores ao `cli.py` não está em nenhuma das T35–T37 (nenhuma lista o `cli.py`); até ela, o `cli.py` segue encerrando com código 1 e sugerindo `--sem-ia`.
+
 ### Prompts
 
 Em `rastro/ia/prompts/`, um arquivo por tarefa, iguais para os três provedores:

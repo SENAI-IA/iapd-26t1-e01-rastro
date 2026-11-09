@@ -346,7 +346,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R16.3
   - Revisão: @cristiano.albino
 
-- [ ] **T35 Chamar o Claude pela CLI**
+- [x] **T35 Chamar o Claude pela CLI**
   - Entrega: `provedores/claude.py`.
   - Aceite: prompt pela entrada padrão, tokens lidos da resposta; teste com `subprocess.run` trocado por dublê.
   - Arquivos: `rastro/ia/provedores/claude.py`, `tests/ia/provedores/test_claude.py`
