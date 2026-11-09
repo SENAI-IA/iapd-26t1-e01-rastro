@@ -26,17 +26,25 @@ def test_r13_1_pasta_da_analise_por_aplicacao_e_data_e_hora(tmp_path: Path) -> N
 def test_r13_1_grava_o_json_numa_pasta_nova(tmp_path: Path) -> None:
     pasta = caminho_do_relatorio(tmp_path / "relatorios", "loja.exemplo.com", MOMENTO)
 
-    caminho = gravar_relatorio(pasta, {"versao_formato": 1, "site": "loja.exemplo.com"})
+    gravado = gravar_relatorio(pasta, {"versao_formato": 1, "site": "loja.exemplo.com"})
 
-    assert caminho == pasta / "relatorio.json"
-    with caminho.open(encoding="utf-8") as arquivo:
+    assert gravado.json == pasta / "relatorio.json"
+    with gravado.json.open(encoding="utf-8") as arquivo:
         assert json.load(arquivo) == {"versao_formato": 1, "site": "loja.exemplo.com"}
 
 
 def test_r13_1_json_em_utf_8_legivel(tmp_path: Path) -> None:
-    caminho = gravar_relatorio(tmp_path / "analise", {"texto": "não procurado"})
+    gravado = gravar_relatorio(tmp_path / "analise", {"texto": "não procurado"})
 
-    assert "não procurado" in caminho.read_text(encoding="utf-8")
+    assert "não procurado" in gravado.json.read_text(encoding="utf-8")
+
+
+def test_r13_1_grava_o_html_com_os_dados_na_mesma_pasta(tmp_path: Path) -> None:
+    gravado = gravar_relatorio(tmp_path / "analise", {"texto": "não procurado"})
+
+    assert gravado.html == tmp_path / "analise" / "relatorio.html"
+    html = gravado.html.read_text(encoding="utf-8")
+    assert '<script id="dados" type="application/json">{"texto": "não procurado"}</script>' in html
 
 
 def test_r13_2_pasta_padrao_fica_na_pasta_do_usuario(
@@ -115,6 +123,7 @@ def test_r17_1_grava_so_o_relatorio_na_pasta_da_analise(tmp_path: Path) -> None:
     assert sorted(p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*")) == [
         "loja.exemplo.com",
         "loja.exemplo.com/2026-11-20_14-03-00",
+        "loja.exemplo.com/2026-11-20_14-03-00/relatorio.html",
         "loja.exemplo.com/2026-11-20_14-03-00/relatorio.json",
     ]
 

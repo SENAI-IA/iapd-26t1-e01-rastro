@@ -90,6 +90,7 @@ def test_r13_1_analisar_sem_ia_grava_o_json_na_pasta_da_analise(tmp_path: Path) 
     assert relatorio["versao_formato"] == 1
     assert relatorio["resumo"]
     assert relatorio["analise"]["limitacoes"]
+    assert (tmp_path / PASTA_DA_LOJA / "relatorio.html").is_file()
 
 
 @pytest.mark.usefixtures("fontes_falsas")
@@ -129,13 +130,14 @@ def test_r13_4_pasta_da_analise_existente_encerra_com_1_sem_gravar(
 
 
 @pytest.mark.usefixtures("fontes_falsas")
-def test_r13_8_mostra_a_pasta_o_json_e_o_resumo_de_uma_linha(
+def test_r13_8_mostra_a_pasta_o_html_o_json_e_o_resumo_de_uma_linha(
     capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:
     analisar_loja(tmp_path)
 
     saida = capsys.readouterr().out
     assert f"Relatório gravado em: {tmp_path / PASTA_DA_LOJA}" in saida
+    assert f"HTML: {tmp_path / PASTA_DA_LOJA / 'relatorio.html'}" in saida
     assert f"JSON: {tmp_path / PASTA_DA_LOJA / 'relatorio.json'}" in saida
     assert (
         "Resumo: loja.exemplo.com · bibliotecas: 2 (1 com falhas) · achados: 2"
@@ -205,6 +207,9 @@ def test_r17_1_grava_so_o_relatorio_e_nao_altera_o_har(tmp_path: Path) -> None:
 
     analisar_loja(tmp_path)
 
-    arquivos = [p for p in tmp_path.rglob("*") if p.is_file()]
-    assert arquivos == [tmp_path / PASTA_DA_LOJA / "relatorio.json"]
+    arquivos = sorted(p for p in tmp_path.rglob("*") if p.is_file())
+    assert arquivos == [
+        tmp_path / PASTA_DA_LOJA / "relatorio.html",
+        tmp_path / PASTA_DA_LOJA / "relatorio.json",
+    ]
     assert HAR_DA_LOJA.read_bytes() == antes

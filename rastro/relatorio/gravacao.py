@@ -1,8 +1,11 @@
 import json
 import re
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+from rastro.relatorio.html import NOME_DO_HTML, ler_modelo, montar_html
 
 NOME_DO_JSON = "relatorio.json"
 FORMATO_DA_PASTA_DA_ANALISE = "%Y-%m-%d_%H-%M-%S"
@@ -12,6 +15,12 @@ NOMES_RESERVADOS_NO_WINDOWS = frozenset(
     + [f"COM{numero}" for numero in range(1, 10)]
     + [f"LPT{numero}" for numero in range(1, 10)]
 )
+
+
+@dataclass(frozen=True)
+class RelatorioGravado:
+    json: Path
+    html: Path
 
 
 class RelatorioJaExiste(Exception):
@@ -49,13 +58,19 @@ def caminho_do_relatorio(raiz: Path, aplicacao: str, momento: datetime) -> Path:
     return raiz / nome_de_pasta_seguro(aplicacao) / momento.strftime(FORMATO_DA_PASTA_DA_ANALISE)
 
 
-def gravar_relatorio(pasta_da_analise: Path, relatorio: dict[str, Any]) -> Path:
+def gravar_relatorio(pasta_da_analise: Path, relatorio: dict[str, Any]) -> RelatorioGravado:
+    texto_do_json = json.dumps(relatorio, ensure_ascii=False, indent=2) + "\n"
+    texto_do_html = montar_html(ler_modelo(), relatorio)
     criar_pasta_nova(pasta_da_analise)
-    caminho_do_json = pasta_da_analise / NOME_DO_JSON
-    with open(caminho_do_json, "x", encoding="utf-8") as arquivo:
-        json.dump(relatorio, arquivo, ensure_ascii=False, indent=2)
-        arquivo.write("\n")
-    return caminho_do_json
+    gravado = RelatorioGravado(pasta_da_analise / NOME_DO_JSON, pasta_da_analise / NOME_DO_HTML)
+    gravar_arquivo_novo(gravado.json, texto_do_json)
+    gravar_arquivo_novo(gravado.html, texto_do_html)
+    return gravado
+
+
+def gravar_arquivo_novo(caminho: Path, texto: str) -> None:
+    with open(caminho, "x", encoding="utf-8") as arquivo:
+        arquivo.write(texto)
 
 
 def criar_pasta_nova(pasta_da_analise: Path) -> None:

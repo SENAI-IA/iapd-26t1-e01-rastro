@@ -264,7 +264,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R13.5, R13.6
   - Revisão: @halan.bacca
 
-- [ ] **T25 Embutir o JSON no HTML**
+- [x] **T25 Embutir o JSON no HTML**
   - Entrega: `relatorio/html.py` gera o `relatorio.html` a partir do modelo do build.
   - Aceite: o relatório abre com duplo clique e sem rede; `</script>` dentro dos dados não quebra a página.
   - Arquivos: `rastro/relatorio/html.py`, `rastro/relatorio/modelo.html`, `tests/relatorio/test_html.py`

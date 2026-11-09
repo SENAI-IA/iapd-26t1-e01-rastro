@@ -9,6 +9,7 @@ from rastro.fontes.github_advisory import GitHubAdvisory
 from rastro.fontes.registro_npm import RegistroNpm
 from rastro.har.leitor import ErroAoLerHar
 from rastro.relatorio.gravacao import (
+    RelatorioGravado,
     RelatorioJaExiste,
     caminho_do_relatorio,
     gravar_relatorio,
@@ -78,10 +79,10 @@ def executar_analise(caminho_har: Path, sem_ia: bool, saida: Path | None) -> int
     aplicacao = nome_da_aplicacao(analise.site, caminho_har)
     pasta = caminho_do_relatorio(saida or pasta_padrao(), aplicacao, analise.inicio)
     try:
-        caminho_do_json = gravar_relatorio(pasta, relatorio)
+        gravado = gravar_relatorio(pasta, relatorio)
     except RelatorioJaExiste as erro:
         return encerrar_com_erro(str(erro))
-    mostrar_resultado(pasta, caminho_do_json, relatorio)
+    mostrar_resultado(pasta, gravado, relatorio)
     return 0
 
 
@@ -92,9 +93,10 @@ def avisar_analise_sem_ia() -> None:
     print()
 
 
-def mostrar_resultado(pasta: Path, caminho_do_json: Path, relatorio: dict[str, Any]) -> None:
+def mostrar_resultado(pasta: Path, gravado: RelatorioGravado, relatorio: dict[str, Any]) -> None:
     print(f"Relatório gravado em: {pasta}")
-    print(f"JSON: {caminho_do_json}")
+    print(f"HTML: {gravado.html}")
+    print(f"JSON: {gravado.json}")
     print(f"Resumo: {resumo_de_uma_linha(relatorio)}")
     if relatorio["analise"]["ia"] is None:
         print(AVISO_SEM_IA)
