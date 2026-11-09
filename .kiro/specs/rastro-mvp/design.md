@@ -502,10 +502,10 @@ Componentes do MVP (padrões em `.kiro/steering/frontend-react.md`):
 | Indicadores | `Indicadores` → `Indicador` (risco do site, bibliotecas vulneráveis, encontradas só pela IA, primeira ação) |
 | Rastreado | `GraficoDispersao` (CVSS × EPSS), `PainelIA` |
 | Agir | `PlanoDeAcao` → `Acao`, `ModalTask` |
-| Detalhes | `ListaBibliotecas` → `LinhaBiblioteca` → `ExplicacaoIA`, `ListaFalhas` → `ItemFalha`; `ListaChecagens` → `ItemChecagem` |
+| Detalhes | `ListaBibliotecas` → `LinhaBiblioteca` → `ExplicacaoIA`, `Evidencias`, `ListaFalhas` → `ItemFalha`; `ListaAConfirmar` → `ItemAConfirmar`; `ListaChecagens` → `ItemChecagem`. Biblioteca e checagem abrem recolhidas (`<details>`). Os selos saem direto do estado no JSON: "sem EPSS" (`nota.sem_epss`), "não consultada" (`motivo_nao_consultada`), "não conferida no npm" (`conferida_no_npm` nulo), "não verificada" (`situacao`). A lista "a confirmar" fica aberta, com a trava que falhou, o motivo (de `ia.travas_acionadas`, pelo `alvo`) e como confirmar à mão: um texto fixo por nome de trava em `ItemAConfirmar.tsx`. A ordem das bibliotecas e das falhas é a do JSON. Decidido na T28. |
 | Sob demanda | `PainelOrigemDoDado` |
 | Avisos | `AvisoSemIA`: faixa no topo sempre que `analise.limitacoes` vier preenchido, presa junto da `BarraSuperior` ao rolar; lista cada limitação com o ícone do seu `id` e, quando `analise.ia` é `null`, o título "Análise sem IA", o `continua_igual` e o comando para rodar com IA. Com IA e só `sem_javascript`, a mesma faixa diz "Análise incompleta". Recolhível (`<details>`, aberta por padrão), para não tomar a tela em 400px. Decidido na T27. |
-| Apoio | `Termo` + `Dica`, `Selo` (e `SeloDePrioridade`), `Icone`; `formato.ts` só formata número, data e plural em pt-BR |
+| Apoio | `Termo` + `Dica`, `Selo` (e `SeloDePrioridade`, `SeloDoMetodo`), `Icone`; `formato.ts` só formata número, data e plural em pt-BR |
 | Modo foco | `BarraDeFoco`, e o botão "Focar" no cabeçalho de cada zona |
 
 **Tema.** A `BarraSuperior` tem o botão de tema. O `App` guarda o tema escolhido (`null` segue o sistema) e grava `data-tema` no `<html>`; o tema desce por props, sem contexto enquanto só a barra precisar dele. Decidido na T26.

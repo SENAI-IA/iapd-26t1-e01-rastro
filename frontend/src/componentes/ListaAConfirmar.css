@@ -1,0 +1,32 @@
+.lista-a-confirmar {
+  display: grid;
+  gap: 12px;
+}
+
+.lista-a-confirmar h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.lista-a-confirmar > div > p {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 2px 0 0;
+  color: var(--cor-texto-suave);
+  font-size: 13px;
+}
+
+.lista-a-confirmar > div > p .icone {
+  position: relative;
+  top: 2px;
+}
+
+.lista-a-confirmar__lista {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

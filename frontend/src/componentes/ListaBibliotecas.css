@@ -1,0 +1,32 @@
+.lista-bibliotecas {
+  display: grid;
+  gap: 12px;
+}
+
+.lista-bibliotecas h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.lista-bibliotecas > div > p {
+  margin: 2px 0 0;
+  color: var(--cor-texto-suave);
+  font-size: 13px;
+}
+
+.lista-bibliotecas__lista {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  list-style: none;
+}
+
+.lista-bibliotecas__vazio {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--cor-linha);
+  background: var(--cor-superficie);
+}

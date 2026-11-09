@@ -288,7 +288,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R14.6
   - Revisão: @halan.bacca
 
-- [ ] **T28 Mostrar bibliotecas, falhas e checagens**
+- [x] **T28 Mostrar bibliotecas, falhas e checagens**
   - Entrega: `ListaBibliotecas`, `LinhaBiblioteca`, `ListaFalhas`, `ItemFalha`, `ListaChecagens`, `ItemChecagem`, com detalhes recolhidos.
   - Aceite: selos "sem EPSS", "não consultada", "não conferida no npm" e "não verificada" aparecem quando o JSON traz o estado; a lista "a confirmar" fica separada, com a trava que falhou e como confirmar à mão. *(verificação manual)*
   - Arquivos: `frontend/src/componentes/*`

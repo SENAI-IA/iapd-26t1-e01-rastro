@@ -1,0 +1,21 @@
+.lista-falhas h4 {
+  margin: 0 0 6px;
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.lista-falhas__lista {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-falhas__vazio {
+  margin: 0;
+  font-size: 13.5px;
+}

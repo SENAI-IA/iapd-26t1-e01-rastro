@@ -1,0 +1,25 @@
+.lista-checagens {
+  display: grid;
+  gap: 12px;
+}
+
+.lista-checagens h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.lista-checagens > div > p {
+  margin: 2px 0 0;
+  color: var(--cor-texto-suave);
+  font-size: 13px;
+}
+
+.lista-checagens__lista {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  list-style: none;
+}

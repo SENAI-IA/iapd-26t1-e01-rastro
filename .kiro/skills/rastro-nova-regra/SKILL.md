@@ -57,6 +57,7 @@ Cinco pontos de extensão, cada um com lugar fixo (`.kiro/steering/structure.md`
    Trava que consulta o npm (4 e 5) não é função pura: a leitura fica em `rastro/fontes/registro_npm.py`, atrás de `RegistroDePacotes`, e quem decide é `conferencia.py`, que recebe o registro como parâmetro. Sem resposta do registro (`ConsultaNaoRealizada`), a biblioteca por assinatura segue com `conferida_no_npm=None` e a da IA vai para "a confirmar" (R21.9).
 2. **O que barra fica registrado** como `TravaAcionada` (trava, alvo, motivo), de `rastro/travas/modelos.py`, no painel da IA (R21.10). Dado que a trava não consegue ler (faixa, versão) também barra, com o motivo: o que não foi conferido não passa. A IA nunca preenche CVE, versão, CVSS, EPSS, nota ou versão-alvo (R21.8).
 3. **Spec:** acrescente a linha na tabela de travas do `design.md` (seção 8) e o critério em R21.
+   Trava que manda biblioteca para "a confirmar": acrescente o "como confirmar à mão" no `comoConfirmar` de `frontend/src/componentes/ItemAConfirmar.tsx`, com o mesmo nome de trava do Python (`TRAVA_...`). Sem a linha, o relatório mostra um texto genérico.
 4. **Teste** em `tests/travas/test_<nome>.py`: pelo menos um caso em que a IA (dublê) inventa algo e a trava barra, e um em que o dado verdadeiro passa. Se a trava consulta o npm, use o `RegistroDePacotes` dublê.
 5. **Cobertura:** acima de 80% em `travas/`.
 

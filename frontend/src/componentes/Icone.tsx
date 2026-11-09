@@ -77,6 +77,19 @@ const TRACOS = {
     </>
   ),
   certo: <path d="m5 12.5 4.5 4.5L19 7.5" />,
+  erro: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m9 9 6 6m0-6-6 6" />
+    </>
+  ),
+  lupa: (
+    <>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m16 16 4.5 4.5" />
+    </>
+  ),
+  seta: <path d="m9 6 6 6-6 6" />,
   terminal: (
     <>
       <rect x="3" y="4" width="18" height="16" rx="1" />

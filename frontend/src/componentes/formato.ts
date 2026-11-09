@@ -1,8 +1,13 @@
 const NUMERO = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const PERCENTIL = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 5 });
 const DATA = new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" });
 
 export function formatarNota(nota: number): string {
   return NUMERO.format(nota);
+}
+
+export function formatarPercentil(percentil: number): string {
+  return PERCENTIL.format(percentil);
 }
 
 export function formatarDuracao(segundos: number): string {

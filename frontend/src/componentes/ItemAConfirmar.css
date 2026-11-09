@@ -1,0 +1,56 @@
+.item-a-confirmar {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--cor-linha);
+  border-left: 4px solid var(--cor-serio);
+  background: var(--cor-superficie);
+}
+
+.item-a-confirmar__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.item-a-confirmar__nome {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.item-a-confirmar__nome code {
+  color: var(--cor-texto-suave);
+}
+
+.item-a-confirmar__motivos {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--cor-texto-suave);
+  font-size: 13.5px;
+}
+
+.item-a-confirmar__como h4 {
+  margin: 0 0 6px;
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.item-a-confirmar__como ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+}
+
+.item-a-confirmar__como code {
+  overflow-wrap: anywhere;
+}
+
+.item-a-confirmar__como a {
+  color: var(--cor-destaque);
+}

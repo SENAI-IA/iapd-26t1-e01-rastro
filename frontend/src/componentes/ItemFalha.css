@@ -1,0 +1,64 @@
+.item-falha {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--cor-linha);
+  background: var(--cor-superficie);
+}
+
+.item-falha__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.item-falha__topo a {
+  color: var(--cor-destaque);
+  font-family: var(--fonte-mono);
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.item-falha__topo code {
+  color: var(--cor-texto-suave);
+}
+
+.item-falha__selos {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.item-falha__nota {
+  margin-left: auto;
+  font-family: var(--fonte-titulo);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.item-falha__resumo {
+  margin: 0;
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.item-falha__dados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 12.5px;
+}
+
+.item-falha__dados div {
+  display: flex;
+  gap: 5px;
+}
+
+.item-falha__dados dd {
+  margin: 0;
+  color: var(--cor-texto);
+}

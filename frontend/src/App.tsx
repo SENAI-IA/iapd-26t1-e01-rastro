@@ -5,6 +5,9 @@ import AvisoSemIA from "./componentes/AvisoSemIA.tsx";
 import BarraSuperior, { type Tema } from "./componentes/BarraSuperior.tsx";
 import CabecalhoAnalise from "./componentes/CabecalhoAnalise.tsx";
 import Indicadores from "./componentes/Indicadores.tsx";
+import ListaAConfirmar from "./componentes/ListaAConfirmar.tsx";
+import ListaBibliotecas from "./componentes/ListaBibliotecas.tsx";
+import ListaChecagens from "./componentes/ListaChecagens.tsx";
 import PlanoDeAcao from "./componentes/PlanoDeAcao.tsx";
 
 interface Props {
@@ -41,6 +44,15 @@ export default function App({ relatorio }: Props) {
             <CabecalhoAnalise analise={relatorio.analise} />
             <Indicadores resumo={relatorio.resumo} primeiraAcao={relatorio.plano_de_acao[0]} />
             <PlanoDeAcao acoes={relatorio.plano_de_acao} />
+            <ListaBibliotecas bibliotecas={relatorio.bibliotecas} achados={relatorio.achados} />
+            {relatorio.a_confirmar.length > 0 && (
+              <ListaAConfirmar bibliotecas={relatorio.a_confirmar} travasAcionadas={relatorio.ia.travas_acionadas} />
+            )}
+            <ListaChecagens
+              checagens={relatorio.checagens}
+              comFalha={relatorio.resumo.checagens_com_falha}
+              naoVerificadas={relatorio.resumo.checagens_nao_verificadas}
+            />
           </>
         )}
       </main>
