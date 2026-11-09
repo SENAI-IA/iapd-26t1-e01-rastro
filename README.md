@@ -120,14 +120,14 @@ Os critérios marcados *(verificação manual)* na spec só se conferem olhando 
 | 5 | Abrir o `relatorio.html` com duplo clique, sem internet | Abre completo, sem requisição externa | R13.5 | conferido 09/11 (0 requisições externas no Chromium) | a conferir (T42) |
 | 6 | Trocar o tema no botão do topo e estreitar a janela para 400px | Claro e escuro legíveis; em 400px, nada cortado | R13.6 | conferido 09/11 (prints 1 a 3; em 400px, sem rolagem lateral com tudo aberto, nos dois temas) | a conferir (T42) |
 | 7 | Abrir uma biblioteca e clicar em "Ver a origem" ou na nota de uma falha | Painel lateral com HAR → identificação → aviso → cálculo | R10.2 | conferido 09/11 (print 6) | a conferir (T42) |
-| 8 | Passar o mouse num termo sublinhado; depois chegar nele com `Tab`; depois tocar (celular ou modo de toque do DevTools) | A definição aparece nos três casos | R12.1 | mouse conferido 09/11 (print 9); teclado e toque a conferir | a conferir (T42) |
-| 9 | Em "O que fazer agora", clicar em "Abrir task" e em "Copiar task"; colar num editor | Texto com título, contexto, o que fazer, critério de aceite e evidências, igual ao do JSON | R09.2 | abrir conferido 09/11 (print 7); copiar e colar a conferir | a conferir (T42) |
+| 8 | Passar o mouse num termo sublinhado; depois chegar nele com `Tab`; depois tocar (celular ou modo de toque do DevTools) | A definição aparece nos três casos | R12.1 | conferido 09/11 (mouse no print 9; `Tab`, `Esc` e toque em 400px no Chromium) | a conferir (T42) |
+| 9 | Em "O que fazer agora", clicar em "Abrir task" e em "Copiar task"; colar num editor | Texto com título, contexto, o que fazer, critério de aceite e evidências, igual ao do JSON | R09.2 | conferido 09/11 (print 7; o texto copiado é igual ao `texto_task` do JSON) | a conferir (T42) |
 | 10 | Clicar em "Focar" numa zona | A zona ocupa a largura; barra fina no topo com a zona atual, troca de zona e "Sair do foco" | R15.3 | conferido 09/11 (print 8) | a conferir (T42) |
-| 11 | Apertar `Esc` ou "Sair do foco" | Volta ao layout completo, na posição da zona | R15.4 | a conferir | a conferir (T42) |
-| 12 | Em foco, abrir a origem, um termo do glossário, uma task e, no relatório sem IA, o aviso | Tudo continua funcionando | R15.5 | a conferir | a conferir (T42) |
-| 13 | Fazer os passos 10 e 11 só com o teclado e em 400px | Funciona por teclado e em tela estreita | R15.6 | a conferir | a conferir (T42) |
+| 11 | Apertar `Esc` ou "Sair do foco" | Volta ao layout completo, na posição da zona | R15.4 | conferido 09/11 (volta com a zona logo abaixo do topo) | a conferir (T42) |
+| 12 | Em foco, abrir a origem, um termo do glossário, uma task e, no relatório sem IA, o aviso | Tudo continua funcionando | R15.5 | conferido 09/11 (origem, glossário, task e aviso sem IA; `Esc` fecha a origem e mantém o foco) | a conferir (T42) |
+| 13 | Fazer os passos 10 e 11 só com o teclado e em 400px | Funciona por teclado e em tela estreita | R15.6 | conferido 09/11 (só teclado, em 400px, sem rolagem lateral) | a conferir (T42) |
 
-"Conferido 09/11" quer dizer: visto na tela, no Chromium, a partir dos prints de `docs/prints/`. "A conferir" fica para a pessoa do grupo que seguir este README do zero (revisão da T43) e para a T42, no Windows.
+"Conferido 09/11" quer dizer: visto na tela, no Chromium, nos prints de `docs/prints/` ou numa conferência automatizada com o Playwright. "A conferir" fica para a pessoa do grupo que seguir este README do zero (revisão da T43) e para a T42, no Windows.
 
 ## A conferir no Windows (T42)
 
