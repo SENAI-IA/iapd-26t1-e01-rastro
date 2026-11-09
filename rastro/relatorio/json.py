@@ -5,6 +5,7 @@ from rastro.acao.modelos import Acao
 from rastro.acao.plano import chave_da_biblioteca
 from rastro.configuracao.modelos import SituacaoDaChecagem
 from rastro.fluxo import Analise
+from rastro.fontes.conector import FonteSemResposta
 from rastro.ia.cliente import ChamadaIA
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.modelos import Achado, Prioridade
@@ -30,6 +31,10 @@ TEXTO_SEM_JAVASCRIPT = (
     "analisada. O HAR pode ter sido gravado sem o conteúdo das respostas, ou o site não "
     "carrega scripts. As checagens de cabeçalhos e cookies foram feitas."
 )
+CONSEQUENCIA_DA_FONTE_SEM_RESPOSTA = {
+    "OSV": "Esses avisos vêm só do GitHub Advisory.",
+    "NVD": "Esses avisos seguem sem o CVSS do NVD.",
+}
 
 
 def montar_relatorio(analise: Analise) -> dict[str, Any]:
@@ -65,7 +70,19 @@ def listar_limitacoes(analise: Analise) -> list[dict[str, str]]:
         limitacoes.append(limitacao("achados_sem_explicacao", TEXTO_ACHADOS_SEM_EXPLICACAO))
     if not analise.tem_javascript:
         limitacoes.append(limitacao("sem_javascript", TEXTO_SEM_JAVASCRIPT))
+    for fonte in fontes_que_nao_responderam(analise.fontes_sem_resposta):
+        texto = texto_da_fonte_sem_resposta(fonte, analise.fontes_sem_resposta)
+        limitacoes.append(limitacao(f"fonte_sem_resposta_{fonte.lower()}", texto))
     return limitacoes
+
+
+def fontes_que_nao_responderam(sem_resposta: list[FonteSemResposta]) -> list[str]:
+    return list(dict.fromkeys(item.fonte for item in sem_resposta))
+
+
+def texto_da_fonte_sem_resposta(fonte: str, sem_resposta: list[FonteSemResposta]) -> str:
+    alvos = "; ".join(f"{item.alvo}: {item.motivo}" for item in sem_resposta if item.fonte == fonte)
+    return f"O {fonte} não respondeu ({alvos}). {CONSEQUENCIA_DA_FONTE_SEM_RESPOSTA[fonte]}"
 
 
 def limitacao(identificador: str, texto: str) -> dict[str, str]:

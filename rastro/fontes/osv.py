@@ -3,7 +3,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from rastro.fontes.conector import Aviso, ConsultaNaoRealizada
+from rastro.fontes.conector import Aviso, ConsultaNaoRealizada, marcar_origem
 from rastro.travas.faixa_de_versao import FaixaSemver, faixas_dos_eventos_semver
 
 NOME_DA_FONTE = "OSV"
@@ -94,7 +94,7 @@ def faixas_semver(afetado: Any) -> list[FaixaSemver]:
 def converter_aviso(aviso_da_fonte: Any, faixa: FaixaSemver) -> Aviso:
     identificadores = [aviso_da_fonte["id"], *(aviso_da_fonte.get("aliases") or [])]
     principal = identificador_principal(identificadores)
-    return Aviso(
+    aviso = Aviso(
         fontes=[NOME_DA_FONTE],
         apelidos=[identificador for identificador in identificadores if identificador != principal],
         ghsa=principal,
@@ -106,6 +106,7 @@ def converter_aviso(aviso_da_fonte: Any, faixa: FaixaSemver) -> Aviso:
         versao_corrigida=faixa.versao_corrigida,
         link=f"{ENDERECO_DO_AVISO}{aviso_da_fonte['id']}",
     )
+    return marcar_origem(aviso, NOME_DA_FONTE)
 
 
 def identificador_principal(identificadores: list[str]) -> str:

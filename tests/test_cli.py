@@ -13,6 +13,7 @@ from rastro import cli
 from rastro.cli import AVISO_SEM_IA, executar
 from rastro.fluxo import Analise, analisar
 from rastro.fontes.conector import ConectorDeAvisos
+from rastro.fontes.nvd import BuscaDeCvss
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.ia import cliente
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
@@ -22,6 +23,8 @@ from tests.dubles import (
     HAR_DO_JUICE_SHOP,
     TRECHO_DO_ANGULAR,
     ConectorFalso,
+    NvdFalso,
+    OsvFalso,
     ProvedorFalso,
     RegistroFalso,
 )
@@ -35,14 +38,18 @@ def analisar_no_momento_fixo(
     fonte: ConectorDeAvisos,
     registro: RegistroDePacotes,
     ia: ClienteDeIA | None = None,
+    osv: ConectorDeAvisos | None = None,
+    nvd: BuscaDeCvss | None = None,
 ) -> Analise:
-    return replace(analisar(caminho_har, fonte, registro, ia), inicio=MOMENTO)
+    return replace(analisar(caminho_har, fonte, registro, ia, osv, nvd), inicio=MOMENTO)
 
 
 @pytest.fixture
 def fontes_falsas(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(cli, "GitHubAdvisory", ConectorFalso)
     monkeypatch.setattr(cli, "RegistroNpm", RegistroFalso)
+    monkeypatch.setattr(cli, "Osv", OsvFalso)
+    monkeypatch.setattr(cli, "Nvd", NvdFalso)
     monkeypatch.setattr(cli, "analisar", analisar_no_momento_fixo)
 
 

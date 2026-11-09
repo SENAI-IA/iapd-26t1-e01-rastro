@@ -9,7 +9,16 @@ from rastro.configuracao.checagens import checar_configuracao
 from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.ia import explicar_achados
 from rastro.explicacao.modelos import Explicacao
-from rastro.fontes.conector import Aviso, ConectorDeAvisos, ConsultaNaoRealizada
+from rastro.fontes import nvd as fonte_nvd
+from rastro.fontes import osv as fonte_osv
+from rastro.fontes.conector import (
+    Aviso,
+    ConectorDeAvisos,
+    ConsultaNaoRealizada,
+    FonteSemResposta,
+)
+from rastro.fontes.juncao import juntar_avisos
+from rastro.fontes.nvd import BuscaDeCvss, completar_cvss
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.har.leitor import ler_har
 from rastro.har.site import descobrir_site_analisado
@@ -38,6 +47,7 @@ class Analise:
     bibliotecas: list[Biblioteca]
     a_confirmar: list[Biblioteca]
     nao_consultadas: dict[str, str]
+    fontes_sem_resposta: list[FonteSemResposta]
     achados: list[Achado]
     explicacoes: dict[str, Explicacao]
     checagens: list[Checagem]
@@ -50,6 +60,13 @@ class Analise:
 class AvisosConsultados:
     avisos: list[AvisosDaBiblioteca]
     nao_consultadas: dict[str, str]
+    fontes_sem_resposta: list[FonteSemResposta]
+
+
+@dataclass(frozen=True)
+class AvisosDeUmaFonte:
+    avisos: list[Aviso]
+    sem_resposta: list[FonteSemResposta]
 
 
 def analisar(
@@ -57,6 +74,8 @@ def analisar(
     fonte: ConectorDeAvisos,
     registro: RegistroDePacotes,
     ia: ClienteDeIA | None = None,
+    osv: ConectorDeAvisos | None = None,
+    nvd: BuscaDeCvss | None = None,
 ) -> Analise:
     inicio = datetime.now()
     cronometro = time.perf_counter()
@@ -66,7 +85,7 @@ def analisar(
     por_assinatura = identificar_por_assinatura(requisicoes)
     em_bundles = identificar_em_bundles(requisicoes, por_assinatura, ia)
     bibliotecas = conferir_bibliotecas(por_assinatura + em_bundles.bibliotecas, registro)
-    consultados = consultar_avisos(bibliotecas.confirmadas, fonte)
+    consultados = consultar_avisos(bibliotecas.confirmadas, fonte, osv, nvd)
     avisos_na_faixa, travas_da_faixa = conferir_faixas(consultados.avisos)
     achados = calcular_risco(avisos_na_faixa)
     explicados = explicar_achados(achados, ia)
@@ -83,6 +102,7 @@ def analisar(
         bibliotecas=bibliotecas.confirmadas,
         a_confirmar=bibliotecas.a_confirmar,
         nao_consultadas=consultados.nao_consultadas,
+        fontes_sem_resposta=consultados.fontes_sem_resposta,
         achados=achados,
         explicacoes=explicados.explicacoes,
         checagens=checagens,
@@ -109,15 +129,47 @@ def chamadas_feitas(ia: ClienteDeIA | None) -> list[ChamadaIA]:
     return list(ia.chamadas)
 
 
-def consultar_avisos(bibliotecas: list[Biblioteca], fonte: ConectorDeAvisos) -> AvisosConsultados:
+def consultar_avisos(
+    bibliotecas: list[Biblioteca],
+    fonte: ConectorDeAvisos,
+    osv: ConectorDeAvisos | None = None,
+    nvd: BuscaDeCvss | None = None,
+) -> AvisosConsultados:
     avisos: list[AvisosDaBiblioteca] = []
     nao_consultadas: dict[str, str] = {}
+    fontes_sem_resposta: list[FonteSemResposta] = []
     for biblioteca in bibliotecas:
         try:
-            avisos.append((biblioteca, fonte.consultar(biblioteca.pacote, biblioteca.versao)))
+            do_github = fonte.consultar(biblioteca.pacote, biblioteca.versao)
         except ConsultaNaoRealizada as erro:
             nao_consultadas[chave_da_biblioteca(biblioteca)] = erro.motivo
-    return AvisosConsultados(avisos, nao_consultadas)
+            continue
+        do_osv = consultar_osv(biblioteca, osv)
+        com_cvss = completar_cvss_pelo_nvd(juntar_avisos(do_github + do_osv.avisos), nvd)
+        avisos.append((biblioteca, com_cvss.avisos))
+        fontes_sem_resposta.extend(do_osv.sem_resposta + com_cvss.sem_resposta)
+    return AvisosConsultados(avisos, nao_consultadas, fontes_sem_resposta)
+
+
+def consultar_osv(biblioteca: Biblioteca, osv: ConectorDeAvisos | None) -> AvisosDeUmaFonte:
+    if osv is None:
+        return AvisosDeUmaFonte([], [])
+    try:
+        return AvisosDeUmaFonte(osv.consultar(biblioteca.pacote, biblioteca.versao), [])
+    except ConsultaNaoRealizada as erro:
+        alvo = chave_da_biblioteca(biblioteca)
+        return AvisosDeUmaFonte([], [FonteSemResposta(fonte_osv.NOME_DA_FONTE, alvo, erro.motivo)])
+
+
+def completar_cvss_pelo_nvd(avisos: list[Aviso], nvd: BuscaDeCvss | None) -> AvisosDeUmaFonte:
+    if nvd is None:
+        return AvisosDeUmaFonte(avisos, [])
+    completado = completar_cvss(avisos, nvd)
+    sem_resposta = [
+        FonteSemResposta(fonte_nvd.NOME_DA_FONTE, cve, motivo)
+        for cve, motivo in completado.nao_responderam.items()
+    ]
+    return AvisosDeUmaFonte(completado.avisos, sem_resposta)
 
 
 def conferir_faixas(

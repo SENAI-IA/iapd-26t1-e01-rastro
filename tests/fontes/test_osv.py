@@ -111,6 +111,13 @@ def test_r04a_1_converte_a_resposta_gravada_em_aviso_com_apelidos(
         versoes_afetadas=">= 1.12.0, < 3.5.0",
         versao_corrigida="3.5.0",
         link="https://osv.dev/vulnerability/GHSA-gxr4-xjj5-5px2",
+        origem_dos_campos={
+            "cve": "OSV",
+            "resumo": "OSV",
+            "versoes_afetadas": "OSV",
+            "versao_corrigida": "OSV",
+            "link": "OSV",
+        },
     )
 
 

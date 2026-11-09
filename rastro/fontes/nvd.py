@@ -108,4 +108,9 @@ def aplicar_cvss(aviso: Aviso, cvss_por_cve: dict[str, float | None]) -> Aviso:
     cvss = cvss_por_cve.get(aviso.cve)
     if cvss is None:
         return aviso
-    return replace(aviso, cvss=cvss, fontes=[*aviso.fontes, NOME_DA_FONTE])
+    return replace(
+        aviso,
+        cvss=cvss,
+        fontes=[*aviso.fontes, NOME_DA_FONTE],
+        origem_dos_campos={**aviso.origem_dos_campos, "cvss": NOME_DA_FONTE},
+    )

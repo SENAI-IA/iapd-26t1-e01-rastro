@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from rastro.fluxo import analisar
+from rastro.fontes.conector import FonteSemResposta
 from rastro.har.leitor import HarInvalido, HarNaoEncontrado
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
 from rastro.relatorio.json import montar_relatorio
@@ -13,6 +14,8 @@ from tests.dubles import (
     HAR_DO_JUICE_SHOP,
     TRECHO_DO_ANGULAR,
     ConectorFalso,
+    NvdFalso,
+    OsvFalso,
     ProvedorFalso,
     RegistroFalso,
 )
@@ -208,3 +211,42 @@ def test_r01_2_har_inexistente_para_antes_de_consultar(tmp_path: Path) -> None:
 def test_r01_3_har_invalido_para_a_analise() -> None:
     with pytest.raises(HarInvalido):
         analisar(DADOS / "har-invalido.har", ConectorFalso(), RegistroFalso())
+
+
+def test_r04a_3_fluxo_junta_github_e_osv_antes_da_trava_da_faixa() -> None:
+    osv = OsvFalso()
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), osv=osv, nvd=NvdFalso())
+
+    assert osv.consultas == [("jquery", "3.4.1"), ("lodash", "4.17.21")]
+    assert [achado.aviso.ghsa for achado in analise.achados] == [
+        "GHSA-jpcq-cgw6-v4j6",
+        "GHSA-gxr4-xjj5-5px2",
+    ]
+    assert all(achado.aviso.fontes == ["GitHub Advisory", "OSV"] for achado in analise.achados)
+    assert [trava.alvo for trava in analise.travas_acionadas] == [
+        "GHSA-jpcq-cgw6-v4j6 em jquery@3.4.1"
+    ]
+    assert analise.fontes_sem_resposta == []
+
+
+def test_r04a_6_osv_sem_resposta_segue_so_com_o_github_e_registra_a_fonte() -> None:
+    analise = analisar(
+        HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), osv=OsvFalso(sem_resposta=True)
+    )
+
+    assert len(analise.achados) == 2
+    assert all(achado.aviso.fontes == ["GitHub Advisory"] for achado in analise.achados)
+    assert analise.nao_consultadas == {}
+    assert analise.fontes_sem_resposta[0] == FonteSemResposta(
+        "OSV", "jquery@3.4.1", "sem resposta do OSV: tempo esgotado"
+    )
+
+
+def test_r04a_6_github_sem_resposta_nao_consulta_o_osv_da_biblioteca() -> None:
+    osv = OsvFalso()
+    fonte = ConectorFalso(sem_resposta_para=frozenset({"jquery"}))
+
+    analise = analisar(HAR_DA_LOJA, fonte, RegistroFalso(), osv=osv)
+
+    assert "jquery@3.4.1" in analise.nao_consultadas
+    assert osv.consultas == [("lodash", "4.17.21")]

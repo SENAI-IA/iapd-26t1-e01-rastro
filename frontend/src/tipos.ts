@@ -73,7 +73,17 @@ export interface Aviso {
   versoes_afetadas: string;
   versao_corrigida: string | null;
   link: string;
+  origem_dos_campos: Partial<Record<CampoComOrigem, string>>;
 }
+
+export type CampoComOrigem =
+  | "cve"
+  | "resumo"
+  | "cvss"
+  | "percentil_epss"
+  | "versoes_afetadas"
+  | "versao_corrigida"
+  | "link";
 
 export interface Nota {
   valor: number | null;

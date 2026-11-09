@@ -10,6 +10,7 @@ import pytest
 from rastro.fontes import nvd
 from rastro.fontes.conector import Aviso, ConsultaNaoRealizada
 from rastro.fontes.nvd import BuscaDeCvss, Nvd, completar_cvss
+from tests.dubles import NvdFalso
 
 PASTA_DE_DADOS = Path(__file__).resolve().parents[1] / "dados"
 SEM_RESULTADO = b'{"totalResults": 0, "vulnerabilities": []}'
@@ -30,19 +31,6 @@ class UrlopenFalso:
         if self.erro is not None:
             raise self.erro
         return io.BytesIO(self.corpo)
-
-
-class NvdFalso:
-    def __init__(self, cvss: dict[str, float | None], falhas: dict[str, str] | None = None) -> None:
-        self.cvss = cvss
-        self.falhas = falhas or {}
-        self.consultados: list[str] = []
-
-    def buscar_cvss(self, cve: str) -> float | None:
-        self.consultados.append(cve)
-        if cve in self.falhas:
-            raise ConsultaNaoRealizada(self.falhas[cve])
-        return self.cvss.get(cve)
 
 
 def resposta_gravada(nome: str) -> bytes:

@@ -3,6 +3,7 @@ from dataclasses import replace
 from typing import Any
 
 from rastro.fluxo import Analise, analisar
+from rastro.fontes.conector import FonteSemResposta
 from rastro.ia.cliente import ChamadaIA, ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
 from rastro.relatorio.json import (
     TEXTO_BUNDLES_NAO_PROCURADOS,
@@ -10,7 +11,14 @@ from rastro.relatorio.json import (
     VERSAO_FORMATO,
     montar_relatorio,
 )
-from tests.dubles import HAR_DA_LOJA, ConectorFalso, ProvedorFalso, RegistroFalso
+from tests.dubles import (
+    HAR_DA_LOJA,
+    ConectorFalso,
+    NvdFalso,
+    OsvFalso,
+    ProvedorFalso,
+    RegistroFalso,
+)
 
 
 def analise_da_loja(fonte: ConectorFalso | None = None) -> Analise:
@@ -299,3 +307,38 @@ def test_r11_3_achado_de_biblioteca_da_ia_conta_so_com_ia() -> None:
 
 def test_r11_3_sem_ia_o_painel_fica_sem_a_comparacao() -> None:
     assert relatorio_da_loja()["ia"]["com_e_sem_ia"] is None
+
+
+def test_r04a_6_fonte_sem_resposta_vira_limitacao_com_o_alvo_e_o_motivo() -> None:
+    sem_resposta = [
+        FonteSemResposta("OSV", "jquery@3.4.1", "sem resposta do OSV: tempo esgotado"),
+        FonteSemResposta("OSV", "lodash@4.17.21", "sem resposta do OSV: tempo esgotado"),
+        FonteSemResposta("NVD", "CVE-2020-11022", "limite de consultas do NVD atingido (HTTP 403)"),
+    ]
+    analise = replace(analise_da_loja(), provedor_de_ia="kiro", fontes_sem_resposta=sem_resposta)
+
+    limitacoes = montar_relatorio(analise)["analise"]["limitacoes"]
+
+    assert [limitacao["id"] for limitacao in limitacoes] == [
+        "fonte_sem_resposta_osv",
+        "fonte_sem_resposta_nvd",
+    ]
+    assert limitacoes[0]["texto"] == (
+        "O OSV não respondeu (jquery@3.4.1: sem resposta do OSV: tempo esgotado; "
+        "lodash@4.17.21: sem resposta do OSV: tempo esgotado). "
+        "Esses avisos vêm só do GitHub Advisory."
+    )
+    assert limitacoes[1]["texto"].endswith("Esses avisos seguem sem o CVSS do NVD.")
+
+
+def test_r04a_5_achado_leva_as_fontes_e_a_origem_de_cada_campo_para_o_json() -> None:
+    osv, nvd = OsvFalso(), NvdFalso()
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), osv=osv, nvd=nvd)
+
+    aviso = montar_relatorio(analise)["achados"][0]["aviso"]
+
+    assert aviso["fontes"] == ["GitHub Advisory", "OSV"]
+    assert aviso["origem_dos_campos"]["versoes_afetadas"] == "GitHub Advisory"
+    assert set(aviso["origem_dos_campos"]) == {
+        "cve", "resumo", "cvss", "percentil_epss", "versoes_afetadas", "versao_corrigida", "link",
+    }

@@ -121,6 +121,11 @@
   font-weight: 600;
 }
 
+.painel-origem__fonte {
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+}
+
 .painel-origem__trecho {
   margin: 0;
   padding: 9px 11px;

@@ -489,7 +489,7 @@ Começa só se as fases 1 e 2 estiverem fechadas. Prazo limite: 02/12. O que nã
   - Requisito: R04A.2, R04A.6, R04A.7
   - Revisão: @ali.santos
 
-- [ ] **T51 Juntar avisos de fontes diferentes**
+- [x] **T51 Juntar avisos de fontes diferentes**
   - Entrega: `fontes/juncao.py` (puro) ligado ao fluxo.
   - Aceite: o mesmo aviso no GitHub e no OSV aparece uma vez, com as duas fontes; discordância segue a ordem fixa; a origem mostra a fonte de cada campo.
   - Arquivos: `rastro/fontes/juncao.py`, `rastro/fluxo.py`, `tests/fontes/test_juncao.py`

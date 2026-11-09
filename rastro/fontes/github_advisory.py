@@ -5,7 +5,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from rastro.fontes.conector import Aviso, ConsultaNaoRealizada
+from rastro.fontes.conector import Aviso, ConsultaNaoRealizada, marcar_origem
 
 NOME_DA_FONTE = "GitHub Advisory"
 ENDERECO_DA_API = "https://api.github.com/advisories"
@@ -91,7 +91,7 @@ def vulnerabilidade_do_pacote_npm(vulnerabilidade: Any, pacote: str) -> bool:
 
 def converter_aviso(aviso_da_fonte: Any, faixa: Any) -> Aviso:
     ghsa = aviso_da_fonte["ghsa_id"]
-    return Aviso(
+    aviso = Aviso(
         fontes=[NOME_DA_FONTE],
         apelidos=ler_apelidos(aviso_da_fonte, ghsa),
         ghsa=ghsa,
@@ -103,6 +103,7 @@ def converter_aviso(aviso_da_fonte: Any, faixa: Any) -> Aviso:
         versao_corrigida=faixa.get("first_patched_version"),
         link=aviso_da_fonte["html_url"],
     )
+    return marcar_origem(aviso, NOME_DA_FONTE)
 
 
 def ler_apelidos(aviso_da_fonte: Any, ghsa: str) -> list[str]:

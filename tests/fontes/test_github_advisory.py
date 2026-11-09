@@ -8,7 +8,7 @@ from urllib.request import Request
 import pytest
 
 from rastro.fontes import github_advisory
-from rastro.fontes.conector import Aviso, ConectorDeAvisos, ConsultaNaoRealizada
+from rastro.fontes.conector import CAMPOS_COM_ORIGEM, Aviso, ConectorDeAvisos, ConsultaNaoRealizada
 from rastro.fontes.github_advisory import GitHubAdvisory
 
 PASTA_DE_DADOS = Path(__file__).resolve().parents[1] / "dados"
@@ -95,6 +95,7 @@ def test_r04_2_converte_a_resposta_gravada_em_aviso(monkeypatch: pytest.MonkeyPa
         versoes_afetadas=">= 1.2, < 3.5.0",
         versao_corrigida="3.5.0",
         link="https://github.com/advisories/GHSA-gxr4-xjj5-5px2",
+        origem_dos_campos=dict.fromkeys(CAMPOS_COM_ORIGEM, "GitHub Advisory"),
     )
 
 

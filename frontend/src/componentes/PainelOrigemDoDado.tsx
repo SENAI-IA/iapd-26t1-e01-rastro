@@ -1,5 +1,5 @@
 import { useEffect, useRef, type MouseEvent } from "react";
-import type { Achado, Biblioteca } from "../tipos.ts";
+import type { Achado, Aviso, Biblioteca, CampoComOrigem } from "../tipos.ts";
 import EtapaDaOrigem from "./EtapaDaOrigem.tsx";
 import Icone from "./Icone.tsx";
 import SeloDePrioridade from "./SeloDePrioridade.tsx";
@@ -97,7 +97,7 @@ export default function PainelOrigemDoDado({ origem, aoFechar }: Props) {
             ))}
           </EtapaDaOrigem>
 
-          <EtapaDaOrigem numero={3} titulo="Aviso no GitHub Advisory">
+          <EtapaDaOrigem numero={3} titulo="Aviso nas fontes">
             {naoConsultada ? (
               <p className="painel-origem__texto">Não consultado: {biblioteca.motivo_nao_consultada}.</p>
             ) : achados.length === 0 ? (
@@ -113,23 +113,34 @@ export default function PainelOrigemDoDado({ origem, aoFechar }: Props) {
                           {aviso.ghsa}
                         </a>
                         {aviso.cve !== null && <code> · {aviso.cve}</code>}
+                        {fonteDoCampo(aviso, "link")}
                       </dd>
+                      <dt>Fontes</dt>
+                      <dd>{aviso.fontes.join(" · ")}</dd>
                       <dt>Versões afetadas</dt>
                       <dd>
                         <code>{aviso.versoes_afetadas}</code>
+                        {fonteDoCampo(aviso, "versoes_afetadas")}
                       </dd>
                       <dt>Corrigida em</dt>
                       <dd>
                         {aviso.versao_corrigida === null ? "sem versão corrigida" : <code>{aviso.versao_corrigida}</code>}
+                        {fonteDoCampo(aviso, "versao_corrigida")}
                       </dd>
                       <dt>
                         <Termo nome="CVSS" />
                       </dt>
-                      <dd>{aviso.cvss === null ? "sem CVSS" : formatarNota(aviso.cvss)}</dd>
+                      <dd>
+                        {aviso.cvss === null ? "sem CVSS" : formatarNota(aviso.cvss)}
+                        {fonteDoCampo(aviso, "cvss")}
+                      </dd>
                       <dt>
                         Percentil <Termo nome="EPSS" />
                       </dt>
-                      <dd>{aviso.percentil_epss === null ? "sem EPSS" : formatarPercentil(aviso.percentil_epss)}</dd>
+                      <dd>
+                        {aviso.percentil_epss === null ? "sem EPSS" : formatarPercentil(aviso.percentil_epss)}
+                        {fonteDoCampo(aviso, "percentil_epss")}
+                      </dd>
                     </dl>
                   </li>
                 ))}
@@ -170,6 +181,11 @@ export default function PainelOrigemDoDado({ origem, aoFechar }: Props) {
 function tituloDaOrigem({ biblioteca, achados }: OrigemDoDado): string {
   const nome = `${biblioteca.pacote} ${biblioteca.versao}`;
   return achados.length === 1 ? `${nome} · ${achados[0].aviso.ghsa}` : nome;
+}
+
+function fonteDoCampo(aviso: Aviso, campo: CampoComOrigem) {
+  const fonte = aviso.origem_dos_campos[campo];
+  return fonte === undefined ? null : <span className="painel-origem__fonte"> · {fonte}</span>;
 }
 
 function trechosSemRepeticao(biblioteca: Biblioteca): string[] {

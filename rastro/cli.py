@@ -8,6 +8,8 @@ from typing import Any
 from rastro.acao.plano import ROTULO_DA_PRIORIDADE
 from rastro.fluxo import analisar
 from rastro.fontes.github_advisory import GitHubAdvisory
+from rastro.fontes.nvd import Nvd
+from rastro.fontes.osv import Osv
 from rastro.fontes.registro_npm import RegistroNpm
 from rastro.har.leitor import ErroAoLerHar
 from rastro.ia.cliente import (
@@ -119,7 +121,7 @@ def analisar_sem_ia(caminho_har: Path, saida: Path | None) -> int:
 
 def analisar_e_gravar(caminho_har: Path, saida: Path | None, ia: ClienteDeIA | None) -> int:
     try:
-        analise = analisar(caminho_har, GitHubAdvisory(), RegistroNpm(), ia)
+        analise = analisar(caminho_har, GitHubAdvisory(), RegistroNpm(), ia, Osv(), Nvd())
     except ErroAoLerHar as erro:
         return encerrar_com_erro(str(erro))
     relatorio = montar_relatorio(analise)

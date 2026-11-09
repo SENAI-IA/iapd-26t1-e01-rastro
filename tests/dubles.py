@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from rastro.fontes import osv
 from rastro.fontes.conector import Aviso, ConsultaNaoRealizada
 from rastro.fontes.github_advisory import converter_resposta
 from rastro.ia.cliente import FalhaDoProvedor, RespostaDoProvedor
@@ -35,6 +36,40 @@ class ConectorFalso:
         if pacote == "jquery":
             return avisos_gravados_do_jquery()
         return []
+
+
+def avisos_gravados_do_jquery_no_osv() -> list[Aviso]:
+    with (DADOS / "osv-jquery-3.4.1.json").open(encoding="utf-8") as arquivo:
+        return osv.converter_resposta(json.load(arquivo), "jquery")
+
+
+class OsvFalso:
+    def __init__(self, sem_resposta: bool = False) -> None:
+        self.sem_resposta = sem_resposta
+        self.consultas: list[tuple[str, str]] = []
+
+    def consultar(self, pacote: str, versao: str) -> list[Aviso]:
+        self.consultas.append((pacote, versao))
+        if self.sem_resposta:
+            raise ConsultaNaoRealizada("sem resposta do OSV: tempo esgotado")
+        if pacote == "jquery":
+            return avisos_gravados_do_jquery_no_osv()
+        return []
+
+
+class NvdFalso:
+    def __init__(
+        self, cvss: dict[str, float | None] | None = None, falhas: dict[str, str] | None = None
+    ) -> None:
+        self.cvss = cvss or {}
+        self.falhas = falhas or {}
+        self.consultados: list[str] = []
+
+    def buscar_cvss(self, cve: str) -> float | None:
+        self.consultados.append(cve)
+        if cve in self.falhas:
+            raise ConsultaNaoRealizada(self.falhas[cve])
+        return self.cvss.get(cve)
 
 
 class RegistroFalso:
