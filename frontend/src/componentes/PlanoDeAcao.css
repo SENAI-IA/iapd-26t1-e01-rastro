@@ -1,0 +1,30 @@
+.plano-de-acao {
+  display: grid;
+  gap: 12px;
+}
+
+.plano-de-acao h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.plano-de-acao p {
+  margin: 2px 0 0;
+  color: var(--cor-texto-suave);
+  font-size: 13px;
+}
+
+.plano-de-acao__lista {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plano-de-acao__vazio {
+  padding: 14px 16px;
+  border: 1px solid var(--cor-linha);
+  background: var(--cor-superficie);
+}

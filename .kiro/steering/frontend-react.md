@@ -13,7 +13,8 @@ O relatório abre offline com duplo clique. O React monta a tela a partir do JSO
 - **Recebe props, devolve JSX.** Sem classes.
 - **Não calcula regra de negócio.** Nota, prioridade e contagens já vêm no JSON.
 - **Eventos sobem por props** (`aoClicarFalha(id)`). Só `App.tsx` liga os componentes.
-- **Estado só com o React:** `useState`, `useReducer` e um contexto para o tema.
+- **Estado só com o React:** `useState` e `useReducer`. O tema escolhido fica no `App` e desce por props; contexto só quando mais de um componente precisar dele.
+- **Formatação de apresentação** (nota com vírgula, data, plural) em `componentes/formato.ts`, com `Intl` em pt-BR. Formatar não é calcular: nada de regra de negócio ali.
 - **Tipos do JSON num único `tipos.ts`**, espelhando os modelos do Python. Mudou o JSON, muda o `tipos.ts` no mesmo commit.
 - **Tokens em português** (`--cor-destaque`, `--fonte-mono`, `--raio`) em `tokens.css`. O tema segue o sistema; `data-tema="claro"` ou `"escuro"` no `<html>` força um deles.
 - Mesmas regras de legibilidade do Python: nomes em português, funções curtas, sem comentários.

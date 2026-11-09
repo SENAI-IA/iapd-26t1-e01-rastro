@@ -1,0 +1,37 @@
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: var(--raio-pequeno);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.selo--critico {
+  background: var(--cor-critico-suave);
+  color: var(--cor-critico);
+}
+
+.selo--serio {
+  background: var(--cor-serio-suave);
+  color: var(--cor-serio);
+}
+
+.selo--neutro {
+  background: var(--cor-superficie-2);
+  color: var(--cor-texto-suave);
+}
+
+.selo--bom {
+  background: var(--cor-bom-suave);
+  color: var(--cor-bom);
+}
+
+.selo--ia {
+  background: var(--cor-ia-suave);
+  color: var(--cor-ia);
+  font-weight: 500;
+}

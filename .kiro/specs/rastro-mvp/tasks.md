@@ -272,7 +272,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R13.1, R13.5
   - Revisão: @halan.bacca
 
-- [ ] **T26 Mostrar os indicadores e o plano de ação**
+- [x] **T26 Mostrar os indicadores e o plano de ação**
   - Entrega: `BarraSuperior`, `CabecalhoAnalise`, `Indicador`, `PlanoDeAcao`, `Acao`, `Selo`, `Icone`.
   - Aceite: a tela mostra os quatro indicadores e as ações na ordem do JSON, em claro, escuro e 400px. *(verificação manual)*
   - Arquivos: `frontend/src/App.tsx`, `frontend/src/componentes/*`

@@ -499,14 +499,16 @@ Componentes do MVP (padrões em `.kiro/steering/frontend-react.md`):
 | Zona | Componentes |
 |---|---|
 | Estrutura | `BarraSuperior`, `CabecalhoAnalise` |
-| Indicadores | `Indicador` (risco do site, bibliotecas vulneráveis, encontradas só pela IA, primeira ação) |
+| Indicadores | `Indicadores` → `Indicador` (risco do site, bibliotecas vulneráveis, encontradas só pela IA, primeira ação) |
 | Rastreado | `GraficoDispersao` (CVSS × EPSS), `PainelIA` |
 | Agir | `PlanoDeAcao` → `Acao`, `ModalTask` |
 | Detalhes | `ListaBibliotecas` → `LinhaBiblioteca` → `ExplicacaoIA`, `ListaFalhas` → `ItemFalha`; `ListaChecagens` → `ItemChecagem` |
 | Sob demanda | `PainelOrigemDoDado` |
 | Avisos | `AvisoSemIA` (só quando `analise.ia` é `null`); as outras `limitacoes` (ex.: `sem_javascript`) aparecem como aviso simples |
-| Apoio | `Termo` + `Dica`, `Selo`, `Icone` |
+| Apoio | `Termo` + `Dica`, `Selo` (e `SeloDePrioridade`), `Icone`; `formato.ts` só formata número, data e plural em pt-BR |
 | Modo foco | `BarraDeFoco`, e o botão "Focar" no cabeçalho de cada zona |
+
+**Tema.** A `BarraSuperior` tem o botão de tema. O `App` guarda o tema escolhido (`null` segue o sistema) e grava `data-tema` no `<html>`; o tema desce por props, sem contexto enquanto só a barra precisar dele. Decidido na T26.
 
 **Modo foco (R15).** O layout de hoje continua sendo o padrão. O foco é só um estado do `App.tsx`: `zonaEmFoco: "rastreado" | "agir" | "detalhes" | null`, com `useState`.
 
