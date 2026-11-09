@@ -198,7 +198,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R21.6, R21.8
   - Revisão: @cristiano.albino
 
-- [ ] **T17 Calcular a nota de risco**
+- [x] **T17 Calcular a nota de risco**
   - Entrega: `calcular_nota_de_risco` e os casos sem EPSS e sem CVSS, com a conta escrita.
   - Aceite: CVSS 6,1 e percentil 0,97 dão 7,9; sem EPSS usa o CVSS; sem CVSS dá "sem nota".
   - Arquivos: `rastro/risco/nota.py`, `tests/risco/test_nota.py`

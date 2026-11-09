@@ -308,8 +308,15 @@ No spike, esse critério passou o acerto da IA (`@angular/core@22.2.2`) e barrou
 
 ```python
 def calcular_nota_de_risco(cvss: float, percentil_epss: float) -> float:
-    return round(10 * (0.5 * cvss / 10 + 0.5 * percentil_epss), 1)
+    parte_do_cvss = PESO_DO_CVSS * Decimal(str(cvss)) / 10
+    parte_do_epss = PESO_DO_EPSS * Decimal(str(percentil_epss))
+    nota = 10 * (parte_do_cvss + parte_do_epss)
+    return float(nota.quantize(UMA_CASA_DECIMAL, rounding=ROUND_HALF_UP))
 ```
+
+- A conta usa `Decimal` e arredonda meio para cima, como na conta feita à mão: CVSS 6,1 e percentil 0 dão 3,1. Com `float` e `round` daria 3,0 (3,05 vira 3,0499…), e a nota mostrada não bateria com a conta escrita.
+- `calcular_nota(cvss, percentil_epss)` devolve a `Nota` com a conta escrita (R10.1): `10 × (0,5 × 6,1/10 + 0,5 × 0,97) = 7,9`, `sem EPSS: nota = CVSS = 6,1` ou `sem CVSS: sem nota`. CVSS e nota com uma casa; o percentil como veio da fonte (`0,21662`).
+- A `prioridade` da `Nota` entra com as faixas, em `prioridade.py` (T18).
 
 | Situação | Nota | Prioridade |
 |---|---|---|
