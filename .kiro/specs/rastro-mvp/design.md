@@ -419,6 +419,14 @@ Cada prompt pede **só JSON**, em português simples, e traz um exemplo de entra
 
 Antes de qualquer envio: tira query strings das URLs e troca por `[removido]` o que casar com JWT (`eyJ…\.…\.…`), `Bearer …` e sequências hexadecimais ou base64 com mais de 32 caracteres. Cabeçalhos, cookies e corpos de requisição nunca entram no prompt.
 
+Decidido na T34:
+
+- `sanitizar(texto)` em `rastro/ia/sanitizacao.py` é pura e roda dentro do `ClienteDeIA.perguntar`: o provedor recebe e a `ChamadaIA.entrada` guarda o texto já sanitizado. Nenhum outro módulo precisa lembrar de sanitizar.
+- Ordem: `Bearer` e o token que vem depois (sem diferenciar maiúsculas) viram `[removido]` inteiros; depois o JWT; depois a query string de qualquer URL com esquema (`https://loja/a.js?v=1` vira `https://loja/a.js?[removido]`, para mostrar que havia uma); por fim as chaves longas.
+- O token do `Bearer` só leva caracteres de token (`A-Za-z0-9._~+/=-`): `` `Bearer ${localStorage.getItem(`token`)}` ``, que aparece em bundles reais da avaliação, fica intacto.
+- Chave longa: 33 ou mais caracteres de `[A-Za-z0-9+_-]` (com até dois `=` no fim) que tenham letra **e** dígito. A `/` fica de fora e o dígito é exigido porque, nos trechos dos HARs de `avaliacao/`, a regra sem isso apagava caminhos (`github.com/twbs/bootstrap/blob/master/LICENSE`, `malsup/form`) e nomes como o `__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED` do React, que ajudam a identificar a biblioteca. Com a regra, sobram hashes de commit, endereços de carteira, IDs de cliente OAuth e alfabetos de base64.
+- **Efeito nas travas:** o que conta como "trecho enviado" para a trava 2 (trecho real) é o trecho sanitizado, igual ao que está em `ChamadaIA.entrada`. A `conferir_ancoragem` (T15) recebe os `trechos_enviados`; a identificação por IA (T41) passa cada trecho por `sanitizar` antes de montar o prompt e entrega à trava esses trechos já sanitizados.
+
 ## 12. Plano de ação e task (R08, R09)
 
 - Uma ação por biblioteca com achados: "Atualizar jquery de 3.4.1 para 3.5.0". A versão-alvo é a maior entre as `versao_corrigida` dos avisos dela, que é a menor versão que corrige todos. A comparação é por versão, não por texto (`4.17.10` > `4.17.9`, `3.5.0` > `3.5.0-rc.1`), com o `ler_versao` da trava de faixa.

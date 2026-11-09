@@ -3,6 +3,8 @@ import time
 from dataclasses import dataclass
 from typing import Protocol
 
+from rastro.ia.sanitizacao import sanitizar
+
 IA_PADRAO = "kiro"
 VARIAVEL_DA_IA = "RASTRO_IA"
 EXECUTAVEIS_DAS_IAS: dict[str, str] = {
@@ -47,13 +49,15 @@ class ClienteDeIA:
         self.chamadas: list[ChamadaIA] = []
 
     def perguntar(self, etapa: str, prompt: str) -> str | None:
+        entrada = sanitizar(prompt)
         inicio = time.perf_counter()
         try:
-            resposta = self.provedor.executar(prompt)
+            resposta = self.provedor.executar(entrada)
         except FalhaDoProvedor as falha:
-            self.registrar(etapa, prompt, falha.motivo, segundos_desde(inicio), None, False)
+            self.registrar(etapa, entrada, falha.motivo, segundos_desde(inicio), None, False)
             return None
-        self.registrar(etapa, prompt, resposta.texto, segundos_desde(inicio), resposta.tokens, True)
+        duracao_s = segundos_desde(inicio)
+        self.registrar(etapa, entrada, resposta.texto, duracao_s, resposta.tokens, True)
         return resposta.texto
 
     def registrar(

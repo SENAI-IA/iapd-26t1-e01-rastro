@@ -338,7 +338,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R11.1, R11.2, R14.1–R14.3, R14.8
   - Revisão: @luiz.pagliari
 
-- [ ] **T34 Tirar dados sensíveis do que vai para a IA**
+- [x] **T34 Tirar dados sensíveis do que vai para a IA**
   - Entrega: `ia/sanitizacao.py`.
   - Aceite: JWT, `Bearer`, chaves longas e query strings viram `[removido]`.
   - Arquivos: `rastro/ia/sanitizacao.py`, `tests/ia/test_sanitizacao.py`

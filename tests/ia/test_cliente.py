@@ -84,6 +84,17 @@ def test_r11_1_cada_chamada_fica_registrada_na_ordem() -> None:
     ]
 
 
+def test_r16_3_prompt_sai_sanitizado_e_a_chamada_registra_o_que_foi_enviado() -> None:
+    provedor = ProvedorFalso([RespostaDoProvedor("ok", tokens=1)])
+    ia = ClienteDeIA(provedor)
+
+    ia.perguntar("identificar_bibliotecas", "trecho de https://loja.exemplo/a.js?sessao=x1")
+
+    enviado = "trecho de https://loja.exemplo/a.js?[removido]"
+    assert provedor.prompts == [enviado]
+    assert ia.chamadas[0].entrada == enviado
+
+
 def test_r11_2_provedor_sem_tokens_registra_none_e_nunca_estima() -> None:
     resposta_longa = "texto " * 500
     ia = ClienteDeIA(ProvedorFalso([RespostaDoProvedor(resposta_longa, tokens=None)], "kiro"))

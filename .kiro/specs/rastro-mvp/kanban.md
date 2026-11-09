@@ -51,7 +51,8 @@ _(vazio)_
 - [ ] **T30** Mostrar o glossário · fase 2 · revisão @halan.bacca · commit e8f3af6 · 09/11
 - [ ] **T31** Abrir e copiar a task · fase 2 · revisão @halan.bacca · commit 4e5d857 · 09/11
 - [ ] **T32** Ler uma zona por vez (modo foco) · fase 2 · revisão @halan.bacca · commit 4948475 · 09/11
-- [ ] **T33** Criar o cliente de IA e a escolha do provedor · fase 3 · revisão @luiz.pagliari · 09/11
+- [ ] **T33** Criar o cliente de IA e a escolha do provedor · fase 3 · revisão @luiz.pagliari · commit 8d62387 · 09/11
+- [ ] **T34** Tirar dados sensíveis do que vai para a IA · fase 3 · revisão @cristiano.albino · 09/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer
@@ -70,7 +71,6 @@ _(vazio)_
 
 ### Fase 3. IA
 
-- [ ] **T34** Tirar dados sensíveis do que vai para a IA · fase 3 · 30/11–04/12 · revisão @cristiano.albino
 - [ ] **T35** Chamar o Claude pela CLI · fase 3 · 30/11–04/12 · revisão @luiz.pagliari
 - [ ] **T36** Chamar o Codex pela CLI · fase 3 · 30/11–04/12 · revisão @luiz.pagliari
 - [ ] **T37** Chamar o Kiro pela CLI · fase 3 · 30/11–04/12 · revisão @luiz.pagliari
