@@ -1,6 +1,7 @@
 import json
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
@@ -14,16 +15,28 @@ from rastro.fluxo import Analise, analisar
 from rastro.fontes.conector import ConectorDeAvisos
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.ia import cliente
-from tests.dubles import DADOS, HAR_DA_LOJA, ConectorFalso, RegistroFalso
+from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
+from tests.dubles import (
+    DADOS,
+    HAR_DA_LOJA,
+    HAR_DO_JUICE_SHOP,
+    TRECHO_DO_ANGULAR,
+    ConectorFalso,
+    ProvedorFalso,
+    RegistroFalso,
+)
 
 MOMENTO = datetime(2026, 11, 20, 14, 3, 0)
 PASTA_DA_LOJA = Path("loja.exemplo.com") / "2026-11-20_14-03-00"
 
 
 def analisar_no_momento_fixo(
-    caminho_har: Path, fonte: ConectorDeAvisos, registro: RegistroDePacotes
+    caminho_har: Path,
+    fonte: ConectorDeAvisos,
+    registro: RegistroDePacotes,
+    ia: ClienteDeIA | None = None,
 ) -> Analise:
-    return replace(analisar(caminho_har, fonte, registro), inicio=MOMENTO)
+    return replace(analisar(caminho_har, fonte, registro, ia), inicio=MOMENTO)
 
 
 @pytest.fixture
@@ -188,47 +201,137 @@ def nenhuma_cli_instalada(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(cliente.shutil, "which", lambda _nome: None)
 
 
-def test_analisar_com_ia_ainda_nao_disponivel_encerra_com_1_e_sugere_sem_ia(
-    capsys: pytest.CaptureFixture[str], tmp_path: Path, clis_procuradas: list[str]
+class ProvedoresFalsos:
+    def __init__(self) -> None:
+        self.respostas: list[RespostaDoProvedor | FalhaDoProvedor] = [
+            FalhaDoProvedor("o dublê não responde")
+        ]
+        self.criados: list[tuple[ProvedorFalso, str]] = []
+
+    def fabrica(self, nome: str) -> Callable[[str], ProvedorFalso]:
+        def criar(executavel: str) -> ProvedorFalso:
+            provedor = ProvedorFalso(self.respostas, nome=nome)
+            self.criados.append((provedor, executavel))
+            return provedor
+
+        return criar
+
+
+@pytest.fixture
+def provedores(monkeypatch: pytest.MonkeyPatch) -> ProvedoresFalsos:
+    falsos = ProvedoresFalsos()
+    fabricas = {nome: falsos.fabrica(nome) for nome in cli.PROVEDORES_DAS_IAS}
+    monkeypatch.setattr(cli, "PROVEDORES_DAS_IAS", fabricas)
+    return falsos
+
+
+def analisar_com_ia(har: Path, saida: Path, *opcoes: str) -> int:
+    return executar(["analisar", str(har), *opcoes, "--saida", str(saida)])
+
+
+def test_r14_cada_ia_tem_o_seu_provedor() -> None:
+    assert set(cli.PROVEDORES_DAS_IAS) == set(cliente.EXECUTAVEIS_DAS_IAS)
+
+
+@pytest.mark.usefixtures("fontes_falsas")
+def test_r14_1_sem_ia_e_sem_variavel_usa_o_kiro_com_o_executavel_achado(
+    tmp_path: Path, clis_procuradas: list[str], provedores: ProvedoresFalsos
 ) -> None:
-    assert executar(["analisar", str(HAR_DA_LOJA), "--saida", str(tmp_path)]) == 1
-
-    assert "--sem-ia" in capsys.readouterr().err
-    assert list(tmp_path.iterdir()) == []
-
-
-def test_r14_1_sem_ia_e_sem_variavel_procura_a_cli_do_kiro(
-    tmp_path: Path, clis_procuradas: list[str]
-) -> None:
-    executar(["analisar", str(HAR_DA_LOJA), "--saida", str(tmp_path)])
+    assert analisar_com_ia(HAR_DA_LOJA, tmp_path) == 0
 
     assert clis_procuradas == ["kiro-cli"]
+    [(provedor, executavel)] = provedores.criados
+    assert (provedor.nome, executavel) == ("kiro", "/usr/local/bin/kiro-cli")
 
 
+@pytest.mark.usefixtures("fontes_falsas")
 def test_r14_1_variavel_rastro_ia_escolhe_a_ia(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, clis_procuradas: list[str]
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    clis_procuradas: list[str],
+    provedores: ProvedoresFalsos,
 ) -> None:
     monkeypatch.setenv("RASTRO_IA", "codex")
 
-    executar(["analisar", str(HAR_DA_LOJA), "--saida", str(tmp_path)])
+    analisar_com_ia(HAR_DA_LOJA, tmp_path)
 
     assert clis_procuradas == ["codex"]
+    assert [provedor.nome for provedor, _ in provedores.criados] == ["codex"]
 
 
+@pytest.mark.usefixtures("fontes_falsas")
 def test_r14_1_opcao_ia_vale_antes_da_variavel(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, clis_procuradas: list[str]
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    clis_procuradas: list[str],
+    provedores: ProvedoresFalsos,
 ) -> None:
     monkeypatch.setenv("RASTRO_IA", "codex")
 
-    executar(["analisar", str(HAR_DA_LOJA), "--ia", "claude", "--saida", str(tmp_path)])
+    analisar_com_ia(HAR_DA_LOJA, tmp_path, "--ia", "claude")
 
     assert clis_procuradas == ["claude"]
+    assert [provedor.nome for provedor, _ in provedores.criados] == ["claude"]
 
 
+@pytest.mark.usefixtures("fontes_falsas", "clis_procuradas")
+def test_r14_8_com_ia_explica_os_achados_e_grava_provedor_e_chamadas_no_json(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, provedores: ProvedoresFalsos
+) -> None:
+    gravada = (DADOS / "kiro-explicacao-jquery.txt").read_text(encoding="utf-8")
+    provedores.respostas = [RespostaDoProvedor(gravada, None)]
+
+    assert analisar_com_ia(HAR_DA_LOJA, tmp_path) == 0
+
+    relatorio = ler_relatorio(tmp_path / PASTA_DA_LOJA / "relatorio.json")
+    assert relatorio["analise"]["ia"] == "kiro"
+    assert relatorio["analise"]["limitacoes"] == []
+    jquery = relatorio["bibliotecas"][0]
+    assert jquery["explicacao"]["gerada_por_ia"] is True
+    assert [chamada["etapa"] for chamada in relatorio["ia"]["chamadas"]] == ["explicar_achado"]
+    assert relatorio["ia"]["chamadas"][0]["sucesso"] is True
+    saida = capsys.readouterr().out
+    assert saida.startswith("Análise com a IA kiro.")
+    assert AVISO_SEM_IA not in saida
+
+
+@pytest.mark.usefixtures("fontes_falsas", "clis_procuradas")
+def test_r14_com_ia_procura_bibliotecas_em_bundles(
+    tmp_path: Path, provedores: ProvedoresFalsos
+) -> None:
+    angular = {"pacote": "@angular/core", "versao": "22.2.2", "trecho": TRECHO_DO_ANGULAR}
+    provedores.respostas = [
+        RespostaDoProvedor(json.dumps({"bibliotecas": [angular]}), None),
+        FalhaDoProvedor("sem resposta"),
+    ]
+
+    assert analisar_com_ia(HAR_DO_JUICE_SHOP, tmp_path) == 0
+
+    [relatorio_json] = tmp_path.rglob("relatorio.json")
+    relatorio = ler_relatorio(relatorio_json)
+    assert [(b["pacote"], b["metodo"]) for b in relatorio["bibliotecas"]] == [
+        ("@angular/core", "ia")
+    ]
+    assert relatorio["resumo"]["encontradas_so_pela_ia"] == 1
+    assert [chamada["sucesso"] for chamada in relatorio["ia"]["chamadas"]] == [True, False]
+
+
+@pytest.mark.usefixtures("fontes_falsas", "clis_procuradas")
+def test_r14_falha_da_ia_nao_derruba_a_analise(
+    tmp_path: Path, provedores: ProvedoresFalsos
+) -> None:
+    assert analisar_com_ia(HAR_DA_LOJA, tmp_path) == 0
+
+    relatorio = ler_relatorio(tmp_path / PASTA_DA_LOJA / "relatorio.json")
+    assert relatorio["bibliotecas"][0]["explicacao"]["gerada_por_ia"] is False
+    assert relatorio["ia"]["chamadas"][0]["resposta"] == "o dublê não responde"
+
+
+@pytest.mark.usefixtures("provedores")
 def test_r14_2_ia_invalida_encerra_com_1_listando_as_opcoes(
     capsys: pytest.CaptureFixture[str], tmp_path: Path, clis_procuradas: list[str]
 ) -> None:
-    resultado = executar(["analisar", str(HAR_DA_LOJA), "--ia", "gpt", "--saida", str(tmp_path)])
+    resultado = analisar_com_ia(HAR_DA_LOJA, tmp_path, "--ia", "gpt")
 
     assert resultado == 1
     assert "Opções válidas: kiro, claude, codex." in capsys.readouterr().err
@@ -236,6 +339,7 @@ def test_r14_2_ia_invalida_encerra_com_1_listando_as_opcoes(
     assert list(tmp_path.iterdir()) == []
 
 
+@pytest.mark.usefixtures("provedores")
 def test_r14_2_rastro_ia_invalida_encerra_com_1(
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
@@ -244,24 +348,26 @@ def test_r14_2_rastro_ia_invalida_encerra_com_1(
 ) -> None:
     monkeypatch.setenv("RASTRO_IA", "gemini")
 
-    assert executar(["analisar", str(HAR_DA_LOJA), "--saida", str(tmp_path)]) == 1
+    assert analisar_com_ia(HAR_DA_LOJA, tmp_path) == 1
 
     assert "RASTRO_IA" in capsys.readouterr().err
+    assert list(tmp_path.iterdir()) == []
 
 
 @pytest.mark.usefixtures("nenhuma_cli_instalada")
 def test_r14_3_cli_ausente_encerra_com_1_antes_de_ler_o_har(
-    capsys: pytest.CaptureFixture[str], tmp_path: Path
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, provedores: ProvedoresFalsos
 ) -> None:
     har_que_nao_existe = tmp_path / "nao-existe.har"
 
-    assert executar(["analisar", str(har_que_nao_existe), "--saida", str(tmp_path)]) == 1
+    assert analisar_com_ia(har_que_nao_existe, tmp_path) == 1
 
     erro = capsys.readouterr().err
     assert "kiro-cli" in erro
     assert "--sem-ia" in erro
     assert "não procura bibliotecas em bundles e não explica os achados" in erro
     assert str(har_que_nao_existe) not in erro
+    assert provedores.criados == []
 
 
 @pytest.mark.usefixtures("fontes_falsas", "nenhuma_cli_instalada")

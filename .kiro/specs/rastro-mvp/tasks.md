@@ -403,6 +403,14 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Se não fechar até 04/12: sai do MVP, a identificação segue só por assinatura e o PRD e o pitch são atualizados juntos.
   - Revisão: @ali.santos
 
+- [x] **T52 Ligar a IA na linha de comando**
+  - Entrega: o `cli.py` monta o `ClienteDeIA` com o provedor escolhido (`--ia`, `RASTRO_IA` ou Kiro) e passa ao `fluxo.analisar`; sai a mensagem "ainda não está disponível".
+  - Aceite: `analisar` sem `--sem-ia`, com a CLI instalada, gera o relatório com a IA (identificação em bundles, explicações e chamadas no JSON); IA inválida ou CLI ausente seguem em código 1; teste com o provedor trocado por dublê.
+  - Arquivos: `rastro/cli.py`, `tests/test_cli.py`, `design.md`
+  - Teste: `test_r14_*`
+  - Requisito: R14.1–R14.4, R14.8
+  - Revisão: @luiz.pagliari
+
 ## Fase 4. Entregar
 
 - [ ] **T42 Instalar do zero no Windows e no Linux**

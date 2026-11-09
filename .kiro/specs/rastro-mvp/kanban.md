@@ -59,7 +59,8 @@ _(vazio)_
 - [ ] **T38** Explicar cada achado com IA · fase 3 · revisão @luiz.pagliari · commit ae0c9cf · 09/11
 - [ ] **T39** Mostrar onde a IA entrou · fase 3 · revisão @luiz.pagliari · commit 36b7061 · 09/11
 - [ ] **T40** Conferir o trecho no código publicado · fase 3 · revisão @ali.santos · commit 6237dda · 09/11
-- [ ] **T41** Identificar bibliotecas em bundles com IA · fase 3 · revisão @ali.santos · 09/11
+- [ ] **T41** Identificar bibliotecas em bundles com IA · fase 3 · revisão @ali.santos · commit 6d3d16c · 09/11
+- [ ] **T52** Ligar a IA na linha de comando · fase 3 · revisão @luiz.pagliari · 09/11
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 
 ## A fazer

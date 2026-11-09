@@ -107,7 +107,7 @@ Esse é o fluxo sem IA, ligado na T23. A IA entra depois sem mudar a ordem: a T3
 - `conferir_faixas` aplica a trava 6 (`descartar_fora_da_faixa`) biblioteca por biblioteca; `calcular_risco` monta um `Achado` por aviso mantido, com `calcular_nota`, e devolve a lista em `ordenar_achados`.
 - `checar_configuracao(requisicoes, site)`, em `checagens.py`, roda a tupla `CHECAGENS` na ordem dos IDs (C01 a C08).
 - `Analise` (em `fluxo.py`): `har` (nome do arquivo), `site`, `inicio` (hora local), `duracao_s`, `provedor_de_ia: str | None`, `tem_javascript` (R01.6), `bibliotecas` (confirmadas), `a_confirmar`, `nao_consultadas: dict[str, str]`, `achados`, `explicacoes`, `checagens`, `plano_de_acao`, `travas_acionadas` (as da identificação em bundles, as do npm, as da faixa e as da explicação) e `chamadas_de_ia` (as `ChamadaIA` do cliente; vazia sem IA, T39).
-- O `cli.py` monta o relatório (`relatorio/json.py`), escolhe a pasta pelo site e por `analise.inicio` e grava (`relatorio/gravacao.py`). Sem `--sem-ia`, desde a T33 escolhe a IA e procura a CLI dela (código 1 se a IA for inválida ou a CLI faltar); até os provedores (T35–T37), encerra com código 1 e sugere `--sem-ia`.
+- O `cli.py` monta o relatório (`relatorio/json.py`), escolhe a pasta pelo site e por `analise.inicio` e grava (`relatorio/gravacao.py`). Sem `--sem-ia`, escolhe a IA e procura a CLI dela (código 1 se a IA for inválida ou a CLI faltar, T33) e, desde a T52, monta o `ClienteDeIA` com o provedor e o passa ao `fluxo.analisar`.
 
 ### Análise sem IA fica explícita (R14.5–R14.7)
 
@@ -394,7 +394,7 @@ Decidido na T33:
 - Tokens que o provedor não informa ficam `None`, nunca estimados (R11.2); o "não informado" é do painel (T39). A sanitização entra no `perguntar` na T34.
 - Escolha (R14.1–R14.3): `escolher_ia(opcao_ia, variavel_de_ambiente)` é pura: `--ia`, senão `RASTRO_IA` (vazia conta como ausente), senão `kiro`; aceita maiúsculas e espaços em volta. Nome fora de `EXECUTAVEIS_DAS_IAS` levanta `IaInvalida`, com a origem (`--ia` ou `RASTRO_IA`) e as opções. `localizar_cli(nome)` procura o executável da tabela com `shutil.which` e levanta `CliDaIaAusente` com o nome do executável. As duas são filhas de `ErroNaEscolhaDaIa`.
 - `--ia` não usa `choices` do `argparse`, que encerraria com código 2; a validação é do Rastro, com código 1. Com `--sem-ia`, `--ia` e `RASTRO_IA` são ignorados e nenhuma CLI é procurada.
-- Até os provedores (T35–T37), com IA válida e CLI instalada o `cli.py` encerra com código 1 e sugere `--sem-ia`. `fluxo.analisar` já recebe `ia: ClienteDeIA | None = None` e preenche `provedor_de_ia` com o nome do provedor (R14.8). As chamadas entram no JSON (`ia.chamadas`) na T39.
+- Com IA válida e CLI instalada, o `cli.py` monta o `ClienteDeIA` e analisa com ele (T52; antes dela, encerrava com código 1 e sugeria `--sem-ia`). `fluxo.analisar` recebe `ia: ClienteDeIA | None = None` e preenche `provedor_de_ia` com o nome do provedor (R14.8). As chamadas entram no JSON (`ia.chamadas`) na T39.
 
 ### Provedores
 
@@ -417,7 +417,7 @@ Decidido na T35:
 - Cada provedor recebe no construtor o caminho do executável que `localizar_cli` achou (`ProvedorClaude(executavel)`); o provedor não chama `shutil.which` de novo. CLI que some depois de localizada (`OSError` no `subprocess.run`) também vira `FalhaDoProvedor`.
 - Claude: `tokens` é a soma dos quatro campos do `usage` (entrada com e sem cache mais saída). Se faltar algum campo ou vier um valor que não é inteiro, fica `None`: soma parcial seria estimativa (R11.2).
 - Claude: saída que não é objeto JSON, `is_error: true` ou `result` vazio viram `FalhaDoProvedor` com o motivo em português.
-- A ligação dos provedores ao `cli.py` não está em nenhuma das T35–T37 (nenhuma lista o `cli.py`); até ela, o `cli.py` segue encerrando com código 1 e sugerindo `--sem-ia`.
+- A ligação dos provedores ao `cli.py` não estava em nenhuma das T35–T37; ficou com a T52 (ver abaixo).
 
 Decidido na T36:
 
@@ -431,6 +431,13 @@ Decidido na T37:
 - Kiro: o texto da resposta é a saída padrão inteira, sem os espaços e quebras de linha em volta. Saída vazia (ou só espaços) vira `FalhaDoProvedor`, mesmo com código de saída 0.
 - Kiro: a resposta pode vir dentro de um bloco de código (` ```json ... ``` `), como na resposta gravada em `tests/dados/kiro-resposta.txt` (kiro-cli 2.31.1, 09/11). O provedor não tira o bloco: achar o objeto JSON no texto é do cliente, igual para os três provedores.
 - Kiro: `tokens` é sempre `None` (R11.2). O `--output-format stream-json` também não traz tokens, só créditos; por isso o Rastro lê o texto puro.
+
+Decidido na T52:
+
+- O `cli.py` liga cada nome de IA ao seu provedor em `PROVEDORES_DAS_IAS` (`kiro` → `ProvedorKiro`, e assim por diante) e monta `ClienteDeIA(provedor(executavel))` com o caminho que `localizar_cli` achou. A tabela fica no `cli.py`, a borda que compõe o fluxo: em `ia/cliente.py` ela criaria import circular, porque os provedores importam o cliente.
+- Escolha, procura da CLI e montagem do cliente vêm antes de ler o HAR; IA inválida ou CLI ausente seguem em código 1 (R14.2, R14.3). Com e sem IA, o `cli.py` passa pelo mesmo `analisar_e_gravar`; muda só o `ia` (`None` com `--sem-ia`).
+- Com IA, o terminal abre com "Análise com a IA <nome>", avisando que cada chamada pode levar até 2 minutos (o tempo limite dos provedores) e que o que a IA sugere passa pelas travas. Falha da IA não muda o código de saída: o achado fica com o resumo do aviso e a falha vai para `ia.chamadas` (R11).
+- Conferido com o kiro-cli 2.31.1 em 09/11: `tests/dados/loja.har` (2 explicações da IA, 36 s) e `avaliacao/juiceshop.har` (2 chamadas de identificação, `@angular/core@22.2.2` achada só pela IA, 32 s), código 0.
 
 ### Prompts
 

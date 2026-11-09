@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -13,10 +14,15 @@ from rastro.ia.cliente import (
     IA_PADRAO,
     VARIAVEL_DA_IA,
     CliDaIaAusente,
+    ClienteDeIA,
     IaInvalida,
+    ProvedorDeIA,
     escolher_ia,
     localizar_cli,
 )
+from rastro.ia.provedores.claude import ProvedorClaude
+from rastro.ia.provedores.codex import ProvedorCodex
+from rastro.ia.provedores.kiro import ProvedorKiro
 from rastro.relatorio.gravacao import (
     RelatorioGravado,
     RelatorioJaExiste,
@@ -47,9 +53,15 @@ AJUDA_IA = (
     f"sem os dois, {IA_PADRAO})"
 )
 SUGESTAO_SEM_IA = f"Use --sem-ia ({AJUDA_SEM_IA})."
-MENSAGEM_IA_INDISPONIVEL = (
-    f"a análise com IA ainda não está disponível nesta versão. {SUGESTAO_SEM_IA}"
+AVISO_COM_IA = (
+    "Análise com a IA {ia}. Cada chamada à IA pode levar até 2 minutos; "
+    "o que ela sugere passa pelas travas antes do relatório."
 )
+PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
+    "kiro": ProvedorKiro,
+    "claude": ProvedorClaude,
+    "codex": ProvedorCodex,
+}
 
 
 def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
@@ -80,24 +92,34 @@ def executar(argumentos: list[str] | None = None) -> int:
         return 0
     if opcoes.sem_ia:
         return analisar_sem_ia(opcoes.har, opcoes.saida)
-    return analisar_com_ia(opcoes.ia)
+    return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia)
 
 
-def analisar_com_ia(opcao_ia: str | None) -> int:
+def analisar_com_ia(caminho_har: Path, saida: Path | None, opcao_ia: str | None) -> int:
     try:
-        nome_da_ia = escolher_ia(opcao_ia, os.environ.get(VARIAVEL_DA_IA))
-        localizar_cli(nome_da_ia)
+        ia = montar_cliente_de_ia(opcao_ia)
     except IaInvalida as erro:
         return encerrar_com_erro(str(erro))
     except CliDaIaAusente as erro:
         return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
-    return encerrar_com_erro(MENSAGEM_IA_INDISPONIVEL)
+    avisar_analise_com_ia(ia)
+    return analisar_e_gravar(caminho_har, saida, ia)
+
+
+def montar_cliente_de_ia(opcao_ia: str | None) -> ClienteDeIA:
+    nome_da_ia = escolher_ia(opcao_ia, os.environ.get(VARIAVEL_DA_IA))
+    executavel = localizar_cli(nome_da_ia)
+    return ClienteDeIA(PROVEDORES_DAS_IAS[nome_da_ia](executavel))
 
 
 def analisar_sem_ia(caminho_har: Path, saida: Path | None) -> int:
     avisar_analise_sem_ia()
+    return analisar_e_gravar(caminho_har, saida, None)
+
+
+def analisar_e_gravar(caminho_har: Path, saida: Path | None, ia: ClienteDeIA | None) -> int:
     try:
-        analise = analisar(caminho_har, GitHubAdvisory(), RegistroNpm())
+        analise = analisar(caminho_har, GitHubAdvisory(), RegistroNpm(), ia)
     except ErroAoLerHar as erro:
         return encerrar_com_erro(str(erro))
     relatorio = montar_relatorio(analise)
@@ -109,6 +131,11 @@ def analisar_sem_ia(caminho_har: Path, saida: Path | None) -> int:
         return encerrar_com_erro(str(erro))
     mostrar_resultado(pasta, gravado, relatorio)
     return 0
+
+
+def avisar_analise_com_ia(ia: ClienteDeIA) -> None:
+    print(AVISO_COM_IA.format(ia=ia.provedor.nome))
+    print()
 
 
 def avisar_analise_sem_ia() -> None:
