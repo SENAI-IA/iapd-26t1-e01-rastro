@@ -230,7 +230,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R06.6, R06.7, R16.4, R16.5
   - Revisão: @geison.santos
 
-- [ ] **T21 Montar o plano de ação**
+- [x] **T21 Montar o plano de ação**
   - Entrega: `montar_plano_de_acao(achados, explicacoes, checagens)`.
   - Aceite: uma ação por biblioteca vulnerável e por checagem com falha, com a versão-alvo certa e o caso "sem correção publicada".
   - Arquivos: `rastro/acao/plano.py`, `rastro/acao/modelos.py`, `tests/acao/test_plano.py`

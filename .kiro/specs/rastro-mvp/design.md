@@ -67,8 +67,10 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/risco/nota.py` | fórmula da nota | R05.1, R05.3, R05.4 |
 | `rastro/risco/prioridade.py` | faixas, nota da biblioteca e ordenação | R05.2, R05.5, R05.6, R05.7 |
 | `rastro/configuracao/checagens.py` | uma função por checagem | R06 |
+| `rastro/explicacao/modelos.py` | `Explicacao` | R07 |
 | `rastro/explicacao/ia.py` | pede explicação e teste de verificação | R07 |
-| `rastro/acao/plano.py` | monta e ordena as ações | R08 |
+| `rastro/acao/modelos.py` | `Acao`, `CorrecaoDaChecagem` | R08 |
+| `rastro/acao/plano.py` | monta e ordena as ações; o que fazer e impacto fixos de cada checagem | R08 |
 | `rastro/acao/task.py` | gera o texto da task | R09 |
 | `rastro/ia/cliente.py` | ponto único de chamada, mede tempo e tokens, registra a chamada | R11, R14 |
 | `rastro/ia/sanitizacao.py` | tira dados sensíveis do que vai para a IA | R16.3 |
@@ -134,7 +136,7 @@ O texto das limitações sai do Python, no campo `limitacoes`. O React só exibe
 | `Achado` | `biblioteca`, `aviso`, `nota` |
 | `Checagem` | `id`, `titulo`, `situacao: "falhou" \| "passou" \| "nao_verificada"`, `severidade: "alta" \| "media" \| "baixa"`, `quem_resolve`, `evidencia: Evidencia \| None`, `detalhe` |
 | `Explicacao` | `o_que_e`, `impacto`, `como_corrigir`, `teste_verificacao`, `gerada_por_ia: bool` |
-| `Acao` | `id`, `prioridade`, `nota`, `o_que_fazer`, `porque`, `impacto`, `quem_resolve`, `texto_task`, `refs` (achados ou checagem) |
+| `Acao` | `id`, `prioridade`, `nota`, `o_que_fazer`, `porque`, `impacto`, `quem_resolve`, `texto_task` (entra na T22), `refs: list[str]` (GHSA dos achados ou ID da checagem) |
 | `ChamadaIA` | `etapa`, `provedor`, `entrada`, `resposta`, `duracao_s`, `tokens: int \| None`, `sucesso: bool` |
 
 A `situacao` sai só das travas; a IA não tem campo de confiança que decida algo. O campo `Nota.conta` guarda a conta escrita, ex.: `10 × (0,5 × 6,1/10 + 0,5 × 0,97) = 7,9`, que o painel de origem mostra (R10.1).
@@ -405,9 +407,13 @@ Antes de qualquer envio: tira query strings das URLs e troca por `[removido]` o 
 
 ## 12. Plano de ação e task (R08, R09)
 
-- Uma ação por biblioteca com achados: "Atualizar `jquery` de 3.4.1 para 3.5.0". A versão-alvo é a maior entre as `versao_corrigida` dos avisos dela, que é a menor versão que corrige todos.
-- Uma ação por checagem com falha.
-- Ordem: prioridade (alta, média, baixa, a avaliar) e, dentro dela, nota decrescente.
+- Uma ação por biblioteca com achados: "Atualizar jquery de 3.4.1 para 3.5.0". A versão-alvo é a maior entre as `versao_corrigida` dos avisos dela, que é a menor versão que corrige todos. A comparação é por versão, não por texto (`4.17.10` > `4.17.9`, `3.5.0` > `3.5.0-rc.1`), com o `ler_versao` da trava de faixa.
+- Biblioteca é `pacote@versão`: a mesma biblioteca em duas versões dá duas ações. Biblioteca "a confirmar" não entra.
+- Aviso sem `versao_corrigida`: só esses, "jquery 3.4.1 sem correção publicada: avaliar troca ou mitigação"; junto de outros com correção, a ação atualiza para a versão-alvo e acrescenta "GHSA-… sem correção publicada: avaliar troca ou mitigação".
+- Ação da biblioteca: `id` e chave de `explicacoes` são `pacote@versão`; `nota` é a da biblioteca e a `prioridade` sai dela; `porque` lista os GHSA, a nota e a prioridade ("2 falhas conhecidas (GHSA-…, GHSA-…). Nota 7,9 (alta)."); `impacto` é o da `Explicacao` ou, sem ela, o resumo do aviso de maior nota; quem resolve é "dev front-end"; `refs` são os GHSA, do aviso de maior nota para o de menor.
+- Uma ação por checagem com falha ("passou" e "não verificada" não entram). `id` e `refs` são o ID da checagem; a prioridade é a severidade; sem nota; `porque` traz a regra, a severidade e o detalhe. O que fazer e o impacto são texto fixo por ID (`CORRECOES_DAS_CHECAGENS`, em `plano.py`), sem IA: checagem nova acrescenta a sua linha ali.
+- Ordem: prioridade (alta, média, baixa, a avaliar) e, dentro dela, nota decrescente; ação sem nota (checagem) vem depois das com nota da mesma prioridade, e o empate mantém a ordem de entrada (bibliotecas, depois checagens na ordem recebida).
+- O `texto_task` entra na `Acao` com a T22, que monta o texto a partir da própria ação.
 - O texto da task é montado por modelo fixo em `acao/task.py`, sem IA. A IA só entra nos campos de explicação e teste de verificação.
 
 ```markdown

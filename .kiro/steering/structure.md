@@ -23,8 +23,8 @@ rastro/
   fontes/                  conector.py (interface), github_advisory.py, registro_npm.py; opcionais: osv.py, nvd.py, juncao.py
   risco/                   modelos.py, nota.py, prioridade.py
   configuracao/            checagens.py (uma função por checagem)
-  explicacao/              ia.py
-  acao/                    plano.py, task.py
+  explicacao/              modelos.py, ia.py
+  acao/                    modelos.py, plano.py, task.py
   ia/
     cliente.py             interface única, escolha do provedor, medição
     sanitizacao.py         tira dados sensíveis do que vai para a IA
@@ -43,7 +43,7 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 
 ## Onde colocar algo novo
 
-- **Checagem nova:** uma função em `configuracao/checagens.py` e seu teste.
+- **Checagem nova:** uma função em `configuracao/checagens.py` e seu teste, e o que fazer e o impacto dela em `acao/plano.py`.
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
 - **IA nova:** um arquivo em `ia/provedores/`.
 - **Assinatura nova:** em `identificacao/assinaturas.py`.

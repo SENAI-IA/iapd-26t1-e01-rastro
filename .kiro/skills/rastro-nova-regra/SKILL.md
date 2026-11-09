@@ -21,8 +21,9 @@ Cinco pontos de extensão, cada um com lugar fixo (`.kiro/steering/structure.md`
 2. **Dados fixos da regra:** uma `RegraDeChecagem` (ID, título, severidade, quem resolve) no topo de `checagens.py`, como na tabela do `design.md` (seção 10). Acrescente a linha nessa tabela.
 3. **Só o site analisado:** ignore respostas de outros hosts. Cabeçalho falha se alguma resposta HTML do site falha, e a evidência é a primeira delas. Use `paginas_html_do_site` e `checar_paginas_do_site`, que já dão o "não verificada" quando não há página HTML do site e a evidência do "passou"; a checagem nova só escreve a função que diz se uma página falha. Regra que não se aplica ao site (ex.: HSTS sem HTTPS) fica "não verificada", nunca "passou".
    Checagem de cookie olha as respostas do site com cookie, de qualquer tipo: use `respostas_do_site_com_cookies` e `checar_cookies_do_site`, que dão o "não verificada" do HAR sem cookies (R06.7) e listam só o nome do cookie, nunca o valor; a checagem nova só escreve a função que diz se um `Cookie` falha.
-4. **Teste** em `tests/configuracao/test_checagens.py`: um caso que falha, um que passa e um com resposta de outro host que não conta. Monte as `Requisicao` no próprio teste, sem HAR.
-5. **Cobertura:** acima de 80% em `configuracao/`.
+4. **Plano de ação:** acrescente em `CORRECOES_DAS_CHECAGENS`, em `rastro/acao/plano.py`, o que fazer e o impacto da checagem (texto fixo, sem IA), e a regra nova no caso parametrizado `test_r08_2_toda_checagem_tem_o_que_fazer_e_impacto`, em `tests/acao/test_plano.py`. Sem essa linha, a checagem com falha quebra a montagem do plano.
+5. **Teste** em `tests/configuracao/test_checagens.py`: um caso que falha, um que passa e um com resposta de outro host que não conta. Monte as `Requisicao` no próprio teste, sem HAR.
+6. **Cobertura:** acima de 80% em `configuracao/`.
 
 ## Assinatura de biblioteca
 
