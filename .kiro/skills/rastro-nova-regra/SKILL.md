@@ -9,7 +9,7 @@ Cinco pontos de extensão, cada um com lugar fixo (`.kiro/steering/structure.md`
 
 ## Antes de qualquer caso
 
-1. **Spec primeiro.** A regra nova precisa de um critério `Rxx.y` em `.kiro/specs/rastro-mvp/requirements.md` e de uma task no `tasks.md`. Sem critério, não há teste com ID, então pare e escreva o critério.
+1. **Spec primeiro.** A regra nova precisa de um critério `Rxx.y` em `.kiro/specs/rastro/requirements.md` e de uma task no `tasks.md`. Sem critério, não há teste com ID, então pare e escreva o critério.
 2. **Pasta que ainda não existe:** crie seguindo `structure.md` e o `design.md` (seção 2), com o `tests/` espelhando o `rastro/`. Cada pasta nova, em `rastro/` e em `tests/`, leva um `__init__.py` vazio, porque os nomes de arquivo se repetem (`identificacao/test_ia.py`, `explicacao/test_ia.py`).
 3. **Nome do teste** leva o critério e descreve o comportamento: `test_r06_1_csp_ausente_falha`. Cada critério tem pelo menos um teste.
 4. **Nada de rede nem de IA nos testes.** O `tests/conftest.py` bloqueia a rede. Fonte, registro do npm e IA viram dublês (`ConectorFalso`, `ProvedorFalso`, `urlopen` ou `subprocess.run` trocados com `monkeypatch`). `ConectorFalso`, `RegistroFalso` e `ProvedorFalso` (respostas e falhas em fila, prompts recebidos guardados) de uso geral ficam em `tests/dubles.py`, com o HAR de ponta a ponta `tests/dados/loja.har`; a regra nova deve aparecer nos testes de `tests/test_fluxo.py` quando mudar o que o fluxo devolve. Arquivo de entrada de teste (HAR, resposta gravada) fica em `tests/dados/`, feito à mão, pequeno e sem dado real.

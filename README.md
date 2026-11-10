@@ -2,7 +2,7 @@
 
 Rastro lê um arquivo HAR, identifica as bibliotecas front-end do site, cruza com o GitHub Advisory (CVE, CVSS, EPSS) e gera um relatório de risco explicado por IA. Só análise passiva: o site analisado nunca é acessado.
 
-> **Status:** MVP funcionando no Linux (fases 0 a 3 e extensão OSV e NVD). A instalação do zero no Windows ainda não foi conferida (T42): os comandos do Windows abaixo seguem a convenção do projeto e estão marcados como **a conferir**. Andamento no [kanban](.kiro/specs/rastro-mvp/kanban.md).
+> **Status:** MVP funcionando no Linux (fases 0 a 3 e extensão OSV e NVD). A instalação do zero no Windows ainda não foi conferida (T42): os comandos do Windows abaixo seguem a convenção do projeto e estão marcados como **a conferir**. Andamento no [kanban](.kiro/specs/rastro/kanban.md).
 
 ![Relatório do WebGoat, gerado com a IA Kiro](docs/prints/01-relatorio-claro.png)
 
@@ -203,9 +203,9 @@ O Rastro foi construído com um agente de IA guiado por arquivos versionados nes
 
 | Arquivo | O que é | Como foi usado |
 |---|---|---|
-| [`.kiro/specs/rastro-mvp/requirements.md`](.kiro/specs/rastro-mvp/requirements.md) | Requisitos R01 a R21 em EARS, cada critério com ID | Cada critério vira pelo menos um teste com o ID no nome (`test_r05_2_...`); os que só se veem na tela estão no roteiro acima. |
-| [`.kiro/specs/rastro-mvp/design.md`](.kiro/specs/rastro-mvp/design.md) | Arquitetura, modelos, fórmulas, travas, provedores de IA | O agente lê antes de cada task; o que se decide no meio da task volta para o design no mesmo commit. |
-| [`.kiro/specs/rastro-mvp/tasks.md`](.kiro/specs/rastro-mvp/tasks.md) e [`kanban.md`](.kiro/specs/rastro-mvp/kanban.md) | Tasks T01 a T52, com entrega, aceite, arquivos, teste, requisito e revisor; estado de cada uma | Uma task por vez, um commit por task (`feat(risco): ... (T17)`), com o revisor como coautor. O `git log` conta a construção task por task. |
+| [`.kiro/specs/rastro/requirements.md`](.kiro/specs/rastro/requirements.md) | Requisitos R01 a R21 em EARS, cada critério com ID | Cada critério vira pelo menos um teste com o ID no nome (`test_r05_2_...`); os que só se veem na tela estão no roteiro acima. |
+| [`.kiro/specs/rastro/design.md`](.kiro/specs/rastro/design.md) | Arquitetura, modelos, fórmulas, travas, provedores de IA | O agente lê antes de cada task; o que se decide no meio da task volta para o design no mesmo commit. |
+| [`.kiro/specs/rastro/tasks.md`](.kiro/specs/rastro/tasks.md) e [`kanban.md`](.kiro/specs/rastro/kanban.md) | Tasks T01 a T52, com entrega, aceite, arquivos, teste, requisito e revisor; estado de cada uma | Uma task por vez, um commit por task (`feat(risco): ... (T17)`), com o revisor como coautor. O `git log` conta a construção task por task. |
 | [`.kiro/steering/`](.kiro/steering/) | Padrões de produto, tecnologia, estrutura, processo, Python e React | Regras que o agente segue em toda task: biblioteca padrão primeiro, núcleo puro, nomes em português, Windows e Linux, nada destrutivo. Mudou um padrão, o steering muda no mesmo commit. |
 | [`.kiro/skills/rastro-nova-regra/`](.kiro/skills/rastro-nova-regra/SKILL.md) | Passo a passo para acrescentar checagem, assinatura, fonte de dados, provedor de IA ou trava | Usada nas tasks de regra nova (checagens, assinaturas, OSV, NVD, provedores); o que faltou nela foi corrigido no commit da task. |
 | [`docs/decisoes/`](docs/decisoes/) | Uma decisão por arquivo, com contexto e alternativas | O porquê das escolhas (fórmula da nota, IA por CLI, travas contra invenção), em vez de comentário no código. |
@@ -221,7 +221,7 @@ E no próprio produto a IA tem papel real, mas não decide sozinha: ela sugere b
 | `tests/` | Testes, espelhando `rastro/`, e os dados de teste em `tests/dados/`. |
 | `avaliacao/` | HARs do WebGoat, do Drupal e do Juice Shop, o gabarito das bibliotecas de cada um e os resultados medidos com e sem IA. |
 | `.kiro/steering/` | Padrões de construção que o agente de IA segue: produto, tecnologia, estrutura, processo, Python e React. |
-| `.kiro/specs/rastro-mvp/` | Spec do MVP: requisitos em EARS, design, tasks (com revisor) e kanban. |
+| `.kiro/specs/rastro/` | Spec do MVP: requisitos em EARS, design, tasks (com revisor) e kanban. |
 | `.kiro/skills/rastro-nova-regra/` | Skill do projeto: passo a passo para acrescentar checagem, assinatura, fonte de dados, provedor de IA ou trava, com teste, cobertura e verificação. |
 | `docs/` | Entregáveis: `pitch-inicial.pdf`, `prints/` (telas do relatório), `spike/` (validações da fase 0), `cobertura/` (resultado da verificação em cada sistema e relatório HTML da cobertura) e `decisoes/` (um arquivo por decisão, com contexto, decisão e alternativas). |
 

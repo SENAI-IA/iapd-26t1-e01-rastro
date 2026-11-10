@@ -1,6 +1,6 @@
-# Requisitos: Rastro MVP
+# Requisitos: Rastro
 
-**O quê e por quê.** Este arquivo diz o que o MVP faz, sem dizer como. Ele parte do PRD (`docs/prd.pdf`, RF01 a RF17) e do que ele define como escopo do MVP.
+**O quê e por quê.** Este arquivo diz o que o Rastro faz, sem dizer como. Ele parte do PRD (`docs/prd.pdf`, RF01 a RF17).
 
 ## Como ler
 
@@ -16,8 +16,6 @@ Cada requisito tem uma história e critérios de aceite em **EARS** (Easy Approa
 
 **Cada critério tem um ID (`R05.2`) e vira um teste.** O teste leva o ID no nome, por exemplo `test_r05_2_prioridade_alta_a_partir_de_7_5`. Os critérios que só dá para conferir olhando a tela estão marcados como *(verificação manual)*.
 
-Marcados com **[spike]**: os critérios que dependem do que o spike mostrar. Eles podem mudar antes de virar código.
-
 ## Termos
 
 | Termo | Significado aqui |
@@ -26,7 +24,7 @@ Marcados com **[spike]**: os critérios que dependem do que o spike mostrar. Ele
 | Requisição | Uma entrada do HAR: pedido e resposta. |
 | Biblioteca | Pacote front-end identificado, com nome npm e versão. |
 | Bundle | Arquivo JavaScript que junta várias bibliotecas e esconde nome e versão. |
-| Aviso | Falha publicada no GitHub Advisory (GHSA), com CVE quando houver. |
+| Aviso | Falha publicada numa fonte de vulnerabilidades (GitHub Advisory ou OSV), identificada pelo GHSA ou, sem ele, pelo ID do OSV, com CVE quando houver. |
 | Achado | Um aviso que atinge uma biblioteca encontrada no HAR. |
 | Checagem | Regra sobre cabeçalhos ou cookies do site. |
 | Nota de risco | Número de 0 a 10 calculado pela fórmula fixa. |
@@ -44,7 +42,7 @@ Marcados com **[spike]**: os critérios que dependem do que o spike mostrar. Ele
 4. QUANDO o conteúdo de uma resposta vier em base64, o Rastro DEVE decodificá-lo antes de analisar.
 5. O Rastro DEVE abrir o HAR só para leitura e nunca alterá-lo.
 6. SE nenhuma resposta do HAR trouxer conteúdo JavaScript, ENTÃO o Rastro DEVE seguir com as checagens e avisar no relatório que nenhuma biblioteca pôde ser analisada e por quê.
-7. O Rastro DEVE considerar como **site analisado** o host da primeira resposta HTML do HAR.
+7. O Rastro DEVE considerar como **site analisado** o host da primeira resposta HTML do HAR que não seja redirecionamento.
 
 ## R02 Identificar bibliotecas por assinatura (RF02)
 
@@ -74,12 +72,12 @@ Marcados com **[spike]**: os critérios que dependem do que o spike mostrar. Ele
 2. O Rastro DEVE registrar, para cada aviso: ID GHSA, CVE (quando houver), resumo, CVSS, percentil EPSS, faixa de versões afetadas, primeira versão corrigida e link do aviso.
 3. SE a consulta de uma biblioteca falhar (sem rede, limite de requisições, erro do servidor), ENTÃO o Rastro DEVE seguir com as demais e marcar essa biblioteca como "não consultada", com o motivo.
 4. ONDE a variável `GITHUB_TOKEN` estiver definida, o Rastro DEVE usá-la na consulta. Sem token, o limite de 60 consultas por hora basta para uma análise (spike T01).
-5. O Rastro DEVE consultar só fontes oficiais de vulnerabilidades: o GitHub Advisory e, se a extensão R04A for entregue, o OSV e o NVD. O registro do npm (R21) serve só para conferir pacotes, não para buscar falhas.
+5. O Rastro DEVE consultar só fontes oficiais de vulnerabilidades: o GitHub Advisory, o OSV e o NVD (R04A). O registro do npm (R21) serve só para conferir pacotes, não para buscar falhas.
 6. SE o aviso estiver retirado pela fonte (`withdrawn_at` preenchido), ENTÃO o Rastro DEVE descartá-lo.
 
-### R04A Extensão opcional: OSV e NVD (só se houver tempo)
+### R04A Consultar também o OSV e o NVD
 
-O GitHub Advisory é a fonte do MVP. OSV e NVD entram **só se** as fases 1 e 2 fecharem no prazo; senão, vão para os planos futuros sem mudar nada do resto. Cada fonte é um conector a mais, atrás da mesma interface.
+O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensão, só se as fases 1 e 2 fechassem no prazo, e entraram no Rastro (T49 a T51). Cada fonte é um conector a mais, atrás da mesma interface.
 
 1. QUANDO houver biblioteca identificada, o Rastro DEVE consultar também o OSV por pacote npm e versão.
 2. QUANDO um aviso tiver CVE e vier sem CVSS, o Rastro DEVE buscar o CVSS desse CVE no NVD.
@@ -261,7 +259,7 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 **Como** auditor, dev ou PO, **quero** ver a visita gravada no HAR tocada de novo, com cada biblioteca com falha aparecendo no momento em que chegou ao navegador, **para** entender num relance o que quem acessou o site recebeu.
 
 1. O Rastro DEVE ler de cada requisição do HAR o início (`startedDateTime`) e a duração (`time`). SE um deles faltar ou for inválido, ENTÃO a requisição fica sem esse dado e a leitura do HAR continua.
-2. O JSON DEVE trazer `visita`: um passo por requisição com início, em ordem de chegada, com o tempo em milissegundos desde a primeira requisição, a duração, a camada, a URL sem os valores da query, as bibliotecas identificadas naquela requisição e a prioridade mais alta entre elas. Requisição sem início fica de fora; sem nenhum início, `visita` vem vazia.
+2. O JSON DEVE trazer `visita`: um passo por requisição com início, em ordem de chegada, com o tempo em milissegundos desde a primeira requisição, a duração (0 quando o HAR não traz `time`), a camada, a URL sem os valores da query, as bibliotecas identificadas naquela requisição e a prioridade mais alta entre elas. Requisição sem início fica de fora; sem nenhum início, `visita` vem vazia.
 3. A camada DEVE sair do tipo de conteúdo: `text/html` é página; JavaScript, script; `text/css`, estilo; imagem, fonte, vídeo e áudio, mídia; o resto, dados.
 4. QUANDO `visita` tiver passos, o relatório DEVE mostrar na zona Rastreado, antes dos indicadores, um radar que toca a visita: cada requisição aparece no anel da sua camada, na ordem de chegada, e cada biblioteca com falha aparece com nome, versão e prioridade no momento em que chegou. *(verificação manual)*
 5. O auditor DEVE poder tocar, pausar, recomeçar e escolher o ponto da visita numa linha do tempo, com mouse e teclado. ENQUANTO o sistema pedir menos movimento, o radar DEVE abrir já no fim, sem animação. *(verificação manual)*
@@ -271,25 +269,24 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 
 ---
 
-## Fora do escopo do MVP
+## Fora do escopo
 
 - Scan ativo (envio de ataques) e análise de código-fonte.
 - Bibliotecas de back-end: só o que chega ao navegador.
 - Outras fontes além de GitHub Advisory, OSV e NVD: CISA KEV, Exploit-DB, Vulners.
 - Integração com Azure DevOps ou GitLab: vincular a task e acompanhar no painel.
 - Base de falsos positivos por projeto (selo "FP conhecido" e pedido de inclusão).
-- Tour guiado e guia animado "Como usar": no MVP, README com prints.
+- Tour guiado e guia animado "Como usar": por enquanto, README com prints.
 - Execução automática na esteira com Playwright.
 - CI e Docker: o Rastro é instalado e verificado na máquina local.
 
 ## Planos futuros
 
-Ideias para depois do MVP. Não entram na nota nem no cronograma, mas o design deixa o caminho aberto.
+Ideias para as próximas versões. Não entram na nota nem no cronograma, mas o design deixa o caminho aberto.
 
 | Plano | Por quê | Ponto de extensão |
 |---|---|---|
-| **Mais fontes de dados:** OSV e NVD (se não couberem no MVP), CISA KEV (falhas exploradas de fato), Exploit-DB, Vulners | Confirmar exploração real e cobrir avisos que o GitHub ainda não tem | Um arquivo novo em `rastro/fontes/` que implementa `ConectorDeAvisos` (skill `rastro-nova-regra`) |
-| **Avaliar integrar o DefectDojo no SD** | Centralizar os achados do Rastro com os das outras ferramentas de segurança e acompanhar a correção num só lugar | O JSON do relatório já tem tudo; falta um exportador para o formato de importação do DefectDojo, em `rastro/relatorio/` |
+| **Mais fontes de dados:** CISA KEV (falhas exploradas de fato), Exploit-DB, Vulners | Confirmar exploração real e cobrir avisos que o GitHub ainda não tem | Um arquivo novo em `rastro/fontes/` que implementa `ConectorDeAvisos` (skill `rastro-nova-regra`) |
 | Vincular a task no Azure DevOps ou no GitLab e acompanhar no painel | Fechar o ciclo do achado à correção | Hoje a task sai como texto pronto para copiar |
 | Base de falsos positivos por projeto | Não repetir a mesma triagem a cada análise | Selo "FP conhecido", já desenhado no demo |
 | Rodar na esteira com Playwright | Analisar a cada pipeline, com o HAR gravado pelos testes E2E (`recordHar`) | A CLI já roda sem interação e com `--sem-ia` |

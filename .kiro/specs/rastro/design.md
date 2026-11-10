@@ -1,8 +1,6 @@
-# Design: Rastro MVP
+# Design: Rastro
 
 **Como.** Este arquivo diz como o Rastro atende o `requirements.md`: arquitetura, sequência, modelos, regras, erros e estratégia de testes. As regras de construção (SRP, nomes, Windows e Linux) estão no `.kiro/steering/` e não se repetem aqui.
-
-Itens marcados com **[spike]** dependem do spike e podem mudar antes de virar código.
 
 ## 1. Visão geral
 
@@ -29,15 +27,15 @@ flowchart LR
   R --> H[relatorio.html]
   I -. bundles .-> IA((IA))
   E -.-> IA
-  Q -.-> GH[(GitHub Advisory)]
+  Q -.-> GH[(GitHub Advisory, OSV, NVD)]
   T -.-> NPM[(registro do npm)]
 ```
 
 Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA vira dado do relatório sem passar por elas.
 
-- **Bordas** (entrada e saída): `cli.py`, `har/leitor.py`, `fontes/github_advisory.py`, `fontes/registro_npm.py`, `ia/`, `relatorio/`.
+- **Bordas** (entrada e saída): `cli.py`, `har/leitor.py`, `fontes/github_advisory.py`, `fontes/osv.py`, `fontes/nvd.py`, `fontes/registro_npm.py`, `ia/`, `relatorio/`.
 - **Núcleo puro** (regras, sem rede nem arquivo): `identificacao/assinaturas.py`, `travas/`, `risco/`, `configuracao/`, `acao/`.
-- **Três interfaces**, só onde há troca real: `ConectorDeAvisos` (fonte), `RegistroDePacotes` (npm) e `ProvedorDeIA` (Kiro, Claude, Codex). Nos testes, as três viram dublês sem rede.
+- **Quatro interfaces**, só onde há troca real: `ConectorDeAvisos` (GitHub Advisory e OSV), `BuscaDeCvss` (NVD), `RegistroDePacotes` (npm) e `ProvedorDeIA` (Kiro, Claude, Codex). Nos testes, as quatro viram dublês sem rede.
 
 ## 2. Estrutura
 
@@ -54,10 +52,11 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/identificacao/bundles.py` | escolhe bundles e extrai trechos | R03.1 |
 | `rastro/identificacao/ia.py` | pede à IA e valida a resposta | R03 |
 | `rastro/identificacao/modelos.py` | `Biblioteca`, `Evidencia` | R02.5 |
+| `rastro/travas/modelos.py` | `TravaAcionada` | R21.10 |
 | `rastro/fontes/conector.py` | interface `ConectorDeAvisos` | R04 |
 | `rastro/fontes/github_advisory.py` | consulta e converte a resposta | R04 |
 | `rastro/fontes/consulta.py` | consulta cada biblioteca no GitHub, depois no OSV e completa o CVSS pelo NVD | R04.3, R04A.6 |
-| `rastro/fontes/osv.py`, `nvd.py`, `juncao.py` | extensão opcional: OSV, CVSS do NVD e junção dos avisos | R04A |
+| `rastro/fontes/osv.py`, `nvd.py`, `juncao.py` | OSV, CVSS do NVD e junção dos avisos | R04A |
 | `rastro/fontes/registro_npm.py` | confere se `pacote@versão` existe e lê o pacote publicado em memória | R21.4, R21.5, R21.9 |
 | `rastro/travas/formato.py` | aceita só o JSON fechado da IA | R21.1 |
 | `rastro/travas/ancoragem.py` | trecho real e versão dentro do trecho | R21.2, R21.3 |
@@ -69,6 +68,7 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/risco/nota.py` | fórmula da nota | R05.1, R05.3, R05.4 |
 | `rastro/risco/prioridade.py` | faixas, nota da biblioteca e ordenação | R05.2, R05.5, R05.6, R05.7 |
 | `rastro/risco/achados.py` | um `Achado` por aviso, com a nota, em ordem | R05.1, R05.6 |
+| `rastro/configuracao/modelos.py` | `Checagem`, `RegraDeChecagem` | R06 |
 | `rastro/configuracao/checagens.py` | uma função por checagem | R06 |
 | `rastro/explicacao/modelos.py` | `Explicacao` | R07 |
 | `rastro/explicacao/ia.py` | pede explicação e teste de verificação | R07 |
@@ -81,35 +81,45 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/ia/prompts/*.md` | prompts versionados, com exemplo de entrada e saída | R03, R07 |
 | `rastro/relatorio/json.py` | monta o dicionário do relatório | R13.7 |
 | `rastro/relatorio/html.py` | embute o JSON no HTML do build | R13.5 |
+| `rastro/relatorio/modelo.html` | HTML do build do frontend, com a tag `dados` vazia | R13.5 |
 | `rastro/relatorio/gravacao.py` | monta a pasta da análise (aplicação, data e hora) e grava os dois arquivos sem sobrescrever | R13.1–R13.4, R17 |
 | `frontend/` | React: só exibe o JSON | R09.2, R10.2, R12, R13.5, R13.6, R22.4–R22.7 |
 
-**Diferenças em relação ao `structure.md`:** entram `acao/` (plano e task não cabem em `risco/`), `travas/`, `fontes/registro_npm.py`, `har/site.py`, `identificacao/bundles.py`, `ia/sanitizacao.py` e `relatorio/gravacao.py`. Se aprovadas, o steering é atualizado no mesmo commit.
+**Diferenças em relação ao `structure.md`:** entram `acao/` (plano e task não cabem em `risco/`), `travas/`, `fontes/registro_npm.py`, `har/site.py`, `identificacao/bundles.py`, `ia/sanitizacao.py` e `relatorio/gravacao.py`. O `structure.md` já traz essas pastas.
 
 ## 3. Sequência do fluxo
 
 `fluxo.py` lê como a apresentação:
 
 ```python
-def analisar(caminho_har: Path, fonte: ConectorDeAvisos, registro: RegistroDePacotes) -> Analise:
+def analisar(
+    caminho_har: Path,
+    fonte: ConectorDeAvisos,
+    registro: RegistroDePacotes,
+    ia: ClienteDeIA | None = None,
+    osv: ConectorDeAvisos | None = None,
+    nvd: BuscaDeCvss | None = None,
+) -> Analise:
     requisicoes = ler_har(caminho_har)
     site = descobrir_site_analisado(requisicoes)
-    bibliotecas = conferir_bibliotecas(identificar_por_assinatura(requisicoes), registro)
-    consultados = consultar_avisos(bibliotecas.confirmadas, fonte)
+    por_assinatura = identificar_por_assinatura(requisicoes)
+    em_bundles = identificar_em_bundles(requisicoes, por_assinatura, ia)
+    bibliotecas = conferir_bibliotecas(por_assinatura + em_bundles.bibliotecas, registro)
+    consultados = consultar_avisos(bibliotecas.confirmadas, fonte, osv, nvd)
     avisos_na_faixa, travas_da_faixa = conferir_faixas(consultados.avisos)
     achados = calcular_risco(avisos_na_faixa)
-    explicacoes: dict[str, Explicacao] = {}
+    explicados = explicar_achados(achados, ia)
     checagens = checar_configuracao(requisicoes, site)
-    plano = montar_plano_de_acao(achados, explicacoes, checagens)
-    return Analise(...)
+    plano = montar_plano_de_acao(achados, explicados.explicacoes, checagens)
+    return Analise(..., visita=montar_visita(requisicoes))
 ```
 
-Esse é o fluxo sem IA, ligado na T23. A IA entra depois sem mudar a ordem: a T33 acrescenta o parâmetro `ia: ClienteDeIA | None` (com `--sem-ia`, `None`), a T41 acrescenta `identificar_em_bundles(requisicoes, por_assinatura, ia)` (`identificacao/ia.py`), cujas bibliotecas entram em `conferir_bibliotecas` junto com as da assinatura, e a T38 troca o dicionário vazio por `explicar_achados(achados, ia)`.
+O fluxo sem IA foi ligado na T23; a IA entrou sem mudar a ordem: a T33 acrescentou `ia` (com `--sem-ia`, `None`), a T41 acrescentou `identificar_em_bundles` (`identificacao/ia.py`), cujas bibliotecas entram em `conferir_bibliotecas` junto com as da assinatura, e a T38 trocou o dicionário vazio por `explicar_achados(achados, ia)`. Sem IA, `identificar_em_bundles` não acha nada e `explicar_achados` devolve o dicionário vazio.
 
 - `consultar_avisos` (`fontes/consulta.py`) consulta a fonte para cada biblioteca confirmada; `ConsultaNaoRealizada` vira `nao_consultadas[pacote@versão] = motivo` e a análise segue (R04.3). Desde a T51, com `osv` e `nvd` (parâmetros opcionais de `analisar`; o `cli.py` passa `Osv()` e `Nvd()`), cada biblioteca respondida pelo GitHub passa por: OSV, `juntar_avisos` e `completar_cvss`, antes da trava 6 (ver R04A).
 - `conferir_faixas` aplica a trava 6 (`descartar_fora_da_faixa`) biblioteca por biblioteca; `calcular_risco` (`risco/achados.py`) monta um `Achado` por aviso mantido, com `calcular_nota`, e devolve a lista em `ordenar_achados`.
 - `checar_configuracao(requisicoes, site)`, em `checagens.py`, roda a tupla `CHECAGENS` na ordem dos IDs (C01 a C08).
-- `Analise` (em `fluxo.py`): `har` (nome do arquivo), `site`, `inicio` (hora local), `duracao_s`, `provedor_de_ia: str | None`, `tem_javascript` (R01.6), `bibliotecas` (confirmadas), `a_confirmar`, `nao_consultadas: dict[str, str]`, `fontes_sem_resposta: list[FonteSemResposta]` (T51), `achados`, `explicacoes`, `checagens`, `plano_de_acao`, `travas_acionadas` (as da identificação em bundles, as do npm, as da faixa e as da explicação) e `chamadas_de_ia` (as `ChamadaIA` do cliente; vazia sem IA, T39).
+- `Analise` (em `fluxo.py`): `har` (nome do arquivo), `site`, `inicio` (hora local), `duracao_s`, `provedor_de_ia: str | None`, `tem_javascript` (R01.6), `bibliotecas` (confirmadas), `a_confirmar`, `nao_consultadas: dict[str, str]`, `fontes_sem_resposta: list[FonteSemResposta]` (T51), `achados`, `explicacoes`, `checagens`, `plano_de_acao`, `travas_acionadas` (as da identificação em bundles, as do npm, as da faixa e as da explicação), `chamadas_de_ia` (as `ChamadaIA` do cliente; vazia sem IA, T39) e `visita: list[PassoDaVisita]` (T54).
 - O `cli.py` monta o relatório (`relatorio/json.py`), escolhe a pasta pelo site e por `analise.inicio` e grava (`relatorio/gravacao.py`). Sem `--sem-ia`, escolhe a IA e procura a CLI dela (código 1 se a IA for inválida ou a CLI faltar, T33) e, desde a T52, monta o `ClienteDeIA` com o provedor e o passa ao `fluxo.analisar`.
 
 ### Análise sem IA fica explícita (R14.5–R14.7)
@@ -147,7 +157,7 @@ Com IA, chamada que falha também é limitação: `ia_falhou_identificacao` (bun
 | `Checagem` | `id`, `titulo`, `situacao: "falhou" \| "passou" \| "nao_verificada"`, `severidade: "alta" \| "media" \| "baixa"`, `quem_resolve`, `evidencia: Evidencia \| None`, `detalhe` |
 | `Explicacao` | `o_que_e`, `impacto`, `como_corrigir`, `teste_verificacao`, `gerada_por_ia: bool` |
 | `Acao` | `id`, `prioridade`, `nota`, `o_que_fazer`, `porque`, `impacto`, `quem_resolve`, `refs: list[str]` (GHSA dos achados ou ID da checagem), `teste_verificacao: str \| None` (só o sugerido pela IA), `texto_task` |
-| `PassoDaVisita` | `indice_requisicao`, `url`, `camada: "pagina" \| "script" \| "estilo" \| "dados" \| "midia"`, `inicio_ms` (desde a primeira requisição), `duracao_ms` |
+| `PassoDaVisita` | `indice_requisicao`, `url`, `camada: "pagina" \| "script" \| "estilo" \| "dados" \| "midia"`, `inicio_ms` (desde a primeira requisição), `duracao_ms` (0 quando o HAR não traz `time`) |
 | `ChamadaIA` | `etapa`, `provedor`, `entrada`, `resposta`, `duracao_s`, `tokens: int \| None`, `sucesso: bool` |
 
 A `situacao` sai só das travas; a IA não tem campo de confiança que decida algo. O campo `Nota.conta` guarda a conta escrita, ex.: `10 × (0,5 × 6,1/10 + 0,5 × 0,97) = 7,9`, que o painel de origem mostra (R10.1).
@@ -202,7 +212,7 @@ Bibliotecas iguais são agrupadas por `(pacote, versao)`, juntando as evidência
 4. **Resposta fechada:** JSON `{"bibliotecas": [{"pacote", "versao", "trecho"}]}`, nada além disso. Nome de pacote npm inválido ou versão fora do formato `x.y.z` derrubam a resposta inteira.
 5. **Travas:** cada biblioteca passa pelas travas da seção 8 antes de ser usada. Em `identificacao/ia.py`, a resposta passa pela trava 1 (`conferir_formato`, com a mesma tolerância da explicação: a resposta inteira dentro de **um** bloco de código, como o Kiro responde) e cada biblioteca pelas travas 2 e 3 (`conferir_ancoragem`, contra os trechos já sanitizados que foram enviados). Em `travas/conferencia.py`, a biblioteca já barrada segue "a confirmar" sem consultar o npm; as outras passam pela trava 4 e, se vieram da IA, pela 5. A 6 vale para os avisos, como nas da assinatura.
 6. **Uma chamada por bundle**, com no máximo 5 trechos. Bundles com o mesmo conteúdo vão uma vez só; bundle sem trecho não chama a IA. Falha da chamada ou resposta fora do formato num bundle não impede os outros (R03.5).
-7. **Sem repetição:** biblioteca já reconhecida por assinatura ou em outro bundle (mesmo `pacote@versão`) não entra de novo; vale a primeira evidência.
+7. **Sem repetição:** biblioteca já reconhecida por assinatura ou em outro bundle (mesmo `pacote@versão`) não entra de novo; vale a primeira evidência, mas uma sugestão confirmada substitui outra igual que ficou "a confirmar" num bundle anterior.
 8. **Conferido de verdade (T41, 09/11, Kiro):** no Juice Shop, `@angular/core@22.2.2` foi confirmada pela IA e pelas travas 1 a 5 com o npm real; no WebGoat, as sugestões `jquery-ui@1.10.3` (não publicado) e `jquery-form@3.51.0` (versão fora do trecho) ficaram "a confirmar"; no Drupal, nenhum script sem assinatura teve trecho para enviar e a IA não foi chamada para identificar.
 
 ## 7. Consultar o GitHub Advisory (R04)
@@ -230,9 +240,9 @@ Formato conferido no spike T01 (`docs/spike/github-advisory.md`).
 - Erro de rede, HTTP 403/429 ou 5xx → biblioteca "não consultada" com o motivo (R04.3). A análise continua.
 - `ConectorDeAvisos.consultar(pacote, versao) -> list[Aviso]`, em `fontes/conector.py`, junto com o `Aviso` e a exceção `ConsultaNaoRealizada(motivo)`. A falha (rede, tempo esgotado, HTTP de erro, resposta que não é JSON ou fora do formato) vira essa exceção com o motivo pronto; o fluxo a captura e marca a biblioteca como "não consultada" (R04.3). Nos testes, `ConectorFalso` devolve avisos fixos.
 
-### OSV e NVD, extensão opcional (R04A)
+### OSV e NVD (R04A)
 
-Entram só se as fases 1 e 2 fecharem no prazo (tasks T49 a T51, prazo limite 02/12).
+Planejados como extensão, só se as fases 1 e 2 fechassem no prazo; entraram nas tasks T49 a T51.
 
 | Fonte | Consulta | O que acrescenta |
 |---|---|---|
@@ -242,11 +252,11 @@ Entram só se as fases 1 e 2 fecharem no prazo (tasks T49 a T51, prazo limite 02
 - **Arquivos:** `fontes/osv.py` implementa `ConectorDeAvisos`. `fontes/nvd.py` não busca avisos, só completa o CVSS de um CVE, então não usa a interface. `fontes/juncao.py` (puro) junta avisos iguais por ID e apelidos e aplica a ordem fixa de fontes de R04A.4.
 - **Faixa de versão do OSV:** vem como eventos `introduced` e `fixed` do tipo `SEMVER`. `faixa_de_versao.py` ganha a leitura desse formato; a trava 6 vale igual. `faixas_dos_eventos_semver` percorre os eventos na ordem e escreve cada par no formato do GitHub: `introduced` vira `>= x` (`0` não vira condição), `fixed` vira `< y` e é a versão corrigida, `last_affected` vira `<= y` sem versão corrigida, e `introduced` sem fim vira faixa aberta (`>= x`, ou `>= 0`). Um `Aviso` por par. Eventos `limit` e faixas `ECOSYSTEM` ou `GIT` são ignorados. Conferido na API real (T49, 09/11, `jquery@3.4.1`).
 - **Campos do OSV (T49):** só os itens de `affected` com `package.ecosystem == "npm"` e `package.name == pacote`; item sem faixa `SEMVER` (só lista de `versions`) sai com faixa vazia, e a trava 6 o descarta com o motivo. O identificador do `Aviso` é o GHSA, venha ele no `id` ou nos `aliases`; sem GHSA, o `id` do OSV (ex.: `MAL-…`). Os outros identificadores viram `apelidos`; o CVE é o primeiro `CVE-` entre eles. `resumo` é `summary`, senão `details`. `cvss` e `percentil_epss` ficam vazios: o OSV traz só o vetor CVSS, sem a nota, e a ordem de R04A.4 tira o CVSS do GitHub e do NVD. `link` é `https://osv.dev/vulnerability/<id>`. Aviso com `withdrawn` preenchido é descartado, como no GitHub (R04.6). Falhas viram `ConsultaNaoRealizada` com os mesmos motivos do GitHub (o OSV não tem limite por 403).
-- **Campos do NVD (T50):** `fontes/nvd.py` tem `Nvd.buscar_cvss(cve) -> float | None` (atrás do protocolo `BuscaDeCvss`, para o dublê) e a função `completar_cvss(avisos, nvd) -> CvssCompletado(avisos, nao_responderam)`. Só aviso com CVE e sem CVSS é consultado, uma vez por CVE, mesmo que o CVE apareça em vários avisos. O CVSS é o `baseScore` de `metrics`, na ordem `cvssMetricV31`, `cvssMetricV30`, `cvssMetricV40` (v3 antes do v4, como no GitHub); dentro da lista, a medição `type: "Primary"` (a análise do próprio NVD), senão a primeira. O CVSS v2 é ignorado. Aviso completado ganha `"NVD"` no fim de `fontes`. CVE que o NVD não conhece (`vulnerabilities` vazio) ou sem métrica v3/v4 deixa o aviso como estava ("sem nota", R05.4). Com `NVD_API_KEY`, vai no cabeçalho `apiKey`; vazia conta como ausente. Falha do NVD (mesmos motivos do GitHub; 404 é CVE com formato inválido) não para nada: o aviso segue sem CVSS e o CVE vai para `nao_responderam` com o motivo (R04A.6). Ligado ao fluxo e ao relatório na T51. Conferido na API real (T50, 09/11, `CVE-2020-11022`: Primary 6.1, Secondary do GitHub 6.9).
+- **Campos do NVD (T50):** `fontes/nvd.py` tem `Nvd.buscar_cvss(cve) -> float | None` (atrás do protocolo `BuscaDeCvss`, para o dublê) e a função `completar_cvss(avisos, nvd) -> CvssCompletado(avisos, nao_responderam)`. Só aviso com CVE e sem CVSS é consultado, uma vez por CVE em cada biblioteca, mesmo que o CVE apareça em vários avisos dela. O CVSS é o `baseScore` de `metrics`, na ordem `cvssMetricV31`, `cvssMetricV30`, `cvssMetricV40` (v3 antes do v4, como no GitHub); dentro da lista, a medição `type: "Primary"` (a análise do próprio NVD), senão a primeira. O CVSS v2 é ignorado. Aviso completado ganha `"NVD"` no fim de `fontes`. CVE que o NVD não conhece (`vulnerabilities` vazio) ou sem métrica v3/v4 deixa o aviso como estava ("sem nota", R05.4). Com `NVD_API_KEY`, vai no cabeçalho `apiKey`; vazia conta como ausente. Falha do NVD (mesmos motivos do GitHub; 404 é CVE com formato inválido) não para nada: o aviso segue sem CVSS e o CVE vai para `nao_responderam` com o motivo (R04A.6). Ligado ao fluxo e ao relatório na T51. Conferido na API real (T50, 09/11, `CVE-2020-11022`: Primary 6.1, Secondary do GitHub 6.9).
 - **Junção (T51):** `fontes/juncao.py` (puro), `juntar_avisos(avisos) -> list[Aviso]`. Dois avisos são iguais quando o ID (`ghsa`) ou algum apelido de um aparece no outro (GHSA, CVE, ID do OSV). Cada grupo vira um aviso por faixa da fonte mais alta na ordem `ORDEM_DAS_FONTES` (GitHub Advisory, OSV, NVD): faixa, versão corrigida e link andam juntos, do mesmo item dessa fonte, porque a versão corrigida só vale para a sua faixa e a trava 6 escolhe a faixa depois (um GHSA do GitHub com duas faixas segue com duas). `cve`, `resumo`, `cvss` e `percentil_epss` vêm da primeira fonte, na ordem, que traz o campo; como o OSV não traz CVSS nem EPSS, o CVSS fica com GitHub e depois NVD e o EPSS só com o GitHub (R04A.4). `fontes` junta as de todo o grupo, sem repetir, na ordem; `apelidos` junta todos os identificadores menos o `ghsa`. Aviso de uma fonte só sai como veio. Conferido com as respostas gravadas do `jquery@3.4.1`: o GitHub diz `>= 1.2, < 3.5.0` e o OSV `>= 1.12.0, < 3.5.0` para o GHSA-gxr4-xjj5-5px2; vale a do GitHub.
 - **Origem de cada campo (R04A.5):** cada conector chama `marcar_origem(aviso, NOME_DA_FONTE)` (`conector.py`), que preenche `origem_dos_campos` para os campos de `CAMPOS_COM_ORIGEM` que vieram preenchidos; a junção leva a origem de quem forneceu cada campo e o NVD grava `"cvss": "NVD"` ao completar. O JSON leva o dicionário no aviso de cada achado; o `PainelOrigemDoDado` (etapa 3, "Aviso nas fontes") mostra a linha "Fontes" e, ao lado de cada campo, a fonte dele.
 - **Ordem no fluxo (T51):** GitHub; se respondeu, OSV; `juntar_avisos`; `completar_cvss` (só o aviso junto que ficou sem CVSS); trava 6. Sem resposta do GitHub, a biblioteca é "não consultada" (R04.3) e o OSV nem é consultado. Falha do OSV (por biblioteca) ou do NVD (por CVE) vira `FonteSemResposta` em `Analise.fontes_sem_resposta`, e o relatório ganha uma limitação por fonte em `analise.limitacoes` (`fonte_sem_resposta_osv`, `fonte_sem_resposta_nvd`), com cada alvo, o motivo e a consequência ("Esses avisos vêm só do GitHub Advisory." ou "Esses avisos seguem sem o CVSS do NVD."). A faixa de limitações já existente (`AvisoSemIA`) mostra o texto com o ícone padrão (R04A.6).
-- **Limites:** o OSV não exige chave. O NVD sem chave aceita poucas requisições por minuto, então só é chamado para CVE sem CVSS, uma vez por CVE. **[spike]**
+- **Limites:** o OSV não exige chave. O NVD sem chave aceita poucas requisições por minuto, então só é chamado para CVE sem CVSS, uma vez por CVE em cada biblioteca. Conferido na API real na T50.
 - Falha de OSV ou NVD não para a análise: o relatório lista as fontes consultadas e as que não responderam.
 
 ## 8. Travas contra invenção (R21)
@@ -313,7 +323,7 @@ No spike, esse critério passou o acerto da IA (`@angular/core@22.2.2`) e barrou
 ### Formato fechado
 
 - `conferir_formato(resposta)` devolve as `BibliotecaSugerida` (`pacote`, `versao`, `trecho`) e, se a resposta cair, nenhuma biblioteca e uma `TravaAcionada` (alvo `resposta da IA`) com o motivo.
-- Só espaços em volta são aceitos. Texto antes ou depois do JSON, cerca de código (` ```json `) e dois JSONs seguidos são "texto fora do JSON". Campo a mais, faltando ou repetido, valor que não é texto, nome de pacote npm inválido, versão fora de `x.y.z` (pré-lançamento como `-rc.1` vale; `v` na frente e faixa como `^1.2.3` não) e trecho vazio derrubam a resposta inteira.
+- Só espaços em volta são aceitos. Texto antes ou depois do JSON, cerca de código (` ```json `) e dois JSONs seguidos são "texto fora do JSON" (quem chama já tirou a cerca única com `tirar_cerca_de_codigo`). Campo a mais, faltando ou repetido, valor que não é texto, nome de pacote npm inválido, versão fora de `x.y.z` (pré-lançamento como `-rc.1` vale; `v` na frente e faixa como `^1.2.3` não) e trecho vazio derrubam a resposta inteira.
 - Lista vazia é resposta válida: a IA não achou nada.
 
 ### Trecho real e ancoragem
@@ -377,7 +387,7 @@ Só as respostas do site analisado. Cada checagem é uma função pura `(requisi
 - Resposta HTML é a de `e_pagina_html` (`text/html`, sem redirecionamento) do host do site analisado. Passou: a evidência é a primeira resposta conferida. Sem nenhuma resposta HTML do site, a checagem fica "não verificada", sem evidência.
 - C02 só confere as respostas em HTTPS; site só em HTTP deixa a C02 "não verificada" (HSTS não se aplica), e não aprovada.
 - C04 aceita `frame-ancestors` como diretiva da CSP (separada por `;` ou `,`), não como texto em outro valor.
-- C05 procura versão no padrão `\d+\.\d+` ou `/` seguido de dígito (`PHP/7.3.12`, `nginx/1`); o trecho da evidência é o cabeçalho, ex.: `x-powered-by: PHP/7.3.12`.
+- C05 procura versão no padrão `\d+\.\d+` ou `/` seguido de dígito, com `v` opcional (`PHP/7.3.12`, `nginx/1`, `/v1`); o trecho da evidência é o cabeçalho, ex.: `x-powered-by: PHP/7.3.12`.
 - Severidade e quem resolve ficam numa `RegraDeChecagem` fixa por ID, em `checagens.py`.
 - A tupla `CHECAGENS`, em `checagens.py`, lista as funções na ordem dos IDs; `checar_configuracao(requisicoes, site)` roda todas e é o que o fluxo chama. Checagem nova entra na tupla.
 - C06 a C08 viram "não verificada" quando não há nenhum cookie do site (R06.7), com o detalhe dizendo que o HAR completo inclui essas checagens.
@@ -405,10 +415,10 @@ Decidido na T33:
 
 - `rastro/ia/cliente.py` traz `RespostaDoProvedor` (`texto`, `tokens: int | None`), `FalhaDoProvedor(motivo)`, `ProvedorDeIA`, `ChamadaIA` e `ClienteDeIA`. O provedor transforma toda falha (código de saída, tempo limite, `is_error`, resposta sem texto) em `FalhaDoProvedor`; o cliente não captura outra exceção.
 - `ClienteDeIA.chamadas` guarda as `ChamadaIA` na ordem. Na falha, `resposta` traz o motivo, `tokens` fica `None` e `sucesso`, `False`. `duracao_s` tem uma casa, como a da análise.
-- Tokens que o provedor não informa ficam `None`, nunca estimados (R11.2); o "não informado" é do painel (T39). A sanitização entra no `perguntar` na T34.
+- Tokens que o provedor não informa ficam `None`, nunca estimados (R11.2); o "não informado" é do painel (T39). A sanitização do `perguntar` veio na T34.
 - Escolha (R14.1–R14.3): `escolher_ia(opcao_ia, variavel_de_ambiente)` é pura: `--ia`, senão `RASTRO_IA` (vazia conta como ausente), senão `kiro`; aceita maiúsculas e espaços em volta. Nome fora de `EXECUTAVEIS_DAS_IAS` levanta `IaInvalida`, com a origem (`--ia` ou `RASTRO_IA`) e as opções. `localizar_cli(nome)` procura o executável da tabela com `shutil.which` e levanta `CliDaIaAusente` com o nome do executável. As duas são filhas de `ErroNaEscolhaDaIa`.
 - `--ia` não usa `choices` do `argparse`, que encerraria com código 2; a validação é do Rastro, com código 1. Com `--sem-ia`, `--ia` e `RASTRO_IA` são ignorados e nenhuma CLI é procurada.
-- Com IA válida e CLI instalada, o `cli.py` monta o `ClienteDeIA` e analisa com ele (T52; antes dela, encerrava com código 1 e sugeria `--sem-ia`). `fluxo.analisar` recebe `ia: ClienteDeIA | None = None` e preenche `provedor_de_ia` com o nome do provedor (R14.8). As chamadas entram no JSON (`ia.chamadas`) na T39.
+- Com IA válida e CLI instalada, o `cli.py` monta o `ClienteDeIA` e analisa com ele (T52; antes dela, encerrava com código 1 e sugeria `--sem-ia`). `fluxo.analisar` recebe `ia: ClienteDeIA | None = None` e preenche `provedor_de_ia` com o nome do provedor (R14.8). As chamadas entraram no JSON (`ia.chamadas`) na T39.
 
 ### Provedores
 
@@ -443,7 +453,7 @@ Decidido na T36:
 Decidido na T37:
 
 - Kiro: o texto da resposta é a saída padrão inteira, sem os espaços e quebras de linha em volta. Saída vazia (ou só espaços) vira `FalhaDoProvedor`, mesmo com código de saída 0.
-- Kiro: a resposta pode vir dentro de um bloco de código (` ```json ... ``` `), como na resposta gravada em `tests/dados/kiro-resposta.txt` (kiro-cli 2.31.1, 09/11). O provedor não tira o bloco: achar o objeto JSON no texto é do cliente, igual para os três provedores.
+- Kiro: a resposta pode vir dentro de um bloco de código (` ```json ... ``` `), como na resposta gravada em `tests/dados/kiro-resposta.txt` (kiro-cli 2.31.1, 09/11). O provedor não tira o bloco: quem tira é a trava de formato (`tirar_cerca_de_codigo`, em `travas/formato.py`), igual para os três provedores.
 - Kiro: `tokens` é sempre `None` (R11.2). O `--output-format stream-json` também não traz tokens, só créditos; por isso o Rastro lê o texto puro.
 
 Decidido na T52:
@@ -460,7 +470,7 @@ Em `rastro/ia/prompts/`, um arquivo por tarefa, iguais para os três provedores:
 - `identificar_bibliotecas.md`: recebe trechos e devolve o JSON da seção 6.
 - `explicar_achado.md`: recebe pacote, versão, avisos e URL; devolve `{"o_que_e", "impacto", "como_corrigir", "teste_verificacao"}`.
 
-Cada prompt pede **só JSON**, em português simples, e traz um exemplo de entrada e saída. A resposta é lida pelo primeiro objeto JSON do texto e validada campo a campo.
+Cada prompt pede **só JSON**, em português simples, e traz um exemplo de entrada e saída. A resposta passa pela trava de formato (`travas/formato.py`): só o JSON, ou o JSON inteiro dentro de um único bloco de código, validado campo a campo.
 
 Decidido na T38:
 
@@ -551,7 +561,7 @@ Toda contagem que a tela mostra já vem no `resumo`. O React não calcula nada (
 2. Esse arquivo vai para o pacote Python como `rastro/relatorio/modelo.html` e é **versionado**, para quem usa precisar só de Python (R20.2). Mudou o frontend, o build é refeito e o `modelo.html` entra no mesmo commit.
 3. `html.py` (`montar_html(modelo, relatorio)`, pura; `ler_modelo()` lê o `modelo.html` com `importlib.resources`) põe o JSON dentro de `<script id="dados" type="application/json"></script>`, trocando todo `<` por `\u003c`. Ainda é JSON válido (o `<` só aparece dentro de texto) e nenhum `</script>` ou `<!--` dos dados chega ao HTML. Escapar só `</` deixaria `<!--<script>` mudar o estado do analisador do navegador e engolir o fechamento da tag. Modelo sem a tag, ou com ela repetida, é recusado (`ModeloSemTagDosDados`). Decidido na T25.
 4. **Favicon e logo** vêm de `frontend/src/assets/` (cópia do logo da identidade visual). O Vite não embute `<link rel="icon">`, então o `vite.config.ts` troca o caminho do favicon pelo SVG em `data:` (plugin `embutirFavicon`).
-5. Sem requisição externa (R13.5): as fontes IBM Plex vão **embutidas** em woff2, só o subconjunto latin e os pesos usados no relatório (Sans 400, 500 e 600; Condensed 500 e 600; Mono 400 e 500), copiadas do `@fontsource` 5.3.0 para `frontend/src/assets/fontes/` com a licença OFL ao lado, sem virar dependência. São ~141 KB de fonte, e o `index.html` vazio fica com ~413 KB (~225 KB sem as fontes). Se faltar uma letra, cai para a fonte do sistema. Decidido na T24.
+5. Sem requisição externa (R13.5): as fontes IBM Plex vão **embutidas** em woff2, só o subconjunto latin e os pesos usados no relatório (Sans 400, 500 e 600; Condensed 500 e 600; Mono 400 e 500), copiadas do `@fontsource` 5.3.0 para `frontend/src/assets/fontes/` com a licença OFL ao lado, sem virar dependência. São ~141 KB de fonte, e o `index.html` vazio fica com ~494 KB (~354 KB sem as fontes). Se faltar uma letra, cai para a fonte do sistema. Decidido na T24.
 6. O `index.html` traz a tag `dados` vazia antes da raiz do React; `src/dados.ts` (`lerRelatorio`) lê e converte o JSON. Tag vazia ou JSON inválido mostra o aviso de que o arquivo não traz dados de uma análise.
 
 ### Gravação
@@ -576,17 +586,17 @@ Toda contagem que a tela mostra já vem no `resumo`. O React não calcula nada (
 
 ### Frontend
 
-Componentes do MVP (padrões em `.kiro/steering/frontend-react.md`):
+Componentes do relatório (padrões em `.kiro/steering/frontend-react.md`):
 
 | Zona | Componentes |
 |---|---|
 | Estrutura | `BarraSuperior`, `CabecalhoAnalise` |
 | Indicadores | `Indicadores` → `Indicador` (risco do site, bibliotecas vulneráveis, encontradas só pela IA, primeira ação) |
-| Rastreado | `GraficoDispersao` (CVSS × EPSS), `PainelIA` → `ChamadaDaIA`. O `PainelIA` vem depois dos `Indicadores`: sem IA (`analise.ia` nulo), "IA desligada nesta análise", sem tabela nem chamadas; com IA, a tabela "Só por assinatura × Com a IA" (bibliotecas e falhas, de `com_e_sem_ia`), o provedor, o número de chamadas e o `tokens_total`, e uma `ChamadaDaIA` recolhida por chamada (etapa, "Respondeu" ou "Falhou", tempo, tokens; aberta, a entrada enviada e a resposta ou o motivo da falha). Tokens nulos aparecem como "não informado" (`formatarTokens`). As travas acionadas aparecem sempre, com ou sem IA: trava, "Barrou" (`alvo`) e "Por quê" (`motivo`). Decidido na T39. |
+| Rastreado | `ReplayDaVisita` → `RadarDaVisita` (R22), `PainelIA` → `ChamadaDaIA`. O `PainelIA` vem depois dos `Indicadores`: sem IA (`analise.ia` nulo), "IA desligada nesta análise", sem tabela nem chamadas; com IA, a tabela "Só por assinatura × Com a IA" (bibliotecas e falhas, de `com_e_sem_ia`), o provedor, o número de chamadas e o `tokens_total`, e uma `ChamadaDaIA` recolhida por chamada (etapa, "Respondeu" ou "Falhou", tempo, tokens; aberta, a entrada enviada e a resposta ou o motivo da falha). Tokens nulos aparecem como "não informado" (`formatarTokens`). As travas acionadas aparecem sempre, com ou sem IA: trava, "Barrou" (`alvo`) e "Por quê" (`motivo`). Decidido na T39. |
 | Agir | `PlanoDeAcao` → `Acao`, `ModalTask`. Cada ação tem o botão "Abrir task"; o `App` guarda a ação aberta (`null` fechado) e mostra o `ModalTask`: `<dialog>` modal centrado (Esc ou clique fora fecha e o foco volta ao botão), com `texto_task` numa caixa só de leitura e o botão "Copiar task", que já recebe o foco. A cópia usa `navigator.clipboard.writeText(texto_task)`, o texto do JSON sem nenhuma mudança; sem permissão, seleciona o texto e pede Ctrl + C. Copiado aparece com ícone e texto. Decidido na T31. |
 | Detalhes | `ListaBibliotecas` → `LinhaBiblioteca` → `ExplicacaoIA` (só quando `explicacao` vem preenchida: com `gerada_por_ia`, o bloco violeta com o que é, impacto, como corrigir e o teste com "Sugerido pela IA: confira antes de usar"; sem, o selo "Sem explicação da IA" e o resumo do aviso; T39), `Evidencias`, `ListaFalhas` → `ItemFalha`; `ListaAConfirmar` → `ItemAConfirmar`; `ListaChecagens` → `ItemChecagem`. Biblioteca e checagem abrem recolhidas (`<details>`). Os selos saem direto do estado no JSON: "sem EPSS" (`nota.sem_epss`), "não consultada" (`motivo_nao_consultada`), "não conferida no npm" (`conferida_no_npm` nulo), "não verificada" (`situacao`). A lista "a confirmar" fica aberta, com a trava que falhou, o motivo (de `ia.travas_acionadas`, pelo `alvo`) e como confirmar à mão: um texto fixo por nome de trava em `ItemAConfirmar.tsx`. A ordem das bibliotecas e das falhas é a do JSON. Decidido na T28. |
 | Sob demanda | `PainelOrigemDoDado` → `EtapaDaOrigem`: painel lateral (`<dialog>` modal, Esc ou clique fora fecha e o foco volta ao botão) com quatro etapas numeradas: no HAR (`log.entries[i]` e URL de cada evidência), identificação (método, `pacote@versão`, registro do npm, trecho), aviso (GHSA com link, CVE, versões afetadas, corrigida em, CVSS, percentil EPSS, ou o motivo de não ter consultado) e cálculo (`nota.conta` como veio do JSON, com a prioridade). Abre pelo botão "Ver a origem" no corpo da biblioteca (todas as falhas dela) ou pela nota de cada falha (só aquela falha). O `App` guarda a origem aberta (`OrigemDoDado`, `null` fechado). Decidido na T29. |
-| Avisos | `AvisoSemIA`: faixa no topo sempre que `analise.limitacoes` vier preenchido, presa junto da `BarraSuperior` ao rolar; lista cada limitação com o ícone do seu `id` e, quando `analise.ia` é `null`, o título "Análise sem IA", o `continua_igual` e o comando para rodar com IA. Com IA e só `sem_javascript`, a mesma faixa diz "Análise incompleta". Recolhível (`<details>`, aberta por padrão), para não tomar a tela em 400px. Decidido na T27. |
+| Avisos | `AvisoSemIA`: faixa no topo sempre que `analise.limitacoes` vier preenchido, presa junto da `BarraSuperior` ao rolar; lista cada limitação com o ícone do seu `id` e, quando `analise.ia` é `null`, o título "Análise sem IA: o resultado está incompleto.", o `continua_igual` e o comando para rodar com IA. Com IA, qualquer limitação (`sem_javascript`, `ia_falhou_*`, `fonte_sem_resposta_*`) leva o título "Análise incompleta.". Recolhível (`<details>`, aberta por padrão), para não tomar a tela em 400px. Decidido na T27. |
 | Apoio | `Termo` + `Dica`, `Selo` (e `SeloDePrioridade`, `SeloDoMetodo`), `Icone`; `formato.ts` só formata número, data e plural em pt-BR. Glossário (R12): termos e definições só em `dados/glossario.ts`; `<Termo nome="EPSS">` marca o termo no texto fixo da tela (o nome é checado pelo TypeScript). O `Termo` é focável e abre a `Dica` com o mouse em cima, com o foco do teclado ou com o toque (o toque dá foco; tocar fora fecha); Esc fecha. A `Dica` é um `popover="manual"` nativo (camada de cima: aparece também sobre o `PainelOrigemDoDado`), ligada ao termo por `aria-describedby` e posicionada junto dele. Texto que vem do JSON não é marcado. Decidido na T30. |
 | Modo foco | `BarraDeFoco`, e `Zona`: o invólucro de cada zona, com o nome e o botão "Focar". As zonas e os nomes ficam em `dados/zonas.ts`. Decidido na T32. |
 
@@ -599,7 +609,7 @@ Componentes do MVP (padrões em `.kiro/steering/frontend-react.md`):
 - Esc sai do foco. Ao sair, a página rola até a zona que estava em foco.
 - Painéis e modais (`PainelOrigemDoDado`, `ModalTask`, `Dica`) ficam fora das zonas, então funcionam igual. O `AvisoSemIA` aparece em versão compacta, numa linha.
 - Nenhum componente de zona sabe que está em foco. Só o `App` decide o que mostrar, o que mantém a regra de que eventos sobem por props.
-- Decidido na T32: o `App` embrulha cada zona numa `Zona` (nome + "Focar"); em foco, a `Zona` vem sem o cabeçalho e o `CabecalhoAnalise` sai de vista. As zonas mantêm a `key`, então o que estava aberto (`<details>`) continua aberto ao entrar e sair do foco. Ao entrar, o foco do teclado vai para a zona atual na `BarraDeFoco`; ao sair, para o "Focar" da zona, e a página rola até ela descontando o topo fixo. Esc não sai do foco com um `<dialog>` aberto ou quando a `Dica` já tratou o Esc (`defaultPrevented`). O `AvisoSemIA` recebe `recolhido` e fica na linha do título, com "Ver o que falta". A zona Rastreado traz os `Indicadores` e o `PainelIA` (T39); o `GraficoDispersao` ainda não tem task.
+- Decidido na T32: o `App` embrulha cada zona numa `Zona` (nome + "Focar"); em foco, a `Zona` vem sem o cabeçalho e o `CabecalhoAnalise` sai de vista. As zonas mantêm a `key`, então o que estava aberto (`<details>`) continua aberto ao entrar e sair do foco. Ao entrar, o foco do teclado vai para a zona atual na `BarraDeFoco`; ao sair, para o "Focar" da zona, e a página rola até ela descontando o topo fixo. Esc não sai do foco com um `<dialog>` aberto ou quando a `Dica` já tratou o Esc (`defaultPrevented`). O `AvisoSemIA` recebe `recolhido` e fica na linha do título, com "Ver o que falta". A zona Rastreado traz os `Indicadores` e o `PainelIA` (T39).
 
 **Replay da visita (R22).** Na zona Rastreado, antes dos `Indicadores`, só quando `visita` tem passos.
 
@@ -612,7 +622,7 @@ Componentes do MVP (padrões em `.kiro/steering/frontend-react.md`):
 - A partir de 900px, a altura do radar vai até a dobra (`usarAlturaAteADobra`, que mede de novo quando a página muda de tamanho), também em foco.
 - É a única animação contínua do relatório, e só enquanto o replay toca.
 
-Ficam fora do MVP: `Tour`, `GuiaComoUsar`, `ModalPedidoFalsoPositivo`, `PainelBaseFalsosPositivos` e o vínculo de task.
+Ficam de fora: `GraficoDispersao` (CVSS × EPSS), `Tour`, `GuiaComoUsar`, `ModalPedidoFalsoPositivo`, `PainelBaseFalsosPositivos` e o vínculo de task.
 
 ## 14. Erros
 
@@ -622,7 +632,7 @@ Ficam fora do MVP: `Tour`, `GuiaComoUsar`, `ModalPedidoFalsoPositivo`, `PainelBa
 | HAR inválido | "o arquivo não é um HAR válido" | código 1 |
 | `--ia` inválida | lista as opções | código 1 |
 | CLI da IA ausente | diz qual faltou e sugere `--sem-ia`, com o que se perde | código 1, antes de ler o HAR |
-| Relatório já existe | diz qual arquivo; não grava nenhum | código 1 |
+| Relatório já existe | diz qual pasta; não grava nenhum arquivo | código 1 |
 | Sem rede ou limite no GitHub | biblioteca "não consultada", com motivo | segue; código 0 |
 | Registro do npm não responde | assinatura: selo "não conferida no npm"; IA: "a confirmar" | segue; código 0 |
 | IA falha ou responde fora do formato | registra no painel da IA; segue sem aquele dado | segue; código 0 |

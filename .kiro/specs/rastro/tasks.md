@@ -1,4 +1,4 @@
-# Tasks: Rastro MVP
+# Tasks: Rastro
 
 **Em que passos.** Tasks pequenas e ordenadas, que o agente executa uma a uma. Cada task:
 
@@ -15,7 +15,7 @@ Ordem: spike → núcleo determinístico → relatório HTML → explicação po
 | 0. Preparar | 09–13/11 | T01–T07 |
 | 1. Núcleo determinístico | 16–25/11 | T08–T23 |
 | 2. Relatório HTML | 23–28/11 | T24–T32, T54 |
-| 3. IA | 30/11–04/12 | T33–T41 |
+| 3. IA | 30/11–04/12 | T33–T41, T52 |
 | 4. Entregar | 04–08/12 | T42–T48 |
 | Extensão: OSV e NVD (só se houver tempo) | até 02/12 | T49–T51 |
 
@@ -31,7 +31,7 @@ O Paulo escreve todas as tasks com o agente e é o autor dos commits. Os revisor
 | @cristiano.albino | Fontes e travas: GitHub Advisory, OSV, npm, travas, privacidade, decisões | T01, T12–T16, T34, T43, T45, T49 | 10 |
 | @geison.santos | Risco e ação: nota, prioridade, checagens, plano, task, relatório JSON, junção de fontes | T04, T17–T23, T44, T51 | 10 |
 | @halan.bacca | Relatório HTML: frontend, origem do dado, glossário, modo foco | T24–T32, T47, T54 | 11 |
-| @luiz.pagliari | IA: CLIs, cliente, provedores, explicação, painel, medição, versão final | T02, T06, T07, T33, T35–T39, T46, T48 | 11 |
+| @luiz.pagliari | IA: CLIs, cliente, provedores, explicação, painel, linha de comando, medição, versão final | T02, T06, T07, T33, T35–T39, T46, T48, T52 | 12 |
 
 ## Como cada task chega ao `main`
 
@@ -408,7 +408,6 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Arquivos: `rastro/identificacao/bundles.py`, `rastro/identificacao/ia.py`, `rastro/ia/prompts/identificar_bibliotecas.md`, `tests/identificacao/test_bundles.py`, `tests/identificacao/test_ia.py`
   - Teste: `test_r03_*`
   - Requisito: R03.1–R03.5, R21.8
-  - Se não fechar até 04/12: sai do MVP, a identificação segue só por assinatura e o PRD e o pitch são atualizados juntos.
   - Revisão: @ali.santos
 
 - [x] **T52 Ligar a IA na linha de comando**
@@ -472,7 +471,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 - [ ] **T48 Preparar a versão final**
   - Entrega: PRD final em `docs/prd.pdf`, com o pitch já em `docs/` e o logo em `frontend/src/assets/`; a spec, o steering e o README citam só esses arquivos.
   - Aceite: código, spec, steering e README só citam arquivos que estão no repositório; build, `ruff`, `mypy` e `pytest` passam.
-  - Arquivos: `docs/prd.pdf`, `frontend/src/assets/*`, `.kiro/steering/*`, `.kiro/specs/rastro-mvp/*`, `README.md`
+  - Arquivos: `docs/prd.pdf`, `frontend/src/assets/*`, `.kiro/steering/*`, `.kiro/specs/rastro/*`, `README.md`
   - Teste: verificação local completa.
   - Requisito: R20.5
   - Revisão: @luiz.pagliari

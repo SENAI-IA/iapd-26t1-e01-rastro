@@ -2,7 +2,7 @@
 
 ## Desenvolvido com IA, guiado pela spec
 
-- A spec (`.kiro/specs/rastro-mvp/`: requirements, design, tasks) vem antes do código.
+- A spec (`.kiro/specs/rastro/`: requirements, design, tasks) vem antes do código.
 - Cada tarefa do `tasks.md` é marcada como concluída **no mesmo commit** que a implementa.
 - Steering e skill são atualizados no mesmo commit da mudança de padrão.
 - O README tem a seção "Desenvolvido com IA", apontando spec, steering e skill e como foram usados.
