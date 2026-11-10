@@ -15,6 +15,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 
 ## Em andamento
 
+- [ ] **T55** Ensinar a usar o relatório: tour guiado e Como usar · fase 2 · revisão @halan.bacca · 10/11
 - [ ] **T46** Medir com e sem IA · fase 4 · 04–08/12 · revisão @luiz.pagliari · parcial 09/11 · commit 08ed731 · pendente: tempo de triagem manual (medir com uma pessoa) · Codex fora da medição (chave de API removida, sem outra no grupo)
 
 ## Em revisão

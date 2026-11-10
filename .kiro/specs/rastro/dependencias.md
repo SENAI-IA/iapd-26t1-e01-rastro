@@ -1,4 +1,4 @@
-# Dependências entre tasks: Rastro MVP
+# Dependências entre tasks: Rastro
 
 **Quando cada task pode começar.** O que cada task faz está no `tasks.md`; em que pé ela está, no `kanban.md`. Aqui fica o que precisa estar pronto antes.
 
@@ -63,11 +63,12 @@
 | T49 Consultar o OSV | 14 | T13, T23, T32 | T51 | extensão: só com fases 1 e 2 fechadas |
 | T50 Completar o CVSS pelo NVD | 14 | T12, T23, T32 | T51 | extensão: só com fases 1 e 2 fechadas |
 | T54 Rever a visita num radar | 14 | T23, T32 | T44 | `visita` no JSON; radar também em foco |
+| T55 Ensinar a usar o relatório: tour guiado e Como usar | 15 | T39, T43, T54 | T47, T48 | o tour passa pelo painel da IA e pelo radar; o guia usa os comandos do README |
 | T42 Instalar do zero no Windows e no Linux | 15 | T25, T43, T52 | T47, T48 | segue o README, com e sem IA |
 | T51 Juntar avisos de fontes diferentes | 15 | T49, T50 | T44 | |
 | T44 Publicar o relatório de cobertura | 16 | T51, T52, T54 | T48 | depois do último código |
-| T47 Gravar a apresentação e o demo | 16 | T42, T43, T46 | T48 | números reais e instalação conferida |
-| T48 Preparar a versão final | 17 | T42, T43, T44, T45, T46, T47 | — | última |
+| T47 Gravar a apresentação e o demo | 16 | T42, T43, T46, T55 | T48 | números reais, instalação conferida e o relatório final na tela |
+| T48 Preparar a versão final | 17 | T42, T43, T44, T45, T46, T47, T55 | — | última |
 
 ## Grafo
 
@@ -82,7 +83,7 @@ flowchart LR
     T08; T09; T10; T11; T12; T13; T14; T15; T16; T17; T18; T19; T20; T21; T22; T23
   end
   subgraph F2[Fase 2]
-    T24; T25; T26; T27; T28; T29; T30; T31; T32; T54
+    T24; T25; T26; T27; T28; T29; T30; T31; T32; T54; T55
   end
   subgraph F3[Fase 3]
     T33; T34; T35; T36; T37; T38; T39; T40; T41; T52
@@ -119,6 +120,7 @@ flowchart LR
   T28 --> T29
   T27 & T29 & T30 & T31 --> T32
   T23 & T32 --> T54
+  T39 & T43 & T54 --> T55
 
   T02 & T33 --> T35 & T36 & T37
   T15 & T16 & T23 & T33 & T34 --> T38
@@ -135,8 +137,8 @@ flowchart LR
   T25 & T43 & T52 --> T42
   T51 & T52 & T54 --> T44
   T04 & T52 --> T46
-  T42 & T43 & T46 --> T47
-  T42 & T43 & T44 & T45 & T46 & T47 --> T48
+  T42 & T43 & T46 & T55 --> T47
+  T42 & T43 & T44 & T45 & T46 & T47 & T55 --> T48
 ```
 
 ## Caminho crítico
@@ -149,7 +151,7 @@ Atraso em qualquer uma delas atrasa a entrega. A fase 3 (T33–T37) e o frontend
 
 ## Situação em 10/11
 
-Tudo até a T54 está commitado. Faltam só tasks da fase 4:
+Tudo até a T55 está commitado. Faltam só tasks da fase 4:
 
 | Task | Estado | Pode começar? |
 |---|---|---|

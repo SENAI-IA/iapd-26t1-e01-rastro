@@ -14,7 +14,7 @@ Ordem: spike → núcleo determinístico → relatório HTML → explicação po
 |---|---|---|
 | 0. Preparar | 09–13/11 | T01–T07 |
 | 1. Núcleo determinístico | 16–25/11 | T08–T23 |
-| 2. Relatório HTML | 23–28/11 | T24–T32, T54 |
+| 2. Relatório HTML | 23–28/11 | T24–T32, T54, T55 |
 | 3. IA | 30/11–04/12 | T33–T41, T52 |
 | 4. Entregar | 04–08/12 | T42–T48 |
 | Extensão: OSV e NVD (só se houver tempo) | até 02/12 | T49–T51 |
@@ -30,7 +30,7 @@ O Paulo escreve todas as tasks com o agente e é o autor dos commits. Os revisor
 | @ali.santos | Entrada e identificação: HAR, assinaturas, bundles, instalação, NVD | T03, T05, T08–T11, T40–T42, T50 | 10 |
 | @cristiano.albino | Fontes e travas: GitHub Advisory, OSV, npm, travas, privacidade, decisões | T01, T12–T16, T34, T43, T45, T49 | 10 |
 | @geison.santos | Risco e ação: nota, prioridade, checagens, plano, task, relatório JSON, junção de fontes | T04, T17–T23, T44, T51 | 10 |
-| @halan.bacca | Relatório HTML: frontend, origem do dado, glossário, modo foco | T24–T32, T47, T54 | 11 |
+| @halan.bacca | Relatório HTML: frontend, origem do dado, glossário, modo foco, tour e guia | T24–T32, T47, T54, T55 | 12 |
 | @luiz.pagliari | IA: CLIs, cliente, provedores, explicação, painel, linha de comando, medição, versão final | T02, T06, T07, T33, T35–T39, T46, T48, T52 | 12 |
 
 ## Como cada task chega ao `main`
@@ -334,6 +334,14 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Arquivos: `rastro/har/modelos.py`, `rastro/har/leitor.py`, `rastro/har/visita.py`, `rastro/fluxo.py`, `rastro/relatorio/json.py`, `rastro/relatorio/modelo.html`, `tests/har/test_leitor.py`, `tests/har/test_visita.py`, `tests/relatorio/test_json.py`, `frontend/src/App.tsx`, `frontend/src/tipos.ts`, `frontend/src/componentes/ReplayDaVisita.*`, `frontend/src/componentes/RadarDaVisita.*`, `frontend/src/componentes/{usarRelogioDoReplay,usarAlturaAteADobra,chegadasDaVisita,geometriaDoRadar}.ts`, `frontend/src/componentes/Icone.tsx`, `frontend/src/componentes/LinhaBiblioteca.tsx`, `.kiro/steering/structure.md`, `.kiro/steering/frontend-react.md`
   - Teste: `test_r22_1_*` a `test_r22_3_*`; o radar, verificação manual.
   - Requisito: R22.1–R22.8
+  - Revisão: @halan.bacca
+
+- [ ] **T55 Ensinar a usar o relatório: tour guiado e Como usar**
+  - Entrega: `TourGuiado`, `posicaoDoTour.ts` e `dados/tour.ts`; `GuiaComoUsar`, `PassoDoGuia`, `IlustracaoDoGuia` e `dados/guia.ts`; botões "Tour guiado" e "Painel" / "Como usar" na `BarraSuperior`, a partir do esboço visual do planejamento, refeito para a tela de hoje.
+  - Aceite: o relatório abre no painel; o tour passa só pelas partes que existem (conferido com o WebGoat, com o Juice Shop e com uma análise sem IA), anda por teclado e devolve o foco ao fechar; o guia mostra os sete passos com ilustração, "Marcar como feito" e progresso; claro, escuro, 400px e `prefers-reduced-motion` conferidos. *(verificação manual na tela)*
+  - Arquivos: `frontend/src/App.tsx`, `frontend/src/componentes/BarraSuperior.*`, `frontend/src/componentes/TourGuiado.*`, `frontend/src/componentes/posicaoDoTour.ts`, `frontend/src/componentes/GuiaComoUsar.*`, `frontend/src/componentes/PassoDoGuia.*`, `frontend/src/componentes/IlustracaoDoGuia.*`, `frontend/src/componentes/TextoComMarcas.tsx`, `frontend/src/componentes/Icone.tsx`, `frontend/src/dados/tour.ts`, `frontend/src/dados/guia.ts`, `rastro/relatorio/modelo.html`, `.kiro/steering/frontend-react.md`, `.kiro/steering/product.md`, `README.md`, `docs/prints/11-tour-guiado.png`, `docs/prints/12-como-usar.png`
+  - Teste: verificação manual.
+  - Requisito: R23.1–R23.7
   - Revisão: @halan.bacca
 
 ## Fase 3. IA

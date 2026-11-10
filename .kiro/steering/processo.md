@@ -71,7 +71,7 @@ Português do Brasil em tudo: código, nomes, testes, commits, documentação, p
 
 ## Entregas (10/12/2026, 23h59; meta interna 08/12)
 
-- MVP 100% funcional em Windows e Linux.
+- Rastro 100% funcional em Windows e Linux.
 - PRD final em `docs/prd.pdf` (T48).
 - README que outra pessoa consegue seguir para instalar na própria máquina (Windows e Linux). Sem Docker: o demo gravado cumpre o requisito "Docker ou vídeo".
 - Relatório de cobertura no repo (≥ 60% nas regras de negócio).

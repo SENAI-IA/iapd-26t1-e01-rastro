@@ -1,6 +1,6 @@
 # Requisitos: Rastro
 
-**O quê e por quê.** Este arquivo diz o que o Rastro faz, sem dizer como. Ele parte do PRD (`docs/prd.pdf`, RF01 a RF17).
+**O quê e por quê.** Este arquivo diz o que o Rastro faz, sem dizer como. Ele parte do PRD (`docs/prd.pdf`, RF01 a RF18).
 
 ## Como ler
 
@@ -267,6 +267,18 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 7. O radar DEVE caber inteiro na primeira dobra em tela de computador (a partir de 900px de largura), também no modo foco, e funcionar no tema claro, no escuro e em 400px. *(verificação manual)*
 8. O radar DEVE mostrar só o que vem no JSON: tempo e ordem são os do HAR, e a prioridade é a das bibliotecas (R05.2).
 
+## R23 Aprender a usar o relatório (RF18)
+
+**Como** auditor, dev ou PO que abre o relatório pela primeira vez, **quero** um tour pela tela e um guia do HAR ao relatório **para** usar o Rastro sem ler a documentação antes.
+
+1. A barra superior DEVE ter o botão "Tour guiado" e a troca entre "Painel" e "Como usar". O relatório DEVE abrir no painel, nunca no tour nem no guia. *(verificação manual)*
+2. QUANDO o tour começar, o relatório DEVE voltar ao painel, sair do modo foco e destacar uma parte da tela por vez, com o número do passo ("3 de 10"), título, texto, os termos do glossário daquele passo e os botões "Pular", "Voltar" e "Próximo" ("Concluir" no último). *(verificação manual)*
+3. O tour DEVE passar só pelas partes que existem na análise aberta: sem visita, não há o passo do radar; sem ações, não há o de abrir a task; sem bibliotecas confirmadas, não há o das bibliotecas; sem bibliotecas "a confirmar", não há o dessa lista. *(verificação manual)*
+4. O tour DEVE funcionar por teclado (seta para a direita avança, para a esquerda volta, Esc fecha), prender o foco no balão enquanto aberto e devolvê-lo ao botão "Tour guiado" ao fechar, no tema claro, no escuro e em 400px. *(verificação manual)*
+5. A tela "Como usar" DEVE mostrar o caminho do HAR ao relatório em passos numerados, cada um com uma ilustração animada e o botão "Marcar como feito", com o progresso no topo, os comandos de Linux e de Windows do README, o que fazer quando algo der errado e o que acontece com os dados. *(verificação manual)*
+6. O texto do tour e do guia DEVE descrever só o que o Rastro faz hoje. É texto fixo do relatório: da análise, o tour só usa saber se cada parte existe.
+7. ENQUANTO o sistema pedir menos movimento, as ilustrações do guia e o destaque do tour DEVEM ficar sem animação. *(verificação manual)*
+
 ---
 
 ## Fora do escopo
@@ -276,7 +288,6 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 - Outras fontes além de GitHub Advisory, OSV e NVD: CISA KEV, Exploit-DB, Vulners.
 - Integração com Azure DevOps ou GitLab: vincular a task e acompanhar no painel.
 - Base de falsos positivos por projeto (selo "FP conhecido" e pedido de inclusão).
-- Tour guiado e guia animado "Como usar": por enquanto, README com prints.
 - Execução automática na esteira com Playwright.
 - CI e Docker: o Rastro é instalado e verificado na máquina local.
 
@@ -290,4 +301,3 @@ Ideias para as próximas versões. Não entram na nota nem no cronograma, mas o 
 | Vincular a task no Azure DevOps ou no GitLab e acompanhar no painel | Fechar o ciclo do achado à correção | Hoje a task sai como texto pronto para copiar |
 | Base de falsos positivos por projeto | Não repetir a mesma triagem a cada análise | Selo "FP conhecido", já desenhado no demo |
 | Rodar na esteira com Playwright | Analisar a cada pipeline, com o HAR gravado pelos testes E2E (`recordHar`) | A CLI já roda sem interação e com `--sem-ia` |
-| Tour guiado e guia animado "Como usar" | Ajudar quem usa pela primeira vez | Já desenhados no demo |

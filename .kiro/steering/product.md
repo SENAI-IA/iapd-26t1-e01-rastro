@@ -19,13 +19,13 @@ Tudo precisa ser compreensível para quem não é de segurança.
 5. **Priorize:** `nota = 10 × (0,5 × CVSS/10 + 0,5 × percentil EPSS)`. Alta ≥ 7,5; média ≥ 6,5.
 6. **Aja:** plano de ação explicado pela IA, com teste de verificação e task pronta.
 
-## Escopo do MVP
+## Escopo
 
-Entra: CLI, relatório JSON e HTML, GitHub Advisory (OSV e NVD como extensão opcional), bibliotecas front-end, cabeçalhos e cookies, travas contra invenção, modo foco, só análise passiva. Requisitos R01 a R21 da spec (`.kiro/specs/rastro/requirements.md`).
+Entra: CLI, relatório JSON e HTML, GitHub Advisory, OSV e NVD, bibliotecas front-end, cabeçalhos e cookies, travas contra invenção, modo foco, replay da visita, tour guiado e guia "Como usar", só análise passiva. Requisitos R01 a R23 da spec (`.kiro/specs/rastro/requirements.md`).
 
-Fica fora: scan ativo, código-fonte, integração com Azure DevOps ou GitLab, outras fontes (KEV, Exploit-DB, Vulners), base de falsos positivos, tour e guia animado, execução na esteira com Playwright, CI e Docker. Planos futuros (inclui avaliar o DefectDojo no SD) no fim do `requirements.md`.
+Fica fora: scan ativo, código-fonte, integração com Azure DevOps ou GitLab, outras fontes (KEV, Exploit-DB, Vulners), base de falsos positivos, execução na esteira com Playwright, CI e Docker. Planos futuros no fim do `requirements.md`.
 
-**Na dúvida, fica fora.** O MVP precisa estar 100% funcional em 10/12/2026.
+**Na dúvida, fica fora.** O Rastro precisa estar 100% funcional em 10/12/2026.
 
 ## Papel da IA
 

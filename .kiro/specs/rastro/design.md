@@ -83,7 +83,7 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/relatorio/html.py` | embute o JSON no HTML do build | R13.5 |
 | `rastro/relatorio/modelo.html` | HTML do build do frontend, com a tag `dados` vazia | R13.5 |
 | `rastro/relatorio/gravacao.py` | monta a pasta da análise (aplicação, data e hora) e grava os dois arquivos sem sobrescrever | R13.1–R13.4, R17 |
-| `frontend/` | React: só exibe o JSON | R09.2, R10.2, R12, R13.5, R13.6, R22.4–R22.7 |
+| `frontend/` | React: só exibe o JSON | R09.2, R10.2, R12, R13.5, R13.6, R22.4–R22.7, R23 |
 
 **Diferenças em relação ao `structure.md`:** entram `acao/` (plano e task não cabem em `risco/`), `travas/`, `fontes/registro_npm.py`, `har/site.py`, `identificacao/bundles.py`, `ia/sanitizacao.py` e `relatorio/gravacao.py`. O `structure.md` já traz essas pastas.
 
@@ -598,6 +598,7 @@ Componentes do relatório (padrões em `.kiro/steering/frontend-react.md`):
 | Sob demanda | `PainelOrigemDoDado` → `EtapaDaOrigem`: painel lateral (`<dialog>` modal, Esc ou clique fora fecha e o foco volta ao botão) com quatro etapas numeradas: no HAR (`log.entries[i]` e URL de cada evidência), identificação (método, `pacote@versão`, registro do npm, trecho), aviso (GHSA com link, CVE, versões afetadas, corrigida em, CVSS, percentil EPSS, ou o motivo de não ter consultado) e cálculo (`nota.conta` como veio do JSON, com a prioridade). Abre pelo botão "Ver a origem" no corpo da biblioteca (todas as falhas dela) ou pela nota de cada falha (só aquela falha). O `App` guarda a origem aberta (`OrigemDoDado`, `null` fechado). Decidido na T29. |
 | Avisos | `AvisoSemIA`: faixa no topo sempre que `analise.limitacoes` vier preenchido, presa junto da `BarraSuperior` ao rolar; lista cada limitação com o ícone do seu `id` e, quando `analise.ia` é `null`, o título "Análise sem IA: o resultado está incompleto.", o `continua_igual` e o comando para rodar com IA. Com IA, qualquer limitação (`sem_javascript`, `ia_falhou_*`, `fonte_sem_resposta_*`) leva o título "Análise incompleta.". Recolhível (`<details>`, aberta por padrão), para não tomar a tela em 400px. Decidido na T27. |
 | Apoio | `Termo` + `Dica`, `Selo` (e `SeloDePrioridade`, `SeloDoMetodo`), `Icone`; `formato.ts` só formata número, data e plural em pt-BR. Glossário (R12): termos e definições só em `dados/glossario.ts`; `<Termo nome="EPSS">` marca o termo no texto fixo da tela (o nome é checado pelo TypeScript). O `Termo` é focável e abre a `Dica` com o mouse em cima, com o foco do teclado ou com o toque (o toque dá foco; tocar fora fecha); Esc fecha. A `Dica` é um `popover="manual"` nativo (camada de cima: aparece também sobre o `PainelOrigemDoDado`), ligada ao termo por `aria-describedby` e posicionada junto dele. Texto que vem do JSON não é marcado. Decidido na T30. |
+| Aprender a usar | `TourGuiado` e `GuiaComoUsar` → `PassoDoGuia` → `IlustracaoDoGuia` (R23, ver abaixo). |
 | Modo foco | `BarraDeFoco`, e `Zona`: o invólucro de cada zona, com o nome e o botão "Focar". As zonas e os nomes ficam em `dados/zonas.ts`. Decidido na T32. |
 
 **Tema.** A `BarraSuperior` tem o botão de tema. O `App` guarda o tema escolhido (`null` segue o sistema) e grava `data-tema` no `<html>`; o tema desce por props, sem contexto enquanto só a barra precisar dele. Decidido na T26.
@@ -620,9 +621,16 @@ Componentes do relatório (padrões em `.kiro/steering/frontend-react.md`):
 - Cada biblioteca com falha aparece uma vez, na primeira requisição em que chegou (`chegadasDaVisita.ts`, que só cruza `visita` com `bibliotecas`), com um rótulo ao lado do radar. Os rótulos se empilham sem sobrepor e o recorte do SVG só abre espaço do lado que tem rótulo (`geometriaDoRadar.ts`).
 - O rótulo é botão (clique, Enter ou espaço): o `App` sai do foco, abre o `<details>` da biblioteca e rola até ela, descontando o topo fixo.
 - A partir de 900px, a altura do radar vai até a dobra (`usarAlturaAteADobra`, que mede de novo quando a página muda de tamanho), também em foco.
-- É a única animação contínua do relatório, e só enquanto o replay toca.
+- É a única animação contínua do painel, e só enquanto o replay toca. As ilustrações do guia "Como usar" também repetem, mas ficam em outra tela.
 
-Ficam de fora: `GraficoDispersao` (CVSS × EPSS), `Tour`, `GuiaComoUsar`, `ModalPedidoFalsoPositivo`, `PainelBaseFalsosPositivos` e o vínculo de task.
+**Tour guiado e Como usar (R23).** Partem do esboço visual do planejamento, refeitos para a tela de hoje: nada do esboço que o Rastro não faz (gráfico de dispersão, base de falsos positivos, vínculo da task) entra no texto.
+
+- O `App` guarda `tela: "painel" | "como-usar"` e `passosDoTour` (`null` com o tour fechado). A `BarraSuperior` recebe a tela e avisa pelas props `aoTrocarTela` e `aoAbrirTour` (`null` sem relatório, e o botão some). Abrir o tour volta ao painel e sai do foco; no quadro seguinte, já com o painel na tela, o `App` fica só com os passos cujo seletor acha um elemento (R23.3) e abre o `TourGuiado` com eles. Durante o tour, o `AvisoSemIA` fica recolhido, como no foco, para sobrar tela em 400px.
+- **Tour:** `dados/tour.ts` lista os passos, cada um com o seletor da parte da tela (classe que já existe, como `.indicadores` ou `.acao__abrir-task`; para as bibliotecas, `.lista-bibliotecas__lista`, que só existe com biblioteca), título, texto e termos do glossário. O `TourGuiado` é um `<dialog>` modal transparente na tela toda: o destaque é um recorte com sombra em volta da parte da tela e o balão fica ao lado dele. Esc fecha pelo próprio `<dialog>`, o foco fica preso nele e volta ao botão "Tour guiado" ao fechar; clique fora do balão fecha. A cada passo, a página rola até a parte, descontando o topo fixo, e o balão é medido de novo ao rolar e ao mudar o tamanho da tela. Onde pôr o balão (embaixo, em cima, ao lado ou no canto) é conta de tela em `posicaoDoTour.ts`.
+- **Passos do tour**, na ordem da tela: cabeçalho da análise, radar da visita, indicadores, onde a IA entrou, o que fazer agora, abrir a task, bibliotecas, a confirmar, checagens, modo foco e termos do glossário.
+- **Como usar:** `GuiaComoUsar` mostra o que precisa antes, os passos de `dados/guia.ts` (abrir o site, abrir a aba Rede, desativar o cache e recarregar, navegar, exportar o HAR, rodar o Rastro e abrir o relatório), "Se algo der errado" e "Seus dados". Cada `PassoDoGuia` tem o texto, o comando com "Copiar" quando há, "Marcar como feito" e a `IlustracaoDoGuia` do passo: SVG em traço com animação em CSS que repete, parada com `prefers-reduced-motion`. O progresso ("3 de 7 passos feitos") é estado do `GuiaComoUsar` e começa do zero a cada abertura do arquivo. Os comandos são os do README, Linux e Windows lado a lado.
+
+Ficam de fora: `GraficoDispersao` (CVSS × EPSS), `ModalPedidoFalsoPositivo`, `PainelBaseFalsosPositivos` e o vínculo de task.
 
 ## 14. Erros
 
