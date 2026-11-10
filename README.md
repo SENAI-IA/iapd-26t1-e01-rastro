@@ -2,7 +2,7 @@
 
 Rastro lê um arquivo HAR, identifica as bibliotecas front-end do site, cruza com o GitHub Advisory (CVE, CVSS, EPSS) e gera um relatório de risco explicado por IA. Só análise passiva: o site analisado nunca é acessado.
 
-> **Status:** MVP funcionando no Linux (fases 0 a 3 e extensão OSV e NVD). A instalação do zero no Windows ainda não foi conferida (T42): os comandos do Windows abaixo seguem a convenção do projeto e estão marcados como **a conferir**. Andamento no [kanban](.kiro/specs/rastro/kanban.md).
+> **Status:** funcionando no Linux (fases 0 a 3, OSV e NVD, replay da visita, tour guiado e "Como usar"). A instalação do zero no Windows ainda não foi conferida (T42): os comandos do Windows abaixo seguem a convenção do projeto e estão marcados como **a conferir**. Andamento no [kanban](.kiro/specs/rastro/kanban.md).
 
 ![Relatório do WebGoat, gerado com a IA Kiro](docs/prints/01-relatorio-claro.png)
 
@@ -91,6 +91,8 @@ O `relatorio.html` abre com duplo clique, offline, sem nenhuma requisição exte
 |---|---|
 | `xdg-open <caminho do relatorio.html>` | `Invoke-Item <caminho do relatorio.html>` |
 
+Na primeira vez, use o botão **Tour guiado**, no topo: ele passa por cada parte da tela. A aba **Como usar** repete, dentro do relatório, o caminho do HAR ao relatório.
+
 O `relatorio.json` tem os mesmos dados, para guardar ou comparar análises.
 
 ## O relatório
@@ -103,7 +105,8 @@ Prints do relatório do WebGoat (`avaliacao/webgoat.har`), gerados no Linux em 0
 | ![Análise sem IA](docs/prints/04-relatorio-sem-ia.png) **Sem IA.** O aviso fica no topo e "Encontradas só pela IA" mostra "Não procurado". | ![Explicação da IA](docs/prints/05-explicacao-da-ia.png) **Explicação da IA** em cada biblioteca, marcada "Sugerido pela IA: confira antes de usar". |
 | ![Origem do dado](docs/prints/06-origem-do-dado.png) **Origem do dado:** HAR → identificação → aviso → cálculo da nota. | ![Task para o board](docs/prints/07-task.png) **Task** em Markdown, pronta para colar no board. |
 | ![Modo foco](docs/prints/08-modo-foco.png) **Modo foco** na zona Agir. | ![Glossário](docs/prints/09-glossario.png) **Glossário:** a definição aparece no termo sublinhado. |
-| ![Onde a IA entrou](docs/prints/10-onde-a-ia-entrou.png) **Onde a IA entrou:** chamadas, tempo, tokens e travas acionadas. | |
+| ![Onde a IA entrou](docs/prints/10-onde-a-ia-entrou.png) **Onde a IA entrou:** chamadas, tempo, tokens e travas acionadas. | ![Tour guiado](docs/prints/11-tour-guiado.png) **Tour guiado:** um balão por parte da tela, só com as partes que a análise tem. |
+| ![Como usar](docs/prints/12-como-usar.png) **Como usar:** do HAR ao relatório em sete passos, com ilustração e "Marcar como feito". | |
 
 ## Resultados
 
@@ -142,6 +145,9 @@ Os critérios marcados *(verificação manual)* na spec só se conferem olhando 
 | 11 | Apertar `Esc` ou "Sair do foco" | Volta ao layout completo, na posição da zona | R15.4 | conferido 09/11 (volta com a zona logo abaixo do topo) | a conferir (T42) |
 | 12 | Em foco, abrir a origem, um termo do glossário, uma task e, no relatório sem IA, o aviso | Tudo continua funcionando | R15.5 | conferido 09/11 (origem, glossário, task e aviso sem IA; `Esc` fecha a origem e mantém o foco) | a conferir (T42) |
 | 13 | Fazer os passos 10 e 11 só com o teclado e em 400px | Funciona por teclado e em tela estreita | R15.6 | conferido 09/11 (só teclado, em 400px, sem rolagem lateral) | a conferir (T42) |
+| 14 | Abrir o relatório e clicar em "Como usar" e de volta em "Painel" | Abre no painel; "Como usar" mostra os sete passos com ilustração, "Marcar como feito" soma no progresso e os comandos têm "Copiar" | R23.1, R23.5 | conferido 10/11 (print 12) | a conferir (T42) |
+| 15 | Clicar em "Tour guiado" e andar com "Próximo", "Voltar" e as setas; fechar com `Esc` | Destaca uma parte por vez, com "n de total" e os termos do glossário; só as partes que a análise tem; o foco volta ao botão | R23.2, R23.3, R23.4 | conferido 10/11 (print 11; WebGoat com 11 passos, `loja.har` com 10, Juice Shop sem IA com 9; claro, escuro e 400px) | a conferir (T42) |
+| 16 | Ativar "reduzir movimento" no sistema e abrir o tour e o "Como usar" | Ilustrações paradas e destaque sem transição | R23.7 | conferido 10/11 (Chromium com `prefers-reduced-motion`) | a conferir (T42) |
 
 "Conferido 09/11" quer dizer: visto na tela, no Chromium, nos prints de `docs/prints/` ou numa conferência automatizada com o Playwright. "A conferir" fica para a pessoa do grupo que seguir este README do zero (revisão da T43) e para a T42, no Windows.
 
@@ -203,9 +209,9 @@ O Rastro foi construído com um agente de IA guiado por arquivos versionados nes
 
 | Arquivo | O que é | Como foi usado |
 |---|---|---|
-| [`.kiro/specs/rastro/requirements.md`](.kiro/specs/rastro/requirements.md) | Requisitos R01 a R21 em EARS, cada critério com ID | Cada critério vira pelo menos um teste com o ID no nome (`test_r05_2_...`); os que só se veem na tela estão no roteiro acima. |
+| [`.kiro/specs/rastro/requirements.md`](.kiro/specs/rastro/requirements.md) | Requisitos R01 a R23 em EARS, cada critério com ID | Cada critério vira pelo menos um teste com o ID no nome (`test_r05_2_...`); os que só se veem na tela estão no roteiro acima. |
 | [`.kiro/specs/rastro/design.md`](.kiro/specs/rastro/design.md) | Arquitetura, modelos, fórmulas, travas, provedores de IA | O agente lê antes de cada task; o que se decide no meio da task volta para o design no mesmo commit. |
-| [`.kiro/specs/rastro/tasks.md`](.kiro/specs/rastro/tasks.md) e [`kanban.md`](.kiro/specs/rastro/kanban.md) | Tasks T01 a T52, com entrega, aceite, arquivos, teste, requisito e revisor; estado de cada uma | Uma task por vez, um commit por task (`feat(risco): ... (T17)`), com o revisor como coautor. O `git log` conta a construção task por task. |
+| [`.kiro/specs/rastro/tasks.md`](.kiro/specs/rastro/tasks.md) e [`kanban.md`](.kiro/specs/rastro/kanban.md) | Tasks T01 a T55, com entrega, aceite, arquivos, teste, requisito e revisor; estado de cada uma | Uma task por vez, um commit por task (`feat(risco): ... (T17)`), com o revisor como coautor. O `git log` conta a construção task por task. |
 | [`.kiro/steering/`](.kiro/steering/) | Padrões de produto, tecnologia, estrutura, processo, Python e React | Regras que o agente segue em toda task: biblioteca padrão primeiro, núcleo puro, nomes em português, Windows e Linux, nada destrutivo. Mudou um padrão, o steering muda no mesmo commit. |
 | [`.kiro/skills/rastro-nova-regra/`](.kiro/skills/rastro-nova-regra/SKILL.md) | Passo a passo para acrescentar checagem, assinatura, fonte de dados, provedor de IA ou trava | Usada nas tasks de regra nova (checagens, assinaturas, OSV, NVD, provedores); o que faltou nela foi corrigido no commit da task. |
 | [`docs/decisoes/`](docs/decisoes/) | Uma decisão por arquivo, com contexto e alternativas | O porquê das escolhas (fórmula da nota, IA por CLI, travas contra invenção), em vez de comentário no código. |
@@ -221,7 +227,7 @@ E no próprio produto a IA tem papel real, mas não decide sozinha: ela sugere b
 | `tests/` | Testes, espelhando `rastro/`, e os dados de teste em `tests/dados/`. |
 | `avaliacao/` | HARs do WebGoat, do Drupal e do Juice Shop, o gabarito das bibliotecas de cada um e os resultados medidos com e sem IA. |
 | `.kiro/steering/` | Padrões de construção que o agente de IA segue: produto, tecnologia, estrutura, processo, Python e React. |
-| `.kiro/specs/rastro/` | Spec do MVP: requisitos em EARS, design, tasks (com revisor) e kanban. |
+| `.kiro/specs/rastro/` | Spec do Rastro: requisitos em EARS, design, tasks (com revisor), dependências entre as tasks e kanban. |
 | `.kiro/skills/rastro-nova-regra/` | Skill do projeto: passo a passo para acrescentar checagem, assinatura, fonte de dados, provedor de IA ou trava, com teste, cobertura e verificação. |
 | `docs/` | Entregáveis: `pitch-inicial.pdf`, `prints/` (telas do relatório), `spike/` (validações da fase 0), `cobertura/` (resultado da verificação em cada sistema e relatório HTML da cobertura) e `decisoes/` (um arquivo por decisão, com contexto, decisão e alternativas). |
 

@@ -336,7 +336,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R22.1–R22.8
   - Revisão: @halan.bacca
 
-- [ ] **T55 Ensinar a usar o relatório: tour guiado e Como usar**
+- [x] **T55 Ensinar a usar o relatório: tour guiado e Como usar**
   - Entrega: `TourGuiado`, `posicaoDoTour.ts` e `dados/tour.ts`; `GuiaComoUsar`, `PassoDoGuia`, `IlustracaoDoGuia` e `dados/guia.ts`; botões "Tour guiado" e "Painel" / "Como usar" na `BarraSuperior`, a partir do esboço visual do planejamento, refeito para a tela de hoje.
   - Aceite: o relatório abre no painel; o tour passa só pelas partes que existem (conferido com o WebGoat, com o Juice Shop e com uma análise sem IA), anda por teclado e devolve o foco ao fechar; o guia mostra os sete passos com ilustração, "Marcar como feito" e progresso; claro, escuro, 400px e `prefers-reduced-motion` conferidos. *(verificação manual na tela)*
   - Arquivos: `frontend/src/App.tsx`, `frontend/src/componentes/BarraSuperior.*`, `frontend/src/componentes/TourGuiado.*`, `frontend/src/componentes/posicaoDoTour.ts`, `frontend/src/componentes/GuiaComoUsar.*`, `frontend/src/componentes/PassoDoGuia.*`, `frontend/src/componentes/IlustracaoDoGuia.*`, `frontend/src/componentes/TextoComMarcas.tsx`, `frontend/src/componentes/Icone.tsx`, `frontend/src/dados/tour.ts`, `frontend/src/dados/guia.ts`, `rastro/relatorio/modelo.html`, `.kiro/steering/frontend-react.md`, `.kiro/steering/product.md`, `README.md`, `docs/prints/11-tour-guiado.png`, `docs/prints/12-como-usar.png`

@@ -112,6 +112,26 @@ const TRACOS = {
       <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
     </>
   ),
+  bussola: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m15.5 8.5-2 5-5 2 2-5Z" />
+    </>
+  ),
+  livro: (
+    <>
+      <path d="M4 19V5a2 2 0 0 1 2-2h14v14H6a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h14" />
+      <path d="M8 7h8M8 11h6" />
+    </>
+  ),
+  painel: (
+    <>
+      <rect x="3" y="3" width="7" height="9" rx="1" />
+      <rect x="14" y="3" width="7" height="5" rx="1" />
+      <rect x="14" y="12" width="7" height="9" rx="1" />
+      <rect x="3" y="16" width="7" height="5" rx="1" />
+    </>
+  ),
 };
 
 export type NomeDoIcone = keyof typeof TRACOS;

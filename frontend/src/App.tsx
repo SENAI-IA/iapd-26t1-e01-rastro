@@ -4,8 +4,9 @@ import type { Acao, Relatorio } from "./tipos.ts";
 import { idDaZona, ZONAS, type NomeDaZona } from "./dados/zonas.ts";
 import AvisoSemIA from "./componentes/AvisoSemIA.tsx";
 import BarraDeFoco from "./componentes/BarraDeFoco.tsx";
-import BarraSuperior, { type Tema } from "./componentes/BarraSuperior.tsx";
+import BarraSuperior, { type Tela, type Tema } from "./componentes/BarraSuperior.tsx";
 import CabecalhoAnalise from "./componentes/CabecalhoAnalise.tsx";
+import GuiaComoUsar from "./componentes/GuiaComoUsar.tsx";
 import Indicadores from "./componentes/Indicadores.tsx";
 import ListaAConfirmar from "./componentes/ListaAConfirmar.tsx";
 import ListaBibliotecas from "./componentes/ListaBibliotecas.tsx";
@@ -16,7 +17,9 @@ import PainelIA from "./componentes/PainelIA.tsx";
 import PainelOrigemDoDado, { type OrigemDoDado } from "./componentes/PainelOrigemDoDado.tsx";
 import PlanoDeAcao from "./componentes/PlanoDeAcao.tsx";
 import ReplayDaVisita from "./componentes/ReplayDaVisita.tsx";
+import TourGuiado from "./componentes/TourGuiado.tsx";
 import Zona from "./componentes/Zona.tsx";
+import { PASSOS_DO_TOUR, type PassoDoTour } from "./dados/tour.ts";
 
 interface Props {
   relatorio: Relatorio | null;
@@ -40,6 +43,10 @@ function rolarAteAZona(zona: NomeDaZona, topo: HTMLElement | null) {
   elemento.querySelector<HTMLButtonElement>(".zona__focar")?.focus({ preventScroll: true });
 }
 
+function passosQueExistemNaTela(): PassoDoTour[] {
+  return PASSOS_DO_TOUR.filter((passo) => document.querySelector(passo.seletor) !== null);
+}
+
 function abrirBiblioteca(id: string, topo: HTMLElement | null) {
   const linha = document.getElementById(idDaLinhaDaBiblioteca(id));
   if (!linha) {
@@ -57,6 +64,8 @@ export default function App({ relatorio }: Props) {
   const [origemAberta, setOrigemAberta] = useState<OrigemDoDado | null>(null);
   const [taskAberta, setTaskAberta] = useState<Acao | null>(null);
   const [zonaEmFoco, setZonaEmFoco] = useState<NomeDaZona | null>(null);
+  const [tela, setTela] = useState<Tela>("painel");
+  const [passosDoTour, setPassosDoTour] = useState<PassoDoTour[] | null>(null);
   const zonaQueSaiuDoFoco = useRef<NomeDaZona | null>(null);
   const topo = useRef<HTMLDivElement>(null);
 
@@ -95,6 +104,18 @@ export default function App({ relatorio }: Props) {
   const sairDoFoco = () => {
     zonaQueSaiuDoFoco.current = zonaEmFoco;
     setZonaEmFoco(null);
+  };
+
+  const trocarTela = (novaTela: Tela) => {
+    setZonaEmFoco(null);
+    setTela(novaTela);
+    window.scrollTo({ top: 0 });
+  };
+
+  const abrirTour = () => {
+    setZonaEmFoco(null);
+    setTela("painel");
+    requestAnimationFrame(() => setPassosDoTour(passosQueExistemNaTela()));
   };
 
   const irParaBiblioteca = (id: string) => {
@@ -144,17 +165,25 @@ export default function App({ relatorio }: Props) {
   return (
     <>
       <div className="app__topo" ref={topo}>
-        <BarraSuperior tema={tema} aoTrocarTema={trocarTema} />
+        <BarraSuperior
+          tema={tema}
+          tela={tela}
+          aoTrocarTema={trocarTema}
+          aoTrocarTela={trocarTela}
+          aoAbrirTour={relatorio ? abrirTour : null}
+        />
         {relatorio && zonaEmFoco && (
           <BarraDeFoco zonaEmFoco={zonaEmFoco} aoTrocarZona={setZonaEmFoco} aoSair={sairDoFoco} />
         )}
-        {relatorio && relatorio.analise.limitacoes.length > 0 && (
-          <AvisoSemIA analise={relatorio.analise} recolhido={zonaEmFoco !== null} />
+        {relatorio && tela === "painel" && relatorio.analise.limitacoes.length > 0 && (
+          <AvisoSemIA analise={relatorio.analise} recolhido={zonaEmFoco !== null || passosDoTour !== null} />
         )}
       </div>
       <main className={zonaEmFoco ? "app app--foco" : "app"}>
-        {relatorio === null ? (
-          <p>Este arquivo não traz os dados de uma análise. Gere o relatório com o Rastro.</p>
+        {tela === "como-usar" ? (
+          <GuiaComoUsar aoIrParaOPainel={relatorio ? () => trocarTela("painel") : null} />
+        ) : relatorio === null ? (
+          <p>Este arquivo não traz os dados de uma análise. Gere o relatório com o Rastro: veja em "Como usar".</p>
         ) : (
           <>
             {zonaEmFoco === null && <CabecalhoAnalise analise={relatorio.analise} />}
@@ -168,6 +197,9 @@ export default function App({ relatorio }: Props) {
       </main>
       {origemAberta && <PainelOrigemDoDado origem={origemAberta} aoFechar={() => setOrigemAberta(null)} />}
       {taskAberta && <ModalTask acao={taskAberta} aoFechar={() => setTaskAberta(null)} />}
+      {passosDoTour && passosDoTour.length > 0 && (
+        <TourGuiado passos={passosDoTour} topo={topo.current} aoFechar={() => setPassosDoTour(null)} />
+      )}
     </>
   );
 }
