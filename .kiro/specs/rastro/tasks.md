@@ -14,7 +14,7 @@ Ordem: spike → núcleo determinístico → relatório HTML → explicação po
 |---|---|---|
 | 0. Preparar | 09–13/11 | T01–T07 |
 | 1. Núcleo determinístico | 16–25/11 | T08–T23 |
-| 2. Relatório HTML | 23–28/11 | T24–T32, T54, T55 |
+| 2. Relatório HTML | 23–28/11 | T24–T32, T54–T56 |
 | 3. IA | 30/11–04/12 | T33–T41, T52 |
 | 4. Entregar | 04–08/12 | T42–T48 |
 | Extensão: OSV e NVD (só se houver tempo) | até 02/12 | T49–T51 |
@@ -31,7 +31,7 @@ O Paulo escreve todas as tasks com o agente e é o autor dos commits. Os revisor
 | @cristiano.albino | Fontes e travas: GitHub Advisory, OSV, npm, travas, privacidade, decisões | T01, T12–T16, T34, T43, T45, T49 | 10 |
 | @geison.santos | Risco e ação: nota, prioridade, checagens, plano, task, relatório JSON, junção de fontes | T04, T17–T23, T44, T51 | 10 |
 | @halan.bacca | Relatório HTML: frontend, origem do dado, glossário, modo foco, tour e guia | T24–T32, T47, T54, T55 | 12 |
-| @luiz.pagliari | IA: CLIs, cliente, provedores, explicação, painel, linha de comando, medição, versão final | T02, T06, T07, T33, T35–T39, T46, T48, T52 | 12 |
+| @luiz.pagliari | IA: CLIs, cliente, provedores, explicação, painel, linha de comando, medição, versão final | T02, T06, T07, T33, T35–T39, T46, T48, T52, T56 | 13 |
 
 ## Como cada task chega ao `main`
 
@@ -343,6 +343,14 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Teste: verificação manual.
   - Requisito: R23.1–R23.7
   - Revisão: @halan.bacca
+
+- [ ] **T56 Abrir o Como usar pela linha de comando**
+  - Entrega: o comando `python -m rastro como-usar` abre no navegador o relatório sem dados, que passa a começar na tela "Como usar".
+  - Aceite: `como-usar` abre o `modelo.html` do pacote e mostra o caminho, sem ler HAR, sem rede e sem gravar; sem navegador, avisa e mostra o caminho com código 0; o `--help` lista o comando; o relatório com análise continua abrindo no painel. Teste com o navegador trocado por dublê.
+  - Arquivos: `rastro/cli.py`, `rastro/relatorio/html.py`, `tests/test_cli.py`, `frontend/src/App.tsx`, `rastro/relatorio/modelo.html`, `README.md`
+  - Teste: `test_r23_8_*`; o resto, verificação manual.
+  - Requisito: R23.1, R23.8
+  - Revisão: @luiz.pagliari
 
 ## Fase 3. IA
 

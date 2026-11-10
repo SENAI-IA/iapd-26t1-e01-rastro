@@ -271,13 +271,14 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 
 **Como** auditor, dev ou PO que abre o relatório pela primeira vez, **quero** um tour pela tela e um guia do HAR ao relatório **para** usar o Rastro sem ler a documentação antes.
 
-1. A barra superior DEVE ter o botão "Tour guiado" e a troca entre "Painel" e "Como usar". O relatório DEVE abrir no painel, nunca no tour nem no guia. *(verificação manual)*
+1. A barra superior DEVE ter o botão "Tour guiado" e a troca entre "Painel" e "Como usar". O relatório com uma análise DEVE abrir no painel, nunca no tour nem no guia; o relatório sem dados de análise DEVE abrir no "Como usar". *(verificação manual)*
 2. QUANDO o tour começar, o relatório DEVE voltar ao painel, sair do modo foco e destacar uma parte da tela por vez, com o número do passo ("3 de 10"), título, texto, os termos do glossário daquele passo e os botões "Pular", "Voltar" e "Próximo" ("Concluir" no último). *(verificação manual)*
 3. O tour DEVE passar só pelas partes que existem na análise aberta: sem visita, não há o passo do radar; sem ações, não há o de abrir a task; sem bibliotecas confirmadas, não há o das bibliotecas; sem bibliotecas "a confirmar", não há o dessa lista. *(verificação manual)*
 4. O tour DEVE funcionar por teclado (seta para a direita avança, para a esquerda volta, Esc fecha), prender o foco no balão enquanto aberto e devolvê-lo ao botão "Tour guiado" ao fechar, no tema claro, no escuro e em 400px. *(verificação manual)*
 5. A tela "Como usar" DEVE mostrar o caminho do HAR ao relatório em passos numerados, cada um com uma ilustração animada e o botão "Marcar como feito", com o progresso no topo, os comandos de Linux e de Windows do README, o que fazer quando algo der errado e o que acontece com os dados. *(verificação manual)*
 6. O texto do tour e do guia DEVE descrever só o que o Rastro faz hoje. É texto fixo do relatório: da análise, o tour só usa saber se cada parte existe.
 7. ENQUANTO o sistema pedir menos movimento, as ilustrações do guia e o destaque do tour DEVEM ficar sem animação. *(verificação manual)*
+8. QUANDO a pessoa rodar `python -m rastro como-usar`, o Rastro DEVE abrir no navegador o relatório sem dados de análise (o "Como usar"), sem ler HAR, sem acessar a rede e sem gravar nada, e mostrar no terminal o caminho do arquivo aberto. SE não conseguir abrir o navegador, ENTÃO o Rastro DEVE dizer isso e mostrar o caminho para abrir à mão, com código 0.
 
 ---
 
