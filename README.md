@@ -173,10 +173,10 @@ Na raiz do projeto:
 
 ### Cobertura
 
-| Medida (Linux, 09/11/2026, commit a61e8f8) | Cobertura |
+| Medida (Linux, 10/11/2026, commit b73056d) | Cobertura |
 |---|---|
-| Regras de negócio (`har`, `identificacao`, `travas`, `fontes`, `risco`, `configuracao`, `acao`, `ia/sanitizacao`) | **99%** (1582 linhas, 3 sem teste) |
-| Total do pacote `rastro` | 99% (2279 linhas, 6 sem teste) |
+| Regras de negócio (`har`, `identificacao`, `travas`, `fontes`, `risco`, `configuracao`, `acao`, `ia/sanitizacao`) | **99%** (1753 linhas, 3 sem teste) |
+| Total do pacote `rastro` | 99% (2450 linhas, 6 sem teste) |
 
 O mínimo é 60% nas regras de negócio, com meta de 80% (R19.1). O relatório HTML, arquivo por arquivo e linha por linha, fica em [`docs/cobertura/html/index.html`](docs/cobertura/html/index.html). Para atualizá-lo, com o `.venv` ativo:
 

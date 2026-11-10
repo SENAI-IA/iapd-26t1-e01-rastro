@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_2c7f5d14372dfda1_sanitizacao_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.2">coverage.py v7.16.2</a>,
-            created at 2026-11-09 13:56 -0300
+            created at 2026-11-10 20:06 -0300
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -105,26 +105,27 @@
     <p class="run run2"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">                <span class="nam">input</span><span class="op">=</span><span class="nam">prompt</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">                <span class="nam">capture_output</span><span class="op">=</span><span class="key">True</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">                <span class="nam">encoding</span><span class="op">=</span><span class="str">&quot;utf-8&quot;</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">                <span class="nam">timeout</span><span class="op">=</span><span class="nam">TEMPO_LIMITE_EM_SEGUNDOS</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">        <span class="key">except</span> <span class="nam">subprocess</span><span class="op">.</span><span class="nam">TimeoutExpired</span> <span class="key">as</span> <span class="nam">erro</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">            <span class="key">raise</span> <span class="nam">FalhaDoProvedor</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t">                <span class="str">f&quot;a CLI do Kiro passou do tempo limite de {TEMPO_LIMITE_EM_SEGUNDOS} s&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">            <span class="op">)</span> <span class="key">from</span> <span class="nam">erro</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">        <span class="key">except</span> <span class="nam">OSError</span> <span class="key">as</span> <span class="nam">erro</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t">            <span class="key">raise</span> <span class="nam">FalhaDoProvedor</span><span class="op">(</span><span class="str">f&quot;a CLI do Kiro n&#227;o p&#244;de ser executada: {erro}&quot;</span><span class="op">)</span> <span class="key">from</span> <span class="nam">erro</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">        <span class="key">if</span> <span class="nam">processo</span><span class="op">.</span><span class="nam">returncode</span> <span class="op">!=</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">            <span class="key">raise</span> <span class="nam">FalhaDoProvedor</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">                <span class="str">f&quot;a CLI do Kiro terminou com c&#243;digo de sa&#237;da {processo.returncode}&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">        <span class="key">return</span> <span class="nam">processo</span><span class="op">.</span><span class="nam">stdout</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">                <span class="nam">errors</span><span class="op">=</span><span class="str">&quot;replace&quot;</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">                <span class="nam">timeout</span><span class="op">=</span><span class="nam">TEMPO_LIMITE_EM_SEGUNDOS</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">        <span class="key">except</span> <span class="nam">subprocess</span><span class="op">.</span><span class="nam">TimeoutExpired</span> <span class="key">as</span> <span class="nam">erro</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t">            <span class="key">raise</span> <span class="nam">FalhaDoProvedor</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">                <span class="str">f&quot;a CLI do Kiro passou do tempo limite de {TEMPO_LIMITE_EM_SEGUNDOS} s&quot;</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">            <span class="op">)</span> <span class="key">from</span> <span class="nam">erro</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t">        <span class="key">except</span> <span class="nam">OSError</span> <span class="key">as</span> <span class="nam">erro</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">            <span class="key">raise</span> <span class="nam">FalhaDoProvedor</span><span class="op">(</span><span class="str">f&quot;a CLI do Kiro n&#227;o p&#244;de ser executada: {erro}&quot;</span><span class="op">)</span> <span class="key">from</span> <span class="nam">erro</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">        <span class="key">if</span> <span class="nam">processo</span><span class="op">.</span><span class="nam">returncode</span> <span class="op">!=</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">            <span class="key">raise</span> <span class="nam">FalhaDoProvedor</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">                <span class="str">f&quot;a CLI do Kiro terminou com c&#243;digo de sa&#237;da {processo.returncode}&quot;</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">        <span class="key">return</span> <span class="nam">processo</span><span class="op">.</span><span class="nam">stdout</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t"><span class="key">def</span> <span class="nam">ler_resposta</span><span class="op">(</span><span class="nam">saida</span><span class="op">:</span> <span class="nam">str</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="nam">RespostaDoProvedor</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t">    <span class="nam">texto</span> <span class="op">=</span> <span class="nam">saida</span><span class="op">.</span><span class="nam">strip</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">texto</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">        <span class="key">raise</span> <span class="nam">FalhaDoProvedor</span><span class="op">(</span><span class="str">&quot;a CLI do Kiro respondeu sem texto&quot;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">    <span class="key">return</span> <span class="nam">RespostaDoProvedor</span><span class="op">(</span><span class="nam">texto</span><span class="op">,</span> <span class="nam">tokens</span><span class="op">=</span><span class="key">None</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t"><span class="key">def</span> <span class="nam">ler_resposta</span><span class="op">(</span><span class="nam">saida</span><span class="op">:</span> <span class="nam">str</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="nam">RespostaDoProvedor</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">    <span class="nam">texto</span> <span class="op">=</span> <span class="nam">saida</span><span class="op">.</span><span class="nam">strip</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">texto</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">        <span class="key">raise</span> <span class="nam">FalhaDoProvedor</span><span class="op">(</span><span class="str">&quot;a CLI do Kiro respondeu sem texto&quot;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t">    <span class="key">return</span> <span class="nam">RespostaDoProvedor</span><span class="op">(</span><span class="nam">texto</span><span class="op">,</span> <span class="nam">tokens</span><span class="op">=</span><span class="key">None</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -134,7 +135,7 @@
             <a class="nav" href="z_2c7f5d14372dfda1_sanitizacao_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.2">coverage.py v7.16.2</a>,
-            created at 2026-11-09 13:56 -0300
+            created at 2026-11-10 20:06 -0300
         </p>
     </div>
 </footer>
