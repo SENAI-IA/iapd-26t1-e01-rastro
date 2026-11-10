@@ -64,7 +64,7 @@ export default function App({ relatorio }: Props) {
   const [origemAberta, setOrigemAberta] = useState<OrigemDoDado | null>(null);
   const [taskAberta, setTaskAberta] = useState<Acao | null>(null);
   const [zonaEmFoco, setZonaEmFoco] = useState<NomeDaZona | null>(null);
-  const [tela, setTela] = useState<Tela>("painel");
+  const [tela, setTela] = useState<Tela>(relatorio ? "painel" : "como-usar");
   const [passosDoTour, setPassosDoTour] = useState<PassoDoTour[] | null>(null);
   const zonaQueSaiuDoFoco = useRef<NomeDaZona | null>(null);
   const topo = useRef<HTMLDivElement>(null);

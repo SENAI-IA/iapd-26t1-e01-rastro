@@ -1,5 +1,6 @@
 import json
 from importlib import resources
+from pathlib import Path
 from typing import Any
 
 NOME_DO_HTML = "relatorio.html"
@@ -14,8 +15,12 @@ class ModeloSemTagDosDados(Exception):
         )
 
 
+def caminho_do_modelo() -> Path:
+    return Path(str(resources.files("rastro.relatorio").joinpath("modelo.html"))).resolve()
+
+
 def ler_modelo() -> str:
-    return resources.files("rastro.relatorio").joinpath("modelo.html").read_text(encoding="utf-8")
+    return caminho_do_modelo().read_text(encoding="utf-8")
 
 
 def montar_html(modelo: str, relatorio: dict[str, Any]) -> str:

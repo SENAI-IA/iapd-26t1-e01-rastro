@@ -344,7 +344,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R23.1–R23.7
   - Revisão: @halan.bacca
 
-- [ ] **T56 Abrir o Como usar pela linha de comando**
+- [x] **T56 Abrir o Como usar pela linha de comando**
   - Entrega: o comando `python -m rastro como-usar` abre no navegador o relatório sem dados, que passa a começar na tela "Como usar".
   - Aceite: `como-usar` abre o `modelo.html` do pacote e mostra o caminho, sem ler HAR, sem rede e sem gravar; sem navegador, avisa e mostra o caminho com código 0; o `--help` lista o comando; o relatório com análise continua abrindo no painel. Teste com o navegador trocado por dublê.
   - Arquivos: `rastro/cli.py`, `rastro/relatorio/html.py`, `tests/test_cli.py`, `frontend/src/App.tsx`, `rastro/relatorio/modelo.html`, `README.md`

@@ -37,6 +37,14 @@ Na pasta onde quer o projeto:
 
 ## Uso
 
+Para ver o passo a passo antes de ter um HAR, abra o guia **Como usar** do relatório, sem analisar nada:
+
+| Linux | Windows (PowerShell) — a conferir (T42) |
+|---|---|
+| `python3 -m rastro como-usar` | `py -m rastro como-usar` |
+
+O comando abre no navegador o relatório sem dados, já na aba "Como usar", e mostra no terminal o caminho do arquivo. Não lê HAR, não acessa a rede e não grava nada. Se o navegador não abrir (num servidor sem tela, por exemplo), abra esse arquivo à mão.
+
 ### 1. Gravar o HAR
 
 No Chrome ou no Edge, no site que você quer analisar (o seu, ou um que tem autorização para auditar):
@@ -132,7 +140,7 @@ Os critérios marcados *(verificação manual)* na spec só se conferem olhando 
 
 | # | Passo | O que deve acontecer | Critério | Linux | Windows |
 |---|---|---|---|---|---|
-| 1 | Rodar `python3 -m rastro --help` (Windows: `py -m rastro --help`) | Mostra o comando `analisar`; no `analisar --help`, `--sem-ia` diz o que se perde na mesma linha | R14.7 | conferido 09/11 | a conferir (T42) |
+| 1 | Rodar `python3 -m rastro --help` (Windows: `py -m rastro --help`) | Mostra os comandos `analisar` e `como-usar`; no `analisar --help`, `--sem-ia` diz o que se perde na mesma linha | R14.7 | conferido 09/11 | a conferir (T42) |
 | 2 | Analisar `avaliacao/webgoat.har` com IA | Terminal mostra a pasta, o `relatorio.html` e o resumo de uma linha | R13.1, R13.8 | conferido 09/11 (Kiro) | a conferir (T42) |
 | 3 | Analisar o mesmo HAR com `--sem-ia` | Terminal e topo do relatório avisam que a análise está incompleta; "Encontradas só pela IA" mostra "Não procurado" | R14.5, R14.6 | conferido 09/11 | a conferir (T42) |
 | 4 | Rodar com `--ia gpt` | Erro com código 1 listando `kiro, claude, codex` | R14.2 | conferido 09/11 | a conferir (T42) |
@@ -148,6 +156,7 @@ Os critérios marcados *(verificação manual)* na spec só se conferem olhando 
 | 14 | Abrir o relatório e clicar em "Como usar" e de volta em "Painel" | Abre no painel; "Como usar" mostra os sete passos com ilustração, "Marcar como feito" soma no progresso e os comandos têm "Copiar" | R23.1, R23.5 | conferido 10/11 (print 12) | a conferir (T42) |
 | 15 | Clicar em "Tour guiado" e andar com "Próximo", "Voltar" e as setas; fechar com `Esc` | Destaca uma parte por vez, com "n de total" e os termos do glossário; só as partes que a análise tem; o foco volta ao botão | R23.2, R23.3, R23.4 | conferido 10/11 (print 11; WebGoat com 11 passos, `loja.har` com 10, Juice Shop sem IA com 9; claro, escuro e 400px) | a conferir (T42) |
 | 16 | Ativar "reduzir movimento" no sistema e abrir o tour e o "Como usar" | Ilustrações paradas e destaque sem transição | R23.7 | conferido 10/11 (Chromium com `prefers-reduced-motion`) | a conferir (T42) |
+| 17 | Rodar `python3 -m rastro como-usar` (Windows: `py -m rastro como-usar`) | O navegador abre o relatório sem dados já no "Como usar", sem o botão "Tour guiado"; o terminal mostra o caminho do `modelo.html` | R23.1, R23.8 | conferido 10/11 (Chromium; com dados, o relatório segue abrindo no painel) | a conferir (T42) |
 
 "Conferido 09/11" quer dizer: visto na tela, no Chromium, nos prints de `docs/prints/` ou numa conferência automatizada com o Playwright. "A conferir" fica para a pessoa do grupo que seguir este README do zero (revisão da T43) e para a T42, no Windows.
 

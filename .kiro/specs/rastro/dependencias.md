@@ -153,11 +153,10 @@ Atraso em qualquer uma delas atrasa a entrega. A fase 3 (T33–T37) e o frontend
 
 ## Situação em 10/11
 
-Tudo até a T55 está commitado. Faltam a T56 e tasks da fase 4:
+Tudo até a T56 está commitado. Faltam só tasks da fase 4:
 
 | Task | Estado | Pode começar? |
 |---|---|---|
-| T56 Abrir o Como usar pela linha de comando | em andamento | — (T52 e T55 commitadas) |
 | T46 Medir com e sem IA | em andamento | — (falta o tempo de triagem manual) |
 | T42 Instalar do zero no Windows e no Linux | a fazer | **sim**: T25, T43 e T52 commitadas |
 | T47 Gravar a apresentação e o demo | a fazer | não: espera T42 e T46 |

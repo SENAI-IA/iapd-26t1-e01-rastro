@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import webbrowser
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,7 @@ from rastro.relatorio.gravacao import (
     nome_da_aplicacao,
     pasta_padrao,
 )
+from rastro.relatorio.html import caminho_do_modelo
 from rastro.relatorio.json import (
     PRIORIDADES,
     TEXTO_ACHADOS_SEM_EXPLICACAO,
@@ -59,6 +61,12 @@ AVISO_COM_IA = (
     "Análise com a IA {ia}. Cada chamada à IA pode levar até 2 minutos; "
     "o que ela sugere passa pelas travas antes do relatório."
 )
+AJUDA_COMO_USAR = "abre no navegador o guia do HAR ao relatório, sem analisar nada"
+TEXTO_COMO_USAR_ABERTO = 'Guia "Como usar" aberto no navegador: {caminho}'
+TEXTO_COMO_USAR_SEM_NAVEGADOR = (
+    "Não foi possível abrir o navegador. Abra este arquivo nele para ver o guia "
+    '"Como usar": {caminho}'
+)
 PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
     "kiro": ProvedorKiro,
     "claude": ProvedorClaude,
@@ -83,6 +91,11 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         metavar="PASTA",
         help="pasta dos relatórios (padrão: Rastro/relatorios na pasta do usuário)",
     )
+    comandos.add_parser(
+        "como-usar",
+        help=AJUDA_COMO_USAR,
+        description='Abre no navegador o guia "Como usar" do relatório, sem analisar nada.',
+    )
     return leitor
 
 
@@ -92,9 +105,20 @@ def executar(argumentos: list[str] | None = None) -> int:
     if opcoes.comando is None:
         leitor.print_help()
         return 0
+    if opcoes.comando == "como-usar":
+        return abrir_como_usar()
     if opcoes.sem_ia:
         return analisar_sem_ia(opcoes.har, opcoes.saida)
     return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia)
+
+
+def abrir_como_usar() -> int:
+    caminho = caminho_do_modelo()
+    if webbrowser.open(caminho.as_uri()):
+        print(TEXTO_COMO_USAR_ABERTO.format(caminho=caminho))
+    else:
+        print(TEXTO_COMO_USAR_SEM_NAVEGADOR.format(caminho=caminho))
+    return 0
 
 
 def analisar_com_ia(caminho_har: Path, saida: Path | None, opcao_ia: str | None) -> int:

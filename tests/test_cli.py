@@ -17,6 +17,7 @@ from rastro.fontes.nvd import BuscaDeCvss
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.ia import cliente
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
+from rastro.relatorio.html import TAG_DOS_DADOS_VAZIA
 from tests.dubles import (
     DADOS,
     HAR_DA_LOJA,
@@ -103,6 +104,59 @@ def test_r14_7_ajuda_descreve_sem_ia_e_o_que_se_perde_na_mesma_linha(
     linhas = capsys.readouterr().out.splitlines()
     linha_da_opcao = next(linha for linha in linhas if linha.strip().startswith("--sem-ia"))
     assert "não procura bibliotecas em bundles e não explica os achados" in linha_da_opcao
+
+
+class NavegadorFalso:
+    def __init__(self, abre: bool) -> None:
+        self.abre = abre
+        self.enderecos: list[str] = []
+
+    def __call__(self, endereco: str) -> bool:
+        self.enderecos.append(endereco)
+        return self.abre
+
+
+def test_r23_8_como_usar_aparece_na_ajuda(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit):
+        executar(["--help"])
+
+    assert "como-usar" in capsys.readouterr().out
+
+
+def test_r23_8_como_usar_abre_o_modelo_sem_dados_no_navegador(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    navegador = NavegadorFalso(abre=True)
+    monkeypatch.setattr(cli.webbrowser, "open", navegador)
+
+    assert executar(["como-usar"]) == 0
+
+    modelo = Path(cli.__file__).parent / "relatorio" / "modelo.html"
+    assert navegador.enderecos == [modelo.resolve().as_uri()]
+    assert TAG_DOS_DADOS_VAZIA in modelo.read_text(encoding="utf-8")
+    assert str(modelo.resolve()) in capsys.readouterr().out
+
+
+def test_r23_8_como_usar_sem_navegador_mostra_o_caminho_e_retorna_0(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(cli.webbrowser, "open", NavegadorFalso(abre=False))
+
+    assert executar(["como-usar"]) == 0
+
+    saida = capsys.readouterr().out
+    assert "Não foi possível abrir o navegador" in saida
+    assert "modelo.html" in saida
+
+
+def test_r23_8_como_usar_nao_grava_nada(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(cli.webbrowser, "open", NavegadorFalso(abre=True))
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    monkeypatch.chdir(tmp_path)
+
+    executar(["como-usar"])
+
+    assert list(tmp_path.iterdir()) == []
 
 
 @pytest.mark.usefixtures("fontes_falsas")

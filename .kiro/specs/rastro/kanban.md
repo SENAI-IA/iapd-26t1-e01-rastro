@@ -15,7 +15,6 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 
 ## Em andamento
 
-- [ ] **T56** Abrir o Como usar pela linha de comando · fase 2 · revisão @luiz.pagliari · 10/11
 - [ ] **T46** Medir com e sem IA · fase 4 · 04–08/12 · revisão @luiz.pagliari · parcial 09/11 · commit 08ed731 · pendente: tempo de triagem manual (medir com uma pessoa) · Codex fora da medição (chave de API removida, sem outra no grupo)
 
 ## Em revisão
@@ -70,6 +69,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T43** Escrever o README de uso · fase 4 · 04–08/12 · revisão @cristiano.albino · 09/11 · commit 7f2d2af
 - [ ] **T54** Rever a visita num radar · fase 2 · revisão @halan.bacca · 09/11 · spec da42b94 · commit 9b73418
 - [ ] **T55** Ensinar a usar o relatório: tour guiado e Como usar · fase 2 · revisão @halan.bacca · 10/11
+- [ ] **T56** Abrir o Como usar pela linha de comando · fase 2 · revisão @luiz.pagliari · 10/11 · spec 7ed91fe
 - [ ] **S01** Atualizar PRD, pitch e steering com as decisões da spec e regerar os PDFs · antes da fase 0 · revisão: todos, junto com a spec (S02)
 - [ ] **S04** Alinhar a spec com a implementação: hashes do kanban, OSV e NVD entregues, design conferido com o código, sem "MVP" e pasta `specs/rastro` · revisão: todos · 10/11
 
