@@ -99,6 +99,10 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
     return leitor
 
 
+def principal() -> None:
+    sys.exit(executar())
+
+
 def executar(argumentos: list[str] | None = None) -> int:
     leitor = criar_leitor_de_argumentos()
     opcoes = leitor.parse_args(argumentos)

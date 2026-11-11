@@ -64,12 +64,13 @@
 | T50 Completar o CVSS pelo NVD | 14 | T12, T23, T32 | T51 | extensão: só com fases 1 e 2 fechadas |
 | T54 Rever a visita num radar | 14 | T23, T32 | T44 | `visita` no JSON; radar também em foco |
 | T55 Ensinar a usar o relatório: tour guiado e Como usar | 15 | T39, T43, T54 | T47, T48 | o tour passa pelo painel da IA e pelo radar; o guia usa os comandos do README |
-| T42 Instalar do zero no Windows e no Linux | 15 | T25, T43, T52 | T47, T48 | segue o README, com e sem IA |
 | T51 Juntar avisos de fontes diferentes | 15 | T49, T50 | T44 | |
 | T56 Abrir o Como usar pela linha de comando | 16 | T52, T55 | T47, T48 | o comando abre o relatório sem dados da T55; o demo pode começar por ele |
 | T44 Publicar o relatório de cobertura | 16 | T51, T52, T54 | T48 | depois do último código |
-| T47 Gravar a apresentação e o demo | 16 | T42, T43, T46, T55, T56 | T48 | números reais, instalação conferida e o relatório final na tela |
-| T48 Preparar a versão final | 17 | T42, T43, T44, T45, T46, T47, T55, T56 | — | última |
+| T57 Rodar o Rastro de qualquer pasta | 17 | T56 | T42, T47, T48 | o comando `rastro` chama a mesma CLI, com `como-usar` |
+| T42 Instalar do zero no Windows e no Linux | 18 | T25, T43, T52, T57 | T47, T48 | segue o README, com e sem IA, e confere o comando `rastro` no Windows |
+| T47 Gravar a apresentação e o demo | 19 | T42, T43, T46, T55, T56, T57 | T48 | números reais, instalação conferida e o relatório final na tela |
+| T48 Preparar a versão final | 20 | T42, T43, T44, T45, T46, T47, T55, T56, T57 | — | última |
 
 ## Grafo
 
@@ -84,7 +85,7 @@ flowchart LR
     T08; T09; T10; T11; T12; T13; T14; T15; T16; T17; T18; T19; T20; T21; T22; T23
   end
   subgraph F2[Fase 2]
-    T24; T25; T26; T27; T28; T29; T30; T31; T32; T54; T55; T56
+    T24; T25; T26; T27; T28; T29; T30; T31; T32; T54; T55; T56; T57
   end
   subgraph F3[Fase 3]
     T33; T34; T35; T36; T37; T38; T39; T40; T41; T52
@@ -123,6 +124,7 @@ flowchart LR
   T23 & T32 --> T54
   T39 & T43 & T54 --> T55
   T52 & T55 --> T56
+  T56 --> T57
 
   T02 & T33 --> T35 & T36 & T37
   T15 & T16 & T23 & T33 & T34 --> T38
@@ -136,28 +138,28 @@ flowchart LR
   T49 & T50 --> T51
 
   T06 & T32 & T39 & T52 --> T43
-  T25 & T43 & T52 --> T42
+  T25 & T43 & T52 & T57 --> T42
   T51 & T52 & T54 --> T44
   T04 & T52 --> T46
-  T42 & T43 & T46 & T55 & T56 --> T47
-  T42 & T43 & T44 & T45 & T46 & T47 & T55 & T56 --> T48
+  T42 & T43 & T46 & T55 & T56 & T57 --> T47
+  T42 & T43 & T44 & T45 & T46 & T47 & T55 & T56 & T57 --> T48
 ```
 
 ## Caminho crítico
 
 A sequência mais longa, que decide a data final:
 
-T03 (ou T05) → T08 → T10 → T17 → T18 → T21 → T22 → T23 → T25 → T26 → T28 → T29 → T32 → T43 → T42 → T47 → T48
+T03 (ou T05) → T08 → T10 → T17 → T18 → T21 → T22 → T23 → T25 → T26 → T28 → T29 → T32 → T43 → T55 → T56 → T57 → T42 → T47 → T48
 
 Atraso em qualquer uma delas atrasa a entrega. A fase 3 (T33–T37) e o frontend base (T24) começam cedo e correm em paralelo ao núcleo.
 
-## Situação em 10/11
+## Situação em 11/11
 
-Tudo até a T56 está commitado. Faltam só tasks da fase 4:
+Tudo até a T57 está commitado. Faltam só tasks da fase 4:
 
 | Task | Estado | Pode começar? |
 |---|---|---|
 | T46 Medir com e sem IA | em andamento | — (falta o tempo de triagem manual) |
-| T42 Instalar do zero no Windows e no Linux | a fazer | **sim**: T25, T43 e T52 commitadas |
+| T42 Instalar do zero no Windows e no Linux | a fazer | **sim**: T25, T43, T52 e T57 commitadas |
 | T47 Gravar a apresentação e o demo | a fazer | não: espera T42 e T46 |
 | T48 Preparar a versão final | a fazer | não: espera T42, T46 e T47 |

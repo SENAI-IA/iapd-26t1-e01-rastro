@@ -20,6 +20,7 @@ A análise é passiva: Rastro lê o HAR e não acessa o site analisado.
 
 - [Antes de começar](#antes-de-começar)
 - [Instalar](#instalar)
+- [Usar de qualquer pasta (opcional)](#usar-de-qualquer-pasta-opcional)
 - [Ver o guia sem analisar](#ver-o-guia-sem-analisar)
 - [Gravar um arquivo HAR](#gravar-um-arquivo-har)
 - [Fazer uma análise](#fazer-uma-análise)
@@ -42,7 +43,7 @@ Você precisa de:
 
 Node.js não é necessário para usar o Rastro. O relatório HTML já vem pronto no projeto.
 
-Rastro não instala Python, Node.js nem CLI de IA. Também não exige `sudo`, administrador ou instalação global.
+Rastro não instala Python, Node.js nem CLI de IA. Nada é instalado no sistema nem pede `sudo` ou administrador; a instalação opcional do comando `rastro` com o pipx fica na pasta do usuário.
 
 ## Instalar
 
@@ -80,6 +81,31 @@ py --version
 py -m rastro --help
 ```
 
+## Usar de qualquer pasta (opcional)
+
+Sem instalar nada, os comandos `python3 -m rastro` rodam na pasta do projeto. Se você usa o Rastro com frequência, pode instalar o comando `rastro` e rodá-lo de qualquer pasta, por exemplo onde o navegador salvou o HAR:
+
+```bash
+cd ~/Downloads
+rastro analisar site.har
+```
+
+A instalação usa o [pipx](https://pipx.pypa.io/), que cria um ambiente só para o Rastro dentro da sua pasta de usuário. Não mexe no Python do sistema e não pede `sudo` nem administrador.
+
+| Passo | Linux | Windows (PowerShell) — a conferir |
+|---|---|---|
+| 1. Instalar o pipx (uma vez) | `python3 -m pip install --user pipx` | `py -m pip install --user pipx` |
+| 2. Pôr o pipx no PATH (uma vez) | `python3 -m pipx ensurepath` | `py -m pipx ensurepath` |
+| 3. Instalar o Rastro, na pasta do projeto | `python3 -m pipx install .` | `py -m pipx install .` |
+| 4. Conferir, num terminal novo e em outra pasta | `rastro --help` | `rastro --help` |
+
+- O passo 3 precisa de internet uma vez.
+- Depois de atualizar o projeto (`git pull`), rode de novo na pasta do projeto: `python3 -m pipx install --force .` (Windows: `py -m pipx install --force .`).
+- Para remover: `python3 -m pipx uninstall rastro` (Windows: `py -m pipx uninstall rastro`).
+- No Ubuntu, se o passo 1 recusar com `externally-managed-environment`, instale o pipx pela distribuição: `sudo apt install pipx`. O `sudo` é para o pipx, não para o Rastro.
+
+Com o comando instalado, troque `python3 -m rastro` (Windows: `py -m rastro`) por `rastro` em todos os exemplos abaixo.
+
 ## Ver o guia sem analisar
 
 O Rastro possui um guia visual com o passo a passo completo:
@@ -113,7 +139,7 @@ Para testar sem gravar um arquivo, use os exemplos em [`avaliacao/`](avaliacao/R
 
 ## Fazer uma análise
 
-Execute o comando na raiz do projeto.
+Execute o comando na raiz do projeto ou, com o [comando `rastro` instalado](#usar-de-qualquer-pasta-opcional), em qualquer pasta.
 
 ### Com IA
 
@@ -210,6 +236,10 @@ Detalhes dos arquivos e dos resultados ficam em [`avaliacao/README.md`](avaliaca
 ### `python3: command not found`
 
 Instale Python 3.10 ou mais novo. No Windows, use o comando `py`.
+
+### `rastro: command not found` depois de instalar com o pipx
+
+Abra um terminal novo: o `pipx ensurepath` só vale para os terminais abertos depois dele. Se continuar, rode `python3 -m pipx ensurepath` (Windows: `py -m pipx ensurepath`) de novo. Enquanto isso, `python3 -m rastro` na pasta do projeto continua funcionando.
 
 ### CLI de IA não encontrada
 

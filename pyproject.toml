@@ -1,9 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "rastro"
 version = "0.1.0"
 description = "Lê um HAR, identifica bibliotecas front-end e prioriza as falhas conhecidas."
 requires-python = ">=3.10"
 dependencies = []
+
+[project.scripts]
+rastro = "rastro.cli:principal"
+
+[tool.setuptools.packages.find]
+include = ["rastro*"]
+
+[tool.setuptools.package-data]
+"rastro.relatorio" = ["modelo.html"]
+"rastro.ia" = ["prompts/*.md"]
 
 [tool.ruff]
 line-length = 100

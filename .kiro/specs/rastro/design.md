@@ -42,8 +42,8 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 
 | Arquivo | Responsabilidade | Requisitos |
 |---|---|---|
-| `rastro/__main__.py` | permite `python -m rastro` | R01.1 |
-| `rastro/cli.py` | lê argumentos, escolhe o provedor, chama o fluxo, grava, imprime o resumo; `como-usar` abre o modelo no navegador | R13.8, R14, R23.8 |
+| `rastro/__main__.py` | permite `python -m rastro`, chamando `cli.principal()` | R01.1 |
+| `rastro/cli.py` | lê argumentos, escolhe o provedor, chama o fluxo, grava, imprime o resumo; `como-usar` abre o modelo no navegador; `principal()` é a entrada do `python -m rastro` e do comando `rastro` instalado com o pipx | R13.8, R14, R18.1, R23.8 |
 | `rastro/fluxo.py` | orquestra as etapas, sem regra própria | todos |
 | `rastro/har/leitor.py` | lê e valida o HAR, decodifica base64 | R01 |
 | `rastro/har/modelos.py` | `Requisicao`, `Cookie` | R01 |

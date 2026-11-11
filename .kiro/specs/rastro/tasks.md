@@ -14,7 +14,7 @@ Ordem: spike → núcleo determinístico → relatório HTML → explicação po
 |---|---|---|
 | 0. Preparar | 09–13/11 | T01–T07 |
 | 1. Núcleo determinístico | 16–25/11 | T08–T23 |
-| 2. Relatório HTML | 23–28/11 | T24–T32, T54–T56 |
+| 2. Relatório HTML | 23–28/11 | T24–T32, T54–T57 |
 | 3. IA | 30/11–04/12 | T33–T41, T52 |
 | 4. Entregar | 04–08/12 | T42–T48 |
 | Extensão: OSV e NVD (só se houver tempo) | até 02/12 | T49–T51 |
@@ -31,7 +31,7 @@ O Paulo escreve todas as tasks com o agente e é o autor dos commits. Os revisor
 | @cristiano.albino | Fontes e travas: GitHub Advisory, OSV, npm, travas, privacidade, decisões | T01, T12–T16, T34, T43, T45, T49 | 10 |
 | @geison.santos | Risco e ação: nota, prioridade, checagens, plano, task, relatório JSON, junção de fontes | T04, T17–T23, T44, T51 | 10 |
 | @halan.bacca | Relatório HTML: frontend, origem do dado, glossário, modo foco, tour e guia | T24–T32, T47, T54, T55 | 12 |
-| @luiz.pagliari | IA: CLIs, cliente, provedores, explicação, painel, linha de comando, medição, versão final | T02, T06, T07, T33, T35–T39, T46, T48, T52, T56 | 13 |
+| @luiz.pagliari | IA: CLIs, cliente, provedores, explicação, painel, linha de comando, medição, versão final | T02, T06, T07, T33, T35–T39, T46, T48, T52, T56, T57 | 14 |
 
 ## Como cada task chega ao `main`
 
@@ -352,6 +352,14 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Requisito: R23.1, R23.8
   - Revisão: @luiz.pagliari
 
+- [x] **T57 Rodar o Rastro de qualquer pasta**
+  - Entrega: o comando `rastro`, instalado por usuário com `pipx install .`, roda `analisar` e `como-usar` de qualquer pasta.
+  - Aceite: o pacote montado do projeto cria o comando `rastro` e leva o `modelo.html` e os prompts; instalado, `rastro --help` funciona fora da pasta do projeto e `rastro analisar` grava o relatório com o `modelo.html`; `python -m rastro` na raiz continua igual; README e README técnico com o passo a passo no Linux e no Windows (Windows a conferir na T42).
+  - Arquivos: `pyproject.toml`, `requirements-dev.txt`, `rastro/cli.py`, `rastro/__main__.py`, `tests/test_cli.py`, `tests/test_instalacao.py`, `README.md`, `README-TECNICO.md`, `.kiro/steering/tech.md`
+  - Teste: `test_r18_1_*`: monta o pacote sem rede (`pip wheel --no-build-isolation --no-index`) e confere o comando e os arquivos de dados; `principal()` sai com o código da execução. A instalação com o pipx, verificação manual.
+  - Requisito: R18.1, R20.1
+  - Revisão: @luiz.pagliari
+
 ## Fase 3. IA
 
 - [x] **T33 Criar o cliente de IA e a escolha do provedor**
@@ -438,7 +446,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 - [ ] **T42 Instalar do zero no Windows e no Linux**
   - Entrega: instalação conferida numa máquina limpa de cada sistema, só com Python e a CLI de IA já instalada.
-  - Aceite: seguindo só o README, gera o relatório com IA e com `--sem-ia`, sem Node e sem instalar nada global; no Windows, a lista "A conferir no Windows" de `docs/spike/clis-de-ia.md` está conferida e a coluna Windows da tabela de provedores do design, preenchida.
+  - Aceite: seguindo só o README, gera o relatório com IA e com `--sem-ia`, sem Node e sem instalar nada global; o comando `rastro` instalado com o pipx (T57) roda de outra pasta; no Windows, a lista "A conferir no Windows" de `docs/spike/clis-de-ia.md` está conferida e a coluna Windows da tabela de provedores do design, preenchida.
   - Arquivos: `README.md` (ajustes que aparecerem), `docs/spike/clis-de-ia.md`, `design.md`
   - Teste: verificação manual.
   - Requisito: R14.4, R17.2, R18.1, R20.1–R20.3

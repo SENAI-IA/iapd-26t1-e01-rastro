@@ -79,6 +79,17 @@ def test_r14_7_sem_argumentos_mostra_a_ajuda_e_retorna_0(
     assert "HAR" in capsys.readouterr().out
 
 
+def test_r18_1_comando_rastro_sai_com_o_codigo_da_execucao(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(cli, "executar", lambda: 1)
+
+    with pytest.raises(SystemExit) as saida:
+        cli.principal()
+
+    assert saida.value.code == 1
+
+
 def test_r14_7_python_m_rastro_help_retorna_0() -> None:
     resultado = subprocess.run(
         [sys.executable, "-m", "rastro", "--help"],
