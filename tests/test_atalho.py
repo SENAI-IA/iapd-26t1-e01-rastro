@@ -168,17 +168,31 @@ def test_r17_3_instalar_e_desinstalar_aparecem_na_ajuda(
     assert "desinstalar" in saida
 
 
-def test_r17_3_cli_instalar_mostra_o_proximo_passo(
+def test_r17_3_cli_instalar_pede_terminal_novo_quando_mexe_no_path(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     monkeypatch.setattr(atalho, "instalar", lambda: instalar_no_unix(tmp_path, ambiente(tmp_path)))
 
     assert cli.executar(["instalar"]) == 0
 
-    saida = capsys.readouterr().out
-    assert str(atalho_unix(tmp_path)) in saida
-    assert "rastro --help" in saida
-    assert "rastro desinstalar" in saida
+    assert capsys.readouterr().out == (
+        "Pronto! Comando rastro instalado.\nAbra um terminal novo e teste com: rastro --help\n"
+    )
+
+
+def test_r17_3_cli_instalar_com_a_pasta_no_path_testa_no_mesmo_terminal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = f"{tmp_path / '.local' / 'bin'}{os.pathsep}{PATH_SEM_A_PASTA}"
+    monkeypatch.setattr(
+        atalho, "instalar", lambda: instalar_no_unix(tmp_path, ambiente(tmp_path, path=path))
+    )
+
+    assert cli.executar(["instalar"]) == 0
+
+    assert capsys.readouterr().out == (
+        "Pronto! Comando rastro instalado.\nTeste com: rastro --help\n"
+    )
 
 
 def test_r17_3_cli_instalar_com_comando_de_outro_sai_com_1(
@@ -199,7 +213,7 @@ def test_r17_3_cli_desinstalar_sem_nada_instalado_retorna_0(
     monkeypatch.setattr(atalho, "desinstalar", lambda: desinstalar_no_unix(tmp_path))
 
     assert cli.executar(["desinstalar"]) == 0
-    assert "Nada a remover" in capsys.readouterr().out
+    assert capsys.readouterr().out == "O comando rastro não está instalado.\n"
 
 
 def test_r17_3_cli_desinstalar_confirma_o_que_removeu(
@@ -210,7 +224,5 @@ def test_r17_3_cli_desinstalar_confirma_o_que_removeu(
 
     assert cli.executar(["desinstalar"]) == 0
 
-    saida = capsys.readouterr().out
-    assert "Comando rastro removido" in saida
-    assert "relatórios continuam" in saida
+    assert capsys.readouterr().out == "Comando rastro removido.\n"
     assert FIM_DO_BLOCO not in (tmp_path / ".bashrc").read_text(encoding="utf-8")

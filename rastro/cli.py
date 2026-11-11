@@ -68,27 +68,13 @@ TEXTO_COMO_USAR_SEM_NAVEGADOR = (
     "Não foi possível abrir o navegador. Abra este arquivo nele para ver o guia "
     '"Como usar": {caminho}'
 )
-AJUDA_INSTALAR = "cria o comando rastro para usar de qualquer pasta, só na sua pasta de usuário"
-AJUDA_DESINSTALAR = "remove o comando rastro criado pelo instalar; o projeto e os relatórios ficam"
-TEXTO_INSTALADO = (
-    "Comando rastro instalado em: {atalho}\n"
-    "Ele usa o Rastro desta pasta: {projeto}\n"
-    "Se mover ou apagar essa pasta, rode o instalar de novo no novo lugar."
-)
-TEXTO_PATH_ALTERADO = "Pasta do comando adicionada ao PATH em: {onde}"
-TEXTO_PROXIMO_PASSO = "\n".join(
-    [
-        "Pronto! Abra um terminal novo e digite: rastro --help",
-        "Para remover depois: rastro desinstalar",
-    ]
-)
-TEXTO_DESINSTALADO = "Comando rastro removido: {atalho}"
-TEXTO_PATH_REMOVIDO = "Pasta do comando tirada do PATH em: {onde}"
-TEXTO_NADA_A_REMOVER = "O comando rastro não está instalado. Nada a remover."
-TEXTO_DESINSTALADO_FIM = (
-    "O projeto e os relatórios continuam onde estavam. Para usar sem o comando: "
-    "python3 -m rastro na pasta do projeto (Windows: py -m rastro)."
-)
+AJUDA_INSTALAR = "cria o comando rastro para usar em qualquer pasta"
+AJUDA_DESINSTALAR = "remove o comando rastro"
+TEXTO_INSTALADO = "Pronto! Comando rastro instalado."
+TEXTO_TESTE_NO_MESMO_TERMINAL = "Teste com: rastro --help"
+TEXTO_TESTE_NUM_TERMINAL_NOVO = "Abra um terminal novo e teste com: rastro --help"
+TEXTO_DESINSTALADO = "Comando rastro removido."
+TEXTO_NADA_A_REMOVER = "O comando rastro não está instalado."
 PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
     "kiro": ProvedorKiro,
     "claude": ProvedorClaude,
@@ -121,18 +107,12 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
     comandos.add_parser(
         "instalar",
         help=AJUDA_INSTALAR,
-        description=(
-            "Cria o comando rastro para usar de qualquer pasta. Fica só na sua pasta de "
-            "usuário, sem sudo nem administrador, e usa o Rastro desta pasta do projeto."
-        ),
+        description="Cria o comando rastro para usar em qualquer pasta.",
     )
     comandos.add_parser(
         "desinstalar",
         help=AJUDA_DESINSTALAR,
-        description=(
-            "Remove o comando rastro e a linha do PATH criados pelo instalar. "
-            "Não mexe no projeto nem nos relatórios."
-        ),
+        description="Remove o comando rastro. O projeto e os relatórios ficam.",
     )
     return leitor
 
@@ -172,11 +152,11 @@ def instalar_comando() -> int:
         instalacao = atalho.instalar()
     except (atalho.ProjetoNaoEncontrado, atalho.AtalhoDeOutro) as erro:
         return encerrar_com_erro(str(erro))
-    print(TEXTO_INSTALADO.format(atalho=instalacao.atalho, projeto=instalacao.projeto))
+    print(TEXTO_INSTALADO)
     if instalacao.path_alterado_em:
-        print(TEXTO_PATH_ALTERADO.format(onde=instalacao.path_alterado_em))
-    print()
-    print(TEXTO_PROXIMO_PASSO)
+        print(TEXTO_TESTE_NUM_TERMINAL_NOVO)
+    else:
+        print(TEXTO_TESTE_NO_MESMO_TERMINAL)
     return 0
 
 
@@ -187,12 +167,8 @@ def desinstalar_comando() -> int:
         return encerrar_com_erro(str(erro))
     if desinstalacao.atalho_removido is None and not desinstalacao.path_removido_de:
         print(TEXTO_NADA_A_REMOVER)
-        return 0
-    if desinstalacao.atalho_removido is not None:
-        print(TEXTO_DESINSTALADO.format(atalho=desinstalacao.atalho_removido))
-    for onde in desinstalacao.path_removido_de:
-        print(TEXTO_PATH_REMOVIDO.format(onde=onde))
-    print(TEXTO_DESINSTALADO_FIM)
+    else:
+        print(TEXTO_DESINSTALADO)
     return 0
 
 
