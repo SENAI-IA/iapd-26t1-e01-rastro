@@ -220,7 +220,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 
 ## R18 Windows e Linux
 
-1. O Rastro DEVE funcionar em Windows e Linux com os mesmos comandos, exceto a ativação do venv.
+1. O Rastro DEVE funcionar em Windows e Linux com os mesmos comandos, exceto a ativação do venv. Vale para `python -m rastro` na raiz do projeto e para o comando `rastro`, instalado por usuário com o pipx, de qualquer pasta.
 2. A verificação (`ruff`, `mypy` e `pytest`) DEVE passar no Windows e no Linux, rodada na máquina local. Não há CI: antes de cada entrega, o resultado nos dois sistemas fica registrado em `docs/cobertura/`.
 
 ## R19 Qualidade

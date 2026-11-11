@@ -1,5 +1,3 @@
-import sys
+from rastro.cli import principal
 
-from rastro.cli import executar
-
-sys.exit(executar())
+principal()

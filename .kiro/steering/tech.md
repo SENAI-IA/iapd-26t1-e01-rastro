@@ -7,19 +7,19 @@
 - **IA:** Kiro (padrão), Claude ou Codex, chamados pela CLI já instalada e autenticada na máquina. Escolha por `--ia` ou `RASTRO_IA`.
 - **Dados:** GitHub Advisory; OSV e NVD como extensão opcional. Registro do npm só com leitura, para as travas.
 - **Qualidade:** pytest, pytest-cov, ruff, mypy.
-- **Entrega:** instalação local, só com Python (o HTML do relatório vai pronto no repo). Sem Docker e sem CI; o demo gravado cumpre o requisito "Docker ou vídeo".
+- **Entrega:** instalação local, só com Python (o HTML do relatório vai pronto no repo). Opcional: o comando `rastro`, instalado por usuário com o pipx. Sem Docker e sem CI; o demo gravado cumpre o requisito "Docker ou vídeo".
 
 ## Dependências
 
 - **Python em produção:** nenhuma. Nada de SDK de IA nem chave de API no projeto.
-- **Python em desenvolvimento:** `pytest`, `pytest-cov`, `ruff`, `mypy`, com versão fixa em `requirements-dev.txt`, instalados num `.venv` na raiz do projeto.
-- **Configuração:** `ruff`, `mypy` (modo `strict`), `pytest` e cobertura no `pyproject.toml`.
+- **Python em desenvolvimento:** `pytest`, `pytest-cov`, `ruff`, `mypy` e `setuptools` (monta o pacote no teste de instalação, sem rede), com versão fixa em `requirements-dev.txt`, instalados num `.venv` na raiz do projeto.
+- **Configuração:** `ruff`, `mypy` (modo `strict`), `pytest`, cobertura e o empacotamento (setuptools, comando `rastro` e arquivos de dados do pacote) no `pyproject.toml`. Arquivo novo que não seja `.py` dentro de `rastro/` entra em `[tool.setuptools.package-data]`.
 - **Frontend:** `react`, `react-dom`; em desenvolvimento, `vite`, `typescript`, `vite-plugin-singlefile` e o que o template `react-ts` do Vite já traz (`@vitejs/plugin-react` e os pacotes `@types/*`). O linter do template (`oxlint`) fica de fora: o `tsc` do build já confere os tipos. Sem biblioteca de componentes, de estado ou de gráficos. `package-lock.json` versionado.
 - Qualquer dependência nova precisa resolver algo que o padrão não resolve. Justifique antes de adicionar.
 
 ## Comandos
 
-Só comandos padrão: `python -m venv`, `pip install -r requirements.txt`, `python -m rastro`, `pytest`, `npm install`, `npm run build`. Nada de `Makefile` nem script `.sh`.
+Só comandos padrão: `python -m venv`, `pip install -r requirements.txt`, `python -m rastro`, `pipx install .` (opcional, para o comando `rastro`), `pytest`, `npm install`, `npm run build`. Nada de `Makefile` nem script `.sh`.
 
 ## Windows e Linux
 
@@ -37,7 +37,7 @@ Tudo precisa funcionar nos dois.
 
 - O Rastro só lê o HAR e nunca o altera.
 - O relatório é gravado numa pasta nova, `~/Rastro/relatorios/<site>/<AAAA-MM-DD_HH-MM-SS>/` (`--saida` troca a raiz), com arquivos abertos no modo `"x"`; se a pasta já existir, para com mensagem clara. Nome de pasta sem `:` e sem caracteres que o Windows não aceita.
-- Nada instalado globalmente, sem `sudo`, nenhum arquivo apagado.
+- Nada instalado no sistema, sem `sudo`, nenhum arquivo apagado. A instalação opcional com o pipx é feita pela pessoa e fica na pasta do usuário; o Rastro em si não instala nada.
 - Vale também para os comandos que o agente roda durante o desenvolvimento.
 
 ## Rede
