@@ -83,33 +83,22 @@ py -m rastro --help
 
 ## Usar de qualquer pasta (opcional)
 
-Sem instalar nada, os comandos `python3 -m rastro` rodam na pasta do projeto. Se você usa o Rastro com frequência, pode instalar o comando `rastro` e rodá-lo de qualquer pasta, por exemplo onde o navegador salvou o HAR:
+Para digitar só `rastro` em qualquer pasta, sem entrar na pasta do projeto:
 
-```bash
-cd ~/Downloads
-rastro analisar site.har
-```
+1. Na pasta do projeto, rode uma vez:
 
-Para isso, rode **uma vez**, na pasta do projeto:
+   ```bash
+   python3 -m rastro instalar
+   ```
 
-```bash
-python3 -m rastro instalar
-```
+   No Windows: `py -m rastro instalar` (a conferir).
 
-No Windows (a conferir): `py -m rastro instalar`.
+2. Feche o terminal e abra outro.
+3. Confira: `rastro --help`
 
-Depois **abra um terminal novo** e confira, em qualquer pasta:
+Pronto. Agora, nos exemplos abaixo, troque `python3 -m rastro` por `rastro`.
 
-```bash
-rastro --help
-```
-
-- Não precisa de internet, `sudo` nem administrador. Funciona também com um ambiente virtual (`.venv`) ativo.
-- O comando fica só na sua pasta de usuário e usa o Rastro da pasta do projeto: depois de um `git pull`, ele já usa a versão nova.
-- Se mover ou apagar a pasta do projeto, rode `python3 -m rastro instalar` de novo no novo lugar.
-- Para remover: `rastro desinstalar`. O projeto e os relatórios continuam onde estão.
-
-Com o comando instalado, troque `python3 -m rastro` (Windows: `py -m rastro`) por `rastro` em todos os exemplos abaixo.
+Para remover: `rastro desinstalar`. Se mudar a pasta do projeto de lugar, rode o passo 1 de novo.
 
 ## Ver o guia sem analisar
 
