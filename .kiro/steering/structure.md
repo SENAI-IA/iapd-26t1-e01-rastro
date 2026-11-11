@@ -16,6 +16,7 @@
 ```
 rastro/
   cli.py                   lê os argumentos e chama o fluxo
+  atalho.py                cria e remove o comando rastro na pasta do usuário (instalar e desinstalar)
   fluxo.py                 orquestra as etapas, sem regra própria; define a Analise
   har/                     leitor.py, modelos.py, site.py, visita.py
   identificacao/           modelos.py, assinaturas.py, bundles.py, ia.py

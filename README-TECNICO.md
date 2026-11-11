@@ -49,9 +49,9 @@ Este documento é referência para desenvolvimento, manutenção, agentes de IA 
 | CLI de IA instalada e autenticada: Kiro (`kiro-cli`, padrão), Claude (`claude`) ou Codex (`codex`) | só para a análise com IA | não |
 | Node.js | não: o HTML do relatório já vem pronto em `rastro/relatorio/modelo.html` | só para mudar o frontend |
 
-- O Rastro não tem dependência Python em produção: não há `pip install` para usar. O comando `rastro` instalado com o pipx é opcional.
+- O Rastro não tem dependência Python em produção: não há `pip install` para usar. O comando `rastro` de qualquer pasta é opcional (`python3 -m rastro instalar`).
 - O Rastro não instala nem autentica a CLI de IA. Use a que você já tem; sem nenhuma, rode com `--sem-ia`.
-- Nada é instalado no sistema nem pede administrador ou `sudo`; a instalação opcional com o pipx fica na pasta do usuário.
+- Nada é instalado no sistema nem pede administrador ou `sudo`. O Rastro só cria ou remove o comando `rastro` quando a pessoa pede (`instalar` e `desinstalar`), e só na pasta do usuário.
 
 ## Instalação
 
@@ -71,19 +71,18 @@ Na pasta onde quer o projeto:
 
 ### Comando `rastro` de qualquer pasta (opcional)
 
-Para não precisar entrar na pasta do projeto, o comando `rastro` pode ser instalado por usuário com o [pipx](https://pipx.pypa.io/), sem `sudo`. O `python -m rastro` na raiz continua sendo o caminho garantido.
+Para não precisar entrar na pasta do projeto, a pessoa cria o comando `rastro` com o próprio Rastro, uma vez, na raiz do projeto. O `python -m rastro` na raiz continua sendo o caminho garantido.
 
 | Passo | Linux | Windows (PowerShell) — a conferir (T42) |
 |---|---|---|
-| 1. Instalar o pipx (uma vez) | `python3 -m pip install --user pipx` | `py -m pip install --user pipx` |
-| 2. Pôr o pipx no PATH (uma vez) | `python3 -m pipx ensurepath` | `py -m pipx ensurepath` |
-| 3. Instalar o Rastro, na raiz do projeto | `python3 -m pipx install .` | `py -m pipx install .` |
-| 4. Conferir, num terminal novo e em outra pasta | `rastro --help` | `rastro --help` |
-| Atualizar depois de um `git pull` | `python3 -m pipx install --force .` | `py -m pipx install --force .` |
-| Remover | `python3 -m pipx uninstall rastro` | `py -m pipx uninstall rastro` |
+| 1. Criar o comando, na raiz do projeto | `python3 -m rastro instalar` | `py -m rastro instalar` |
+| 2. Conferir, num terminal novo e em outra pasta | `rastro --help` | `rastro --help` |
+| Remover | `rastro desinstalar` | `rastro desinstalar` |
 
-- O pipx cria um ambiente isolado só para o Rastro, na pasta do usuário, e põe o comando no PATH do usuário. O passo 3 precisa de internet uma vez, para baixar o setuptools que monta o pacote.
-- No Ubuntu 24.04 e no Debian 12, o passo 1 é recusado (`externally-managed-environment`); lá o pipx vem por `sudo apt install pipx`. O `sudo` é para o pipx, não para o Rastro.
+- O `instalar` grava um atalho marcado (`~/.local/bin/rastro`; no Windows, `%LOCALAPPDATA%\Rastro\bin\rastro.cmd`) que roda `python -m rastro` com a raiz do projeto no `PYTHONPATH`. Se a pasta não estiver no PATH, acrescenta um bloco marcado no `.bashrc`, `.zshrc` ou `.profile`, conforme o `$SHELL` (no Windows, no PATH do usuário, no registro `HKCU\Environment`). Sem pip, sem internet e sem `sudo`.
+- O atalho usa o Python do sistema, mesmo com o `.venv` ativo, para não quebrar se o `.venv` for apagado. Como aponta para a pasta do projeto, um `git pull` já vale; mover a pasta pede outro `instalar`.
+- O `desinstalar` remove só o atalho com a marca e o bloco marcado do PATH. Um `rastro` que não tem a marca (do pipx, por exemplo) não é sobrescrito nem apagado: o comando para com mensagem clara.
+- Quem preferir pode instalar com o pipx (`pipx install .`): o `pyproject.toml` continua declarando o comando `rastro` e os arquivos de dados.
 - Com o comando instalado, `rastro` substitui `python3 -m rastro` (Windows: `py -m rastro`) em todos os comandos deste documento.
 - O pacote declara o `modelo.html` e os prompts de `rastro/ia/prompts/` como dados, porque o código os lê com `importlib.resources`. Arquivo novo que não seja `.py` dentro de `rastro/` precisa entrar em `[tool.setuptools.package-data]` no `pyproject.toml`; o `tests/test_instalacao.py` confere.
 
@@ -209,7 +208,7 @@ Os critérios marcados *(verificação manual)* na spec só se conferem olhando 
 | 15 | Clicar em "Tour guiado" e andar com "Próximo", "Voltar" e as setas; fechar com `Esc` | Destaca uma parte por vez, com "n de total" e os termos do glossário; só as partes que a análise tem; o foco volta ao botão | R23.2, R23.3, R23.4 | conferido 10/11 (print 11; WebGoat com 11 passos, `loja.har` com 10, Juice Shop sem IA com 9; claro, escuro e 400px) | a conferir (T42) |
 | 16 | Ativar "reduzir movimento" no sistema e abrir o tour e o "Como usar" | Ilustrações paradas e destaque sem transição | R23.7 | conferido 10/11 (Chromium com `prefers-reduced-motion`) | a conferir (T42) |
 | 17 | Rodar `python3 -m rastro como-usar` (Windows: `py -m rastro como-usar`) | O navegador abre o relatório sem dados já no "Como usar", sem o botão "Tour guiado"; o terminal mostra o caminho do `modelo.html` | R23.1, R23.8 | conferido 10/11 (Chromium; com dados, o relatório segue abrindo no painel) | a conferir (T42) |
-| 18 | Instalar com `python3 -m pipx install .` (Windows: `py -m pipx install .`) e, num terminal novo, em outra pasta, rodar `rastro --help`, `rastro como-usar` e `rastro analisar <caminho>/webgoat.har --sem-ia` | O comando existe fora do projeto; o guia abre; o relatório é gravado completo, com o HTML do pacote | R18.1 | conferido 11/11 (comando instalado num venv temporário, equivalente ao pipx, rodado de outra pasta) | a conferir (T42) |
+| 18 | Rodar `python3 -m rastro instalar` (Windows: `py -m rastro instalar`), inclusive com o `.venv` ativo, e, num terminal novo, em outra pasta, rodar `rastro --help`, `rastro como-usar` e `rastro analisar <caminho>/webgoat.har --sem-ia`; depois `rastro desinstalar` | O comando existe fora do projeto; o guia abre; o relatório é gravado completo; o `desinstalar` tira o atalho e a linha do PATH, e o `rastro` some num terminal novo | R17.3, R18.1 | conferido 11/11 (pasta de usuário de teste, com o `.venv` ativo e zsh: atalho com o `/usr/bin/python3.10`, `--help` de outra pasta, `desinstalar` limpou o `.zshrc`) | a conferir (T42) |
 
 "Conferido 09/11" quer dizer: visto na tela, no Chromium, nos prints de `docs/prints/` ou numa conferência automatizada com o Playwright. "A conferir" fica para a pessoa do grupo que seguir este README do zero (revisão da T43) e para a T42, no Windows.
 
@@ -218,7 +217,7 @@ Os critérios marcados *(verificação manual)* na spec só se conferem olhando 
 - Os comandos marcados "a conferir" nas tabelas: `py`, `$env:RASTRO_IA`, `Invoke-Item` e a ativação do `.venv`.
 - Se o `kiro-cli` existe para Windows e se `claude` e `codex` são achados (`.exe` ou `.cmd`). A lista completa está em `docs/spike/clis-de-ia.md`, "A conferir no Windows".
 - Se os acentos chegam certos no terminal e no relatório.
-- Se o `py -m pipx ensurepath` põe o comando `rastro` no PATH e se ele roda de outra pasta (passo 18 do roteiro).
+- Se o `py -m rastro instalar` põe o comando `rastro` no PATH do usuário, se ele roda de outra pasta, num terminal novo, e se o `rastro desinstalar` apaga o próprio `rastro.cmd` sem erro do cmd (passo 18 do roteiro). Pasta do projeto com acento no caminho também.
 - A pasta padrão `C:\Users\<nome>\Rastro\relatorios` e o nome da pasta do site com `_` no lugar de `:` (ex.: `127.0.0.1_8080`).
 
 ## Verificação

@@ -6,6 +6,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from rastro import atalho
 from rastro.acao.plano import ROTULO_DA_PRIORIDADE
 from rastro.fluxo import analisar
 from rastro.fontes.github_advisory import GitHubAdvisory
@@ -67,6 +68,27 @@ TEXTO_COMO_USAR_SEM_NAVEGADOR = (
     "Não foi possível abrir o navegador. Abra este arquivo nele para ver o guia "
     '"Como usar": {caminho}'
 )
+AJUDA_INSTALAR = "cria o comando rastro para usar de qualquer pasta, só na sua pasta de usuário"
+AJUDA_DESINSTALAR = "remove o comando rastro criado pelo instalar; o projeto e os relatórios ficam"
+TEXTO_INSTALADO = (
+    "Comando rastro instalado em: {atalho}\n"
+    "Ele usa o Rastro desta pasta: {projeto}\n"
+    "Se mover ou apagar essa pasta, rode o instalar de novo no novo lugar."
+)
+TEXTO_PATH_ALTERADO = "Pasta do comando adicionada ao PATH em: {onde}"
+TEXTO_PROXIMO_PASSO = "\n".join(
+    [
+        "Pronto! Abra um terminal novo e digite: rastro --help",
+        "Para remover depois: rastro desinstalar",
+    ]
+)
+TEXTO_DESINSTALADO = "Comando rastro removido: {atalho}"
+TEXTO_PATH_REMOVIDO = "Pasta do comando tirada do PATH em: {onde}"
+TEXTO_NADA_A_REMOVER = "O comando rastro não está instalado. Nada a remover."
+TEXTO_DESINSTALADO_FIM = (
+    "O projeto e os relatórios continuam onde estavam. Para usar sem o comando: "
+    "python3 -m rastro na pasta do projeto (Windows: py -m rastro)."
+)
 PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
     "kiro": ProvedorKiro,
     "claude": ProvedorClaude,
@@ -96,6 +118,22 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         help=AJUDA_COMO_USAR,
         description='Abre no navegador o guia "Como usar" do relatório, sem analisar nada.',
     )
+    comandos.add_parser(
+        "instalar",
+        help=AJUDA_INSTALAR,
+        description=(
+            "Cria o comando rastro para usar de qualquer pasta. Fica só na sua pasta de "
+            "usuário, sem sudo nem administrador, e usa o Rastro desta pasta do projeto."
+        ),
+    )
+    comandos.add_parser(
+        "desinstalar",
+        help=AJUDA_DESINSTALAR,
+        description=(
+            "Remove o comando rastro e a linha do PATH criados pelo instalar. "
+            "Não mexe no projeto nem nos relatórios."
+        ),
+    )
     return leitor
 
 
@@ -111,6 +149,10 @@ def executar(argumentos: list[str] | None = None) -> int:
         return 0
     if opcoes.comando == "como-usar":
         return abrir_como_usar()
+    if opcoes.comando == "instalar":
+        return instalar_comando()
+    if opcoes.comando == "desinstalar":
+        return desinstalar_comando()
     if opcoes.sem_ia:
         return analisar_sem_ia(opcoes.har, opcoes.saida)
     return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia)
@@ -122,6 +164,35 @@ def abrir_como_usar() -> int:
         print(TEXTO_COMO_USAR_ABERTO.format(caminho=caminho))
     else:
         print(TEXTO_COMO_USAR_SEM_NAVEGADOR.format(caminho=caminho))
+    return 0
+
+
+def instalar_comando() -> int:
+    try:
+        instalacao = atalho.instalar()
+    except (atalho.ProjetoNaoEncontrado, atalho.AtalhoDeOutro) as erro:
+        return encerrar_com_erro(str(erro))
+    print(TEXTO_INSTALADO.format(atalho=instalacao.atalho, projeto=instalacao.projeto))
+    if instalacao.path_alterado_em:
+        print(TEXTO_PATH_ALTERADO.format(onde=instalacao.path_alterado_em))
+    print()
+    print(TEXTO_PROXIMO_PASSO)
+    return 0
+
+
+def desinstalar_comando() -> int:
+    try:
+        desinstalacao = atalho.desinstalar()
+    except atalho.AtalhoDeOutro as erro:
+        return encerrar_com_erro(str(erro))
+    if desinstalacao.atalho_removido is None and not desinstalacao.path_removido_de:
+        print(TEXTO_NADA_A_REMOVER)
+        return 0
+    if desinstalacao.atalho_removido is not None:
+        print(TEXTO_DESINSTALADO.format(atalho=desinstalacao.atalho_removido))
+    for onde in desinstalacao.path_removido_de:
+        print(TEXTO_PATH_REMOVIDO.format(onde=onde))
+    print(TEXTO_DESINSTALADO_FIM)
     return 0
 
 

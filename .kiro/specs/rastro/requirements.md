@@ -215,12 +215,13 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 
 ## R17 Seguro para a máquina
 
-1. O Rastro DEVE gravar só os dois arquivos do relatório, sempre como arquivos novos.
-2. O Rastro NÃO DEVE instalar nada global, pedir `sudo` nem apagar arquivos.
+1. Na análise, o Rastro DEVE gravar só os dois arquivos do relatório, sempre como arquivos novos.
+2. O Rastro NÃO DEVE instalar nada global, pedir `sudo` nem, por conta própria, instalar ou apagar arquivos.
+3. QUANDO a pessoa pedir `rastro instalar`, o Rastro DEVE criar só o atalho do comando `rastro` na pasta do usuário, marcado como dele, e pôr essa pasta no PATH do usuário com um bloco marcado. QUANDO a pessoa pedir `rastro desinstalar`, o Rastro DEVE remover só o atalho e o bloco que têm a marca. SE já existir um comando `rastro` sem a marca, ENTÃO o Rastro NÃO DEVE sobrescrevê-lo nem apagá-lo, e para com mensagem clara.
 
 ## R18 Windows e Linux
 
-1. O Rastro DEVE funcionar em Windows e Linux com os mesmos comandos, exceto a ativação do venv. Vale para `python -m rastro` na raiz do projeto e para o comando `rastro`, instalado por usuário com o pipx, de qualquer pasta.
+1. O Rastro DEVE funcionar em Windows e Linux com os mesmos comandos, exceto a ativação do venv. Vale para `python -m rastro` na raiz do projeto e para o comando `rastro`, criado pela pessoa com `rastro instalar`, de qualquer pasta.
 2. A verificação (`ruff`, `mypy` e `pytest`) DEVE passar no Windows e no Linux, rodada na máquina local. Não há CI: antes de cada entrega, o resultado nos dois sistemas fica registrado em `docs/cobertura/`.
 
 ## R19 Qualidade

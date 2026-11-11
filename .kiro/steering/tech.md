@@ -7,7 +7,7 @@
 - **IA:** Kiro (padrão), Claude ou Codex, chamados pela CLI já instalada e autenticada na máquina. Escolha por `--ia` ou `RASTRO_IA`.
 - **Dados:** GitHub Advisory; OSV e NVD como extensão opcional. Registro do npm só com leitura, para as travas.
 - **Qualidade:** pytest, pytest-cov, ruff, mypy.
-- **Entrega:** instalação local, só com Python (o HTML do relatório vai pronto no repo). Opcional: o comando `rastro`, instalado por usuário com o pipx. Sem Docker e sem CI; o demo gravado cumpre o requisito "Docker ou vídeo".
+- **Entrega:** instalação local, só com Python (o HTML do relatório vai pronto no repo). Opcional: o comando `rastro`, criado pela pessoa com `python -m rastro instalar`. Sem Docker e sem CI; o demo gravado cumpre o requisito "Docker ou vídeo".
 
 ## Dependências
 
@@ -19,7 +19,7 @@
 
 ## Comandos
 
-Só comandos padrão: `python -m venv`, `pip install -r requirements.txt`, `python -m rastro`, `pipx install .` (opcional, para o comando `rastro`), `pytest`, `npm install`, `npm run build`. Nada de `Makefile` nem script `.sh`.
+Só comandos padrão: `python -m venv`, `pip install -r requirements.txt`, `python -m rastro` (com `instalar` e `desinstalar` para o comando `rastro`), `pytest`, `npm install`, `npm run build`. Nada de `Makefile` nem script `.sh`.
 
 ## Windows e Linux
 
@@ -37,7 +37,7 @@ Tudo precisa funcionar nos dois.
 
 - O Rastro só lê o HAR e nunca o altera.
 - O relatório é gravado numa pasta nova, `~/Rastro/relatorios/<site>/<AAAA-MM-DD_HH-MM-SS>/` (`--saida` troca a raiz), com arquivos abertos no modo `"x"`; se a pasta já existir, para com mensagem clara. Nome de pasta sem `:` e sem caracteres que o Windows não aceita.
-- Nada instalado no sistema, sem `sudo`, nenhum arquivo apagado. A instalação opcional com o pipx é feita pela pessoa e fica na pasta do usuário; o Rastro em si não instala nada.
+- Nada instalado no sistema, sem `sudo`, e o Rastro não instala nem apaga nada por conta própria. O comando `rastro` só é criado ou removido quando a pessoa pede (`instalar` e `desinstalar`), na pasta do usuário, e só o que tem a marca do Rastro é tocado.
 - Vale também para os comandos que o agente roda durante o desenvolvimento.
 
 ## Rede

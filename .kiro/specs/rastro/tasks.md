@@ -353,11 +353,11 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Revisão: @luiz.pagliari
 
 - [x] **T57 Rodar o Rastro de qualquer pasta**
-  - Entrega: o comando `rastro`, instalado por usuário com `pipx install .`, roda `analisar` e `como-usar` de qualquer pasta.
-  - Aceite: o pacote montado do projeto cria o comando `rastro` e leva o `modelo.html` e os prompts; instalado, `rastro --help` funciona fora da pasta do projeto e `rastro analisar` grava o relatório com o `modelo.html`; `python -m rastro` na raiz continua igual; README e README técnico com o passo a passo no Linux e no Windows (Windows a conferir na T42).
-  - Arquivos: `pyproject.toml`, `requirements-dev.txt`, `rastro/cli.py`, `rastro/__main__.py`, `tests/test_cli.py`, `tests/test_instalacao.py`, `README.md`, `README-TECNICO.md`, `.kiro/steering/tech.md`
-  - Teste: `test_r18_1_*`: monta o pacote sem rede (`pip wheel --no-build-isolation --no-index`) e confere o comando e os arquivos de dados; `principal()` sai com o código da execução. A instalação com o pipx, verificação manual.
-  - Requisito: R18.1, R20.1
+  - Entrega: a pessoa cria o comando `rastro` com `python -m rastro instalar`, uma vez, na raiz do projeto, e remove com `rastro desinstalar`; o comando roda `analisar` e `como-usar` de qualquer pasta. O `pyproject.toml` também permite `pipx install .`.
+  - Aceite: `instalar` grava o atalho marcado na pasta do usuário, com o Python do sistema mesmo com o `.venv` ativo, e põe a pasta no PATH só se faltar, sem repetir o bloco; num terminal novo, `rastro --help` funciona fora da pasta do projeto; `desinstalar` remove só o atalho e o bloco marcados; um `rastro` sem a marca não é tocado e o comando sai com 1; o pacote montado do projeto cria o comando `rastro` e leva o `modelo.html` e os prompts; `python -m rastro` na raiz continua igual; README e README técnico com o passo a passo no Linux e no Windows (Windows a conferir na T42).
+  - Arquivos: `pyproject.toml`, `requirements-dev.txt`, `rastro/atalho.py`, `rastro/cli.py`, `rastro/__main__.py`, `tests/test_atalho.py`, `tests/test_cli.py`, `tests/test_instalacao.py`, `README.md`, `README-TECNICO.md`, `.kiro/steering/tech.md`, `.kiro/steering/structure.md`
+  - Teste: `test_r17_3_*` e `test_r18_1_*`: instala e desinstala numa pasta de usuário falsa (`tmp_path`) e roda o atalho de outra pasta; monta o pacote sem rede (`pip wheel --no-build-isolation --no-index`) e confere o comando e os arquivos de dados; `principal()` sai com o código da execução. O PATH do Windows (registro), verificação manual na T42.
+  - Requisito: R17.3, R18.1, R20.1
   - Revisão: @luiz.pagliari
 
 ## Fase 3. IA
@@ -446,7 +446,7 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
 
 - [ ] **T42 Instalar do zero no Windows e no Linux**
   - Entrega: instalação conferida numa máquina limpa de cada sistema, só com Python e a CLI de IA já instalada.
-  - Aceite: seguindo só o README, gera o relatório com IA e com `--sem-ia`, sem Node e sem instalar nada global; o comando `rastro` instalado com o pipx (T57) roda de outra pasta; no Windows, a lista "A conferir no Windows" de `docs/spike/clis-de-ia.md` está conferida e a coluna Windows da tabela de provedores do design, preenchida.
+  - Aceite: seguindo só o README, gera o relatório com IA e com `--sem-ia`, sem Node e sem instalar nada global; o comando `rastro` criado com `py -m rastro instalar` (T57) roda de outra pasta e o `rastro desinstalar` o remove; no Windows, a lista "A conferir no Windows" de `docs/spike/clis-de-ia.md` está conferida e a coluna Windows da tabela de provedores do design, preenchida.
   - Arquivos: `README.md` (ajustes que aparecerem), `docs/spike/clis-de-ia.md`, `design.md`
   - Teste: verificação manual.
   - Requisito: R14.4, R17.2, R18.1, R20.1–R20.3
