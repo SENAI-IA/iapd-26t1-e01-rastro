@@ -756,5 +756,5 @@ Puro, sobre a `SessaoDeGravacao`, com relógio e pedido de parada recebidos de f
 
 ### HAR gravado pelo Playwright
 
-O leitor do HAR não muda: o conteúdo vem embutido, o site sai da primeira resposta HTML (não há `log.pages`) e a visita tem `startedDateTime` e `time` (T58). Muda só a mensagem das checagens de cookie (R24.9): o leitor passa a guardar o `log.creator.name`, e `configuracao/checagens.py` escolhe o texto pela origem do HAR.
+O leitor do HAR não muda: o conteúdo vem embutido, o site sai da primeira resposta HTML (não há `log.pages`) e a visita tem `startedDateTime` e `time` (T58). Muda só a mensagem das checagens de cookie (R24.9): o `gravar` chama `analisar(..., gravado_pelo_rastro=True)`, e `checar_configuracao` troca o "exporte o HAR completo" por "o site não criou nenhum cookie". A origem não sai do `log.creator.name`: os HARs da avaliação também foram gravados pelo Playwright, mas tiveram os cookies tirados depois (T61).
 

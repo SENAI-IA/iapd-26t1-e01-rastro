@@ -55,6 +55,7 @@ def analisar(
     ia: ClienteDeIA | None = None,
     osv: ConectorDeAvisos | None = None,
     nvd: BuscaDeCvss | None = None,
+    gravado_pelo_rastro: bool = False,
 ) -> Analise:
     inicio = datetime.now()
     cronometro = time.perf_counter()
@@ -68,7 +69,7 @@ def analisar(
     avisos_na_faixa, travas_da_faixa = conferir_faixas(consultados.avisos)
     achados = calcular_risco(avisos_na_faixa)
     explicados = explicar_achados(achados, ia)
-    checagens = checar_configuracao(requisicoes, site)
+    checagens = checar_configuracao(requisicoes, site, gravado_pelo_rastro)
     plano = montar_plano_de_acao(achados, explicados.explicacoes, checagens)
 
     return Analise(

@@ -76,6 +76,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T58** Registrar os spikes da gravação com Playwright · extensão · revisão a definir · 13/11
 - [ ] **T59** Especificar a gravação da visita · extensão · revisão a definir · 13/11 · pendente: PRD e pitch (só em PDF)
 - [ ] **T60** Gravar a visita à mão com `rastro gravar` · extensão · revisão a definir · 13/11 · pendente: fechar a janela e Windows (T42)
+- [ ] **T61** Avisar sobre a sessão gravada no HAR · extensão · revisão a definir · 13/11
 
 ## A fazer
 
@@ -107,7 +108,6 @@ _(vazio)_
 
 ### Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo, até 08/12)
 
-- [ ] **T61** Avisar sobre a sessão gravada no HAR · revisão a definir
 - [ ] **T62** Navegar sozinho com travas · revisão a definir
 - [ ] **T63** Combinar o robô com a navegação da pessoa · revisão a definir
 - [ ] **T64** Ensinar a gravar a visita · revisão a definir

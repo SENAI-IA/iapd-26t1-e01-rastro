@@ -1,5 +1,6 @@
 import re
 from collections.abc import Callable
+from dataclasses import replace
 from urllib.parse import urlsplit
 
 from rastro.configuracao.modelos import Checagem, RegraDeChecagem, SituacaoDaChecagem
@@ -23,6 +24,10 @@ SEPARADOR_DE_DIRETIVAS_CSP = re.compile(r"[;,]")
 MOTIVO_SEM_COOKIES = (
     "o HAR não traz cookies do site analisado (ex.: exportado no modo sanitized); "
     "exportar o HAR completo inclui as checagens de cookie C06 a C08"
+)
+MOTIVO_SEM_COOKIES_NA_GRAVACAO = (
+    "o site não criou nenhum cookie durante a visita gravada pelo Rastro; "
+    "a gravação guarda os cookies, então não há o que conferir"
 )
 
 TesteDeFalha = Callable[[Requisicao], bool]
@@ -123,8 +128,20 @@ CHECAGENS: tuple[Callable[[list[Requisicao], str | None], Checagem], ...] = (
 )
 
 
-def checar_configuracao(requisicoes: list[Requisicao], site: str | None) -> list[Checagem]:
-    return [checar(requisicoes, site) for checar in CHECAGENS]
+def checar_configuracao(
+    requisicoes: list[Requisicao], site: str | None, gravado_pelo_rastro: bool = False
+) -> list[Checagem]:
+    checagens = [checar(requisicoes, site) for checar in CHECAGENS]
+    if not gravado_pelo_rastro:
+        return checagens
+    return [explicar_falta_de_cookie_na_gravacao(checagem) for checagem in checagens]
+
+
+def explicar_falta_de_cookie_na_gravacao(checagem: Checagem) -> Checagem:
+    """A gravação do `gravar` guarda os cookies: sem eles, não há por que pedir o HAR completo."""
+    if checagem.detalhe != MOTIVO_SEM_COOKIES:
+        return checagem
+    return replace(checagem, detalhe=MOTIVO_SEM_COOKIES_NA_GRAVACAO)
 
 
 def respostas_do_site_com_cookies(

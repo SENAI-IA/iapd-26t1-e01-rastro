@@ -46,8 +46,12 @@ def analisar_no_momento_fixo(
     ia: ClienteDeIA | None = None,
     osv: ConectorDeAvisos | None = None,
     nvd: BuscaDeCvss | None = None,
+    gravado_pelo_rastro: bool = False,
 ) -> Analise:
-    return replace(analisar(caminho_har, fonte, registro, ia, osv, nvd), inicio=MOMENTO)
+    analise = analisar(
+        caminho_har, fonte, registro, ia, osv, nvd, gravado_pelo_rastro=gravado_pelo_rastro
+    )
+    return replace(analise, inicio=MOMENTO)
 
 
 class NavegadorFalso:
@@ -635,6 +639,7 @@ class GravacaoFalsa:
         self.sessao = SessaoFalsa()
         self.hars: list[Path] = []
         self.grava_o_har = True
+        self.har_de_origem = HAR_DA_LOJA
         self.erro: Exception | None = None
 
     @contextmanager
@@ -646,7 +651,7 @@ class GravacaoFalsa:
             yield self.sessao
         finally:
             if self.grava_o_har:
-                shutil.copyfile(HAR_DA_LOJA, har)
+                shutil.copyfile(self.har_de_origem, har)
 
 
 @pytest.fixture
@@ -788,3 +793,29 @@ def test_r24_1_falha_na_primeira_pagina_avisa_e_continua_gravando(
     assert gravar_loja(tmp_path / "relatorios", "--sem-ia", "--nao-abrir") == 0
 
     assert "ERR_CONNECTION_REFUSED" in capsys.readouterr().out
+
+
+def test_r24_8_avisa_que_o_har_gravado_guarda_a_sessao(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravar_loja(tmp_path / "relatorios", "--sem-ia", "--nao-abrir")
+
+    terminal = capsys.readouterr().out
+    assert "guarda a sessão do site" in terminal
+    assert "Não compartilhe o arquivo" in terminal
+
+
+def test_r24_9_sem_cookies_na_gravacao_nao_pede_o_har_completo(
+    tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravacao.har_de_origem = DADOS / "har-sem-text.har"
+    saida = tmp_path / "relatorios"
+
+    assert gravar_loja(saida, "--sem-ia", "--nao-abrir") == 0
+
+    [json_do_relatorio] = saida.glob("*/*/relatorio.json")
+    checagens = ler_relatorio(json_do_relatorio)["checagens"]
+    de_cookie = [c for c in checagens if c["id"] in ("C06", "C07", "C08")]
+    assert [c["situacao"] for c in de_cookie] == ["nao_verificada"] * 3
+    assert all("não criou nenhum cookie" in c["detalhe"] for c in de_cookie)
+    assert not any("HAR completo" in c["detalhe"] for c in de_cookie)

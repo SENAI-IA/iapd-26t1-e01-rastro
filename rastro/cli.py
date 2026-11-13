@@ -113,6 +113,11 @@ TEXTO_FALHA_NA_PRIMEIRA_PAGINA = (
     "confira o endereço nela ou feche-a para encerrar."
 )
 TEXTO_HAR_GRAVADO = "Visita gravada em: {har}"
+AVISO_SESSAO_NO_HAR = (
+    "Atenção: este HAR guarda a sessão do site (cabeçalhos Cookie e Set-Cookie). "
+    "Não compartilhe o arquivo; apague-o quando não precisar mais. "
+    "O relatório não traz esses valores."
+)
 TEXTO_NADA_GRAVADO = (
     "nenhuma requisição foi gravada: a janela foi fechada antes de o site carregar. "
     "Nenhum relatório foi gerado."
@@ -296,11 +301,13 @@ def gravar_e_analisar(
     if not har.is_file():
         return encerrar_com_erro(TEXTO_HAR_PERDIDO)
     print(TEXTO_HAR_GRAVADO.format(har=har))
+    print(AVISO_SESSAO_NO_HAR)
     print()
     if ia is None:
-        return analisar_sem_ia(har, saida, abrir)
-    avisar_analise_com_ia(ia)
-    return analisar_e_gravar(har, saida, ia, abrir)
+        avisar_analise_sem_ia()
+    else:
+        avisar_analise_com_ia(ia)
+    return analisar_e_gravar(har, saida, ia, abrir, gravado_pelo_rastro=True)
 
 
 def gravar_visita(url: str, host: str, har: Path) -> int:
@@ -342,10 +349,22 @@ def analisar_sem_ia(caminho_har: Path, saida: Path | None, abrir: bool) -> int:
 
 
 def analisar_e_gravar(
-    caminho_har: Path, saida: Path | None, ia: ClienteDeIA | None, abrir: bool
+    caminho_har: Path,
+    saida: Path | None,
+    ia: ClienteDeIA | None,
+    abrir: bool,
+    gravado_pelo_rastro: bool = False,
 ) -> int:
     try:
-        analise = analisar(caminho_har, GitHubAdvisory(), RegistroNpm(), ia, Osv(), Nvd())
+        analise = analisar(
+            caminho_har,
+            GitHubAdvisory(),
+            RegistroNpm(),
+            ia,
+            Osv(),
+            Nvd(),
+            gravado_pelo_rastro=gravado_pelo_rastro,
+        )
     except ErroAoLerHar as erro:
         return encerrar_com_erro(str(erro))
     relatorio = montar_relatorio(analise)

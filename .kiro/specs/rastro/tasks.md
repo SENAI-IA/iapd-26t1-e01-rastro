@@ -560,10 +560,10 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Requisito: R24.1–R24.7, R16.1, R17.1, R20.2
   - Revisão: a definir
 
-- [ ] **T61 Avisar sobre a sessão gravada no HAR**
-  - Entrega: o terminal avisa que o HAR gravado pelo comando guarda a sessão (cabeçalhos `Cookie` e `Set-Cookie`), e a checagem de cookie sem dado deixa de mandar "exportar o HAR completo" quando o HAR veio do Playwright.
-  - Aceite: o aviso aparece ao fim do `gravar` com o caminho do arquivo; a mensagem das checagens C06–C08 muda conforme a origem do HAR.
-  - Arquivos: `rastro/captura/`, `rastro/configuracao/checagens.py`, testes
+- [x] **T61 Avisar sobre a sessão gravada no HAR**
+  - Entrega: o terminal avisa que o HAR gravado pelo comando guarda a sessão (cabeçalhos `Cookie` e `Set-Cookie`), e a checagem de cookie sem dado deixa de mandar "exportar o HAR completo" quando o HAR veio do `gravar`.
+  - Aceite: o aviso aparece ao fim do `gravar`, logo depois do caminho do arquivo; a mensagem das checagens C06–C08 muda só no HAR do `gravar` (o `analisar` continua igual).
+  - Arquivos: `rastro/cli.py`, `rastro/fluxo.py`, `rastro/configuracao/checagens.py`, `tests/test_cli.py`, `tests/configuracao/test_checagens.py`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`
   - Teste: `test_r24_*`, `test_r06_7_*`
   - Requisito: R24.8, R24.9, R06.7
   - Revisão: a definir
