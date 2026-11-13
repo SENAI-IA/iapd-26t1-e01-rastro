@@ -10,7 +10,6 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
-# Só para o `rastro gravar` (R24, decisão 12). O resto do Rastro não precisa.
 gravar = ["playwright==1.65.1"]
 
 [project.scripts]

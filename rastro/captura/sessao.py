@@ -11,8 +11,6 @@ class FalhaAoNavegar(Exception):
 
 
 class SessaoDeGravacao(Protocol):
-    """O navegador aberto para o auditor, gravando tudo o que recebe num HAR."""
-
     requisicoes: int
     scripts: int
 
@@ -44,12 +42,6 @@ def esperar_a_janela_fechar(sessao: SessaoDeGravacao, parada: PedidoDeParada) ->
 def esperar_o_enter(
     sessao: SessaoDeGravacao, parada: PedidoDeParada, ler_linha: Callable[[], str] = input
 ) -> bool:
-    """Espera o Enter sem deixar de ver o Ctrl+C e a janela fechada.
-
-    Um `input()` parado não sai com o Ctrl+C (o Python volta a ler depois do tratador),
-    então a leitura fica numa thread e a espera, em fatias. Sem terminal (fim da
-    entrada), conta como Enter. Devolve se o robô deve começar.
-    """
     apertou = threading.Event()
 
     def ler() -> None:

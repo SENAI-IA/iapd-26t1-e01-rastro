@@ -50,7 +50,6 @@ class ResultadoDoRobo:
 
 
 def normalizar(url: str) -> str:
-    """A mesma página, mesmo com outros valores na query ou com âncora que não é rota."""
     sem_fragmento, fragmento = urldefrag(url)
     partes = urlsplit(sem_fragmento)
     rota = fragmento if e_rota_de_spa(fragmento) else ""
@@ -75,11 +74,6 @@ def e_rota_de_spa(fragmento: str) -> bool:
 
 
 def familia(url: str) -> str:
-    """O caminho (ou a rota da SPA) sem o último trecho: páginas irmãs são da mesma família.
-
-    Página de um trecho só (`/contato`, `/sobre`) é família de si mesma: as páginas da
-    raiz costumam ser as mais diferentes entre si.
-    """
     _, fragmento = urldefrag(url)
     caminho = fragmento if e_rota_de_spa(fragmento) else urlsplit(url).path
     trechos = [trecho for trecho in caminho.split("/") if trecho]
@@ -98,12 +92,10 @@ def link_permitido(url: str, host: str) -> bool:
 
 
 def leva_para_outro_endereco(query: str) -> bool:
-    """`/redirect?to=https://outro.site`: do mesmo host, mas sai do site."""
     return URL_DENTRO_DA_QUERY.search(query) is not None
 
 
 def saida_do_site(endereco: str, host: str) -> str | None:
-    """Um redirecionamento pode levar para fora: dessa página o robô não segue links."""
     destino = urlsplit(endereco).netloc.lower()
     if destino == host:
         return None

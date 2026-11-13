@@ -1,5 +1,3 @@
-"""Único arquivo do Rastro que importa o Playwright, e só quando o `gravar` roda."""
-
 import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -93,7 +91,6 @@ class SessaoPlaywright:
 
 @contextmanager
 def abrir_gravacao(har: Path) -> Iterator[SessaoDeGravacao]:
-    """Abre o navegador da máquina gravando num HAR; o HAR é gravado ao sair do bloco."""
     from playwright.sync_api import sync_playwright
 
     with sync_playwright() as playwright:
@@ -108,11 +105,6 @@ def abrir_gravacao(har: Path) -> Iterator[SessaoDeGravacao]:
 
 
 def abrir_navegador_da_maquina(playwright: "Playwright") -> "Browser":
-    """Chrome ou, sem ele, Edge, com janela.
-
-    `handle_sigint=False`: com o padrão, o Playwright fecha o navegador no Ctrl+C,
-    antes de o contexto gravar o HAR, que se perdia em silêncio (spike T58).
-    """
     from playwright.sync_api import Error
 
     for canal in CANAIS_DO_NAVEGADOR:
@@ -125,11 +117,6 @@ def abrir_navegador_da_maquina(playwright: "Playwright") -> "Browser":
 
 
 def fechar(contexto: "BrowserContext", navegador: "Browser") -> None:
-    """Fecha o contexto (grava o HAR) e o navegador.
-
-    Se a pessoa fechou a janela, o navegador pode já ter fechado: o Playwright
-    reclama, mas o HAR fica gravado (spike T58).
-    """
     from playwright.sync_api import Error
 
     for fechamento in (contexto.close, navegador.close):

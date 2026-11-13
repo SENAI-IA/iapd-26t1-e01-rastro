@@ -138,7 +138,6 @@ def checar_configuracao(
 
 
 def explicar_falta_de_cookie_na_gravacao(checagem: Checagem) -> Checagem:
-    """A gravação do `gravar` guarda os cookies: sem eles, não há por que pedir o HAR completo."""
     if checagem.detalhe != MOTIVO_SEM_COOKIES:
         return checagem
     return replace(checagem, detalhe=MOTIVO_SEM_COOKIES_NA_GRAVACAO)

@@ -427,7 +427,6 @@ def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str) -> None:
 
 @contextmanager
 def ctrl_c_pede_parada(parada: PedidoDeParada) -> Iterator[None]:
-    """O Ctrl+C só pede a parada, para o HAR ser gravado com o que já foi visitado."""
     original = signal.signal(signal.SIGINT, lambda *_: parada.pedir("Ctrl+C"))
     try:
         yield
