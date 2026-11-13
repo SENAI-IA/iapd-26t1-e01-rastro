@@ -15,6 +15,19 @@ function janela(conteudo: ReactNode): ReactNode {
   );
 }
 
+function terminal(conteudo: ReactNode): ReactNode {
+  return (
+    <>
+      <rect className="ilustracao__traco" x="8" y="10" width="304" height="170" rx="4" />
+      <line className="ilustracao__traco" x1="8" y1="34" x2="312" y2="34" />
+      <circle className="ilustracao__traco" cx="22" cy="22" r="4" />
+      <circle className="ilustracao__traco" cx="34" cy="22" r="4" />
+      <circle className="ilustracao__traco" cx="46" cy="22" r="4" />
+      {conteudo}
+    </>
+  );
+}
+
 const DESENHOS: Record<IlustracaoDoPasso, ReactNode> = {
   site: (
     janela(
@@ -135,15 +148,31 @@ const DESENHOS: Record<IlustracaoDoPasso, ReactNode> = {
       </text>
     </>
   ),
-  terminal: (
+  instalar: terminal(
     <>
-      <rect className="ilustracao__traco" x="8" y="10" width="304" height="170" rx="4" />
-      <line className="ilustracao__traco" x1="8" y1="34" x2="312" y2="34" />
-      <circle className="ilustracao__traco" cx="22" cy="22" r="4" />
-      <circle className="ilustracao__traco" cx="34" cy="22" r="4" />
-      <circle className="ilustracao__traco" cx="46" cy="22" r="4" />
       <text className="ilustracao__texto ilustracao__texto--mono ilustracao__texto--forte ilustracao__digita ilustracao__digita--1" x="22" y="60">
-        $ python3 -m rastro analisar site.har
+        $ python3 -m rastro instalar
+      </text>
+      <text className="ilustracao__texto ilustracao__texto--mono ilustracao__digita ilustracao__digita--2" x="22" y="84">
+        Pronto! Comando rastro instalado.
+      </text>
+      <text className="ilustracao__texto ilustracao__texto--mono ilustracao__digita ilustracao__digita--3" x="22" y="102">
+        Abra um terminal novo e teste.
+      </text>
+      <text
+        className="ilustracao__texto ilustracao__texto--mono ilustracao__texto--destaque ilustracao__texto--forte ilustracao__digita ilustracao__digita--4"
+        x="22"
+        y="128"
+      >
+        $ rastro --help
+      </text>
+      <rect className="ilustracao__cursor-texto" x="22" y="138" width="7" height="12" />
+    </>,
+  ),
+  terminal: terminal(
+    <>
+      <text className="ilustracao__texto ilustracao__texto--mono ilustracao__texto--forte ilustracao__digita ilustracao__digita--1" x="22" y="60">
+        $ rastro analisar site.har
       </text>
       <text className="ilustracao__texto ilustracao__texto--mono ilustracao__digita ilustracao__digita--2" x="22" y="84">
         Análise com a IA kiro.
@@ -162,7 +191,7 @@ const DESENHOS: Record<IlustracaoDoPasso, ReactNode> = {
         HTML: …/relatorio.html
       </text>
       <rect className="ilustracao__cursor-texto" x="22" y="156" width="7" height="12" />
-    </>
+    </>,
   ),
   relatorio: (
     janela(

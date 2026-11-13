@@ -12,6 +12,10 @@ interface Props {
   aoMarcar: () => void;
 }
 
+export function idDoPassoDoGuia(numero: number): string {
+  return `passo-do-guia-${numero}`;
+}
+
 export default function PassoDoGuia({ numero, passo, feito, aoMarcar }: Props) {
   const [copiado, setCopiado] = useState<string | null>(null);
 
@@ -23,7 +27,11 @@ export default function PassoDoGuia({ numero, passo, feito, aoMarcar }: Props) {
   };
 
   return (
-    <li className={feito ? "passo-do-guia passo-do-guia--feito" : "passo-do-guia"}>
+    <li
+      id={idDoPassoDoGuia(numero)}
+      tabIndex={-1}
+      className={feito ? "passo-do-guia passo-do-guia--feito" : "passo-do-guia"}
+    >
       <div className="passo-do-guia__numero" aria-hidden="true">
         {feito ? <Icone nome="certo" tamanho={18} /> : numero}
       </div>

@@ -1,9 +1,33 @@
 import { useState } from "react";
 import { ANTES_DE_COMECAR, PASSOS_DO_GUIA, PROBLEMAS, SEUS_DADOS } from "../dados/guia.ts";
 import { plural } from "./formato.ts";
-import PassoDoGuia from "./PassoDoGuia.tsx";
+import PassoDoGuia, { idDoPassoDoGuia } from "./PassoDoGuia.tsx";
 import TextoComMarcas from "./TextoComMarcas.tsx";
 import "./GuiaComoUsar.css";
+
+const ID_DO_FIM_DO_GUIA = "guia-ir-para-o-painel";
+
+function preferePoucoMovimento(): boolean {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+}
+
+function proximoPassoPendente(depoisDe: number, feitos: Set<number>, total: number): number | null {
+  for (let indice = depoisDe + 1; indice < total; indice++) {
+    if (!feitos.has(indice)) {
+      return indice;
+    }
+  }
+  return null;
+}
+
+function rolarAte(elemento: HTMLElement) {
+  const alturaDoTopo = document.querySelector<HTMLElement>(".app__topo")?.offsetHeight ?? 0;
+  window.scrollTo({
+    top: elemento.getBoundingClientRect().top + window.scrollY - alturaDoTopo - 12,
+    behavior: preferePoucoMovimento() ? "auto" : "smooth",
+  });
+  elemento.focus({ preventScroll: true });
+}
 
 interface Props {
   aoIrParaOPainel: (() => void) | null;
@@ -17,10 +41,18 @@ export default function GuiaComoUsar({ aoIrParaOPainel }: Props) {
     const novos = new Set(feitos);
     if (novos.has(indice)) {
       novos.delete(indice);
-    } else {
-      novos.add(indice);
+      setFeitos(novos);
+      return;
     }
+    novos.add(indice);
     setFeitos(novos);
+    const proximo = proximoPassoPendente(indice, novos, total);
+    const destino = document.getElementById(
+      proximo === null ? ID_DO_FIM_DO_GUIA : idDoPassoDoGuia(proximo + 1),
+    );
+    if (destino) {
+      requestAnimationFrame(() => rolarAte(destino));
+    }
   };
 
   return (
@@ -62,7 +94,12 @@ export default function GuiaComoUsar({ aoIrParaOPainel }: Props) {
       </ol>
 
       {aoIrParaOPainel && (
-        <button type="button" className="guia__ir-para-o-painel" onClick={aoIrParaOPainel}>
+        <button
+          type="button"
+          id={ID_DO_FIM_DO_GUIA}
+          className="guia__ir-para-o-painel"
+          onClick={aoIrParaOPainel}
+        >
           Ver o relatório desta análise
         </button>
       )}

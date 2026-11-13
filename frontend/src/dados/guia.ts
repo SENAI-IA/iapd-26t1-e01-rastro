@@ -1,4 +1,4 @@
-export type IlustracaoDoPasso = "site" | "rede" | "cache" | "navegar" | "exportar" | "terminal" | "relatorio";
+export type IlustracaoDoPasso = "instalar" | "site" | "rede" | "cache" | "navegar" | "exportar" | "terminal" | "relatorio";
 
 export interface Comando {
   sistema: string;
@@ -20,12 +20,23 @@ export interface Problema {
 
 export const ANTES_DE_COMECAR: string[] = [
   "**Chrome ou Edge.** No Firefox os passos são os mesmos, com outros nomes de menu.",
-  "**Python e o Rastro instalados**, como na seção \"Instalação\" do README.",
+  "**Python e a pasta do Rastro** no computador, como na seção \"Instalar\" do README.",
   "**Uma CLI de IA** (Kiro, Claude ou Codex) para a análise completa. Sem ela, rode com `--sem-ia`.",
   "**Autorização para analisar o site.** O Rastro só lê o arquivo gravado e nunca acessa o site, mas combine com o time responsável.",
 ];
 
 export const PASSOS_DO_GUIA: PassoDoGuia[] = [
+  {
+    titulo: "Instale o comando rastro",
+    texto:
+      "Só na primeira vez: abra o terminal na pasta do Rastro e rode o comando. Depois disso, é só digitar `rastro` no terminal, em qualquer pasta.",
+    comandos: [
+      { sistema: "Linux", texto: "python3 -m rastro instalar" },
+      { sistema: "Windows", texto: "py -m rastro instalar" },
+    ],
+    dica: "Se o terminal pedir, feche-o e abra outro. Confira com `rastro --help`. Já instalou antes? Marque como feito e siga.",
+    ilustracao: "instalar",
+  },
   {
     titulo: "Abra o site",
     texto:
@@ -61,10 +72,10 @@ export const PASSOS_DO_GUIA: PassoDoGuia[] = [
   {
     titulo: "Rode o Rastro",
     texto:
-      "Abra o terminal na pasta do arquivo e rode o comando. Com IA, cada chamada pode levar até 2 minutos; no fim, o terminal mostra o resumo e onde gravou o relatório.",
+      "Abra o terminal na pasta onde salvou o `site.har` e rode o comando. Com IA, cada chamada pode levar até 2 minutos; no fim, o terminal mostra o resumo e onde gravou o relatório.",
     comandos: [
-      { sistema: "Linux", texto: "python3 -m rastro analisar site.har" },
-      { sistema: "Windows", texto: "py -m rastro analisar site.har" },
+      { sistema: "Linux", texto: "rastro analisar site.har" },
+      { sistema: "Windows", texto: "rastro analisar site.har" },
     ],
     dica: "Sem CLI de IA, acrescente `--sem-ia`: nota, prioridade e plano são os mesmos, mas bibliotecas em bundles não são procuradas e os achados ficam sem explicação.",
     ilustracao: "terminal",
@@ -90,6 +101,10 @@ export const PROBLEMAS: Problema[] = [
   {
     sintoma: "As checagens de cookie estão como não verificadas",
     solucao: "É o esperado com o HAR sanitized, que tira os cookies. As bibliotecas são analisadas do mesmo jeito.",
+  },
+  {
+    sintoma: "\"rastro: comando não encontrado\"",
+    solucao: "Feche o terminal e abra outro. Se continuar, rode de novo `python3 -m rastro instalar` na pasta do Rastro (Windows: `py -m rastro instalar`). Se mudou a pasta do Rastro de lugar, rode também.",
   },
   {
     sintoma: "\"A CLI da IA não foi encontrada\"",
