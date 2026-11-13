@@ -2,6 +2,7 @@ import argparse
 import os
 import signal
 import sys
+import time
 import webbrowser
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
@@ -25,6 +26,7 @@ from rastro.captura.playwright import (
     abrir_gravacao,
     conferir_playwright,
 )
+from rastro.captura.robo import LIMITES_PADRAO, PassoDoRobo, ResultadoDoRobo, Robo
 from rastro.captura.sessao import (
     FalhaAoNavegar,
     PedidoDeParada,
@@ -112,6 +114,22 @@ TEXTO_FALHA_NA_PRIMEIRA_PAGINA = (
     "Não foi possível abrir {url} ({motivo}). A janela continua aberta: "
     "confira o endereço nela ou feche-a para encerrar."
 )
+AJUDA_ROBO = (
+    "o Rastro navega sozinho pelos links do site (só links, nunca botões nem formulários), "
+    "com limite de páginas, tempo e cliques"
+)
+TEXTO_ROBO_COMECOU = (
+    "O robô vai navegar pelos links de {host}: até {paginas} páginas, {minutos:g} minutos "
+    "e {cliques} cliques da página inicial. Ctrl+C aqui ou fechar a janela param o robô."
+)
+TEXTO_PASSO_DO_ROBO = (
+    "  páginas {paginas}/{limite} · requisições {requisicoes} · scripts {scripts} · {tempo} · {url}"
+)
+TEXTO_PASSO_QUE_FALHOU = "  não abriu: {url} ({motivo})"
+TEXTO_ROBO_PAROU = (
+    "O robô parou: {motivo}. {paginas} páginas visitadas, {barrados} links perigosos ou "
+    "de fora do site não seguidos, {parecidos} páginas parecidas demais com outras puladas."
+)
 TEXTO_HAR_GRAVADO = "Visita gravada em: {har}"
 AVISO_SESSAO_NO_HAR = (
     "Atenção: este HAR guarda a sessão do site (cabeçalhos Cookie e Set-Cookie). "
@@ -149,6 +167,7 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         ),
     )
     gravar.add_argument("url", help="endereço do site, com http:// ou https://")
+    gravar.add_argument("--robo", action="store_true", help=AJUDA_ROBO)
     adicionar_opcoes_da_analise(gravar)
     comandos.add_parser(
         "como-usar",
@@ -198,7 +217,9 @@ def executar(argumentos: list[str] | None = None) -> int:
         return desinstalar_comando()
     abrir = not opcoes.nao_abrir
     if opcoes.comando == "gravar":
-        return gravar_e_analisar(opcoes.url, opcoes.saida, opcoes.ia, opcoes.sem_ia, abrir)
+        return gravar_e_analisar(
+            opcoes.url, opcoes.saida, opcoes.ia, opcoes.sem_ia, abrir, opcoes.robo
+        )
     if opcoes.sem_ia:
         return analisar_sem_ia(opcoes.har, opcoes.saida, abrir)
     return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia, abrir)
@@ -279,7 +300,12 @@ def analisar_com_ia(
 
 
 def gravar_e_analisar(
-    url: str, saida: Path | None, opcao_ia: str | None, sem_ia: bool, abrir: bool
+    url: str,
+    saida: Path | None,
+    opcao_ia: str | None,
+    sem_ia: bool,
+    abrir: bool,
+    robo: bool = False,
 ) -> int:
     try:
         host = host_da_url(url)
@@ -292,7 +318,7 @@ def gravar_e_analisar(
     except (UrlInvalida, IaInvalida, PlaywrightAusente, GravacaoJaExiste) as erro:
         return encerrar_com_erro(str(erro))
     try:
-        requisicoes = gravar_visita(url, host, har)
+        requisicoes = gravar_visita(url, host, har, robo)
     except NavegadorAusente as erro:
         pasta.rmdir()
         return encerrar_com_erro(str(erro))
@@ -310,14 +336,61 @@ def gravar_e_analisar(
     return analisar_e_gravar(har, saida, ia, abrir, gravado_pelo_rastro=True)
 
 
-def gravar_visita(url: str, host: str, har: Path) -> int:
+def gravar_visita(url: str, host: str, har: Path, robo: bool) -> int:
     parada = PedidoDeParada()
     with ctrl_c_pede_parada(parada), abrir_gravacao(har) as sessao:
-        print(TEXTO_GRAVANDO.format(host=host))
-        abrir_primeira_pagina(sessao, url)
-        esperar_a_janela_fechar(sessao, parada)
+        if robo:
+            navegar_com_o_robo(sessao, parada, url, host)
+        else:
+            print(TEXTO_GRAVANDO.format(host=host))
+            abrir_primeira_pagina(sessao, url)
+            esperar_a_janela_fechar(sessao, parada)
         requisicoes = sessao.requisicoes
     return requisicoes
+
+
+def navegar_com_o_robo(
+    sessao: SessaoDeGravacao, parada: PedidoDeParada, url: str, host: str
+) -> None:
+    limites = LIMITES_PADRAO
+    print(
+        TEXTO_ROBO_COMECOU.format(
+            host=host,
+            paginas=limites.paginas,
+            minutos=limites.segundos / 60,
+            cliques=limites.cliques,
+        )
+    )
+    robo = Robo(sessao, parada, time.monotonic, mostrar_passo_do_robo, limites)
+    mostrar_fim_do_robo(robo.navegar(url))
+
+
+def mostrar_passo_do_robo(passo: PassoDoRobo) -> None:
+    if passo.falha is not None:
+        print(TEXTO_PASSO_QUE_FALHOU.format(url=passo.url, motivo=passo.falha))
+        return
+    minutos, segundos = divmod(int(passo.segundos), 60)
+    print(
+        TEXTO_PASSO_DO_ROBO.format(
+            paginas=passo.paginas,
+            limite=LIMITES_PADRAO.paginas,
+            requisicoes=passo.requisicoes,
+            scripts=passo.scripts,
+            tempo=f"{minutos}:{segundos:02d}",
+            url=passo.url,
+        )
+    )
+
+
+def mostrar_fim_do_robo(resultado: ResultadoDoRobo) -> None:
+    print(
+        TEXTO_ROBO_PAROU.format(
+            motivo=resultado.motivo,
+            paginas=resultado.paginas,
+            barrados=resultado.barrados,
+            parecidos=resultado.parecidos,
+        )
+    )
 
 
 def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str) -> None:

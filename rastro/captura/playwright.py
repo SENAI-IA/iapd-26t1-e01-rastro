@@ -73,6 +73,9 @@ class SessaoPlaywright:
             return []
         return hrefs
 
+    def endereco(self) -> str:
+        return self._pagina.url
+
     def aberta(self) -> bool:
         return len(self._contexto.pages) > 0
 

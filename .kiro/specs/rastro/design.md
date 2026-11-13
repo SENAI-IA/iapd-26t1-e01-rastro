@@ -740,6 +740,7 @@ A quinta interface com troca real, ao lado das quatro do `structure.md`: o Playw
 |---|---|
 | `ir(url)` | navega e espera a rede parar (até 15 s); falha vira `FalhaAoNavegar` |
 | `links()` | `href` absolutos dos `<a>` da página atual |
+| `endereco()` | o endereço da página atual, depois de redirecionamentos |
 | `aberta()` | a janela ainda está aberta |
 | `esperar(segundos)` | dá uma fatia de tempo ao navegador |
 | `requisicoes`, `scripts` | contagem para o progresso (R24.14) |
@@ -750,8 +751,9 @@ Puro, sobre a `SessaoDeGravacao`, com relógio e pedido de parada recebidos de f
 
 - fila em largura, com os links de cada página em ordem alfabética (a mesma visita a cada execução);
 - `normalizar(url)`: sem os valores da query e sem o fragmento que não é rota (R24.11);
-- `link_permitido(url, origem)`: mesmo host e porta, sem as palavras e extensões do R24.12;
-- `familia(url)`: o caminho, ou a rota do fragmento, sem o último trecho; conta só páginas visitadas com sucesso, porque contar na fila travou o WebGoat no spike;
+- `link_permitido(url, origem)`: mesmo host e porta, sem as palavras e extensões do R24.12 e sem URL dentro da query;
+- `saida_do_site(endereco, host)`: depois de navegar, confere o endereço final pela `SessaoDeGravacao.endereco()`; se um redirecionamento levou para outro host, a página não conta e os links dela não entram na fila. No teste real da T62, o `/redirect?to=https://github.com/...` do Juice Shop levou o robô ao GitHub e encheu o HAR de scripts de fora;
+- `familia(url)`: o caminho, ou a rota do fragmento, sem o último trecho; página de um trecho só é família de si mesma, senão as páginas da raiz (`/contato`, `/sobre`) dividiriam 2 vagas; conta só páginas visitadas com sucesso, porque contar na fila travou o WebGoat no spike;
 - devolve o motivo da parada (R24.13), que o `cli.py` mostra.
 
 ### HAR gravado pelo Playwright

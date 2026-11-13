@@ -568,10 +568,10 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Requisito: R24.8, R24.9, R06.7
   - Revisão: a definir
 
-- [ ] **T62 Navegar sozinho com travas**
+- [x] **T62 Navegar sozinho com travas**
   - Entrega: `rastro gravar <url> --robo` navega pelos links do próprio site, com limite de páginas, tempo e profundidade, no máximo 2 páginas por família de URL e sem seguir links de sair, excluir ou com `token=`.
   - Aceite: nunca visita a mesma URL duas vezes; para no primeiro limite atingido e diz qual; o progresso aparece no terminal; Ctrl+C ou fechar a janela param o robô e o HAR é gravado com o que já foi coletado (`handle_sigint=False`).
-  - Arquivos: `rastro/captura/robo.py`, `tests/captura/test_robo.py`
+  - Arquivos: `rastro/captura/robo.py`, `rastro/captura/sessao.py`, `rastro/captura/playwright.py`, `rastro/cli.py`, `tests/captura/test_robo.py`, `tests/test_cli.py`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`
   - Teste: `test_r24_*`, com a navegação trocada por dublê (sem rede).
   - Requisito: R24.10–R24.14
   - Revisão: a definir

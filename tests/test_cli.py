@@ -623,6 +623,9 @@ class SessaoFalsa:
     def links(self) -> list[str]:
         return []
 
+    def endereco(self) -> str:
+        return self.urls[-1] if self.urls else ""
+
     def aberta(self) -> bool:
         return self.esperas < 1000
 
@@ -819,3 +822,18 @@ def test_r24_9_sem_cookies_na_gravacao_nao_pede_o_har_completo(
     assert [c["situacao"] for c in de_cookie] == ["nao_verificada"] * 3
     assert all("não criou nenhum cookie" in c["detalhe"] for c in de_cookie)
     assert not any("HAR completo" in c["detalhe"] for c in de_cookie)
+
+
+def test_r24_14_robo_mostra_o_progresso_e_por_que_parou(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    saida = tmp_path / "relatorios"
+
+    assert gravar_loja(saida, "--robo", "--sem-ia", "--nao-abrir") == 0
+
+    terminal = capsys.readouterr().out
+    assert "O robô vai navegar pelos links de loja.exemplo.com" in terminal
+    assert "páginas 1/20 · requisições 3 · scripts 1" in terminal
+    assert "O robô parou: nenhum link novo" in terminal
+    assert gravacao.sessao.esperas == 0
+    assert (saida / PASTA_DA_LOJA / "relatorio.json").is_file()

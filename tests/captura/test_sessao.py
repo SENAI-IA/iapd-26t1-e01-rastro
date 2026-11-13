@@ -14,6 +14,9 @@ class SessaoQueFechaSozinha:
     def links(self) -> list[str]:
         return []
 
+    def endereco(self) -> str:
+        return "https://loja.exemplo.com/"
+
     def aberta(self) -> bool:
         return self.fatias_esperadas < self.fatias_ate_fechar
 
