@@ -586,8 +586,8 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
 
 - [x] **T64 Ensinar a gravar a visita**
   - Entrega: README, README técnico e a tela "Como usar" com o `gravar`, nos comandos de Linux e de Windows.
-  - Aceite: o passo a passo instala o Playwright e grava uma visita do zero nos dois sistemas; a tela "Como usar" mostra o `gravar` como alternativa ao DevTools. Linux conferido; Windows na T42.
-  - Arquivos: `README.md`, `README-TECNICO.md`, `frontend/src/dados/guia.ts`, `frontend/src/dados/tour.ts`, `rastro/relatorio/modelo.html`, `.kiro/specs/rastro/requirements.md` (painel ao vivo nos planos futuros)
+  - Aceite: o passo a passo instala o Playwright e grava uma visita do zero nos dois sistemas; a tela "Como usar" deixa escolher o jeito de gravar (DevTools, o Rastro grava, o robô navega) e mostra só os passos dele (R24.17). Linux conferido; Windows na T42.
+  - Arquivos: `README.md`, `README-TECNICO.md`, `frontend/src/dados/guia.ts`, `frontend/src/dados/tour.ts`, `frontend/src/componentes/GuiaComoUsar.tsx`, `frontend/src/componentes/AnimacaoDoModo.tsx`, `frontend/src/componentes/IlustracaoDoGuia.tsx`, `rastro/relatorio/modelo.html`, `.kiro/specs/rastro/requirements.md` (painel ao vivo nos planos futuros)
   - Teste: verificação manual.
-  - Requisito: R24, R20.1
+  - Requisito: R24 (R24.17), R20.1
   - Revisão: a definir

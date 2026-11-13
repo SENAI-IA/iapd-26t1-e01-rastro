@@ -302,6 +302,7 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 14. ENQUANTO o robô navegar, o terminal DEVE mostrar, a cada página, quantas páginas de quantas, requisições, scripts, o tempo e a URL.
 15. QUANDO o robô parar por limite, o Rastro DEVE deixar a janela aberta e dizer que o auditor pode visitar mais páginas antes de fechá-la. QUANDO o auditor apertar Ctrl+C ou fechar a janela durante o robô, a gravação DEVE terminar como em 7.
 16. ONDE a opção `--robo` for usada, ANTES do Enter, o terminal DEVE avisar que, num sistema em produção, um link comum pode disparar uma ação, e recomendar não entrar para o robô com usuário que tem permissão de administrador ou acesso a dados sensíveis: nesse caso, gravar sem `--robo` e navegar à mão.
+17. A tela "Como usar" DEVE deixar escolher como gravar a visita (no DevTools, pelo Rastro ou com o robô) e mostrar só os passos, o que precisa antes, os problemas e os dados daquele jeito. Cada jeito DEVE ter uma animação curta que mostre, sem ler, quem faz o quê até o relatório. QUANDO a pessoa trocar de jeito, o progresso DEVE voltar a zero. Sem escolha, o guia DEVE mostrar o DevTools. *(verificação manual)*
 
 ---
 

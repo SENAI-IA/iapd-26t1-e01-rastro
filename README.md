@@ -10,7 +10,7 @@ Ele gera um relatório visual com:
 - explicações e sugestões de ação;
 - origem dos dados usados na análise.
 
-A análise é passiva: Rastro lê o HAR e não acessa o site analisado. A exceção opcional é o [`rastro gravar`](#gravar-pelo-rastro-opcional), em que o Rastro abre o navegador para você e quem acessa o site é esse navegador.
+A análise é passiva: Rastro lê o HAR e não acessa o site analisado. Se preferir, o [`rastro gravar`](#gravar-pelo-rastro-opcional) abre o navegador e grava a visita por você; aí quem acessa o site é esse navegador.
 
 > **Importante:** use o Rastro somente em sites próprios ou em sites para os quais você tem autorização para auditar.
 
@@ -23,6 +23,7 @@ A análise é passiva: Rastro lê o HAR e não acessa o site analisado. A exceç
 - [Usar de qualquer pasta (opcional)](#usar-de-qualquer-pasta-opcional)
 - [Ver o guia sem analisar](#ver-o-guia-sem-analisar)
 - [Gravar um arquivo HAR](#gravar-um-arquivo-har)
+- [Gravar pelo Rastro (opcional)](#gravar-pelo-rastro-opcional)
 - [Fazer uma análise](#fazer-uma-análise)
 - [Abrir o relatório](#abrir-o-relatório)
 - [Usar sem IA](#usar-sem-ia)
@@ -114,7 +115,7 @@ No Windows:
 py -m rastro como-usar
 ```
 
-Esse comando abre o guia no navegador. Não lê HAR, não consulta a internet e não grava uma análise.
+Esse comando abre o guia no navegador. No alto, escolha como quer gravar a visita (no DevTools, pelo Rastro ou com o robô) e o guia mostra só os passos daquele jeito. Não lê HAR, não consulta a internet e não grava uma análise.
 
 ## Gravar um arquivo HAR
 
@@ -133,40 +134,41 @@ Para testar sem gravar um arquivo, use os exemplos em [`avaliacao/`](avaliacao/R
 
 ## Gravar pelo Rastro (opcional)
 
-Sem DevTools: o Rastro abre o Chrome (ou o Edge) da sua máquina, grava tudo o que você visitar e analisa quando você fecha a janela.
+Em vez de usar o DevTools, deixe o Rastro abrir o navegador e gravar por você. No fim, ele já faz a análise.
 
-Precisa de duas coisas a mais:
+**Só na primeira vez**, instale o Playwright (precisa do Chrome ou do Edge instalado):
 
-- **Google Chrome ou Microsoft Edge** instalado. O Rastro não baixa navegador.
-- **Playwright para Python**, no mesmo Python que roda o Rastro. Rode uma vez:
+```bash
+python3 -m pip install --user playwright==1.65.1
+```
 
-  ```bash
-  python3 -m pip install --user playwright==1.65.1
-  ```
+No Windows: `py -m pip install --user playwright==1.65.1`. Se der erro, rode o `gravar` assim mesmo: a mensagem mostra o comando certo para o seu computador.
 
-  No Windows: `py -m pip install --user playwright==1.65.1`. Se o `pip` recusar com `externally-managed-environment` (Ubuntu 24.04 e parecidos), instale dentro do `.venv` do projeto e rode o Rastro com ele ativo. Na dúvida, rode o `gravar`: se faltar o Playwright, o próprio erro mostra o comando certo para a sua máquina.
-
-Gravar à mão:
+### Você navega
 
 ```bash
 rastro gravar https://site.com.br
 ```
 
-Navegue pelo site como um usuário comum e feche a janela (ou aperte `Ctrl+C` no terminal). A análise roda em seguida, com as mesmas opções do `analisar` (`--ia`, `--sem-ia`, `--saida`, `--nao-abrir`).
+1. O navegador abre no site.
+2. Navegue pelas páginas que importam.
+3. Feche a janela. A análise roda e o relatório abre.
 
-Deixar o robô navegar:
+### O robô navega
 
 ```bash
 rastro gravar https://site.com.br --robo
 ```
 
-1. Se o site pede login, entre na janela aberta e aperte Enter no terminal. Sem login, só aperte Enter.
-2. O robô segue os links do próprio site, até 20 páginas, 3 minutos e 2 cliques da página inicial, e mostra o progresso no terminal. Ele nunca clica em botão nem envia formulário, e não segue links de sair, excluir, com `token=` ou que levam para fora do site.
-3. Quando ele parar, a janela continua aberta: visite mais alguma página importante e feche a janela.
+1. O navegador abre no site. Se precisar, faça login.
+2. Aperte Enter no terminal. O robô visita os links do site (até 20 páginas ou 3 minutos), sem clicar em botões e sem enviar formulários.
+3. Quando ele parar, feche a janela. A análise roda e o relatório abre.
 
-> **Cuidado em produção:** o robô só segue links, mas num sistema em produção um link comum pode disparar uma ação (aprovar, arquivar, enviar). Se o usuário tem permissão de administrador ou acesso a dados sensíveis, não entre com ele para o robô: grave sem `--robo` e navegue você mesmo.
+> **Em produção:** não use o robô com um usuário administrador ou com acesso a dados sensíveis. Um link comum pode aprovar, arquivar ou enviar algo. Nesse caso, navegue você mesmo.
 
-O HAR fica em `~/Rastro/gravacoes/<site>/<data e hora>/visita.har` e **guarda a sessão do site** (cabeçalhos `Cookie` e `Set-Cookie`): não compartilhe o arquivo e apague-o quando não precisar mais. O relatório não traz esses valores.
+As opções do `analisar` também valem aqui: `--sem-ia`, `--ia`, `--saida` e `--nao-abrir`.
+
+A gravação fica em `~/Rastro/gravacoes/` e **guarda o seu login no site**. Não compartilhe o arquivo e apague quando não precisar mais. O relatório não traz o login.
 
 ## Fazer uma análise
 
@@ -282,11 +284,15 @@ Confira se a CLI está instalada e disponível no terminal. Como alternativa, us
 
 ### `o Playwright não está instalado` no `gravar`
 
-Rode o comando que a própria mensagem mostra. Ele já traz o caminho do Python que roda o Rastro. Ou grave o HAR pelo DevTools, como em [Gravar um arquivo HAR](#gravar-um-arquivo-har).
+Rode o comando que a própria mensagem mostra. Ou grave pelo DevTools, como em [Gravar um arquivo HAR](#gravar-um-arquivo-har).
 
 ### `nem o Google Chrome nem o Microsoft Edge foram encontrados`
 
-Instale um dos dois. O Rastro usa o navegador da máquina e não baixa outro.
+Instale um dos dois. O Rastro usa o navegador do computador e não baixa outro.
+
+### `não foi possível abrir o navegador para gravar a visita`
+
+Feche as janelas do Chrome ou do Edge que estiverem travadas e rode de novo. Se continuar, grave pelo DevTools.
 
 ### HAR inválido ou inexistente
 
