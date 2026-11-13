@@ -79,6 +79,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T61** Avisar sobre a sessão gravada no HAR · extensão · revisão a definir · 13/11
 - [ ] **T62** Navegar sozinho com travas · extensão · revisão a definir · 13/11
 - [ ] **T63** Combinar o robô com a navegação da pessoa · extensão · revisão a definir · 13/11
+- [ ] **T64** Ensinar a gravar a visita · extensão · revisão a definir · 13/11 · pendente: Windows (T42)
 
 ## A fazer
 
@@ -110,7 +111,7 @@ _(vazio)_
 
 ### Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo, até 08/12)
 
-- [ ] **T64** Ensinar a gravar a visita · revisão a definir
+_(vazio)_
 
 ## Feito
 

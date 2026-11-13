@@ -22,7 +22,7 @@ export const ANTES_DE_COMECAR: string[] = [
   "**Chrome ou Edge.** No Firefox os passos são os mesmos, com outros nomes de menu.",
   "**Python e a pasta do Rastro** no computador, como na seção \"Instalar\" do README.",
   "**Uma CLI de IA** (Kiro, Claude ou Codex) para a análise completa. Sem ela, rode com `--sem-ia`.",
-  "**Autorização para analisar o site.** O Rastro só lê o arquivo gravado e nunca acessa o site, mas combine com o time responsável.",
+  "**Autorização para analisar o site.** O Rastro só lê o arquivo gravado e não acessa o site (no `rastro gravar`, quem acessa é o navegador aberto para você), mas combine com o time responsável.",
 ];
 
 export const PASSOS_DO_GUIA: PassoDoGuia[] = [
@@ -41,6 +41,7 @@ export const PASSOS_DO_GUIA: PassoDoGuia[] = [
     titulo: "Abra o site",
     texto:
       "No Chrome ou no Edge, abra o site que você quer analisar: o seu, ou um que você tem autorização para auditar. Prefira o ambiente de homologação.",
+    dica: "Atalho sem DevTools: `rastro gravar https://site.com.br` abre o Chrome ou o Edge, grava o que você visitar e analisa ao fechar a janela. Com `--robo`, o Rastro também navega sozinho pelos links. Precisa do Playwright (veja \"Gravar pelo Rastro\" no README). Usou o atalho? Vá direto ao passo 8.",
     ilustracao: "site",
   },
   {
@@ -103,6 +104,10 @@ export const PROBLEMAS: Problema[] = [
     solucao: "É o esperado com o HAR sanitized, que tira os cookies. As bibliotecas são analisadas do mesmo jeito.",
   },
   {
+    sintoma: "\"o Playwright não está instalado\" no `rastro gravar`",
+    solucao: "Rode o comando de instalação que o próprio erro mostra, com o caminho do Python que roda o Rastro. Ou grave o HAR pelo DevTools, como nos passos 2 a 6.",
+  },
+  {
     sintoma: "\"rastro: comando não encontrado\"",
     solucao: "Feche o terminal e abra outro. Se continuar, rode de novo `python3 -m rastro instalar` na pasta do Rastro (Windows: `py -m rastro instalar`). Se mudou a pasta do Rastro de lugar, rode também.",
   },
@@ -117,7 +122,7 @@ export const PROBLEMAS: Problema[] = [
 ];
 
 export const SEUS_DADOS: string[] = [
-  "O HAR e o relatório ficam na sua máquina, e o site analisado nunca é acessado.",
+  "O HAR e o relatório ficam na sua máquina. O Rastro não acessa o site analisado; no `rastro gravar`, quem acessa é o navegador aberto para você, e o HAR gravado guarda a sessão: não compartilhe o arquivo.",
   "A IA recebe só trechos de scripts, o nome e a versão das bibliotecas e os dados dos avisos, com tokens, chaves e parâmetros de endereço tirados antes.",
   "O GitHub Advisory, o OSV e o registro do npm recebem só o nome e a versão das bibliotecas; o NVD, só o CVE.",
 ];

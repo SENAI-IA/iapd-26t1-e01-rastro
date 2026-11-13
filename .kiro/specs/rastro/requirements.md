@@ -325,3 +325,4 @@ Ideias para as próximas versões. Não entram na nota nem no cronograma, mas o 
 | Vincular a task no Azure DevOps ou no GitLab e acompanhar no painel | Fechar o ciclo do achado à correção | Hoje a task sai como texto pronto para copiar |
 | Base de falsos positivos por projeto | Não repetir a mesma triagem a cada análise | Selo "FP conhecido", já desenhado no demo |
 | Rodar na esteira com Playwright | Analisar a cada pipeline, com o HAR gravado pelos testes E2E (`recordHar`) | A CLI já roda sem interação e com `--sem-ia` |
+| Painel ao vivo da gravação | Ver o rastro se formando enquanto o `gravar` navega | O Playwright só grava o HAR ao fechar e o relatório é um HTML estático (decisão 05): precisaria ouvir o evento `response` e de um servidor local. Hoje, o progresso fica no terminal e o radar da visita (R22) toca o rastro logo depois |

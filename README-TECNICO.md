@@ -48,8 +48,10 @@ Este documento é referência para desenvolvimento, manutenção, agentes de IA 
 | Internet (GitHub Advisory, OSV, NVD e registro do npm, só leitura) | sim | não (os testes não acessam a rede) |
 | CLI de IA instalada e autenticada: Kiro (`kiro-cli`, padrão), Claude (`claude`) ou Codex (`codex`) | só para a análise com IA | não |
 | Node.js | não: o HTML do relatório já vem pronto em `rastro/relatorio/modelo.html` | só para mudar o frontend |
+| Playwright para Python 1.65.1 e Chrome ou Edge | só para o `rastro gravar` (opcional) | sim, pelo `requirements-dev.txt` (os testes usam dublê) |
 
-- O Rastro não tem dependência Python em produção: não há `pip install` para usar. O comando `rastro` de qualquer pasta é opcional (`python3 -m rastro instalar`).
+- O Rastro não tem dependência Python obrigatória em produção: não há `pip install` para usar. O comando `rastro` de qualquer pasta é opcional (`python3 -m rastro instalar`).
+- A exceção opcional é o `rastro gravar` (R24, decisão 12): ele importa o Playwright só nesse comando e usa o Chrome ou o Edge da máquina. Sem o Playwright, o comando mostra como instalar e para. O `pyproject.toml` declara o extra `gravar`.
 - O Rastro não instala nem autentica a CLI de IA. Use a que você já tem; sem nenhuma, rode com `--sem-ia`.
 - Nada é instalado no sistema nem pede administrador ou `sudo`. O Rastro só cria ou remove o comando `rastro` quando a pessoa pede (`instalar` e `desinstalar`), e só na pasta do usuário.
 
@@ -97,6 +99,9 @@ Para ver o passo a passo antes de ter um HAR, abra o guia **Como usar** do relat
 O comando abre no navegador o relatório sem dados, já na aba "Como usar", e mostra no terminal o caminho do arquivo. Não lê HAR, não acessa a rede e não grava nada. Se o navegador não abrir (num servidor sem tela, por exemplo), abra esse arquivo à mão.
 
 ### 1. Gravar o HAR
+
+Pelo DevTools, como abaixo, ou pelo próprio Rastro, com `rastro gravar <url>` (à mão) ou `rastro gravar <url> --robo` (o robô navega pelos links depois do Enter). O passo a passo do `gravar` está no [README](README.md#gravar-pelo-rastro-opcional); o desenho, na seção 18 do design e na decisão 12.
+
 
 No Chrome ou no Edge, no site que você quer analisar (o seu, ou um que tem autorização para auditar):
 
@@ -209,10 +214,15 @@ Os critérios marcados *(verificação manual)* na spec só se conferem olhando 
 | 16 | Ativar "reduzir movimento" no sistema e abrir o tour e o "Como usar" | Ilustrações paradas e destaque sem transição | R23.7 | conferido 10/11 (Chromium com `prefers-reduced-motion`) | a conferir (T42) |
 | 17 | Rodar `python3 -m rastro como-usar` (Windows: `py -m rastro como-usar`) | O navegador abre o relatório sem dados já no "Como usar", sem o botão "Tour guiado"; o terminal mostra o caminho do `modelo.html` | R23.1, R23.8 | conferido 10/11 (Chromium; com dados, o relatório segue abrindo no painel) | a conferir (T42) |
 | 18 | Rodar `python3 -m rastro instalar` (Windows: `py -m rastro instalar`), inclusive com o `.venv` ativo, e, num terminal novo, em outra pasta, rodar `rastro --help`, `rastro como-usar` e `rastro analisar <caminho>/webgoat.har --sem-ia`; depois `rastro desinstalar` | O comando existe fora do projeto; o guia abre; o relatório é gravado completo; o `desinstalar` tira o atalho e a linha do PATH, e o `rastro` some num terminal novo | R17.3, R18.1 | conferido 11/11 (pasta de usuário de teste, com o `.venv` ativo e zsh: atalho com o `/usr/bin/python3.10`, `--help` de outra pasta, `desinstalar` limpou o `.zshrc`) | a conferir (T42) |
+| 19 | Rodar `rastro gravar <url>`, navegar e fechar a janela | O Chrome (ou o Edge) abre na URL; ao fechar, o terminal mostra o `visita.har`, o aviso da sessão e roda a análise | R24.1, R24.7, R24.8 | Ctrl+C conferido 13/11 (Juice Shop, Chrome 157, Linux); fechar a janela, a conferir | a conferir (T42) |
+| 20 | Rodar `rastro gravar <url> --robo`, apertar Enter, esperar o robô e apertar Ctrl+C | Aviso de produção antes do Enter; uma linha de progresso por página; o motivo da parada; a janela continua aberta até o Ctrl+C; o HAR só tem o host da URL | R24.10–R24.16 | conferido 13/11 (Juice Shop: 8 páginas, parou sem links novos; o HAR só com `127.0.0.1:3000`) | a conferir (T42) |
+| 21 | Rodar `rastro gravar <url>` num Python sem o Playwright | Erro com o comando `"<python>" -m pip install playwright==1.65.1`, código 1, sem abrir navegador | R24.3 | conferido por teste (`test_r24_3_*`) | a conferir (T42) |
 
 "Conferido 09/11" quer dizer: visto na tela, no Chromium, nos prints de `docs/prints/` ou numa conferência automatizada com o Playwright. "A conferir" fica para a pessoa do grupo que seguir este README do zero (revisão da T43) e para a T42, no Windows.
 
 ## A conferir no Windows (T42)
+
+- O `rastro gravar` (extensão R24): se o Playwright acha o Chrome ou o Edge pelo `channel`, se fechar a janela grava o HAR, se o Ctrl+C no PowerShell e no `cmd` grava o HAR e se o `pip install --user playwright` funciona sem administrador. Ver `docs/spike/gravacao-com-playwright.md`, "A conferir no Windows".
 
 - Os comandos marcados "a conferir" nas tabelas: `py`, `$env:RASTRO_IA`, `Invoke-Item` e a ativação do `.venv`.
 - Se o `kiro-cli` existe para Windows e se `claude` e `codex` são achados (`.exe` ou `.cmd`). A lista completa está em `docs/spike/clis-de-ia.md`, "A conferir no Windows".

@@ -12,7 +12,7 @@ export const PASSOS_DO_TOUR: PassoDoTour[] = [
     seletor: ".cabecalho-analise",
     titulo: "Uma análise do Rastro",
     texto:
-      "Você grava a navegação do site e o Rastro mostra o que está vulnerável nas bibliotecas que chegaram ao navegador. O site nunca é acessado: tudo sai do arquivo gravado.",
+      "Você grava a navegação do site e o Rastro mostra o que está vulnerável nas bibliotecas que chegaram ao navegador. O Rastro não acessa o site: tudo sai do arquivo gravado.",
     termos: ["HAR"],
   },
   {
