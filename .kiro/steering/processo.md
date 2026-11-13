@@ -44,6 +44,7 @@ Tamanho: até meio dia de trabalho. Se a descrição precisa de "e", são duas t
 ## Autoria, revisão e kanban
 
 - **Tudo direto no `main`, sem branch e sem MR**, uma task por vez, um commit por task. Push logo depois.
+- **Exceção: a extensão "Gravar a visita" (T58–T65)** corre na branch `feat/gravar`, porque só entra se der tempo. Lá valem as mesmas regras (uma task, um commit, push logo depois). Volta ao `main` por merge, sem rebase, para os commits de cada task continuarem no `git log`. Se não fechar até 08/12, a branch fica fora da entrega.
 - Antes do commit, `ruff`, `mypy` e `pytest` passam na máquina local.
 - **Revisor é coautor desde o commit:** a mensagem termina com `Co-authored-by: <Nome> <e-mail do Git>`. Tabela dos revisores no `tasks.md`.
 - **Revisão depois do commit:** o revisor confere o commit (`git show`), o critério de aceite e a verificação. Ajuste vira commit novo `fix(...) (Tnn)`. Commit enviado nunca é reescrito.

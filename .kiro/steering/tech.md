@@ -11,8 +11,8 @@
 
 ## Dependências
 
-- **Python em produção:** nenhuma. Nada de SDK de IA nem chave de API no projeto.
-- **Python em desenvolvimento:** `pytest`, `pytest-cov`, `ruff`, `mypy` e `setuptools` (monta o pacote no teste de instalação, sem rede), com versão fixa em `requirements-dev.txt`, instalados num `.venv` na raiz do projeto.
+- **Python em produção:** nenhuma obrigatória. Nada de SDK de IA nem chave de API no projeto. A exceção é opcional: o `playwright` (versão fixa), só para o `gravar` (R24, decisão 12), importado só nesse comando. Sem ele, o resto do Rastro funciona igual.
+- **Python em desenvolvimento:** `pytest`, `pytest-cov`, `ruff`, `mypy`, `playwright` (só para os tipos; os testes usam dublê) e `setuptools` (monta o pacote no teste de instalação, sem rede), com versão fixa em `requirements-dev.txt`, instalados num `.venv` na raiz do projeto.
 - **Configuração:** `ruff`, `mypy` (modo `strict`), `pytest`, cobertura e o empacotamento (setuptools, comando `rastro` e arquivos de dados do pacote) no `pyproject.toml`. Arquivo novo que não seja `.py` dentro de `rastro/` entra em `[tool.setuptools.package-data]`.
 - **Frontend:** `react`, `react-dom`; em desenvolvimento, `vite`, `typescript`, `vite-plugin-singlefile` e o que o template `react-ts` do Vite já traz (`@vitejs/plugin-react` e os pacotes `@types/*`). O linter do template (`oxlint`) fica de fora: o `tsc` do build já confere os tipos. Sem biblioteca de componentes, de estado ou de gráficos. `package-lock.json` versionado.
 - Qualquer dependência nova precisa resolver algo que o padrão não resolve. Justifique antes de adicionar.
@@ -37,12 +37,13 @@ Tudo precisa funcionar nos dois.
 
 - O Rastro só lê o HAR e nunca o altera.
 - O relatório é gravado numa pasta nova, `~/Rastro/relatorios/<site>/<AAAA-MM-DD_HH-MM-SS>/` (`--saida` troca a raiz), com arquivos abertos no modo `"x"`; se a pasta já existir, para com mensagem clara. Nome de pasta sem `:` e sem caracteres que o Windows não aceita.
-- Nada instalado no sistema, sem `sudo`, e o Rastro não instala nem apaga nada por conta própria. O comando `rastro` só é criado ou removido quando a pessoa pede (`instalar` e `desinstalar`), na pasta do usuário, e só o que tem a marca do Rastro é tocado.
+- Nada instalado no sistema, sem `sudo`, e o Rastro não instala nem apaga nada por conta própria. Sem o Playwright, o `gravar` só mostra o comando de instalação; o navegador é o da máquina, nunca baixado. O comando `rastro` só é criado ou removido quando a pessoa pede (`instalar` e `desinstalar`), na pasta do usuário, e só o que tem a marca do Rastro é tocado.
 - Vale também para os comandos que o agente roda durante o desenvolvimento.
 
 ## Rede
 
 - Só GitHub Advisory, registro do npm (leitura) e, se a extensão for feita, OSV e NVD. Nunca o site analisado.
+- Exceção: no `gravar`, o navegador aberto para a pessoa acessa o site, como se ela navegasse. O robô só segue links do mesmo host, nunca envia formulário.
 - O pacote baixado do npm é lido em memória: nada extraído em disco, nada executado.
 
 ## Testes

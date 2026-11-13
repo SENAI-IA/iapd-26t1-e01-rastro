@@ -455,3 +455,33 @@ def test_r06_8_checar_configuracao_roda_todas_as_regras_na_ordem_dos_ids() -> No
 
     assert [checagem.id for checagem in checagens] == [f"C0{numero}" for numero in range(1, 9)]
     assert list(CHECAGENS) == TODAS_AS_CHECAGENS + CHECAGENS_DE_COOKIE
+
+
+def checagens_de_cookie(checagens: list[Checagem]) -> list[Checagem]:
+    return [checagem for checagem in checagens if checagem.id in ("C06", "C07", "C08")]
+
+
+def test_r24_9_gravado_pelo_rastro_sem_cookies_diz_que_o_site_nao_criou_cookie() -> None:
+    requisicoes = [resposta(0, CABECALHOS_SEGUROS)]
+
+    checagens = checagens_de_cookie(checar_configuracao(requisicoes, SITE, True))
+
+    assert [c.situacao for c in checagens] == ["nao_verificada"] * 3
+    assert all("não criou nenhum cookie" in c.detalhe for c in checagens)
+    assert not any("HAR completo" in c.detalhe for c in checagens)
+
+
+def test_r24_9_fora_da_gravacao_continua_sugerindo_o_har_completo() -> None:
+    requisicoes = [resposta(0, CABECALHOS_SEGUROS)]
+
+    checagens = checagens_de_cookie(checar_configuracao(requisicoes, SITE))
+
+    assert all("HAR completo" in c.detalhe for c in checagens)
+
+
+def test_r24_9_gravado_pelo_rastro_com_cookies_confere_normalmente() -> None:
+    requisicoes = [com_cookies(0, Cookie("sessao", False, False, None))]
+
+    checagens = checagens_de_cookie(checar_configuracao(requisicoes, SITE, True))
+
+    assert checagens[0].situacao == "falhou"

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from importlib import resources
 
+from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.har.modelos import Requisicao
 from rastro.ia.cliente import ClienteDeIA
 from rastro.ia.sanitizacao import sanitizar
@@ -22,15 +23,21 @@ class BibliotecasDaIA:
 
 
 def identificar_em_bundles(
-    requisicoes: list[Requisicao], por_assinatura: list[Biblioteca], ia: ClienteDeIA | None
+    requisicoes: list[Requisicao],
+    por_assinatura: list[Biblioteca],
+    ia: ClienteDeIA | None,
+    andamento: Andamento = SEM_ANDAMENTO,
 ) -> BibliotecasDaIA:
     if ia is None:
         return BibliotecasDaIA([], [])
     ja_identificadas = {chave(biblioteca) for biblioteca in por_assinatura}
     da_ia: dict[tuple[str, str], Biblioteca] = {}
     travas_acionadas: list[TravaAcionada] = []
-    for bundle in escolher_bundles(requisicoes, por_assinatura):
+    bundles = escolher_bundles(requisicoes, por_assinatura)
+    andamento.itens(len(bundles))
+    for bundle in bundles:
         do_bundle, barrados = identificar_no_bundle(bundle, ia)
+        andamento.avancar()
         travas_acionadas.extend(barrados)
         for biblioteca in do_bundle:
             if chave(biblioteca) not in ja_identificadas:

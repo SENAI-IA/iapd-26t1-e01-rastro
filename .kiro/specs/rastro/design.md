@@ -46,6 +46,8 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/cli.py` | lê argumentos, escolhe o provedor, chama o fluxo, grava, imprime o resumo e abre o relatório no navegador (menos com `--nao-abrir`); `como-usar` abre o modelo no navegador; `instalar` e `desinstalar` chamam o `atalho.py`; `principal()` é a entrada do `python -m rastro` e do comando `rastro` | R13.8, R13.9, R14, R17.3, R18.1, R23.8 |
 | `rastro/atalho.py` | cria e remove o atalho marcado do comando `rastro` e o bloco marcado do PATH, na pasta do usuário | R17.3, R18.1 |
 | `rastro/fluxo.py` | orquestra as etapas, sem regra própria | todos |
+| `rastro/andamento.py` | interface `Andamento` (`comecar`, `etapa`, `itens`, `avancar`) e o `SEM_ANDAMENTO`, que não faz nada | R13.10 |
+| `rastro/terminal.py` | `LinhaAoVivo` (a linha que se reescreve com `\r`) e `AndamentoNoTerminal`, que mostra as etapas da análise nela | R13.10, R24.18 |
 | `rastro/har/leitor.py` | lê e valida o HAR, decodifica base64 | R01 |
 | `rastro/har/modelos.py` | `Requisicao`, `Cookie` | R01 |
 | `rastro/har/site.py` | descobre o site analisado | R01.7 |
@@ -85,6 +87,10 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/relatorio/html.py` | embute o JSON no HTML do build; dá o caminho do modelo para o `como-usar` | R13.5, R23.8 |
 | `rastro/relatorio/modelo.html` | HTML do build do frontend, com a tag `dados` vazia | R13.5 |
 | `rastro/relatorio/gravacao.py` | monta a pasta da análise (aplicação, data e hora) e grava os dois arquivos sem sobrescrever | R13.1–R13.4, R17 |
+| `rastro/captura/sessao.py` | interface `SessaoDeGravacao`: o navegador que grava a visita; nos testes, vira dublê | R24 |
+| `rastro/captura/playwright.py` | abre o Chrome ou o Edge pelo Playwright, grava o HAR e traduz o que falta (Playwright, navegador) em erro claro; único arquivo que importa o Playwright | R24.1, R24.3, R24.4 |
+| `rastro/captura/pasta.py` | monta a pasta nova da gravação (host e porta, data e hora), só do dono, e tira usuário e senha da URL mostrada | R24.6, R24.8 |
+| `rastro/captura/robo.py` | navega pelos links com as travas e diz por que parou | R24.10–R24.15 |
 | `frontend/` | React: só exibe o JSON | R09.2, R10.2, R12, R13.5, R13.6, R22.4–R22.7, R23 |
 
 **Diferenças em relação ao `structure.md`:** entram `acao/` (plano e task não cabem em `risco/`), `travas/`, `fontes/registro_npm.py`, `har/site.py`, `identificacao/bundles.py`, `ia/sanitizacao.py` e `relatorio/gravacao.py`. O `structure.md` já traz essas pastas.
@@ -600,7 +606,7 @@ Componentes do relatório (padrões em `.kiro/steering/frontend-react.md`):
 | Sob demanda | `PainelOrigemDoDado` → `EtapaDaOrigem`: painel lateral (`<dialog>` modal, Esc ou clique fora fecha e o foco volta ao botão) com quatro etapas numeradas: no HAR (`log.entries[i]` e URL de cada evidência), identificação (método, `pacote@versão`, registro do npm, trecho), aviso (GHSA com link, CVE, versões afetadas, corrigida em, CVSS, percentil EPSS, ou o motivo de não ter consultado) e cálculo (`nota.conta` como veio do JSON, com a prioridade). Abre pelo botão "Ver a origem" no corpo da biblioteca (todas as falhas dela) ou pela nota de cada falha (só aquela falha). O `App` guarda a origem aberta (`OrigemDoDado`, `null` fechado). Decidido na T29. |
 | Avisos | `AvisoSemIA`: faixa no topo sempre que `analise.limitacoes` vier preenchido, presa junto da `BarraSuperior` ao rolar; lista cada limitação com o ícone do seu `id` e, quando `analise.ia` é `null`, o título "Análise sem IA: o resultado está incompleto.", o `continua_igual` e o comando para rodar com IA. Com IA, qualquer limitação (`sem_javascript`, `ia_falhou_*`, `fonte_sem_resposta_*`) leva o título "Análise incompleta.". Recolhível (`<details>`, aberta por padrão), para não tomar a tela em 400px. Decidido na T27. |
 | Apoio | `Termo` + `Dica`, `Selo` (e `SeloDePrioridade`, `SeloDoMetodo`), `Icone`; `formato.ts` só formata número, data e plural em pt-BR. Glossário (R12): termos e definições só em `dados/glossario.ts`; `<Termo nome="EPSS">` marca o termo no texto fixo da tela (o nome é checado pelo TypeScript). O `Termo` é focável e abre a `Dica` com o mouse em cima, com o foco do teclado ou com o toque (o toque dá foco; tocar fora fecha); Esc fecha. A `Dica` é um `popover="manual"` nativo (camada de cima: aparece também sobre o `PainelOrigemDoDado`), ligada ao termo por `aria-describedby` e posicionada junto dele. Texto que vem do JSON não é marcado. Decidido na T30. |
-| Aprender a usar | `TourGuiado` e `GuiaComoUsar` → `PassoDoGuia` → `IlustracaoDoGuia` (R23, ver abaixo). |
+| Aprender a usar | `TourGuiado` e `GuiaComoUsar` → `AnimacaoDoModo` e `PassoDoGuia` → `IlustracaoDoGuia` (R23 e R24.17, ver abaixo). |
 | Modo foco | `BarraDeFoco`, e `Zona`: o invólucro de cada zona, com o nome e o botão "Focar". As zonas e os nomes ficam em `dados/zonas.ts`. Decidido na T32. |
 
 **Tema.** A `BarraSuperior` tem o botão de tema. O `App` guarda o tema escolhido (`null` segue o sistema) e grava `data-tema` no `<html>`; o tema desce por props, sem contexto enquanto só a barra precisar dele. Decidido na T26.
@@ -630,10 +636,18 @@ Componentes do relatório (padrões em `.kiro/steering/frontend-react.md`):
 - O `App` guarda `tela: "painel" | "como-usar"`, que começa em `"como-usar"` quando o arquivo não traz análise (`relatorio` `null`, R23.1) e `passosDoTour` (`null` com o tour fechado). A `BarraSuperior` recebe a tela e avisa pelas props `aoTrocarTela` e `aoAbrirTour` (`null` sem relatório, e o botão some). Abrir o tour volta ao painel e sai do foco; no quadro seguinte, já com o painel na tela, o `App` fica só com os passos cujo seletor acha um elemento (R23.3) e abre o `TourGuiado` com eles. Durante o tour, o `AvisoSemIA` fica recolhido, como no foco, para sobrar tela em 400px.
 - **Tour:** `dados/tour.ts` lista os passos, cada um com o seletor da parte da tela (classe que já existe, como `.indicadores` ou `.acao__abrir-task`; para as bibliotecas, `.lista-bibliotecas__lista`, que só existe com biblioteca), título, texto e termos do glossário. O `TourGuiado` é um `<dialog>` modal transparente na tela toda: o destaque é um recorte com sombra em volta da parte da tela e o balão fica ao lado dele. Esc fecha pelo próprio `<dialog>`, o foco fica preso nele e volta ao botão "Tour guiado" ao fechar; clique fora do balão fecha. A cada passo, a página rola até a parte, descontando o topo fixo, e o balão é medido de novo ao rolar e ao mudar o tamanho da tela. Onde pôr o balão (embaixo, em cima, ao lado ou no canto) é conta de tela em `posicaoDoTour.ts`.
 - **Passos do tour**, na ordem da tela: cabeçalho da análise, radar da visita, indicadores, onde a IA entrou, o que fazer agora, abrir a task, bibliotecas, a confirmar, checagens, modo foco e termos do glossário.
-- **Como usar:** `GuiaComoUsar` mostra o que precisa antes, os passos de `dados/guia.ts` (abrir o site, abrir a aba Rede, desativar o cache e recarregar, navegar, exportar o HAR, rodar o Rastro e abrir o relatório), "Se algo der errado" e "Seus dados". Cada `PassoDoGuia` tem o texto, o comando com "Copiar" quando há, "Marcar como feito" e a `IlustracaoDoGuia` do passo: SVG em traço com animação em CSS que repete, parada com `prefers-reduced-motion`. O progresso ("3 de 7 passos feitos") é estado do `GuiaComoUsar` e começa do zero a cada abertura do arquivo. Os comandos são os do README, Linux e Windows lado a lado.
+- **Como usar:** `GuiaComoUsar` começa pela escolha do jeito de gravar (`MODOS_DE_USO`: DevTools, o Rastro grava, o robô navega; R24.17) e mostra o que precisa antes, os passos de `PASSOS_POR_MODO` em `dados/guia.ts`, "Se algo der errado" e "Seus dados". No DevTools, os passos são abrir o site, abrir a aba Rede, desativar o cache e recarregar, navegar, exportar o HAR, rodar o Rastro e abrir o relatório; nos outros dois, instalar o Playwright, rodar o `gravar` (com ou sem `--robo`), navegar ou esperar o robô e abrir o relatório. Itens de "Antes de começar", dos problemas e dos dados com `modos` só aparecem naqueles jeitos (`valeNoModo`). Trocar de jeito zera o progresso. Cada cartão de jeito tem a `AnimacaoDoModo`, uma tirinha em três quadros com legenda (o que a pessoa faz → o que acontece → relatório), que só anda no cartão escolhido ou com o mouse em cima; os passos do `gravar` e do robô têm desenhos próprios (`gravar`, `robo`, `entrar`, `robo-visita`, `navegar-e-fechar`). Cada `PassoDoGuia` tem o texto, o comando com "Copiar" quando há, "Marcar como feito" e a `IlustracaoDoGuia` do passo: SVG em traço com animação em CSS que repete, parada com `prefers-reduced-motion`. O progresso ("3 de 8 passos feitos") é estado do `GuiaComoUsar` e começa do zero a cada abertura do arquivo. Os comandos são os do README, Linux e Windows lado a lado.
 - **`como-usar` na linha de comando (R23.8):** o `modelo.html` já é o relatório sem dados (tag `dados` vazia), então o comando só o abre: `caminho_do_modelo()` (`relatorio/html.py`) dá o arquivo dentro do pacote e o `cli.py` chama `webbrowser.open` com a URI `file://` dele. Nada é copiado nem gravado. O terminal mostra o caminho; se o `webbrowser` devolver `False` (sem navegador, como num servidor sem tela), a mensagem diz para abrir o arquivo à mão, e o código é 0 nos dois casos. O tour fica desligado sem dados (R23.3): não há parte da análise para mostrar.
 
 Ficam de fora: `GraficoDispersao` (CVSS × EPSS), `ModalPedidoFalsoPositivo`, `PainelBaseFalsosPositivos` e o vínculo de task.
+
+### Andamento no terminal (R13.10)
+
+Com IA, a análise pode passar minutos calada (cada chamada pode levar até 2 minutos). Por isso o `fluxo.analisar` recebe um `andamento: Andamento` (padrão `SEM_ANDAMENTO`) e avisa cada etapa: são 5 sem IA e 7 com IA (as duas a mais são os bundles e a explicação). `conferir_bibliotecas`, `consultar_avisos`, `identificar_em_bundles` e `explicar_achados` recebem o mesmo objeto e chamam `itens(total)` antes do laço e `avancar()` ao fim de cada item. A interface fica no núcleo e não sabe de terminal; quem desenha é o `cli.py`, com o `AndamentoNoTerminal`.
+
+- **`LinhaAoVivo`:** só desenha quando a saída é um terminal (`isatty()`). Uma thread redesenha a linha a cada 0,12 s com o sinal que gira (`| / - \`, ASCII para o console antigo do Windows) e o tempo; o texto vem de uma função, lida a cada volta. `imprimir(linha)` apaga a linha ao vivo, escreve a linha fixa e a desenha de novo, tudo sob uma trava, para a thread e o fluxo não se misturarem. A linha é cortada na largura do terminal, porque uma linha que quebra não volta com `\r`. Ao sair do `with`, a thread para e a linha some.
+- **Fora de um terminal** (saída redirecionada, testes), nada é redesenhado: o `AndamentoNoTerminal` escreve só `[n/total] etapa`, uma por linha.
+- **Sem porcentagem:** o tempo de cada etapa depende da rede e da IA, então uma barra de 0 a 100% mentiria. O número da etapa, os itens e o relógio mostram que o Rastro está andando sem prometer quanto falta.
 
 ## 14. Erros
 
@@ -648,6 +662,10 @@ Ficam de fora: `GraficoDispersao` (CVSS × EPSS), `ModalPedidoFalsoPositivo`, `P
 | Registro do npm não responde | assinatura: selo "não conferida no npm"; IA: "a confirmar" | segue; código 0 |
 | IA falha ou responde fora do formato | registra no painel da IA; segue sem aquele dado | segue; código 0 |
 | HAR sem JavaScript | aviso no relatório; só checagens | segue; código 0 |
+| `gravar` com URL sem `http://` ou `https://` | diz o formato esperado | código 1, sem abrir o navegador |
+| `gravar` sem o Playwright | mostra o comando de instalação para o Python que roda o Rastro | código 1, sem abrir o navegador |
+| `gravar` sem Chrome nem Edge | diz para instalar um dos dois | código 1 |
+| `gravar` sem nenhuma requisição gravada | diz que nada foi gravado | código 1, sem relatório |
 
 Código 0 significa que a análise terminou, mesmo com achados. As mensagens vão para a saída de erro, em texto simples.
 
@@ -679,7 +697,10 @@ Um arquivo por decisão, com contexto, decisão e alternativas (T45):
 9. HAR sanitized como recomendado: o completo só acrescenta as três checagens de cookie e traz segredos para a máquina de quem audita. Na avaliação e no repo, só HAR sanitized: `09-har-sanitized.md`.
 10. O NVD ganha a interface `BuscaDeCvss`, a quarta troca real ao lado das outras três: `10-interface-do-nvd.md`.
 
-Decisão nova ganha o próximo número (`11-<tema>.md`), com as mesmas três seções.
+11. Comando `rastro` de qualquer pasta, criado pela pessoa: `11-comando-rastro-de-qualquer-pasta.md`.
+12. Gravar a visita com o Playwright, opcional, pelo navegador da máquina: `12-gravar-com-playwright.md`.
+
+Decisão nova ganha o próximo número (`13-<tema>.md`), com as mesmas três seções.
 
 ## 17. A validar no spike
 
@@ -692,3 +713,65 @@ Decisão nova ganha o próximo número (`11-<tema>.md`), com as mesmas três se�
 | Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 | respondida na T03 (`docs/spike/har-e-bundles.md`) |
 | Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 | Linux respondido na T02 (`docs/spike/clis-de-ia.md`); Windows na T42 |
 | Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 | respondida na T03 (`docs/spike/har-e-bundles.md`) |
+
+## 18. Gravar a visita (R24)
+
+Extensão na branch `feat/gravar`. Base: `docs/spike/gravacao-com-playwright.md` (T58) e decisão 12.
+
+### Comando
+
+```
+rastro gravar <url> [--robo] [--ia NOME | --sem-ia] [--saida PASTA] [--nao-abrir]
+```
+
+Ordem no `cli.py`, para nada abrir antes de tudo estar pronto:
+
+1. Confere a URL (R24.2) e a IA (R24.5), como o `analisar`.
+2. Importa o Playwright (`captura/playwright.py`). Sem ele, `PlaywrightAusente` com o comando `"<sys.executable>" -m pip install playwright==<versão conferida>` (R24.3). O caminho do Python vem no comando porque o atalho `rastro` usa o Python do sistema, e não o `.venv` (decisão 11).
+3. Cria a pasta nova da gravação (R24.6).
+4. Abre a sessão: `launch(channel="chrome")`, e `msedge` se o Chrome faltar (R24.4), com `headless=False` e `handle_sigint=False`. Qualquer outro erro do Playwright ao abrir (driver, `launch`, `new_context`, `new_page`; ex.: Linux sem tela) vira `NavegadorNaoAbriu` com a primeira linha do erro, e o `cli.py` tira a pasta da gravação e encerra com código 1 (R24.4). O contexto grava com `record_har_path` e `record_har_mode="minimal"`, o mesmo do `playwright open --save-har`.
+5. À mão: espera a janela fechar. Com `--robo`: abre a URL, mostra o aviso de produção (R24.16), espera o Enter, roda o robô e, se ele parou por limite, espera a janela fechar (R24.15). O Enter é lido numa thread (`esperar_o_enter`): um `input()` parado não sai com o Ctrl+C, e a espera em fatias vê o Ctrl+C e a janela fechada.
+6. Fecha o contexto, o que grava o HAR, mostra o caminho e o aviso da sessão (R24.8) e chama o mesmo `analisar_e_gravar` do `analisar`.
+
+Do passo 4 ao 6, uma `LinhaAoVivo` (R24.18) diz o que está acontecendo: "Abrindo o navegador", "Abrindo <url>", "Gravando" (tempo, `requisicoes` e `scripts` da sessão), "Robô navegando" (páginas e tempo) e "Salvando a gravação". As linhas do robô e os avisos passam pelo `imprimir` dela. Durante a espera do Enter a linha fica desligada, para não se misturar com o que a pessoa digita. A thread só lê os contadores da sessão; quem fala com o Playwright continua sendo só o fio principal.
+
+O que pede uma ação da pessoa passa pelo `pedir` da `LinhaAoVivo`, que o escreve em negrito amarelo (R24.19), uma sequência ANSI por linha. Só com a saída num terminal e sem `NO_COLOR`; no Windows, `ligar_cores` liga o processamento de sequências do console (`SetConsoleMode`) e, se não conseguir, o texto sai sem cor. Antes do robô, o aviso de produção vem primeiro e o pedido de Enter por último, para a última coisa lida ser o que fazer.
+
+### Ctrl+C
+
+No terminal, o Ctrl+C vai para todo o grupo de processos. Com o padrão do Playwright (`handle_sigint=True`), o navegador fecha antes de o contexto gravar e o HAR se perde em silêncio (T58). Por isso:
+
+- `handle_sigint=False` no `launch`;
+- enquanto o `gravar` roda, o `SIGINT` só marca o pedido de parada (`signal.signal`), sem `KeyboardInterrupt`; o tratador original volta ao fim;
+- a espera é feita em fatias curtas (`wait_for_timeout`), para o pedido de parada ser visto entre elas;
+- o erro "Target page, context or browser has been closed" ao fechar o contexto é esperado depois de um Ctrl+C e não aparece para a pessoa: o que vale é o HAR existir.
+
+### `SessaoDeGravacao`
+
+A quinta interface com troca real, ao lado das quatro do `structure.md`: o Playwright de verdade e o dublê dos testes, sem navegador nem rede (R19.2).
+
+| Método | O que faz |
+|---|---|
+| `ir(url)` | navega até a página carregar (`load`, até 15 s) e dá até 5 s para a rede parar; se a rede não parar (analytics, chat, long-polling), a página conta mesmo assim. Só a falha ao carregar vira `FalhaAoNavegar` |
+| `links()` | `href` absolutos dos `<a>` da página atual |
+| `endereco()` | o endereço da página atual, depois de redirecionamentos |
+| `aberta()` | a janela ainda está aberta |
+| `esperar(segundos)` | dá uma fatia de tempo ao navegador |
+| `requisicoes`, `scripts` | contagem para o progresso (R24.14) |
+
+### Robô
+
+Puro, sobre a `SessaoDeGravacao`, com relógio e pedido de parada recebidos de fora, para o teste controlar o tempo:
+
+- fila em largura, com os links de cada página em ordem alfabética (a mesma visita a cada execução);
+- `normalizar(url)`: sem os valores da query e sem o fragmento que não é rota (R24.11);
+- `host_do_site(url)`: o host sem `www.` e sem a porta padrão do esquema; é o que o robô compara, porque o navegador tira a porta padrão do endereço e muitos sites redirecionam `site.com` para `www.site.com` (R24.10);
+- `link_permitido(url, origem)`: mesmo `host_do_site`, sem as palavras do R24.12 no caminho, na query ou no fragmento (no host, uma palavra como `cron` em `cronos.empresa.com.br` barraria o site inteiro), sem as extensões do R24.12 e sem URL dentro da query;
+- `saida_do_site(endereco, host)`: depois de navegar, confere o endereço final pela `SessaoDeGravacao.endereco()`; se um redirecionamento levou para outro host, a página não conta e os links dela não entram na fila. No teste real da T62, o `/redirect?to=https://github.com/...` do Juice Shop levou o robô ao GitHub e encheu o HAR de scripts de fora;
+- `familia(url)`: o caminho, ou a rota do fragmento, sem o último trecho; página de um trecho só é família de si mesma, senão as páginas da raiz (`/contato`, `/sobre`) dividiriam 2 vagas; conta só páginas visitadas com sucesso, porque contar na fila travou o WebGoat no spike;
+- devolve o motivo da parada (R24.13), que o `cli.py` mostra.
+
+### HAR gravado pelo Playwright
+
+O leitor do HAR não muda: o conteúdo vem embutido, o site sai da primeira resposta HTML (não há `log.pages`) e a visita tem `startedDateTime` e `time` (T58). Muda só a mensagem das checagens de cookie (R24.9): o `gravar` chama `analisar(..., gravado_pelo_rastro=True)`, e `checar_configuracao` troca o "exporte o HAR completo" por "o site não criou nenhum cookie". A origem não sai do `log.creator.name`: os HARs da avaliação também foram gravados pelo Playwright, mas tiveram os cookies tirados depois (T61).
+

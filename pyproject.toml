@@ -9,6 +9,9 @@ description = "Lê um HAR, identifica bibliotecas front-end e prioriza as falhas
 requires-python = ">=3.10"
 dependencies = []
 
+[project.optional-dependencies]
+gravar = ["playwright==1.65.1"]
+
 [project.scripts]
 rastro = "rastro.cli:principal"
 
