@@ -51,8 +51,8 @@ export const PASSOS_DO_GUIA: PassoDoGuia[] = [
   {
     titulo: "Desative o cache e recarregue",
     texto:
-      "Marque **Desativar cache** (Disable cache) e recarregue a página com `Ctrl + R`. Assim os scripts vêm com o conteúdo, que é onde o Rastro lê as versões.",
-    dica: "Se a lista de requisições ficar vazia, recarregue de novo com o DevTools aberto.",
+      "Marque **Desativar cache** (Disable cache), deixe o filtro em **Todos** (All) e recarregue a página com `Ctrl + R`. Assim os scripts vêm com o conteúdo, que é onde o Rastro lê as versões.",
+    dica: "O HAR só leva o que aparece na lista: com o filtro em Fetch/XHR, por exemplo, ele sai sem nenhum script. Se a lista ficar vazia, recarregue de novo com o DevTools aberto.",
     ilustracao: "cache",
   },
   {
@@ -96,7 +96,7 @@ export const PROBLEMAS: Problema[] = [
   },
   {
     sintoma: "O relatório diz que nenhuma resposta trouxe conteúdo JavaScript",
-    solucao: "O HAR foi gravado sem o conteúdo dos scripts, quase sempre por causa do cache. Marque **Desativar cache**, recarregue e exporte o HAR de novo.",
+    solucao: "O HAR foi gravado sem os scripts. Quase sempre é o filtro da aba Rede (como Fetch/XHR), que deixa os scripts fora do arquivo, ou o cache, que grava os scripts sem o conteúdo. Deixe o filtro em **Todos**, marque **Desativar cache**, recarregue e exporte o HAR de novo.",
   },
   {
     sintoma: "As checagens de cookie estão como não verificadas",

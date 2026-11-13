@@ -101,7 +101,7 @@ O comando abre no navegador o relatório sem dados, já na aba "Como usar", e mo
 No Chrome ou no Edge, no site que você quer analisar (o seu, ou um que tem autorização para auditar):
 
 1. Abra o DevTools (`F12`) na aba **Rede** (*Network*).
-2. Marque **Desativar cache** (*Disable cache*) e recarregue a página, para os scripts virem com o conteúdo.
+2. Marque **Desativar cache** (*Disable cache*), deixe o filtro em **Todos** (*All*) e recarregue a página, para os scripts virem com o conteúdo. O HAR só leva o que aparece na lista: com o filtro em *Fetch/XHR*, sai sem nenhum script.
 3. Navegue pelas páginas que importam.
 4. Clique no ícone de download da aba Rede e escolha **Exportar HAR (sanitized)**: sai sem cookies e cabeçalhos de autenticação.
 

@@ -93,10 +93,23 @@ const DESENHOS: Record<IlustracaoDoPasso, ReactNode> = {
         <path className="ilustracao__traco ilustracao__traco--destaque" d="M268 40 a9 9 0 1 0 8 6" />
         <path className="ilustracao__traco ilustracao__traco--destaque" d="M272 38 l4 3 l-1 5" />
       </g>
-      <line className="ilustracao__linha" pathLength="1" x1="22" y1="86" x2="250" y2="86" />
-      <line className="ilustracao__linha" pathLength="1" x1="22" y1="102" x2="200" y2="102" />
-      <line className="ilustracao__linha" pathLength="1" x1="22" y1="118" x2="230" y2="118" />
-      <line className="ilustracao__linha" pathLength="1" x1="22" y1="134" x2="170" y2="134" />
+      <rect className="ilustracao__realce" x="18" y="73" width="44" height="18" rx="3" />
+      <text className="ilustracao__texto ilustracao__texto--destaque ilustracao__texto--forte" x="27" y="86">
+        Todos
+      </text>
+      <text className="ilustracao__texto" x="74" y="86">
+        Fetch/XHR
+      </text>
+      <text className="ilustracao__texto" x="138" y="86">
+        JS
+      </text>
+      <text className="ilustracao__texto" x="162" y="86">
+        CSS
+      </text>
+      <line className="ilustracao__linha" pathLength="1" x1="22" y1="106" x2="250" y2="106" />
+      <line className="ilustracao__linha" pathLength="1" x1="22" y1="120" x2="200" y2="120" />
+      <line className="ilustracao__linha" pathLength="1" x1="22" y1="134" x2="230" y2="134" />
+      <line className="ilustracao__linha" pathLength="1" x1="22" y1="148" x2="170" y2="148" />
       <rect className="ilustracao__traco" x="196" y="168" width="104" height="16" rx="3" />
       <text className="ilustracao__texto" x="226" y="179.5">
         Ctrl + R

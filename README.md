@@ -123,7 +123,7 @@ No Chrome ou Edge:
 1. Abra o site autorizado que deseja analisar.
 2. Abra o DevTools com `F12`.
 3. Entre na aba **Rede** (*Network*).
-4. Marque **Desativar cache** (*Disable cache*).
+4. Marque **Desativar cache** (*Disable cache*) e deixe o filtro em **Todos** (*All*): o HAR só leva o que aparece na lista, e com o filtro em *Fetch/XHR* ele sai sem nenhum script.
 5. Recarregue a página e navegue pelas telas importantes.
 6. Use o botão de download e escolha **Exportar HAR (sanitized)**.
 
