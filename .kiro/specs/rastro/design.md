@@ -85,6 +85,10 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/relatorio/html.py` | embute o JSON no HTML do build; dá o caminho do modelo para o `como-usar` | R13.5, R23.8 |
 | `rastro/relatorio/modelo.html` | HTML do build do frontend, com a tag `dados` vazia | R13.5 |
 | `rastro/relatorio/gravacao.py` | monta a pasta da análise (aplicação, data e hora) e grava os dois arquivos sem sobrescrever | R13.1–R13.4, R17 |
+| `rastro/captura/sessao.py` | interface `SessaoDeGravacao`: o navegador que grava a visita; nos testes, vira dublê | R24 |
+| `rastro/captura/playwright.py` | abre o Chrome ou o Edge pelo Playwright, grava o HAR e traduz o que falta (Playwright, navegador) em erro claro; único arquivo que importa o Playwright | R24.1, R24.3, R24.4 |
+| `rastro/captura/pasta.py` | monta a pasta nova da gravação (host e porta, data e hora) | R24.6 |
+| `rastro/captura/robo.py` | navega pelos links com as travas e diz por que parou | R24.10–R24.15 |
 | `frontend/` | React: só exibe o JSON | R09.2, R10.2, R12, R13.5, R13.6, R22.4–R22.7, R23 |
 
 **Diferenças em relação ao `structure.md`:** entram `acao/` (plano e task não cabem em `risco/`), `travas/`, `fontes/registro_npm.py`, `har/site.py`, `identificacao/bundles.py`, `ia/sanitizacao.py` e `relatorio/gravacao.py`. O `structure.md` já traz essas pastas.
@@ -648,6 +652,10 @@ Ficam de fora: `GraficoDispersao` (CVSS × EPSS), `ModalPedidoFalsoPositivo`, `P
 | Registro do npm não responde | assinatura: selo "não conferida no npm"; IA: "a confirmar" | segue; código 0 |
 | IA falha ou responde fora do formato | registra no painel da IA; segue sem aquele dado | segue; código 0 |
 | HAR sem JavaScript | aviso no relatório; só checagens | segue; código 0 |
+| `gravar` com URL sem `http://` ou `https://` | diz o formato esperado | código 1, sem abrir o navegador |
+| `gravar` sem o Playwright | mostra o comando de instalação para o Python que roda o Rastro | código 1, sem abrir o navegador |
+| `gravar` sem Chrome nem Edge | diz para instalar um dos dois | código 1 |
+| `gravar` sem nenhuma requisição gravada | diz que nada foi gravado | código 1, sem relatório |
 
 Código 0 significa que a análise terminou, mesmo com achados. As mensagens vão para a saída de erro, em texto simples.
 
@@ -679,7 +687,10 @@ Um arquivo por decisão, com contexto, decisão e alternativas (T45):
 9. HAR sanitized como recomendado: o completo só acrescenta as três checagens de cookie e traz segredos para a máquina de quem audita. Na avaliação e no repo, só HAR sanitized: `09-har-sanitized.md`.
 10. O NVD ganha a interface `BuscaDeCvss`, a quarta troca real ao lado das outras três: `10-interface-do-nvd.md`.
 
-Decisão nova ganha o próximo número (`11-<tema>.md`), com as mesmas três seções.
+11. Comando `rastro` de qualquer pasta, criado pela pessoa: `11-comando-rastro-de-qualquer-pasta.md`.
+12. Gravar a visita com o Playwright, opcional, pelo navegador da máquina: `12-gravar-com-playwright.md`.
+
+Decisão nova ganha o próximo número (`13-<tema>.md`), com as mesmas três seções.
 
 ## 17. A validar no spike
 
@@ -692,3 +703,58 @@ Decisão nova ganha o próximo número (`11-<tema>.md`), com as mesmas três se�
 | Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 | respondida na T03 (`docs/spike/har-e-bundles.md`) |
 | Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 | Linux respondido na T02 (`docs/spike/clis-de-ia.md`); Windows na T42 |
 | Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 | respondida na T03 (`docs/spike/har-e-bundles.md`) |
+
+## 18. Gravar a visita (R24)
+
+Extensão na branch `feat/gravar`. Base: `docs/spike/gravacao-com-playwright.md` (T58) e decisão 12.
+
+### Comando
+
+```
+rastro gravar <url> [--robo] [--ia NOME | --sem-ia] [--saida PASTA] [--nao-abrir]
+```
+
+Ordem no `cli.py`, para nada abrir antes de tudo estar pronto:
+
+1. Confere a URL (R24.2) e a IA (R24.5), como o `analisar`.
+2. Importa o Playwright (`captura/playwright.py`). Sem ele, `PlaywrightAusente` com o comando `"<sys.executable>" -m pip install playwright==<versão conferida>` (R24.3). O caminho do Python vem no comando porque o atalho `rastro` usa o Python do sistema, e não o `.venv` (decisão 11).
+3. Cria a pasta nova da gravação (R24.6).
+4. Abre a sessão: `launch(channel="chrome")`, e `msedge` se o Chrome faltar (R24.4), com `headless=False` e `handle_sigint=False`. O contexto grava com `record_har_path` e `record_har_mode="minimal"`, o mesmo do `playwright open --save-har`.
+5. À mão: espera a janela fechar. Com `--robo`: espera o Enter, roda o robô e, se ele parou por limite, espera a janela fechar (R24.15).
+6. Fecha o contexto, o que grava o HAR, mostra o caminho e o aviso da sessão (R24.8) e chama o mesmo `analisar_e_gravar` do `analisar`.
+
+### Ctrl+C
+
+No terminal, o Ctrl+C vai para todo o grupo de processos. Com o padrão do Playwright (`handle_sigint=True`), o navegador fecha antes de o contexto gravar e o HAR se perde em silêncio (T58). Por isso:
+
+- `handle_sigint=False` no `launch`;
+- enquanto o `gravar` roda, o `SIGINT` só marca o pedido de parada (`signal.signal`), sem `KeyboardInterrupt`; o tratador original volta ao fim;
+- a espera é feita em fatias curtas (`wait_for_timeout`), para o pedido de parada ser visto entre elas;
+- o erro "Target page, context or browser has been closed" ao fechar o contexto é esperado depois de um Ctrl+C e não aparece para a pessoa: o que vale é o HAR existir.
+
+### `SessaoDeGravacao`
+
+A quinta interface com troca real, ao lado das quatro do `structure.md`: o Playwright de verdade e o dublê dos testes, sem navegador nem rede (R19.2).
+
+| Método | O que faz |
+|---|---|
+| `ir(url)` | navega e espera a rede parar (até 15 s); falha vira `FalhaAoNavegar` |
+| `links()` | `href` absolutos dos `<a>` da página atual |
+| `aberta()` | a janela ainda está aberta |
+| `esperar(segundos)` | dá uma fatia de tempo ao navegador |
+| `requisicoes`, `scripts` | contagem para o progresso (R24.14) |
+
+### Robô
+
+Puro, sobre a `SessaoDeGravacao`, com relógio e pedido de parada recebidos de fora, para o teste controlar o tempo:
+
+- fila em largura, com os links de cada página em ordem alfabética (a mesma visita a cada execução);
+- `normalizar(url)`: sem os valores da query e sem o fragmento que não é rota (R24.11);
+- `link_permitido(url, origem)`: mesmo host e porta, sem as palavras e extensões do R24.12;
+- `familia(url)`: o caminho, ou a rota do fragmento, sem o último trecho; conta só páginas visitadas com sucesso, porque contar na fila travou o WebGoat no spike;
+- devolve o motivo da parada (R24.13), que o `cli.py` mostra.
+
+### HAR gravado pelo Playwright
+
+O leitor do HAR não muda: o conteúdo vem embutido, o site sai da primeira resposta HTML (não há `log.pages`) e a visita tem `startedDateTime` e `time` (T58). Muda só a mensagem das checagens de cookie (R24.9): o leitor passa a guardar o `log.creator.name`, e `configuracao/checagens.py` escolhe o texto pela origem do HAR.
+

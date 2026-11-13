@@ -71,6 +71,13 @@
 | T42 Instalar do zero no Windows e no Linux | 18 | T25, T43, T52, T57 | T47, T48 | segue o README, com e sem IA, e confere o comando `rastro` no Windows |
 | T47 Gravar a apresentação e o demo | 19 | T42, T43, T46, T55, T56, T57 | T48 | números reais, instalação conferida e o relatório final na tela |
 | T48 Preparar a versão final | 20 | T42, T43, T44, T45, T46, T47, T55, T56, T57 | — | última |
+| T58 Registrar os spikes da gravação com Playwright | extensão | — | T59 | resultado dos spikes de 13/11 |
+| T59 Especificar a gravação da visita | extensão | T58 | T60 | R24, design e decisão 12 antes do código |
+| T60 Gravar a visita à mão com `rastro gravar` | extensão | T59 | T61, T62, T64 | `captura/`, `SessaoDeGravacao` e o comando |
+| T61 Avisar sobre a sessão gravada no HAR | extensão | T60 | T64 | o aviso sai no fim do `gravar` |
+| T62 Navegar sozinho com travas | extensão | T60 | T63 | `robo.py` sobre a `SessaoDeGravacao` |
+| T63 Combinar o robô com a navegação da pessoa | extensão | T62 | T64 | Enter antes e janela aberta depois do robô |
+| T64 Ensinar a gravar a visita | extensão | T61, T63 | — | README e "Como usar" descrevem o comando pronto |
 
 ## Grafo
 

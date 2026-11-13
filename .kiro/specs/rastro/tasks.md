@@ -543,10 +543,11 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Requisito: base para R24
   - Revisão: a definir
 
-- [ ] **T59 Especificar a gravação da visita**
+- [x] **T59 Especificar a gravação da visita**
   - Entrega: R24 no `requirements.md`, seção nova no `design.md` e a decisão 12 (o Rastro abre um navegador que a pessoa controla, com Playwright opcional).
   - Aceite: R24 cobre o comando, as dependências que faltam, a pasta da gravação, o aviso sobre a sessão no HAR, a análise ao fim, o robô e suas travas; o `product.md` e o `tech.md` deixam de pôr o Playwright como fora do escopo e explicam a exceção à dependência zero e à regra de rede; o PRD e o pitch acompanham.
-  - Arquivos: `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`, `docs/decisoes/12-gravar-com-playwright.md`, `.kiro/steering/product.md`, `.kiro/steering/tech.md`
+  - Arquivos: `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`, `.kiro/specs/rastro/dependencias.md`, `docs/decisoes/12-gravar-com-playwright.md`, `.kiro/steering/product.md`, `.kiro/steering/tech.md`, `.kiro/steering/structure.md`
+  - Pendente: o PRD (`docs/prd.pdf`) e o pitch só existem em PDF, sem o fonte no repositório; ficam para quando o grupo decidir entregar a extensão.
   - Teste: não se aplica.
   - Requisito: R24
   - Revisão: a definir
@@ -556,7 +557,7 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Aceite: sem o Playwright, sai com 1 e diz o comando de instalação; sem Chrome nem Edge, diz o que instalar; nunca instala nada; o HAR vai para `~/Rastro/gravacoes/<site>/<AAAA-MM-DD_HH-MM-SS>/visita.har`, sem sobrescrever; o import do Playwright só acontece nesse comando.
   - Arquivos: `rastro/gravacao/`, `rastro/cli.py`, `tests/gravacao/`, `tests/test_cli.py`, `pyproject.toml`
   - Teste: `test_r24_*`, com o Playwright trocado por dublê.
-  - Requisito: R24
+  - Requisito: R24.1–R24.7, R16.1, R17.1, R20.2
   - Revisão: a definir
 
 - [ ] **T61 Avisar sobre a sessão gravada no HAR**
@@ -564,7 +565,7 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Aceite: o aviso aparece ao fim do `gravar` com o caminho do arquivo; a mensagem das checagens C06–C08 muda conforme a origem do HAR.
   - Arquivos: `rastro/gravacao/`, `rastro/configuracao/checagens.py`, testes
   - Teste: `test_r24_*`, `test_r06_7_*`
-  - Requisito: R24, R06.7
+  - Requisito: R24.8, R24.9, R06.7
   - Revisão: a definir
 
 - [ ] **T62 Navegar sozinho com travas**
@@ -572,7 +573,7 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Aceite: nunca visita a mesma URL duas vezes; para no primeiro limite atingido e diz qual; o progresso aparece no terminal; Ctrl+C ou fechar a janela param o robô e o HAR é gravado com o que já foi coletado (`handle_sigint=False`).
   - Arquivos: `rastro/gravacao/robo.py`, `tests/gravacao/test_robo.py`
   - Teste: `test_r24_*`, com a navegação trocada por dublê (sem rede).
-  - Requisito: R24
+  - Requisito: R24.10–R24.14
   - Revisão: a definir
 
 - [ ] **T63 Combinar o robô com a navegação da pessoa**
@@ -580,7 +581,7 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Aceite: sem Enter, o robô não começa; depois do robô, a gravação só termina quando a janela é fechada.
   - Arquivos: `rastro/gravacao/`, testes
   - Teste: `test_r24_*`
-  - Requisito: R24
+  - Requisito: R24.10, R24.15
   - Revisão: a definir
 
 - [ ] **T64 Ensinar a gravar a visita**
@@ -588,5 +589,5 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Aceite: o passo a passo instala o Playwright e grava uma visita do zero nos dois sistemas; a tela "Como usar" mostra o `gravar` como alternativa ao DevTools.
   - Arquivos: `README.md`, `README-TECNICO.md`, `frontend/src/`, `rastro/relatorio/modelo.html`
   - Teste: verificação manual.
-  - Requisito: R24
+  - Requisito: R24, R20.1
   - Revisão: a definir

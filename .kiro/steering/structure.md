@@ -5,7 +5,7 @@
 - **Clareza e qualidade, sem over engineering.** Só existe abstração que resolve um problema de hoje. Na dúvida, a solução simples.
 - **Responsabilidade única (SRP) em pasta, arquivo e função.** Se a descrição precisa de "e", está fazendo coisas demais.
 - **Núcleo puro, entrada e saída nas bordas.** Ler arquivo, chamar API, chamar IA e gravar relatório ficam nas bordas. Nota, prioridade, checagens e travas são funções puras.
-- **Interface só onde há troca real:** a fonte de dados (`ConectorDeAvisos`), o registro do npm (`RegistroDePacotes`), o cliente da IA (`ProvedorDeIA`, com três provedores reais) e o CVSS do NVD (`BuscaDeCvss`, ver `docs/decisoes/10-interface-do-nvd.md`). Nos testes, os quatro viram dublês. Nenhuma outra parte ganha interface.
+- **Interface só onde há troca real:** a fonte de dados (`ConectorDeAvisos`), o registro do npm (`RegistroDePacotes`), o cliente da IA (`ProvedorDeIA`, com três provedores reais), o CVSS do NVD (`BuscaDeCvss`, ver `docs/decisoes/10-interface-do-nvd.md`) e o navegador que grava a visita (`SessaoDeGravacao`, ver `docs/decisoes/12-gravar-com-playwright.md`). Nos testes, os cinco viram dublês. Nenhuma outra parte ganha interface.
 - **A IA sugere, a regra confirma:** toda saída da IA passa por `travas/` antes de virar dado.
 - **Um único ponto de chamada à IA**, que mede tempo e tokens.
 - **Dados separados da apresentação.** O núcleo gera JSON; o React só exibe.
@@ -32,6 +32,7 @@ rastro/
     provedores/            kiro.py, claude.py, codex.py
     prompts/               prompts versionados, com exemplo de entrada e saída
   relatorio/               json.py, html.py, gravacao.py, modelo.html (build do frontend, versionado)
+  captura/                 sessao.py (interface), playwright.py (único import do Playwright), pasta.py, robo.py
 tests/                     mesma estrutura de rastro/
 frontend/                  React (ver frontend-react.md)
 docs/
