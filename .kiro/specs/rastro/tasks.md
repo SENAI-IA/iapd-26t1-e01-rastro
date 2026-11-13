@@ -18,6 +18,7 @@ Ordem: spike → núcleo determinístico → relatório HTML → explicação po
 | 3. IA | 30/11–04/12 | T33–T41, T52 |
 | 4. Entregar | 04–08/12 | T42–T48 |
 | Extensão: OSV e NVD (só se houver tempo) | até 02/12 | T49–T51 |
+| Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo) | até 08/12 | T58–T64 |
 
 Meta interna: tudo pronto em 08/12. Entrega: 10/12/2026, 23h59.
 
@@ -35,7 +36,7 @@ O Paulo escreve todas as tasks com o agente e é o autor dos commits. Os revisor
 
 ## Como cada task chega ao `main`
 
-Direto no `main`, sem branch e sem MR, uma task por vez:
+Direto no `main`, sem branch e sem MR, uma task por vez. A exceção é a extensão "Gravar a visita" (T58–T64), na branch `feat/gravar` (ver o fim desta lista):
 
 1. **Antes do commit:** `ruff check`, `mypy rastro` e `pytest` passam na máquina local.
 2. **Um commit por task**, autocontido (funciona sozinho), com o código, os testes, o `[x]` nesta lista e o cartão movido para "Em revisão" no kanban. Push logo depois.
@@ -527,3 +528,65 @@ Começa só se as fases 1 e 2 estiverem fechadas. Prazo limite: 02/12. O que nã
   - Teste: `test_r04a_3_*` a `test_r04a_5_*`
   - Requisito: R04A.3–R04A.5
   - Revisão: @geison.santos
+
+## Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo)
+
+O auditor grava o HAR pelo próprio Rastro, sem DevTools: abre um navegador, navega (à mão ou com um robô com travas) e a análise roda ao fechar. Base: os spikes de 13/11 (T58). Corre na branch `feat/gravar` e volta ao `main` por merge, sem rebase. Prazo limite: 08/12. O que não fechar fica nos planos futuros. T58 a T61 já entregam a gravação manual; T62 e T63 são o robô.
+
+Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher quem revisa.
+
+- [ ] **T58 Registrar os spikes da gravação com Playwright**
+  - Entrega: `docs/spike/gravacao-com-playwright.md` com o que os dois spikes de 13/11 mostraram.
+  - Aceite: o documento traz como foi feito, os números contra o gabarito (Juice Shop, WebGoat, Drupal), o formato do HAR do Playwright (`mode: "minimal"`, sem `log.pages`, cookies só nos cabeçalhos), o tamanho do download, o Ctrl+C que perdia o HAR e o que fica para conferir no Windows.
+  - Arquivos: `docs/spike/gravacao-com-playwright.md`
+  - Teste: não se aplica.
+  - Requisito: base para R24
+  - Revisão: a definir
+
+- [ ] **T59 Especificar a gravação da visita**
+  - Entrega: R24 no `requirements.md`, seção nova no `design.md` e a decisão 12 (o Rastro abre um navegador que a pessoa controla, com Playwright opcional).
+  - Aceite: R24 cobre o comando, as dependências que faltam, a pasta da gravação, o aviso sobre a sessão no HAR, a análise ao fim, o robô e suas travas; o `product.md` e o `tech.md` deixam de pôr o Playwright como fora do escopo e explicam a exceção à dependência zero e à regra de rede; o PRD e o pitch acompanham.
+  - Arquivos: `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`, `docs/decisoes/12-gravar-com-playwright.md`, `.kiro/steering/product.md`, `.kiro/steering/tech.md`
+  - Teste: não se aplica.
+  - Requisito: R24
+  - Revisão: a definir
+
+- [ ] **T60 Gravar a visita à mão com `rastro gravar`**
+  - Entrega: o comando `rastro gravar <url>` abre o Chrome (ou o Edge) pelo Playwright, espera a pessoa fechar a janela, grava o HAR numa pasta nova e roda a análise com as mesmas opções do `analisar`.
+  - Aceite: sem o Playwright, sai com 1 e diz o comando de instalação; sem Chrome nem Edge, diz o que instalar; nunca instala nada; o HAR vai para `~/Rastro/gravacoes/<site>/<AAAA-MM-DD_HH-MM-SS>/visita.har`, sem sobrescrever; o import do Playwright só acontece nesse comando.
+  - Arquivos: `rastro/gravacao/`, `rastro/cli.py`, `tests/gravacao/`, `tests/test_cli.py`, `pyproject.toml`
+  - Teste: `test_r24_*`, com o Playwright trocado por dublê.
+  - Requisito: R24
+  - Revisão: a definir
+
+- [ ] **T61 Avisar sobre a sessão gravada no HAR**
+  - Entrega: o terminal avisa que o HAR gravado pelo comando guarda a sessão (cabeçalhos `Cookie` e `Set-Cookie`), e a checagem de cookie sem dado deixa de mandar "exportar o HAR completo" quando o HAR veio do Playwright.
+  - Aceite: o aviso aparece ao fim do `gravar` com o caminho do arquivo; a mensagem das checagens C06–C08 muda conforme a origem do HAR.
+  - Arquivos: `rastro/gravacao/`, `rastro/configuracao/checagens.py`, testes
+  - Teste: `test_r24_*`, `test_r06_7_*`
+  - Requisito: R24, R06.7
+  - Revisão: a definir
+
+- [ ] **T62 Navegar sozinho com travas**
+  - Entrega: `rastro gravar <url> --robo` navega pelos links do próprio site, com limite de páginas, tempo e profundidade, no máximo 2 páginas por família de URL e sem seguir links de sair, excluir ou com `token=`.
+  - Aceite: nunca visita a mesma URL duas vezes; para no primeiro limite atingido e diz qual; o progresso aparece no terminal; Ctrl+C ou fechar a janela param o robô e o HAR é gravado com o que já foi coletado (`handle_sigint=False`).
+  - Arquivos: `rastro/gravacao/robo.py`, `tests/gravacao/test_robo.py`
+  - Teste: `test_r24_*`, com a navegação trocada por dublê (sem rede).
+  - Requisito: R24
+  - Revisão: a definir
+
+- [ ] **T63 Combinar o robô com a navegação da pessoa**
+  - Entrega: no `--robo`, a pessoa faz login antes e aperta Enter para o robô começar; ao fim, a janela fica aberta para ela visitar mais páginas antes de fechar.
+  - Aceite: sem Enter, o robô não começa; depois do robô, a gravação só termina quando a janela é fechada.
+  - Arquivos: `rastro/gravacao/`, testes
+  - Teste: `test_r24_*`
+  - Requisito: R24
+  - Revisão: a definir
+
+- [ ] **T64 Ensinar a gravar a visita**
+  - Entrega: README, README técnico e a tela "Como usar" com o `gravar`, nos comandos de Linux e de Windows.
+  - Aceite: o passo a passo instala o Playwright e grava uma visita do zero nos dois sistemas; a tela "Como usar" mostra o `gravar` como alternativa ao DevTools.
+  - Arquivos: `README.md`, `README-TECNICO.md`, `frontend/src/`, `rastro/relatorio/modelo.html`
+  - Teste: verificação manual.
+  - Requisito: R24
+  - Revisão: a definir

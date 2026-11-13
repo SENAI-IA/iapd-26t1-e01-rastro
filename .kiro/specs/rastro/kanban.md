@@ -102,6 +102,16 @@ _(vazio)_
 
 _(vazio)_
 
+### Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo, até 08/12)
+
+- [ ] **T58** Registrar os spikes da gravação com Playwright · revisão a definir
+- [ ] **T59** Especificar a gravação da visita · revisão a definir
+- [ ] **T60** Gravar a visita à mão com `rastro gravar` · revisão a definir
+- [ ] **T61** Avisar sobre a sessão gravada no HAR · revisão a definir
+- [ ] **T62** Navegar sozinho com travas · revisão a definir
+- [ ] **T63** Combinar o robô com a navegação da pessoa · revisão a definir
+- [ ] **T64** Ensinar a gravar a visita · revisão a definir
+
 ## Feito
 
 - [x] **S02** Commitar a spec no `main` (ponto de partida f36fe80) · 06/11
