@@ -87,7 +87,7 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/relatorio/gravacao.py` | monta a pasta da análise (aplicação, data e hora) e grava os dois arquivos sem sobrescrever | R13.1–R13.4, R17 |
 | `rastro/captura/sessao.py` | interface `SessaoDeGravacao`: o navegador que grava a visita; nos testes, vira dublê | R24 |
 | `rastro/captura/playwright.py` | abre o Chrome ou o Edge pelo Playwright, grava o HAR e traduz o que falta (Playwright, navegador) em erro claro; único arquivo que importa o Playwright | R24.1, R24.3, R24.4 |
-| `rastro/captura/pasta.py` | monta a pasta nova da gravação (host e porta, data e hora) | R24.6 |
+| `rastro/captura/pasta.py` | monta a pasta nova da gravação (host e porta, data e hora), só do dono, e tira usuário e senha da URL mostrada | R24.6, R24.8 |
 | `rastro/captura/robo.py` | navega pelos links com as travas e diz por que parou | R24.10–R24.15 |
 | `frontend/` | React: só exibe o JSON | R09.2, R10.2, R12, R13.5, R13.6, R22.4–R22.7, R23 |
 
@@ -719,7 +719,7 @@ Ordem no `cli.py`, para nada abrir antes de tudo estar pronto:
 1. Confere a URL (R24.2) e a IA (R24.5), como o `analisar`.
 2. Importa o Playwright (`captura/playwright.py`). Sem ele, `PlaywrightAusente` com o comando `"<sys.executable>" -m pip install playwright==<versão conferida>` (R24.3). O caminho do Python vem no comando porque o atalho `rastro` usa o Python do sistema, e não o `.venv` (decisão 11).
 3. Cria a pasta nova da gravação (R24.6).
-4. Abre a sessão: `launch(channel="chrome")`, e `msedge` se o Chrome faltar (R24.4), com `headless=False` e `handle_sigint=False`. O contexto grava com `record_har_path` e `record_har_mode="minimal"`, o mesmo do `playwright open --save-har`.
+4. Abre a sessão: `launch(channel="chrome")`, e `msedge` se o Chrome faltar (R24.4), com `headless=False` e `handle_sigint=False`. Qualquer outro erro do Playwright ao abrir (driver, `launch`, `new_context`, `new_page`; ex.: Linux sem tela) vira `NavegadorNaoAbriu` com a primeira linha do erro, e o `cli.py` tira a pasta da gravação e encerra com código 1 (R24.4). O contexto grava com `record_har_path` e `record_har_mode="minimal"`, o mesmo do `playwright open --save-har`.
 5. À mão: espera a janela fechar. Com `--robo`: abre a URL, mostra o aviso de produção (R24.16), espera o Enter, roda o robô e, se ele parou por limite, espera a janela fechar (R24.15). O Enter é lido numa thread (`esperar_o_enter`): um `input()` parado não sai com o Ctrl+C, e a espera em fatias vê o Ctrl+C e a janela fechada.
 6. Fecha o contexto, o que grava o HAR, mostra o caminho e o aviso da sessão (R24.8) e chama o mesmo `analisar_e_gravar` do `analisar`.
 

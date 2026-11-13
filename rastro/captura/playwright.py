@@ -1,13 +1,13 @@
 import sys
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from rastro.captura.sessao import FalhaAoNavegar, SessaoDeGravacao
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Browser, BrowserContext, Playwright, Response
+    from playwright.sync_api import Browser, BrowserContext, Error, Playwright, Response
 
 VERSAO_DO_PLAYWRIGHT = "1.65.1"
 CANAIS_DO_NAVEGADOR = ("chrome", "msedge")
@@ -32,6 +32,18 @@ class NavegadorAusente(Exception):
             "nem o Google Chrome nem o Microsoft Edge foram encontrados nesta máquina. "
             "Instale um dos dois e rode de novo. O Rastro não baixa navegador."
         )
+
+
+class NavegadorNaoAbriu(Exception):
+    def __init__(self, motivo: str) -> None:
+        super().__init__(f"não foi possível abrir o navegador para gravar a visita: {motivo}")
+
+
+def primeira_linha(erro: "Error") -> str:
+    linhas = str(erro).splitlines()
+    if not linhas:
+        return type(erro).__name__
+    return linhas[0]
 
 
 def conferir_playwright() -> None:
@@ -60,7 +72,7 @@ class SessaoPlaywright:
         try:
             self._pagina.goto(url, wait_until="networkidle", timeout=TEMPO_LIMITE_DA_PAGINA_EM_MS)
         except Error as erro:
-            raise FalhaAoNavegar(str(erro).splitlines()[0]) from erro
+            raise FalhaAoNavegar(primeira_linha(erro)) from erro
 
     def links(self) -> list[str]:
         from playwright.sync_api import Error
@@ -91,17 +103,20 @@ class SessaoPlaywright:
 
 @contextmanager
 def abrir_gravacao(har: Path) -> Iterator[SessaoDeGravacao]:
-    from playwright.sync_api import sync_playwright
+    from playwright.sync_api import Error, sync_playwright
 
-    with sync_playwright() as playwright:
-        navegador = abrir_navegador_da_maquina(playwright)
-        contexto = navegador.new_context(
-            record_har_path=str(har), record_har_mode="minimal", no_viewport=True
-        )
+    with ExitStack() as fechamentos:
         try:
-            yield SessaoPlaywright(contexto)
-        finally:
-            fechar(contexto, navegador)
+            playwright = fechamentos.enter_context(sync_playwright())
+            navegador = abrir_navegador_da_maquina(playwright)
+            contexto = navegador.new_context(
+                record_har_path=str(har), record_har_mode="minimal", no_viewport=True
+            )
+            fechamentos.callback(fechar, contexto, navegador)
+            sessao = SessaoPlaywright(contexto)
+        except Error as erro:
+            raise NavegadorNaoAbriu(primeira_linha(erro)) from erro
+        yield sessao
 
 
 def abrir_navegador_da_maquina(playwright: "Playwright") -> "Browser":

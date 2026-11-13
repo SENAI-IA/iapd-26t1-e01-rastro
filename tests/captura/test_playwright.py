@@ -1,4 +1,7 @@
 import sys
+from collections.abc import Iterator
+from contextlib import contextmanager
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -7,7 +10,9 @@ from playwright.sync_api import Error
 from rastro.captura.playwright import (
     VERSAO_DO_PLAYWRIGHT,
     NavegadorAusente,
+    NavegadorNaoAbriu,
     PlaywrightAusente,
+    abrir_gravacao,
     abrir_navegador_da_maquina,
     conferir_playwright,
 )
@@ -86,3 +91,29 @@ def test_r24_4_outro_erro_ao_abrir_o_navegador_nao_vira_navegador_ausente() -> N
 
     with pytest.raises(Error, match="Target crashed"):
         abrir_navegador_da_maquina(PlaywrightFalso(chromium))  # type: ignore[arg-type]
+
+
+SEM_TELA = Error(
+    "BrowserType.launch: Target page, context or browser has been closed\n"
+    "Looks like you launched a headed browser without having a XServer running."
+)
+
+
+def test_r24_4_navegador_que_nao_abre_vira_erro_com_a_mensagem_pronta(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    chromium = ChromiumFalso(instalados={"chrome"}, erro_ao_abrir=SEM_TELA)
+
+    @contextmanager
+    def sync_playwright_falso() -> Iterator[PlaywrightFalso]:
+        yield PlaywrightFalso(chromium)
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", sync_playwright_falso)
+
+    with pytest.raises(NavegadorNaoAbriu) as erro, abrir_gravacao(tmp_path / "visita.har"):
+        pass
+
+    assert str(erro.value) == (
+        "não foi possível abrir o navegador para gravar a visita: "
+        "BrowserType.launch: Target page, context or browser has been closed"
+    )

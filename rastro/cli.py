@@ -17,11 +17,14 @@ from rastro.captura.pasta import (
     UrlInvalida,
     caminho_da_gravacao,
     criar_pasta_da_gravacao,
+    desfazer_pasta_da_gravacao,
     host_da_url,
     pasta_padrao_das_gravacoes,
+    url_sem_usuario_e_senha,
 )
 from rastro.captura.playwright import (
     NavegadorAusente,
+    NavegadorNaoAbriu,
     PlaywrightAusente,
     abrir_gravacao,
     conferir_playwright,
@@ -332,8 +335,8 @@ def gravar_e_analisar(
         return encerrar_com_erro(str(erro))
     try:
         requisicoes = gravar_visita(url, host, har, robo)
-    except NavegadorAusente as erro:
-        pasta.rmdir()
+    except (NavegadorAusente, NavegadorNaoAbriu) as erro:
+        desfazer_pasta_da_gravacao(pasta)
         return encerrar_com_erro(str(erro))
     if requisicoes == 0:
         return encerrar_com_erro(TEXTO_NADA_GRAVADO)
@@ -392,7 +395,11 @@ def ler_enter() -> str:
 
 def mostrar_passo_do_robo(passo: PassoDoRobo) -> None:
     if passo.falha is not None:
-        print(TEXTO_PASSO_QUE_FALHOU.format(url=passo.url, motivo=passo.falha))
+        print(
+            TEXTO_PASSO_QUE_FALHOU.format(
+                url=url_sem_usuario_e_senha(passo.url), motivo=passo.falha
+            )
+        )
         return
     minutos, segundos = divmod(int(passo.segundos), 60)
     print(
@@ -402,7 +409,7 @@ def mostrar_passo_do_robo(passo: PassoDoRobo) -> None:
             requisicoes=passo.requisicoes,
             scripts=passo.scripts,
             tempo=f"{minutos}:{segundos:02d}",
-            url=passo.url,
+            url=url_sem_usuario_e_senha(passo.url),
         )
     )
 
@@ -422,7 +429,7 @@ def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str) -> None:
     try:
         sessao.ir(url)
     except FalhaAoNavegar as erro:
-        print(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=url, motivo=erro))
+        print(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=url_sem_usuario_e_senha(url), motivo=erro))
 
 
 @contextmanager

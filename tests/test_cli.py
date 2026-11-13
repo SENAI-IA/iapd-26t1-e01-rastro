@@ -14,7 +14,7 @@ from typing import Any
 import pytest
 
 from rastro import cli
-from rastro.captura.playwright import NavegadorAusente, PlaywrightAusente
+from rastro.captura.playwright import NavegadorAusente, NavegadorNaoAbriu, PlaywrightAusente
 from rastro.captura.sessao import FalhaAoNavegar
 from rastro.cli import AVISO_SEM_IA, executar
 from rastro.fluxo import Analise, analisar
@@ -738,6 +738,32 @@ def test_r24_4_sem_chrome_nem_edge_encerra_com_1_e_tira_a_pasta_vazia(
 
     assert "Chrome" in capsys.readouterr().err
     assert pastas_das_gravacoes(tmp_path) == []
+
+
+def test_r24_4_navegador_que_nao_abre_encerra_com_1_e_tira_a_pasta(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravacao.erro = NavegadorNaoAbriu("Looks like you launched a headed browser")
+
+    assert gravar_loja(tmp_path, "--sem-ia") == 1
+
+    assert "não foi possível abrir o navegador" in capsys.readouterr().err
+    assert pastas_das_gravacoes(tmp_path) == []
+
+
+def test_r24_6_usuario_e_senha_da_url_nao_vao_para_a_pasta_nem_para_o_terminal(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravacao.sessao.falha_ao_ir = "net::ERR_CONNECTION_REFUSED"
+    url = "https://ana:segredo@loja.exemplo.com/"
+
+    executar(["gravar", url, "--sem-ia", "--nao-abrir", "--saida", str(tmp_path / "r")])
+
+    [pasta] = pastas_das_gravacoes(tmp_path)
+    assert pasta.parent.name == "loja.exemplo.com"
+    assert gravacao.sessao.urls == [url]
+    terminal = capsys.readouterr()
+    assert "segredo" not in terminal.out + terminal.err
 
 
 @pytest.mark.usefixtures("nenhuma_cli_instalada")
