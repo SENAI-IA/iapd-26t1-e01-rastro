@@ -147,6 +147,7 @@ export default function App({ relatorio }: Props) {
             <ListaBibliotecas
               bibliotecas={relatorio.bibliotecas}
               achados={relatorio.achados}
+              semJavascript={relatorio.analise.limitacoes.some((limitacao) => limitacao.id === "sem_javascript")}
               aoVerOrigem={setOrigemAberta}
             />
             {relatorio.a_confirmar.length > 0 && (
