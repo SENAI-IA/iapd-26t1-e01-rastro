@@ -1,6 +1,6 @@
 import sys
 from collections.abc import Iterator
-from contextlib import ExitStack, contextmanager
+from contextlib import ExitStack, contextmanager, suppress
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 VERSAO_DO_PLAYWRIGHT = "1.65.1"
 CANAIS_DO_NAVEGADOR = ("chrome", "msedge")
 TEMPO_LIMITE_DA_PAGINA_EM_MS = 15_000
+TEMPO_DE_ESPERA_DA_REDE_PARADA_EM_MS = 5_000
 TEXTO_DE_NAVEGADOR_NAO_ENCONTRADO = "is not found at"
 LER_OS_LINKS = "elementos => elementos.map(elemento => elemento.href)"
 
@@ -70,9 +71,13 @@ class SessaoPlaywright:
         from playwright.sync_api import Error
 
         try:
-            self._pagina.goto(url, wait_until="networkidle", timeout=TEMPO_LIMITE_DA_PAGINA_EM_MS)
+            self._pagina.goto(url, wait_until="load", timeout=TEMPO_LIMITE_DA_PAGINA_EM_MS)
         except Error as erro:
             raise FalhaAoNavegar(primeira_linha(erro)) from erro
+        with suppress(Error):
+            self._pagina.wait_for_load_state(
+                "networkidle", timeout=TEMPO_DE_ESPERA_DA_REDE_PARADA_EM_MS
+            )
 
     def links(self) -> list[str]:
         from playwright.sync_api import Error

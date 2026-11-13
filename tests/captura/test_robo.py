@@ -6,6 +6,7 @@ from rastro.captura.robo import (
     ResultadoDoRobo,
     Robo,
     familia,
+    host_do_site,
     link_permitido,
     normalizar,
 )
@@ -133,6 +134,29 @@ def test_r24_13_familia_e_o_caminho_sem_o_ultimo_trecho(url: str, esperada: str)
 )
 def test_r24_12_nao_segue_link_perigoso_de_fora_ou_de_arquivo(url: str) -> None:
     assert not link_permitido(url, HOST)
+
+
+def test_r24_12_palavra_perigosa_no_host_nao_barra_o_site() -> None:
+    assert link_permitido("https://cronos.exemplo.com/produtos", "cronos.exemplo.com")
+    assert not link_permitido("https://cronos.exemplo.com/run-cron", "cronos.exemplo.com")
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://loja.exemplo.com/",
+        "https://www.loja.exemplo.com/",
+        "https://LOJA.exemplo.com:443/",
+        "https://ana:segredo@loja.exemplo.com/",
+    ],
+)
+def test_r24_10_mesmo_site_com_ou_sem_www_e_com_a_porta_padrao(url: str) -> None:
+    assert host_do_site(url) == HOST
+
+
+def test_r24_10_porta_diferente_e_outro_site() -> None:
+    assert host_do_site("http://127.0.0.1:8080/") == "127.0.0.1:8080"
+    assert host_do_site("https://loja.exemplo.com:8443/") != HOST
 
 
 def test_r24_10_segue_link_comum_do_mesmo_site() -> None:
@@ -295,3 +319,24 @@ def test_r24_10_redirecionado_para_fora_nao_conta_nem_tem_links_seguidos() -> No
     assert site.visitadas == [INICIO, f"{INICIO}github", f"{INICIO}sobre"]
     assert passos[1].falha == "saiu do site: foi redirecionado para github.com"
     assert resultado.paginas == 2
+
+
+def test_r24_10_pagina_inicial_que_vai_para_o_www_continua_no_site() -> None:
+    www = "https://www.loja.exemplo.com/"
+    site = SiteFalso({www: ["/sobre"]}, redirecionamentos={INICIO: www})
+
+    resultado, passos = navegar(site)
+
+    assert passos[0].falha is None
+    assert site.visitadas == [INICIO, f"{INICIO}sobre"]
+    assert resultado.paginas == 2
+
+
+def test_r24_10_porta_padrao_escrita_na_url_inicial_nao_tira_do_site() -> None:
+    site = SiteFalso({"https://loja.exemplo.com/": ["/sobre"]})
+    robo = Robo(site, PedidoDeParada(), RelogioFalso(), lambda _passo: None)
+
+    resultado = robo.navegar("https://loja.exemplo.com:443/")
+
+    assert resultado.paginas == 1
+    assert site.visitadas == ["https://loja.exemplo.com:443/"]

@@ -2,7 +2,7 @@ import re
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
-from urllib.parse import urldefrag, urljoin, urlsplit, urlunsplit
+from urllib.parse import SplitResult, urldefrag, urljoin, urlsplit, urlunsplit
 
 from rastro.captura.sessao import FalhaAoNavegar, PedidoDeParada, SessaoDeGravacao
 
@@ -18,6 +18,8 @@ EXTENSOES_DE_ARQUIVO = re.compile(
 )
 URL_DENTRO_DA_QUERY = re.compile(r"https?:|https?%3a%2f%2f|%2f%2f", re.IGNORECASE)
 ESQUEMAS_NAVEGAVEIS = ("http", "https")
+PORTAS_PADRAO = {"http": 80, "https": 443}
+PREFIXO_WWW = "www."
 
 
 @dataclass(frozen=True)
@@ -82,13 +84,30 @@ def familia(url: str) -> str:
     return "/" + "/".join(trechos[:-1])
 
 
+def host_do_site(url: str) -> str:
+    partes = urlsplit(url)
+    host = (partes.hostname or "").removeprefix(PREFIXO_WWW)
+    try:
+        porta = partes.port
+    except ValueError:
+        return ""
+    if porta is None or porta == PORTAS_PADRAO.get(partes.scheme):
+        return host
+    return f"{host}:{porta}"
+
+
 def link_permitido(url: str, host: str) -> bool:
     partes = urlsplit(url)
-    if partes.scheme not in ESQUEMAS_NAVEGAVEIS or partes.netloc.lower() != host:
+    if partes.scheme not in ESQUEMAS_NAVEGAVEIS or host_do_site(url) != host:
         return False
-    if PALAVRAS_PERIGOSAS.search(url) or leva_para_outro_endereco(partes.query):
+    if tem_palavra_perigosa(partes) or leva_para_outro_endereco(partes.query):
         return False
     return not EXTENSOES_DE_ARQUIVO.search(partes.path)
+
+
+def tem_palavra_perigosa(partes: SplitResult) -> bool:
+    trecho_depois_do_host = f"{partes.path}?{partes.query}#{partes.fragment}"
+    return PALAVRAS_PERIGOSAS.search(trecho_depois_do_host) is not None
 
 
 def leva_para_outro_endereco(query: str) -> bool:
@@ -96,9 +115,9 @@ def leva_para_outro_endereco(query: str) -> bool:
 
 
 def saida_do_site(endereco: str, host: str) -> str | None:
-    destino = urlsplit(endereco).netloc.lower()
-    if destino == host:
+    if host_do_site(endereco) == host:
         return None
+    destino = urlsplit(endereco).hostname or endereco
     return f"saiu do site: foi redirecionado para {destino}"
 
 
@@ -123,11 +142,12 @@ class Robo:
         self.parecidos = 0
 
     def navegar(self, url_inicial: str) -> ResultadoDoRobo:
-        host = urlsplit(url_inicial).netloc.lower()
+        host = host_do_site(url_inicial)
         fila: deque[tuple[str, int]] = deque([(url_inicial, 0)])
         self.vistas.add(normalizar(url_inicial))
         inicio = self.relogio()
         while fila:
+            self.registrar_janela_fechada()
             motivo = self.motivo_para_parar(inicio)
             if motivo is not None:
                 return self.resultado(motivo)
@@ -144,9 +164,11 @@ class Robo:
         )
         return self.resultado(motivo)
 
-    def motivo_para_parar(self, inicio: float) -> str | None:
+    def registrar_janela_fechada(self) -> None:
         if not self.sessao.aberta():
             self.parada.pedir("janela fechada")
+
+    def motivo_para_parar(self, inicio: float) -> str | None:
         if self.parada.motivo is not None:
             return self.parada.motivo
         if self.paginas >= self.limites.paginas:

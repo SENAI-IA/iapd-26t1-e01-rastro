@@ -5,17 +5,19 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from playwright.sync_api import Error
+from playwright.sync_api import Error, TimeoutError
 
 from rastro.captura.playwright import (
     VERSAO_DO_PLAYWRIGHT,
     NavegadorAusente,
     NavegadorNaoAbriu,
     PlaywrightAusente,
+    SessaoPlaywright,
     abrir_gravacao,
     abrir_navegador_da_maquina,
     conferir_playwright,
 )
+from rastro.captura.sessao import FalhaAoNavegar
 
 NAVEGADOR_ABERTO = object()
 
@@ -117,3 +119,50 @@ def test_r24_4_navegador_que_nao_abre_vira_erro_com_a_mensagem_pronta(
         "não foi possível abrir o navegador para gravar a visita: "
         "BrowserType.launch: Target page, context or browser has been closed"
     )
+
+
+class PaginaFalsa:
+    def __init__(self, erro_ao_ir: Error | None = None) -> None:
+        self.erro_ao_ir = erro_ao_ir
+        self.esperas: list[tuple[str, float]] = []
+        self.url = ""
+
+    def goto(self, url: str, wait_until: str, timeout: float) -> None:
+        self.esperas.append((wait_until, timeout))
+        if self.erro_ao_ir is not None:
+            raise self.erro_ao_ir
+        self.url = url
+
+    def wait_for_load_state(self, estado: str, timeout: float) -> None:
+        self.esperas.append((estado, timeout))
+        raise TimeoutError("Timeout 5000ms exceeded.")
+
+
+class ContextoFalso:
+    def __init__(self, pagina: PaginaFalsa) -> None:
+        self.pagina = pagina
+        self.pages = [pagina]
+
+    def new_page(self) -> PaginaFalsa:
+        return self.pagina
+
+    def on(self, evento: str, tratador: Any) -> None:
+        return None
+
+
+def test_r24_10_pagina_que_carregou_conta_mesmo_sem_a_rede_parar() -> None:
+    pagina = PaginaFalsa()
+    sessao = SessaoPlaywright(ContextoFalso(pagina))  # type: ignore[arg-type]
+
+    sessao.ir("https://loja.exemplo.com/")
+
+    assert sessao.endereco() == "https://loja.exemplo.com/"
+    assert pagina.esperas == [("load", 15_000), ("networkidle", 5_000)]
+
+
+def test_r24_10_pagina_que_nao_carregou_e_falha_ao_navegar() -> None:
+    pagina = PaginaFalsa(erro_ao_ir=Error("net::ERR_CONNECTION_REFUSED at https://x/\nlog"))
+    sessao = SessaoPlaywright(ContextoFalso(pagina))  # type: ignore[arg-type]
+
+    with pytest.raises(FalhaAoNavegar, match="^net::ERR_CONNECTION_REFUSED at https://x/$"):
+        sessao.ir("https://x/")

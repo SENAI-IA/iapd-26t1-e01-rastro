@@ -738,7 +738,7 @@ A quinta interface com troca real, ao lado das quatro do `structure.md`: o Playw
 
 | Método | O que faz |
 |---|---|
-| `ir(url)` | navega e espera a rede parar (até 15 s); falha vira `FalhaAoNavegar` |
+| `ir(url)` | navega até a página carregar (`load`, até 15 s) e dá até 5 s para a rede parar; se a rede não parar (analytics, chat, long-polling), a página conta mesmo assim. Só a falha ao carregar vira `FalhaAoNavegar` |
 | `links()` | `href` absolutos dos `<a>` da página atual |
 | `endereco()` | o endereço da página atual, depois de redirecionamentos |
 | `aberta()` | a janela ainda está aberta |
@@ -751,7 +751,8 @@ Puro, sobre a `SessaoDeGravacao`, com relógio e pedido de parada recebidos de f
 
 - fila em largura, com os links de cada página em ordem alfabética (a mesma visita a cada execução);
 - `normalizar(url)`: sem os valores da query e sem o fragmento que não é rota (R24.11);
-- `link_permitido(url, origem)`: mesmo host e porta, sem as palavras e extensões do R24.12 e sem URL dentro da query;
+- `host_do_site(url)`: o host sem `www.` e sem a porta padrão do esquema; é o que o robô compara, porque o navegador tira a porta padrão do endereço e muitos sites redirecionam `site.com` para `www.site.com` (R24.10);
+- `link_permitido(url, origem)`: mesmo `host_do_site`, sem as palavras do R24.12 no caminho, na query ou no fragmento (no host, uma palavra como `cron` em `cronos.empresa.com.br` barraria o site inteiro), sem as extensões do R24.12 e sem URL dentro da query;
 - `saida_do_site(endereco, host)`: depois de navegar, confere o endereço final pela `SessaoDeGravacao.endereco()`; se um redirecionamento levou para outro host, a página não conta e os links dela não entram na fila. No teste real da T62, o `/redirect?to=https://github.com/...` do Juice Shop levou o robô ao GitHub e encheu o HAR de scripts de fora;
 - `familia(url)`: o caminho, ou a rota do fragmento, sem o último trecho; página de um trecho só é família de si mesma, senão as páginas da raiz (`/contato`, `/sobre`) dividiriam 2 vagas; conta só páginas visitadas com sucesso, porque contar na fila travou o WebGoat no spike;
 - devolve o motivo da parada (R24.13), que o `cli.py` mostra.
