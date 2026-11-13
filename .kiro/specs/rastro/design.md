@@ -5,7 +5,7 @@
 ## 1. Visão geral
 
 ```
-python -m rastro analisar loja.har [--ia kiro|claude|codex] [--sem-ia] [--saida <pasta>]
+python -m rastro analisar loja.har [--ia kiro|claude|codex] [--sem-ia] [--saida <pasta>] [--nao-abrir]
 python -m rastro como-usar
 ```
 
@@ -43,7 +43,7 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | Arquivo | Responsabilidade | Requisitos |
 |---|---|---|
 | `rastro/__main__.py` | permite `python -m rastro`, chamando `cli.principal()` | R01.1 |
-| `rastro/cli.py` | lê argumentos, escolhe o provedor, chama o fluxo, grava, imprime o resumo; `como-usar` abre o modelo no navegador; `instalar` e `desinstalar` chamam o `atalho.py`; `principal()` é a entrada do `python -m rastro` e do comando `rastro` | R13.8, R14, R17.3, R18.1, R23.8 |
+| `rastro/cli.py` | lê argumentos, escolhe o provedor, chama o fluxo, grava, imprime o resumo e abre o relatório no navegador (menos com `--nao-abrir`); `como-usar` abre o modelo no navegador; `instalar` e `desinstalar` chamam o `atalho.py`; `principal()` é a entrada do `python -m rastro` e do comando `rastro` | R13.8, R13.9, R14, R17.3, R18.1, R23.8 |
 | `rastro/atalho.py` | cria e remove o atalho marcado do comando `rastro` e o bloco marcado do PATH, na pasta do usuário | R17.3, R18.1 |
 | `rastro/fluxo.py` | orquestra as etapas, sem regra própria | todos |
 | `rastro/har/leitor.py` | lê e valida o HAR, decodifica base64 | R01 |

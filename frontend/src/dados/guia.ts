@@ -83,7 +83,7 @@ export const PASSOS_DO_GUIA: PassoDoGuia[] = [
   {
     titulo: "Abra o relatório",
     texto:
-      "Abra o `relatorio.html` com dois cliques: ele funciona sem internet. Comece pela **primeira ação** e por **O que fazer agora**. Na primeira vez, clique em **Tour guiado**.",
+      "O relatório abre sozinho no navegador ao fim da análise e funciona sem internet. Para abrir de novo, dê dois cliques no `relatorio.html`. Comece pela **primeira ação** e por **O que fazer agora**. Na primeira vez, clique em **Tour guiado**.",
     dica: "Cada análise fica numa pasta nova, em `Rastro/relatorios/<site>/<data e hora>/` dentro da pasta do usuário.",
     ilustracao: "relatorio",
   },

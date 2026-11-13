@@ -172,6 +172,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 6. O relatório HTML DEVE ter tema claro e escuro e ser legível em tela de 400px. *(verificação manual)*
 7. O JSON DEVE trazer o campo `versao_formato`, e o HTML DEVE exibir exatamente os dados do JSON, sem recalcular nada.
 8. QUANDO a análise terminar, o Rastro DEVE mostrar no terminal o caminho da pasta e do `relatorio.html` e um resumo de uma linha.
+9. QUANDO a análise terminar, o Rastro DEVE abrir o `relatorio.html` no navegador, sem que o navegador escreva no terminal. ONDE a opção `--nao-abrir` for usada, o Rastro NÃO DEVE abrir o navegador. SE não conseguir abrir o navegador, ENTÃO o Rastro DEVE dizer isso, e o caminho do `relatorio.html` continua no terminal, com código 0.
 
 ## R14 Escolher a IA (RF14)
 

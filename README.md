@@ -175,13 +175,13 @@ Sem `--saida`, os relatórios ficam em `~/Rastro/relatorios` no Linux.
 
 ## Abrir o relatório
 
-Abra o arquivo `relatorio.html` indicado no terminal. No Linux:
+Ao fim da análise, o relatório abre sozinho no navegador. Para abrir de novo, use o arquivo `relatorio.html` indicado no terminal. No Linux:
 
 ```bash
 xdg-open <caminho-do-relatorio.html>
 ```
 
-Também é possível abrir o arquivo com duplo clique. Depois da análise, o relatório funciona offline.
+Também é possível abrir o arquivo com duplo clique. Para analisar sem abrir o navegador, acrescente `--nao-abrir`. Depois da análise, o relatório funciona offline.
 
 Na primeira visita, use:
 

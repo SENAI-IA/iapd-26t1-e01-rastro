@@ -144,7 +144,7 @@ Resumo: 127.0.0.1:8080 · bibliotecas: 6 (6 com falhas) · achados: 20 · nota m
 
 ### 3. Abrir o relatório
 
-O `relatorio.html` abre com duplo clique, offline, sem nenhuma requisição externa. Pelo terminal:
+Ao fim da análise, o Rastro abre o `relatorio.html` no navegador; com `--nao-abrir`, só grava. Se o navegador não abrir (num servidor sem tela, por exemplo), o Rastro avisa e o caminho fica no terminal. O arquivo abre com duplo clique, offline, sem nenhuma requisição externa. Pelo terminal:
 
 | Linux | Windows (PowerShell) — a conferir (T42) |
 |---|---|

@@ -69,6 +69,11 @@ TEXTO_COMO_USAR_SEM_NAVEGADOR = (
     "Não foi possível abrir o navegador. Abra este arquivo nele para ver o guia "
     '"Como usar": {caminho}'
 )
+AJUDA_NAO_ABRIR = "não abre o relatório no navegador ao terminar"
+TEXTO_RELATORIO_ABERTO = "Relatório aberto no navegador."
+TEXTO_RELATORIO_SEM_NAVEGADOR = (
+    "Não foi possível abrir o navegador. Abra o arquivo HTML acima nele para ver o relatório."
+)
 AJUDA_INSTALAR = "cria o comando rastro para usar em qualquer pasta"
 AJUDA_DESINSTALAR = "remove o comando rastro"
 TEXTO_INSTALADO = "Pronto! Comando rastro instalado."
@@ -100,6 +105,7 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         metavar="PASTA",
         help="pasta dos relatórios (padrão: Rastro/relatorios na pasta do usuário)",
     )
+    analisar_har.add_argument("--nao-abrir", action="store_true", help=AJUDA_NAO_ABRIR)
     comandos.add_parser(
         "como-usar",
         help=AJUDA_COMO_USAR,
@@ -134,20 +140,24 @@ def executar(argumentos: list[str] | None = None) -> int:
         return instalar_comando()
     if opcoes.comando == "desinstalar":
         return desinstalar_comando()
+    abrir = not opcoes.nao_abrir
     if opcoes.sem_ia:
-        return analisar_sem_ia(opcoes.har, opcoes.saida)
-    return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia)
+        return analisar_sem_ia(opcoes.har, opcoes.saida, abrir)
+    return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia, abrir)
 
 
 def abrir_como_usar() -> int:
     caminho = caminho_do_modelo()
-    with saida_do_terminal_silenciada():
-        aberto = webbrowser.open(caminho.as_uri())
-    if aberto:
+    if abrir_no_navegador(caminho):
         print(TEXTO_COMO_USAR_ABERTO.format(caminho=caminho))
     else:
         print(TEXTO_COMO_USAR_SEM_NAVEGADOR.format(caminho=caminho))
     return 0
+
+
+def abrir_no_navegador(caminho: Path) -> bool:
+    with saida_do_terminal_silenciada():
+        return webbrowser.open(caminho.resolve().as_uri())
 
 
 @contextmanager
@@ -197,7 +207,9 @@ def desinstalar_comando() -> int:
     return 0
 
 
-def analisar_com_ia(caminho_har: Path, saida: Path | None, opcao_ia: str | None) -> int:
+def analisar_com_ia(
+    caminho_har: Path, saida: Path | None, opcao_ia: str | None, abrir: bool
+) -> int:
     try:
         ia = montar_cliente_de_ia(opcao_ia)
     except IaInvalida as erro:
@@ -205,7 +217,7 @@ def analisar_com_ia(caminho_har: Path, saida: Path | None, opcao_ia: str | None)
     except CliDaIaAusente as erro:
         return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
     avisar_analise_com_ia(ia)
-    return analisar_e_gravar(caminho_har, saida, ia)
+    return analisar_e_gravar(caminho_har, saida, ia, abrir)
 
 
 def montar_cliente_de_ia(opcao_ia: str | None) -> ClienteDeIA:
@@ -214,12 +226,14 @@ def montar_cliente_de_ia(opcao_ia: str | None) -> ClienteDeIA:
     return ClienteDeIA(PROVEDORES_DAS_IAS[nome_da_ia](executavel))
 
 
-def analisar_sem_ia(caminho_har: Path, saida: Path | None) -> int:
+def analisar_sem_ia(caminho_har: Path, saida: Path | None, abrir: bool) -> int:
     avisar_analise_sem_ia()
-    return analisar_e_gravar(caminho_har, saida, None)
+    return analisar_e_gravar(caminho_har, saida, None, abrir)
 
 
-def analisar_e_gravar(caminho_har: Path, saida: Path | None, ia: ClienteDeIA | None) -> int:
+def analisar_e_gravar(
+    caminho_har: Path, saida: Path | None, ia: ClienteDeIA | None, abrir: bool
+) -> int:
     try:
         analise = analisar(caminho_har, GitHubAdvisory(), RegistroNpm(), ia, Osv(), Nvd())
     except ErroAoLerHar as erro:
@@ -231,8 +245,15 @@ def analisar_e_gravar(caminho_har: Path, saida: Path | None, ia: ClienteDeIA | N
         gravado = gravar_relatorio(pasta, relatorio)
     except RelatorioJaExiste as erro:
         return encerrar_com_erro(str(erro))
-    mostrar_resultado(pasta, gravado, relatorio)
+    mostrar_resultado(pasta, gravado, relatorio, abrir)
     return 0
+
+
+def abrir_relatorio(html: Path) -> None:
+    if abrir_no_navegador(html):
+        print(TEXTO_RELATORIO_ABERTO)
+    else:
+        print(TEXTO_RELATORIO_SEM_NAVEGADOR)
 
 
 def avisar_analise_com_ia(ia: ClienteDeIA) -> None:
@@ -247,11 +268,15 @@ def avisar_analise_sem_ia() -> None:
     print()
 
 
-def mostrar_resultado(pasta: Path, gravado: RelatorioGravado, relatorio: dict[str, Any]) -> None:
+def mostrar_resultado(
+    pasta: Path, gravado: RelatorioGravado, relatorio: dict[str, Any], abrir: bool
+) -> None:
     print(f"Relatório gravado em: {pasta}")
     print(f"HTML: {gravado.html}")
     print(f"JSON: {gravado.json}")
     print(f"Resumo: {resumo_de_uma_linha(relatorio)}")
+    if abrir:
+        abrir_relatorio(gravado.html)
     if relatorio["analise"]["ia"] is None:
         print(AVISO_SEM_IA)
     for texto in falhas_da_ia(relatorio):
