@@ -535,7 +535,7 @@ O auditor grava o HAR pelo próprio Rastro, sem DevTools: abre um navegador, nav
 
 Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher quem revisa.
 
-- [ ] **T58 Registrar os spikes da gravação com Playwright**
+- [x] **T58 Registrar os spikes da gravação com Playwright**
   - Entrega: `docs/spike/gravacao-com-playwright.md` com o que os dois spikes de 13/11 mostraram.
   - Aceite: o documento traz como foi feito, os números contra o gabarito (Juice Shop, WebGoat, Drupal), o formato do HAR do Playwright (`mode: "minimal"`, sem `log.pages`, cookies só nos cabeçalhos), o tamanho do download, o Ctrl+C que perdia o HAR e o que fica para conferir no Windows.
   - Arquivos: `docs/spike/gravacao-com-playwright.md`
