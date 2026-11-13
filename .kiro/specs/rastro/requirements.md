@@ -173,6 +173,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 7. O JSON DEVE trazer o campo `versao_formato`, e o HTML DEVE exibir exatamente os dados do JSON, sem recalcular nada.
 8. QUANDO a análise terminar, o Rastro DEVE mostrar no terminal o caminho da pasta e do `relatorio.html` e um resumo de uma linha.
 9. QUANDO a análise terminar, o Rastro DEVE abrir o `relatorio.html` no navegador, sem que o navegador escreva no terminal. ONDE a opção `--nao-abrir` for usada, o Rastro NÃO DEVE abrir o navegador. SE não conseguir abrir o navegador, ENTÃO o Rastro DEVE dizer isso, e o caminho do `relatorio.html` continua no terminal, com código 0.
+10. ENQUANTO a análise roda, o terminal DEVE mostrar a etapa atual, o número dela e o total (`[3/7]`) e, nas etapas que andam item por item (npm, fontes de falhas, IA), quantos itens de quantos já terminaram. Num terminal interativo, a linha da etapa DEVE mostrar também o tempo da etapa e um sinal que gira, e cada etapa concluída fica com `ok`. Fora de um terminal interativo (saída redirecionada para arquivo), o Rastro DEVE escrever só o nome de cada etapa, uma por linha, sem códigos de controle.
 
 ## R14 Escolher a IA (RF14)
 
@@ -303,6 +304,7 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 15. QUANDO o robô parar por limite, o Rastro DEVE deixar a janela aberta e dizer que o auditor pode visitar mais páginas antes de fechá-la. QUANDO o auditor apertar Ctrl+C ou fechar a janela durante o robô, a gravação DEVE terminar como em 7.
 16. ONDE a opção `--robo` for usada, ANTES do Enter, o terminal DEVE avisar que, num sistema em produção, um link comum pode disparar uma ação, e recomendar não entrar para o robô com usuário que tem permissão de administrador ou acesso a dados sensíveis: nesse caso, gravar sem `--robo` e navegar à mão.
 17. A tela "Como usar" DEVE deixar escolher como gravar a visita (no DevTools, pelo Rastro ou com o robô) e mostrar só os passos, o que precisa antes, os problemas e os dados daquele jeito. Cada jeito DEVE ter uma animação curta que mostre, sem ler, quem faz o quê até o relatório. QUANDO a pessoa trocar de jeito, o progresso DEVE voltar a zero. Sem escolha, o guia DEVE mostrar o DevTools. *(verificação manual)*
+18. Num terminal interativo, ENQUANTO o `gravar` roda, o terminal DEVE mostrar numa linha que se atualiza o que está acontecendo: abrindo o navegador, abrindo a URL, gravando (com o tempo, as requisições e os scripts gravados e o lembrete de fechar a janela), o robô navegando (páginas de quantas, requisições e tempo) e salvando a gravação. As linhas fixas (R24.14) continuam por cima dela. Fora de um terminal interativo, essa linha NÃO DEVE aparecer.
 
 ---
 

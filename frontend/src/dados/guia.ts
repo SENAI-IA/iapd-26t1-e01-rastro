@@ -119,7 +119,7 @@ const ABRIR_O_RELATORIO: PassoDoGuia = {
 const ABRIR_O_RELATORIO_GRAVADO: PassoDoGuia = {
   titulo: "Abra o relatório",
   texto:
-    "Ao fechar a janela, o Rastro analisa o que foi gravado e abre o relatório no navegador. Com IA, pode levar alguns minutos. Comece pela **primeira ação** e por **O que fazer agora**. Na primeira vez, clique em **Tour guiado**.",
+    "Ao fechar a janela, o Rastro analisa o que foi gravado e abre o relatório no navegador. Com IA, pode levar alguns minutos: o terminal mostra a etapa e o tempo, e enquanto o sinal no fim da linha girar, o Rastro está trabalhando. Comece pela **primeira ação** e por **O que fazer agora**. Na primeira vez, clique em **Tour guiado**.",
   dica: "A gravação fica em `Rastro/gravacoes/` e o relatório em `Rastro/relatorios/`, dentro da pasta do usuário.",
   ilustracao: "relatorio",
 };
@@ -161,7 +161,7 @@ const PASSOS_PELO_DEVTOOLS: PassoDoGuia[] = [
   {
     titulo: "Rode o Rastro",
     texto:
-      "Abra o terminal na pasta onde salvou o `site.har` e rode o comando. Com IA, cada chamada pode levar até 2 minutos; no fim, o terminal mostra o resumo e onde gravou o relatório.",
+      "Abra o terminal na pasta onde salvou o `site.har` e rode o comando. Com IA, pode levar alguns minutos: o terminal mostra a etapa e o tempo, e enquanto o sinal no fim da linha girar, o Rastro está trabalhando. No fim, ele mostra o resumo e onde gravou o relatório.",
     comandos: [
       { sistema: "Linux", texto: "rastro analisar site.har" },
       { sistema: "Windows", texto: "rastro analisar site.har" },
@@ -189,7 +189,7 @@ const PASSOS_COM_O_RASTRO_GRAVANDO: PassoDoGuia[] = [
   {
     titulo: "Navegue e feche a janela",
     texto:
-      "Use o site como quem usa de verdade e passe pelas páginas que importam. Quando terminar, feche a janela do navegador.",
+      "Use o site como quem usa de verdade e passe pelas páginas que importam. O terminal mostra o tempo e quantas requisições já foram gravadas. Quando terminar, feche a janela do navegador.",
     dica: "Quanto mais páginas você visitar, mais bibliotecas o Rastro encontra. Também dá para parar com `Ctrl + C` no terminal.",
     ilustracao: "navegar-e-fechar",
   },

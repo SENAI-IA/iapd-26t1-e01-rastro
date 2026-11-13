@@ -46,6 +46,8 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/cli.py` | lê argumentos, escolhe o provedor, chama o fluxo, grava, imprime o resumo e abre o relatório no navegador (menos com `--nao-abrir`); `como-usar` abre o modelo no navegador; `instalar` e `desinstalar` chamam o `atalho.py`; `principal()` é a entrada do `python -m rastro` e do comando `rastro` | R13.8, R13.9, R14, R17.3, R18.1, R23.8 |
 | `rastro/atalho.py` | cria e remove o atalho marcado do comando `rastro` e o bloco marcado do PATH, na pasta do usuário | R17.3, R18.1 |
 | `rastro/fluxo.py` | orquestra as etapas, sem regra própria | todos |
+| `rastro/andamento.py` | interface `Andamento` (`comecar`, `etapa`, `itens`, `avancar`) e o `SEM_ANDAMENTO`, que não faz nada | R13.10 |
+| `rastro/terminal.py` | `LinhaAoVivo` (a linha que se reescreve com `\r`) e `AndamentoNoTerminal`, que mostra as etapas da análise nela | R13.10, R24.18 |
 | `rastro/har/leitor.py` | lê e valida o HAR, decodifica base64 | R01 |
 | `rastro/har/modelos.py` | `Requisicao`, `Cookie` | R01 |
 | `rastro/har/site.py` | descobre o site analisado | R01.7 |
@@ -639,6 +641,14 @@ Componentes do relatório (padrões em `.kiro/steering/frontend-react.md`):
 
 Ficam de fora: `GraficoDispersao` (CVSS × EPSS), `ModalPedidoFalsoPositivo`, `PainelBaseFalsosPositivos` e o vínculo de task.
 
+### Andamento no terminal (R13.10)
+
+Com IA, a análise pode passar minutos calada (cada chamada pode levar até 2 minutos). Por isso o `fluxo.analisar` recebe um `andamento: Andamento` (padrão `SEM_ANDAMENTO`) e avisa cada etapa: são 5 sem IA e 7 com IA (as duas a mais são os bundles e a explicação). `conferir_bibliotecas`, `consultar_avisos`, `identificar_em_bundles` e `explicar_achados` recebem o mesmo objeto e chamam `itens(total)` antes do laço e `avancar()` ao fim de cada item. A interface fica no núcleo e não sabe de terminal; quem desenha é o `cli.py`, com o `AndamentoNoTerminal`.
+
+- **`LinhaAoVivo`:** só desenha quando a saída é um terminal (`isatty()`). Uma thread redesenha a linha a cada 0,12 s com o sinal que gira (`| / - \`, ASCII para o console antigo do Windows) e o tempo; o texto vem de uma função, lida a cada volta. `imprimir(linha)` apaga a linha ao vivo, escreve a linha fixa e a desenha de novo, tudo sob uma trava, para a thread e o fluxo não se misturarem. A linha é cortada na largura do terminal, porque uma linha que quebra não volta com `\r`. Ao sair do `with`, a thread para e a linha some.
+- **Fora de um terminal** (saída redirecionada, testes), nada é redesenhado: o `AndamentoNoTerminal` escreve só `[n/total] etapa`, uma por linha.
+- **Sem porcentagem:** o tempo de cada etapa depende da rede e da IA, então uma barra de 0 a 100% mentiria. O número da etapa, os itens e o relógio mostram que o Rastro está andando sem prometer quanto falta.
+
 ## 14. Erros
 
 | Situação | Comportamento | Saída |
@@ -722,6 +732,8 @@ Ordem no `cli.py`, para nada abrir antes de tudo estar pronto:
 4. Abre a sessão: `launch(channel="chrome")`, e `msedge` se o Chrome faltar (R24.4), com `headless=False` e `handle_sigint=False`. Qualquer outro erro do Playwright ao abrir (driver, `launch`, `new_context`, `new_page`; ex.: Linux sem tela) vira `NavegadorNaoAbriu` com a primeira linha do erro, e o `cli.py` tira a pasta da gravação e encerra com código 1 (R24.4). O contexto grava com `record_har_path` e `record_har_mode="minimal"`, o mesmo do `playwright open --save-har`.
 5. À mão: espera a janela fechar. Com `--robo`: abre a URL, mostra o aviso de produção (R24.16), espera o Enter, roda o robô e, se ele parou por limite, espera a janela fechar (R24.15). O Enter é lido numa thread (`esperar_o_enter`): um `input()` parado não sai com o Ctrl+C, e a espera em fatias vê o Ctrl+C e a janela fechada.
 6. Fecha o contexto, o que grava o HAR, mostra o caminho e o aviso da sessão (R24.8) e chama o mesmo `analisar_e_gravar` do `analisar`.
+
+Do passo 4 ao 6, uma `LinhaAoVivo` (R24.18) diz o que está acontecendo: "Abrindo o navegador", "Abrindo <url>", "Gravando" (tempo, `requisicoes` e `scripts` da sessão), "Robô navegando" (páginas e tempo) e "Salvando a gravação". As linhas do robô e os avisos passam pelo `imprimir` dela. Durante a espera do Enter a linha fica desligada, para não se misturar com o que a pessoa digita. A thread só lê os contadores da sessão; quem fala com o Playwright continua sendo só o fio principal.
 
 ### Ctrl+C
 

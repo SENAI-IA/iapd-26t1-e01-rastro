@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from rastro.acao.plano import chave_da_biblioteca
+from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.fontes import nvd as fonte_nvd
 from rastro.fontes import osv as fonte_osv
 from rastro.fontes.conector import (
@@ -34,20 +35,24 @@ def consultar_avisos(
     fonte: ConectorDeAvisos,
     osv: ConectorDeAvisos | None = None,
     nvd: BuscaDeCvss | None = None,
+    andamento: Andamento = SEM_ANDAMENTO,
 ) -> AvisosConsultados:
     avisos: list[AvisosDaBiblioteca] = []
     nao_consultadas: dict[str, str] = {}
     fontes_sem_resposta: list[FonteSemResposta] = []
+    andamento.itens(len(bibliotecas))
     for biblioteca in bibliotecas:
         try:
             do_github = fonte.consultar(biblioteca.pacote, biblioteca.versao)
         except ConsultaNaoRealizada as erro:
             nao_consultadas[chave_da_biblioteca(biblioteca)] = erro.motivo
+            andamento.avancar()
             continue
         do_osv = consultar_osv(biblioteca, osv)
         com_cvss = completar_cvss_pelo_nvd(juntar_avisos(do_github + do_osv.avisos), nvd)
         avisos.append((biblioteca, com_cvss.avisos))
         fontes_sem_resposta.extend(do_osv.sem_resposta + com_cvss.sem_resposta)
+        andamento.avancar()
     return AvisosConsultados(avisos, nao_consultadas, fontes_sem_resposta)
 
 

@@ -72,6 +72,7 @@ from rastro.relatorio.json import (
     montar_relatorio,
 )
 from rastro.risco.nota import escrever_nota
+from rastro.terminal import AndamentoNoTerminal, LinhaAoVivo, escrever_tempo
 
 DESCRICAO = (
     "Lê um HAR, identifica as bibliotecas front-end do site e prioriza as falhas "
@@ -146,6 +147,16 @@ TEXTO_ROBO_PAROU = (
     "O robô parou: {motivo}. {paginas} páginas visitadas, {barrados} links perigosos ou "
     "de fora do site não seguidos, {parecidos} páginas parecidas demais com outras puladas."
 )
+TEXTO_ABRINDO_O_NAVEGADOR = "Abrindo o navegador"
+TEXTO_ABRINDO_A_PAGINA = "Abrindo {url}"
+TEXTO_GRAVANDO_AO_VIVO = (
+    "Gravando · {tempo} · requisições {requisicoes} · scripts {scripts} · "
+    "feche a janela para analisar"
+)
+TEXTO_ROBO_AO_VIVO = (
+    "Robô navegando · páginas {paginas}/{limite} · requisições {requisicoes} · {tempo}"
+)
+TEXTO_SALVANDO_A_GRAVACAO = "Salvando a gravação"
 TEXTO_HAR_GRAVADO = "Visita gravada em: {har}"
 AVISO_SESSAO_NO_HAR = (
     "Atenção: este HAR guarda a sessão do site (cabeçalhos Cookie e Set-Cookie). "
@@ -354,26 +365,51 @@ def gravar_e_analisar(
 
 def gravar_visita(url: str, host: str, har: Path, robo: bool) -> int:
     parada = PedidoDeParada()
-    with ctrl_c_pede_parada(parada), abrir_gravacao(har) as sessao:
-        if robo:
-            navegar_com_o_robo(sessao, parada, url, host)
-        else:
-            print(TEXTO_GRAVANDO.format(host=host))
-            abrir_primeira_pagina(sessao, url)
-            esperar_a_janela_fechar(sessao, parada)
-        requisicoes = sessao.requisicoes
+    with LinhaAoVivo() as linha:
+        linha.acompanhar(cronometrado(TEXTO_ABRINDO_O_NAVEGADOR))
+        with ctrl_c_pede_parada(parada), abrir_gravacao(har) as sessao:
+            if robo:
+                navegar_com_o_robo(sessao, parada, url, host, linha)
+            else:
+                linha.imprimir(TEXTO_GRAVANDO.format(host=host))
+                abrir_primeira_pagina(sessao, url, linha)
+                esperar_gravando(sessao, parada, linha)
+            requisicoes = sessao.requisicoes
+            linha.acompanhar(cronometrado(TEXTO_SALVANDO_A_GRAVACAO))
     return requisicoes
 
 
+def cronometrado(texto: str) -> Callable[[], str]:
+    inicio = time.monotonic()
+    return lambda: f"{texto} · {escrever_tempo(time.monotonic() - inicio)}"
+
+
+def esperar_gravando(sessao: SessaoDeGravacao, parada: PedidoDeParada, linha: LinhaAoVivo) -> None:
+    inicio = time.monotonic()
+    linha.acompanhar(
+        lambda: TEXTO_GRAVANDO_AO_VIVO.format(
+            tempo=escrever_tempo(time.monotonic() - inicio),
+            requisicoes=sessao.requisicoes,
+            scripts=sessao.scripts,
+        )
+    )
+    esperar_a_janela_fechar(sessao, parada)
+
+
 def navegar_com_o_robo(
-    sessao: SessaoDeGravacao, parada: PedidoDeParada, url: str, host: str
+    sessao: SessaoDeGravacao,
+    parada: PedidoDeParada,
+    url: str,
+    host: str,
+    linha: LinhaAoVivo,
 ) -> None:
-    abrir_primeira_pagina(sessao, url)
-    print(AVISO_ANTES_DO_ROBO)
+    abrir_primeira_pagina(sessao, url, linha)
+    linha.soltar()
+    linha.imprimir(AVISO_ANTES_DO_ROBO)
     if not esperar_o_enter(sessao, parada, ler_enter):
         return
     limites = LIMITES_PADRAO
-    print(
+    linha.imprimir(
         TEXTO_ROBO_COMECOU.format(
             host=host,
             paginas=limites.paginas,
@@ -381,41 +417,51 @@ def navegar_com_o_robo(
             cliques=limites.cliques,
         )
     )
-    robo = Robo(sessao, parada, time.monotonic, mostrar_passo_do_robo, limites)
-    mostrar_fim_do_robo(robo.navegar(url))
+    inicio = time.monotonic()
+    robo = Robo(
+        sessao, parada, time.monotonic, lambda passo: mostrar_passo_do_robo(passo, linha), limites
+    )
+    linha.acompanhar(
+        lambda: TEXTO_ROBO_AO_VIVO.format(
+            paginas=robo.paginas,
+            limite=limites.paginas,
+            tempo=escrever_tempo(time.monotonic() - inicio),
+            requisicoes=sessao.requisicoes,
+        )
+    )
+    mostrar_fim_do_robo(robo.navegar(url), linha)
     if parada.motivo is not None:
         return
-    print(TEXTO_JANELA_CONTINUA_ABERTA)
-    esperar_a_janela_fechar(sessao, parada)
+    linha.imprimir(TEXTO_JANELA_CONTINUA_ABERTA)
+    esperar_gravando(sessao, parada, linha)
 
 
 def ler_enter() -> str:
     return input()
 
 
-def mostrar_passo_do_robo(passo: PassoDoRobo) -> None:
+def mostrar_passo_do_robo(passo: PassoDoRobo, linha: LinhaAoVivo) -> None:
     if passo.falha is not None:
-        print(
+        linha.imprimir(
             TEXTO_PASSO_QUE_FALHOU.format(
                 url=url_sem_usuario_e_senha(passo.url), motivo=passo.falha
             )
         )
         return
-    minutos, segundos = divmod(int(passo.segundos), 60)
-    print(
+    linha.imprimir(
         TEXTO_PASSO_DO_ROBO.format(
             paginas=passo.paginas,
             limite=LIMITES_PADRAO.paginas,
             requisicoes=passo.requisicoes,
             scripts=passo.scripts,
-            tempo=f"{minutos}:{segundos:02d}",
+            tempo=escrever_tempo(passo.segundos),
             url=url_sem_usuario_e_senha(passo.url),
         )
     )
 
 
-def mostrar_fim_do_robo(resultado: ResultadoDoRobo) -> None:
-    print(
+def mostrar_fim_do_robo(resultado: ResultadoDoRobo, linha: LinhaAoVivo) -> None:
+    linha.imprimir(
         TEXTO_ROBO_PAROU.format(
             motivo=resultado.motivo,
             paginas=resultado.paginas,
@@ -425,11 +471,13 @@ def mostrar_fim_do_robo(resultado: ResultadoDoRobo) -> None:
     )
 
 
-def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str) -> None:
+def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str, linha: LinhaAoVivo) -> None:
+    sem_senha = url_sem_usuario_e_senha(url)
+    linha.acompanhar(cronometrado(TEXTO_ABRINDO_A_PAGINA.format(url=sem_senha)))
     try:
         sessao.ir(url)
     except FalhaAoNavegar as erro:
-        print(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=url_sem_usuario_e_senha(url), motivo=erro))
+        linha.imprimir(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=sem_senha, motivo=erro))
 
 
 @contextmanager
@@ -460,15 +508,19 @@ def analisar_e_gravar(
     gravado_pelo_rastro: bool = False,
 ) -> int:
     try:
-        analise = analisar(
-            caminho_har,
-            GitHubAdvisory(),
-            RegistroNpm(),
-            ia,
-            Osv(),
-            Nvd(),
-            gravado_pelo_rastro=gravado_pelo_rastro,
-        )
+        with LinhaAoVivo() as linha:
+            andamento = AndamentoNoTerminal(linha)
+            analise = analisar(
+                caminho_har,
+                GitHubAdvisory(),
+                RegistroNpm(),
+                ia,
+                Osv(),
+                Nvd(),
+                gravado_pelo_rastro=gravado_pelo_rastro,
+                andamento=andamento,
+            )
+            andamento.terminar()
     except ErroAoLerHar as erro:
         return encerrar_com_erro(str(erro))
     relatorio = montar_relatorio(analise)

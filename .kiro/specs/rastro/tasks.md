@@ -18,7 +18,7 @@ Ordem: spike → núcleo determinístico → relatório HTML → explicação po
 | 3. IA | 30/11–04/12 | T33–T41, T52 |
 | 4. Entregar | 04–08/12 | T42–T48 |
 | Extensão: OSV e NVD (só se houver tempo) | até 02/12 | T49–T51 |
-| Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo) | até 08/12 | T58–T64 |
+| Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo) | até 08/12 | T58–T65 |
 
 Meta interna: tudo pronto em 08/12. Entrega: 10/12/2026, 23h59.
 
@@ -36,7 +36,7 @@ O Paulo escreve todas as tasks com o agente e é o autor dos commits. Os revisor
 
 ## Como cada task chega ao `main`
 
-Direto no `main`, sem branch e sem MR, uma task por vez. A exceção é a extensão "Gravar a visita" (T58–T64), na branch `feat/gravar` (ver o fim desta lista):
+Direto no `main`, sem branch e sem MR, uma task por vez. A exceção é a extensão "Gravar a visita" (T58–T65), na branch `feat/gravar` (ver o fim desta lista):
 
 1. **Antes do commit:** `ruff check`, `mypy rastro` e `pytest` passam na máquina local.
 2. **Um commit por task**, autocontido (funciona sozinho), com o código, os testes, o `[x]` nesta lista e o cartão movido para "Em revisão" no kanban. Push logo depois.
@@ -590,4 +590,12 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Arquivos: `README.md`, `README-TECNICO.md`, `frontend/src/dados/guia.ts`, `frontend/src/dados/tour.ts`, `frontend/src/componentes/GuiaComoUsar.tsx`, `frontend/src/componentes/AnimacaoDoModo.tsx`, `frontend/src/componentes/IlustracaoDoGuia.tsx`, `rastro/relatorio/modelo.html`, `.kiro/specs/rastro/requirements.md` (painel ao vivo nos planos futuros)
   - Teste: verificação manual.
   - Requisito: R24 (R24.17), R20.1
+  - Revisão: a definir
+
+- [x] **T65 Mostrar no terminal que o Rastro está trabalhando**
+  - Entrega: a análise mostra a etapa (`[3/7]`), os itens e o tempo; o `gravar` mostra numa linha ao vivo se está abrindo, gravando, com o robô ou salvando.
+  - Aceite: num terminal, a linha gira e o tempo corre enquanto a IA ou a rede respondem, e cada etapa fica com `ok`; com a saída num arquivo, só os nomes das etapas, sem códigos de controle; conferido num pseudo-terminal com a análise do `loja.har` e com um `gravar` de verdade (Chrome, site local, Ctrl+C).
+  - Arquivos: `rastro/andamento.py`, `rastro/terminal.py`, `rastro/fluxo.py`, `rastro/cli.py`, `rastro/travas/conferencia.py`, `rastro/fontes/consulta.py`, `rastro/identificacao/ia.py`, `rastro/explicacao/ia.py`, `tests/test_terminal.py`, `tests/test_fluxo.py`, `tests/test_cli.py`, `README.md`, `README-TECNICO.md`, `frontend/src/dados/guia.ts`, `rastro/relatorio/modelo.html`, `.kiro/steering/structure.md`
+  - Teste: `test_r13_10_*`, `test_r24_18_*`
+  - Requisito: R13.10, R24.18
   - Revisão: a definir

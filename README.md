@@ -166,6 +166,8 @@ rastro gravar https://site.com.br --robo
 
 > **Em produção:** não use o robô com um usuário administrador ou com acesso a dados sensíveis. Um link comum pode aprovar, arquivar ou enviar algo. Nesse caso, navegue você mesmo.
 
+Enquanto grava, o terminal mostra o tempo e quantas requisições já foram gravadas.
+
 As opções do `analisar` também valem aqui: `--sem-ia`, `--ia`, `--saida` e `--nao-abrir`.
 
 A gravação fica em `~/Rastro/gravacoes/` e **guarda o seu login no site**. Não compartilhe o arquivo e apague quando não precisar mais. O relatório não traz o login.
@@ -192,6 +194,14 @@ python3 -m rastro analisar site.har --ia codex
 No Windows, troque `python3` por `py`.
 
 Durante a análise, Rastro consulta fontes públicas como GitHub Advisory, OSV, NVD e registro do npm. O site descrito no HAR não é acessado.
+
+Enquanto analisa, o terminal mostra a etapa, quantos itens já foram e o tempo. Com IA, uma etapa pode levar alguns minutos: enquanto o sinal no fim da linha girar, o Rastro está trabalhando.
+
+```text
+[1/7] Lendo o HAR · 0:00 · ok
+[2/7] Reconhecendo as bibliotecas pelos arquivos · 0:00 · ok
+[3/7] Procurando bibliotecas nos bundles com a IA · 2 de 5 · 1:12 /
+```
 
 Ao terminar, o terminal mostra os caminhos do relatório HTML e do arquivo JSON:
 

@@ -5,6 +5,7 @@ from pathlib import Path
 
 from rastro.acao.modelos import Acao
 from rastro.acao.plano import montar_plano_de_acao
+from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.configuracao.checagens import checar_configuracao
 from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.ia import explicar_achados
@@ -25,6 +26,16 @@ from rastro.risco.modelos import Achado
 from rastro.travas.conferencia import conferir_bibliotecas
 from rastro.travas.faixa_de_versao import descartar_fora_da_faixa
 from rastro.travas.modelos import TravaAcionada
+
+ETAPA_LER_O_HAR = "Lendo o HAR"
+ETAPA_RECONHECER = "Reconhecendo as bibliotecas pelos arquivos"
+ETAPA_BUNDLES = "Procurando bibliotecas nos bundles com a IA"
+ETAPA_CONFERIR = "Conferindo as bibliotecas no npm"
+ETAPA_CONSULTAR = "Consultando falhas conhecidas (GitHub, OSV, NVD)"
+ETAPA_EXPLICAR = "Explicando os achados com a IA"
+ETAPA_PLANO = "Conferindo a configuração e montando o plano de ação"
+ETAPAS_SEM_IA = 5
+ETAPAS_COM_IA = 7
 
 
 @dataclass(frozen=True)
@@ -56,19 +67,30 @@ def analisar(
     osv: ConectorDeAvisos | None = None,
     nvd: BuscaDeCvss | None = None,
     gravado_pelo_rastro: bool = False,
+    andamento: Andamento = SEM_ANDAMENTO,
 ) -> Analise:
     inicio = datetime.now()
     cronometro = time.perf_counter()
+    andamento.comecar(ETAPAS_SEM_IA if ia is None else ETAPAS_COM_IA)
 
+    andamento.etapa(ETAPA_LER_O_HAR)
     requisicoes = ler_har(caminho_har)
     site = descobrir_site_analisado(requisicoes)
+    andamento.etapa(ETAPA_RECONHECER)
     por_assinatura = identificar_por_assinatura(requisicoes)
-    em_bundles = identificar_em_bundles(requisicoes, por_assinatura, ia)
-    bibliotecas = conferir_bibliotecas(por_assinatura + em_bundles.bibliotecas, registro)
-    consultados = consultar_avisos(bibliotecas.confirmadas, fonte, osv, nvd)
+    if ia is not None:
+        andamento.etapa(ETAPA_BUNDLES)
+    em_bundles = identificar_em_bundles(requisicoes, por_assinatura, ia, andamento)
+    andamento.etapa(ETAPA_CONFERIR)
+    bibliotecas = conferir_bibliotecas(por_assinatura + em_bundles.bibliotecas, registro, andamento)
+    andamento.etapa(ETAPA_CONSULTAR)
+    consultados = consultar_avisos(bibliotecas.confirmadas, fonte, osv, nvd, andamento)
     avisos_na_faixa, travas_da_faixa = conferir_faixas(consultados.avisos)
     achados = calcular_risco(avisos_na_faixa)
-    explicados = explicar_achados(achados, ia)
+    if ia is not None:
+        andamento.etapa(ETAPA_EXPLICAR)
+    explicados = explicar_achados(achados, ia, andamento)
+    andamento.etapa(ETAPA_PLANO)
     checagens = checar_configuracao(requisicoes, site, gravado_pelo_rastro)
     plano = montar_plano_de_acao(achados, explicados.explicacoes, checagens)
 

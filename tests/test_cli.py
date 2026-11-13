@@ -14,6 +14,7 @@ from typing import Any
 import pytest
 
 from rastro import cli
+from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.captura.playwright import NavegadorAusente, NavegadorNaoAbriu, PlaywrightAusente
 from rastro.captura.sessao import FalhaAoNavegar
 from rastro.cli import AVISO_SEM_IA, executar
@@ -24,6 +25,7 @@ from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.ia import cliente
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
 from rastro.relatorio.html import TAG_DOS_DADOS_VAZIA
+from rastro.terminal import LinhaAoVivo
 from tests.dubles import (
     DADOS,
     HAR_DA_LOJA,
@@ -48,9 +50,17 @@ def analisar_no_momento_fixo(
     osv: ConectorDeAvisos | None = None,
     nvd: BuscaDeCvss | None = None,
     gravado_pelo_rastro: bool = False,
+    andamento: Andamento = SEM_ANDAMENTO,
 ) -> Analise:
     analise = analisar(
-        caminho_har, fonte, registro, ia, osv, nvd, gravado_pelo_rastro=gravado_pelo_rastro
+        caminho_har,
+        fonte,
+        registro,
+        ia,
+        osv,
+        nvd,
+        gravado_pelo_rastro=gravado_pelo_rastro,
+        andamento=andamento,
     )
     return replace(analise, inicio=MOMENTO)
 
@@ -852,6 +862,34 @@ def test_r24_9_sem_cookies_na_gravacao_nao_pede_o_har_completo(
     assert not any("HAR completo" in c["detalhe"] for c in de_cookie)
 
 
+@pytest.mark.usefixtures("fontes_falsas")
+def test_r13_10_analisar_mostra_cada_etapa_no_terminal(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    assert analisar_loja(tmp_path) == 0
+
+    terminal = capsys.readouterr().out
+    assert "[1/5] Lendo o HAR" in terminal
+    assert "[5/5] Conferindo a configuração e montando o plano de ação" in terminal
+
+
+def test_r24_18_no_terminal_mostra_ao_vivo_o_tempo_e_as_requisicoes_gravadas(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    gravacao: GravacaoFalsa,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(cli, "LinhaAoVivo", lambda: LinhaAoVivo(sys.stdout, ao_vivo=True))
+
+    assert gravar_loja(tmp_path / "relatorios", "--sem-ia", "--nao-abrir") == 0
+
+    terminal = capsys.readouterr().out
+    assert "Abrindo o navegador · 0:00" in terminal
+    assert "Abrindo https://loja.exemplo.com/ · 0:00" in terminal
+    assert "Gravando · 0:00 · requisições 3 · scripts 1 · feche a janela para analisar" in terminal
+    assert "Salvando a gravação · 0:00" in terminal
+
+
 @pytest.fixture
 def enter(monkeypatch: pytest.MonkeyPatch) -> list[str]:
     lidos: list[str] = []
@@ -878,6 +916,23 @@ def test_r24_14_robo_mostra_o_progresso_e_por_que_parou(
     assert "páginas 1/20 · requisições 3 · scripts 1" in terminal
     assert "O robô parou: nenhum link novo" in terminal
     assert (saida / PASTA_DA_LOJA / "relatorio.json").is_file()
+
+
+@pytest.mark.usefixtures("enter")
+def test_r24_18_no_terminal_o_robo_mostra_ao_vivo_as_paginas_e_o_tempo(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    gravacao: GravacaoFalsa,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    gravacao.sessao.urls_antes_de_fechar = 2
+    monkeypatch.setattr(cli, "LinhaAoVivo", lambda: LinhaAoVivo(sys.stdout, ao_vivo=True))
+
+    assert gravar_loja(tmp_path / "relatorios", "--robo", "--sem-ia", "--nao-abrir") == 0
+
+    terminal = capsys.readouterr().out
+    assert "Robô navegando · páginas 0/20 · requisições 3 · 0:00" in terminal
+    assert "páginas 1/20 · requisições 3 · scripts 1" in terminal
 
 
 def test_r24_10_robo_avisa_sobre_login_e_espera_o_enter(
