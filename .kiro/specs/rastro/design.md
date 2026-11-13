@@ -735,6 +735,8 @@ Ordem no `cli.py`, para nada abrir antes de tudo estar pronto:
 
 Do passo 4 ao 6, uma `LinhaAoVivo` (R24.18) diz o que está acontecendo: "Abrindo o navegador", "Abrindo <url>", "Gravando" (tempo, `requisicoes` e `scripts` da sessão), "Robô navegando" (páginas e tempo) e "Salvando a gravação". As linhas do robô e os avisos passam pelo `imprimir` dela. Durante a espera do Enter a linha fica desligada, para não se misturar com o que a pessoa digita. A thread só lê os contadores da sessão; quem fala com o Playwright continua sendo só o fio principal.
 
+O que pede uma ação da pessoa passa pelo `pedir` da `LinhaAoVivo`, que o escreve em negrito amarelo (R24.19), uma sequência ANSI por linha. Só com a saída num terminal e sem `NO_COLOR`; no Windows, `ligar_cores` liga o processamento de sequências do console (`SetConsoleMode`) e, se não conseguir, o texto sai sem cor. Antes do robô, o aviso de produção vem primeiro e o pedido de Enter por último, para a última coisa lida ser o que fazer.
+
 ### Ctrl+C
 
 No terminal, o Ctrl+C vai para todo o grupo de processos. Com o padrão do Playwright (`handle_sigint=True`), o navegador fecha antes de o contexto gravar e o HAR se perde em silêncio (T58). Por isso:

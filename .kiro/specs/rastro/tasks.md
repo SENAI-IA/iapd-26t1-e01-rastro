@@ -593,9 +593,9 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Revisão: a definir
 
 - [x] **T65 Mostrar no terminal que o Rastro está trabalhando**
-  - Entrega: a análise mostra a etapa (`[3/7]`), os itens e o tempo; o `gravar` mostra numa linha ao vivo se está abrindo, gravando, com o robô ou salvando.
+  - Entrega: a análise mostra a etapa (`[3/7]`), os itens e o tempo; o `gravar` mostra numa linha ao vivo se está abrindo, gravando, com o robô ou salvando, e destaca o que a pessoa precisa fazer.
   - Aceite: num terminal, a linha gira e o tempo corre enquanto a IA ou a rede respondem, e cada etapa fica com `ok`; com a saída num arquivo, só os nomes das etapas, sem códigos de controle; conferido num pseudo-terminal com a análise do `loja.har` e com um `gravar` de verdade (Chrome, site local, Ctrl+C).
   - Arquivos: `rastro/andamento.py`, `rastro/terminal.py`, `rastro/fluxo.py`, `rastro/cli.py`, `rastro/travas/conferencia.py`, `rastro/fontes/consulta.py`, `rastro/identificacao/ia.py`, `rastro/explicacao/ia.py`, `tests/test_terminal.py`, `tests/test_fluxo.py`, `tests/test_cli.py`, `README.md`, `README-TECNICO.md`, `frontend/src/dados/guia.ts`, `rastro/relatorio/modelo.html`, `.kiro/steering/structure.md`
-  - Teste: `test_r13_10_*`, `test_r24_18_*`
-  - Requisito: R13.10, R24.18
+  - Teste: `test_r13_10_*`, `test_r24_18_*`, `test_r24_19_*`
+  - Requisito: R13.10, R24.18, R24.19
   - Revisão: a definir

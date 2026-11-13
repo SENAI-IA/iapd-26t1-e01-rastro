@@ -1,3 +1,4 @@
+import os
 import shutil
 import sys
 import threading
@@ -12,6 +13,33 @@ LARGURA_MINIMA = 20
 TEXTO_DA_ETAPA = "[{numero}/{total}] {nome}"
 TEXTO_DOS_ITENS = "{feitos} de {total}"
 TEXTO_ETAPA_FEITA = "ok"
+DESTAQUE = "\x1b[1;33m"
+FIM_DO_DESTAQUE = "\x1b[0m"
+VARIAVEL_SEM_CORES = "NO_COLOR"
+SAIDA_PADRAO_DO_WINDOWS = -11
+PROCESSAR_SEQUENCIAS_DO_TERMINAL = 0x0004
+
+
+def ligar_cores() -> bool:
+    if os.environ.get(VARIAVEL_SEM_CORES):
+        return False
+    if sys.platform != "win32":
+        return True
+    try:
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        console = kernel32.GetStdHandle(SAIDA_PADRAO_DO_WINDOWS)
+        modo = ctypes.c_uint32()
+        if not kernel32.GetConsoleMode(console, ctypes.byref(modo)):
+            return False
+        return bool(kernel32.SetConsoleMode(console, modo.value | PROCESSAR_SEQUENCIAS_DO_TERMINAL))
+    except (AttributeError, OSError):
+        return False
+
+
+def destacar(texto: str) -> str:
+    return "\n".join(f"{DESTAQUE}{linha}{FIM_DO_DESTAQUE}" for linha in texto.split("\n"))
 
 
 def largura_do_terminal() -> int:
@@ -35,9 +63,11 @@ class LinhaAoVivo:
         saida: TextIO | None = None,
         ao_vivo: bool | None = None,
         largura: Callable[[], int] = largura_do_terminal,
+        cores: bool | None = None,
     ) -> None:
         self.saida = saida or sys.stdout
         self.ao_vivo = self.saida.isatty() if ao_vivo is None else ao_vivo
+        self.cores = (self.ao_vivo and ligar_cores()) if cores is None else cores
         self.largura = largura
         self._texto: Callable[[], str] | None = None
         self._giro = 0
@@ -78,6 +108,9 @@ class LinhaAoVivo:
             self._apagar()
             print(linha, file=self.saida, flush=True)
             self._desenhar()
+
+    def pedir(self, linha: str) -> None:
+        self.imprimir(destacar(linha) if self.cores else linha)
 
     def _girar(self) -> None:
         while not self._parar.wait(INTERVALO_DO_GIRO_EM_SEGUNDOS):

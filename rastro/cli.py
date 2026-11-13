@@ -123,9 +123,11 @@ AJUDA_ROBO = (
     "o Rastro navega sozinho pelos links do site (só links, nunca botões nem formulários), "
     "com limite de páginas, tempo e cliques"
 )
-AVISO_ANTES_DO_ROBO = (
+PEDIDO_ANTES_DO_ROBO = (
     "Antes de o robô começar: se o site pede login, entre agora na janela aberta e depois "
-    "aperte Enter aqui. Para o robô navegar sem login, só aperte Enter.\n"
+    "aperte Enter aqui. Para o robô navegar sem login, só aperte Enter."
+)
+AVISO_ANTES_DO_ROBO = (
     "Cuidado em sistema de produção: o robô só segue links, mas um link comum pode "
     "disparar uma ação (aprovar, arquivar, enviar). Se o usuário tem permissão de "
     "administrador ou acesso a dados sensíveis, não entre com ele para o robô: grave sem "
@@ -371,7 +373,7 @@ def gravar_visita(url: str, host: str, har: Path, robo: bool) -> int:
             if robo:
                 navegar_com_o_robo(sessao, parada, url, host, linha)
             else:
-                linha.imprimir(TEXTO_GRAVANDO.format(host=host))
+                linha.pedir(TEXTO_GRAVANDO.format(host=host))
                 abrir_primeira_pagina(sessao, url, linha)
                 esperar_gravando(sessao, parada, linha)
             requisicoes = sessao.requisicoes
@@ -406,6 +408,7 @@ def navegar_com_o_robo(
     abrir_primeira_pagina(sessao, url, linha)
     linha.soltar()
     linha.imprimir(AVISO_ANTES_DO_ROBO)
+    linha.pedir(PEDIDO_ANTES_DO_ROBO)
     if not esperar_o_enter(sessao, parada, ler_enter):
         return
     limites = LIMITES_PADRAO
@@ -432,7 +435,7 @@ def navegar_com_o_robo(
     mostrar_fim_do_robo(robo.navegar(url), linha)
     if parada.motivo is not None:
         return
-    linha.imprimir(TEXTO_JANELA_CONTINUA_ABERTA)
+    linha.pedir(TEXTO_JANELA_CONTINUA_ABERTA)
     esperar_gravando(sessao, parada, linha)
 
 
@@ -477,7 +480,7 @@ def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str, linha: LinhaAoVivo
     try:
         sessao.ir(url)
     except FalhaAoNavegar as erro:
-        linha.imprimir(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=sem_senha, motivo=erro))
+        linha.pedir(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=sem_senha, motivo=erro))
 
 
 @contextmanager

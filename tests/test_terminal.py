@@ -1,6 +1,15 @@
 import io
 
-from rastro.terminal import AndamentoNoTerminal, LinhaAoVivo, cortar, escrever_tempo
+import pytest
+
+from rastro.terminal import (
+    AndamentoNoTerminal,
+    LinhaAoVivo,
+    cortar,
+    destacar,
+    escrever_tempo,
+    ligar_cores,
+)
 
 
 class RelogioFalso:
@@ -114,3 +123,33 @@ def test_r13_10_fora_do_terminal_a_linha_ao_vivo_nao_escreve_nada() -> None:
         linha.imprimir("página 1")
 
     assert saida.getvalue() == "página 1\n"
+
+
+def test_r24_19_pedido_a_pessoa_sai_destacado_linha_por_linha() -> None:
+    assert destacar("feche a janela\nou aperte Ctrl+C") == (
+        "\x1b[1;33mfeche a janela\x1b[0m\n\x1b[1;33mou aperte Ctrl+C\x1b[0m"
+    )
+
+
+def test_r24_19_no_terminal_com_cores_o_pedido_sai_destacado() -> None:
+    saida = io.StringIO()
+    linha = LinhaAoVivo(saida, ao_vivo=True, cores=True)
+
+    linha.pedir("Aperte Enter aqui.")
+
+    assert saida.getvalue() == "\x1b[1;33mAperte Enter aqui.\x1b[0m\n"
+
+
+def test_r24_19_fora_do_terminal_o_pedido_sai_sem_codigos() -> None:
+    saida = io.StringIO()
+
+    LinhaAoVivo(saida, ao_vivo=False).pedir("Aperte Enter aqui.")
+
+    assert saida.getvalue() == "Aperte Enter aqui.\n"
+
+
+def test_r24_19_no_color_desliga_o_destaque(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("NO_COLOR", "1")
+
+    assert ligar_cores() is False
+    assert LinhaAoVivo(io.StringIO(), ao_vivo=True).cores is False
