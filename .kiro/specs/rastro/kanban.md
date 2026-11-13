@@ -75,6 +75,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **S04** Alinhar a spec com a implementação: hashes do kanban, OSV e NVD entregues, design conferido com o código, sem "MVP" e pasta `specs/rastro` · revisão: todos · 10/11
 - [ ] **T58** Registrar os spikes da gravação com Playwright · extensão · revisão a definir · 13/11
 - [ ] **T59** Especificar a gravação da visita · extensão · revisão a definir · 13/11 · pendente: PRD e pitch (só em PDF)
+- [ ] **T60** Gravar a visita à mão com `rastro gravar` · extensão · revisão a definir · 13/11 · pendente: fechar a janela e Windows (T42)
 
 ## A fazer
 
@@ -106,7 +107,6 @@ _(vazio)_
 
 ### Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo, até 08/12)
 
-- [ ] **T60** Gravar a visita à mão com `rastro gravar` · revisão a definir
 - [ ] **T61** Avisar sobre a sessão gravada no HAR · revisão a definir
 - [ ] **T62** Navegar sozinho com travas · revisão a definir
 - [ ] **T63** Combinar o robô com a navegação da pessoa · revisão a definir

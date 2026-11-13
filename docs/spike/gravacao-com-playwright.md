@@ -98,6 +98,8 @@ No terminal, o Ctrl+C vai para todo o grupo de processos: Python, driver do Play
 
 O robô trata o Ctrl+C com um `signal.signal(SIGINT, ...)` que só marca o pedido de parada; o laço termina a página atual e fecha o contexto.
 
+**Conferido de novo na T60, com o `rastro gravar` real:** com `handle_sigint=False`, o Ctrl+C mandado a todo o grupo grava o HAR e a análise roda. O driver do Playwright (Node) fica no grupo do terminal e sobrevive ao sinal; o navegador o Playwright já abre fora do grupo. **Armadilha de teste:** com `xvfb-run`, o display virtual fica no mesmo grupo, morre com o Ctrl+C e derruba o navegador, e o HAR se perde. Isso não acontece num desktop de verdade. Para testar, rode o `Xvfb` separado (`setsid Xvfb :77 &` e `DISPLAY=:77`).
+
 ## Tempo real
 
 **O Playwright só grava o HAR quando o contexto fecha.** Durante a navegação, o arquivo não existe. Um painel "ao vivo" precisaria ouvir as respostas pelo evento `response` e de um servidor local para o relatório, que hoje é um HTML estático (decisão 05). Fica fora: o progresso no terminal e o replay da visita (R22) cobrem o "ver o rastro".

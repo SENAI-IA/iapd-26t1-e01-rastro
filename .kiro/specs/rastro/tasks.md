@@ -552,18 +552,18 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Requisito: R24
   - Revisão: a definir
 
-- [ ] **T60 Gravar a visita à mão com `rastro gravar`**
+- [x] **T60 Gravar a visita à mão com `rastro gravar`**
   - Entrega: o comando `rastro gravar <url>` abre o Chrome (ou o Edge) pelo Playwright, espera a pessoa fechar a janela, grava o HAR numa pasta nova e roda a análise com as mesmas opções do `analisar`.
   - Aceite: sem o Playwright, sai com 1 e diz o comando de instalação; sem Chrome nem Edge, diz o que instalar; nunca instala nada; o HAR vai para `~/Rastro/gravacoes/<site>/<AAAA-MM-DD_HH-MM-SS>/visita.har`, sem sobrescrever; o import do Playwright só acontece nesse comando.
-  - Arquivos: `rastro/gravacao/`, `rastro/cli.py`, `tests/gravacao/`, `tests/test_cli.py`, `pyproject.toml`
-  - Teste: `test_r24_*`, com o Playwright trocado por dublê.
+  - Arquivos: `rastro/captura/` (`sessao.py`, `pasta.py`, `playwright.py`), `rastro/cli.py`, `tests/captura/`, `tests/test_cli.py`, `pyproject.toml`, `requirements-dev.txt`, `docs/spike/gravacao-com-playwright.md`
+  - Teste: `test_r24_*`, com o Playwright trocado por dublê. A abertura real do navegador e o Ctrl+C foram conferidos à mão no Linux (Juice Shop); fechar a janela e o Windows ficam para a T42.
   - Requisito: R24.1–R24.7, R16.1, R17.1, R20.2
   - Revisão: a definir
 
 - [ ] **T61 Avisar sobre a sessão gravada no HAR**
   - Entrega: o terminal avisa que o HAR gravado pelo comando guarda a sessão (cabeçalhos `Cookie` e `Set-Cookie`), e a checagem de cookie sem dado deixa de mandar "exportar o HAR completo" quando o HAR veio do Playwright.
   - Aceite: o aviso aparece ao fim do `gravar` com o caminho do arquivo; a mensagem das checagens C06–C08 muda conforme a origem do HAR.
-  - Arquivos: `rastro/gravacao/`, `rastro/configuracao/checagens.py`, testes
+  - Arquivos: `rastro/captura/`, `rastro/configuracao/checagens.py`, testes
   - Teste: `test_r24_*`, `test_r06_7_*`
   - Requisito: R24.8, R24.9, R06.7
   - Revisão: a definir
@@ -571,7 +571,7 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
 - [ ] **T62 Navegar sozinho com travas**
   - Entrega: `rastro gravar <url> --robo` navega pelos links do próprio site, com limite de páginas, tempo e profundidade, no máximo 2 páginas por família de URL e sem seguir links de sair, excluir ou com `token=`.
   - Aceite: nunca visita a mesma URL duas vezes; para no primeiro limite atingido e diz qual; o progresso aparece no terminal; Ctrl+C ou fechar a janela param o robô e o HAR é gravado com o que já foi coletado (`handle_sigint=False`).
-  - Arquivos: `rastro/gravacao/robo.py`, `tests/gravacao/test_robo.py`
+  - Arquivos: `rastro/captura/robo.py`, `tests/captura/test_robo.py`
   - Teste: `test_r24_*`, com a navegação trocada por dublê (sem rede).
   - Requisito: R24.10–R24.14
   - Revisão: a definir
@@ -579,7 +579,7 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
 - [ ] **T63 Combinar o robô com a navegação da pessoa**
   - Entrega: no `--robo`, a pessoa faz login antes e aperta Enter para o robô começar; ao fim, a janela fica aberta para ela visitar mais páginas antes de fechar.
   - Aceite: sem Enter, o robô não começa; depois do robô, a gravação só termina quando a janela é fechada.
-  - Arquivos: `rastro/gravacao/`, testes
+  - Arquivos: `rastro/captura/`, testes
   - Teste: `test_r24_*`
   - Requisito: R24.10, R24.15
   - Revisão: a definir

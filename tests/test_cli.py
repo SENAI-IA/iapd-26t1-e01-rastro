@@ -1,7 +1,10 @@
 import json
+import shutil
+import signal
 import subprocess
 import sys
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
@@ -10,6 +13,8 @@ from typing import Any
 import pytest
 
 from rastro import cli
+from rastro.captura.playwright import NavegadorAusente, PlaywrightAusente
+from rastro.captura.sessao import FalhaAoNavegar
 from rastro.cli import AVISO_SEM_IA, executar
 from rastro.fluxo import Analise, analisar
 from rastro.fontes.conector import ConectorDeAvisos
@@ -593,3 +598,193 @@ def test_r17_1_grava_so_o_relatorio_e_nao_altera_o_har(tmp_path: Path) -> None:
         tmp_path / PASTA_DA_LOJA / "relatorio.json",
     ]
     assert HAR_DA_LOJA.read_bytes() == antes
+
+
+class SessaoFalsa:
+    def __init__(
+        self, requisicoes: int = 3, falha_ao_ir: str | None = None, ctrl_c: bool = False
+    ) -> None:
+        self.requisicoes = requisicoes
+        self.scripts = 1
+        self.falha_ao_ir = falha_ao_ir
+        self.ctrl_c = ctrl_c
+        self.urls: list[str] = []
+        self.esperas = 0
+
+    def ir(self, url: str) -> None:
+        self.urls.append(url)
+        if self.falha_ao_ir is not None:
+            raise FalhaAoNavegar(self.falha_ao_ir)
+
+    def links(self) -> list[str]:
+        return []
+
+    def aberta(self) -> bool:
+        return self.esperas < 1000
+
+    def esperar(self, segundos: float) -> None:
+        self.esperas += 1
+        if self.ctrl_c:
+            signal.raise_signal(signal.SIGINT)
+        elif self.esperas >= 2:
+            self.esperas = 1000
+
+
+class GravacaoFalsa:
+    def __init__(self) -> None:
+        self.sessao = SessaoFalsa()
+        self.hars: list[Path] = []
+        self.grava_o_har = True
+        self.erro: Exception | None = None
+
+    @contextmanager
+    def __call__(self, har: Path) -> Iterator[SessaoFalsa]:
+        self.hars.append(har)
+        if self.erro is not None:
+            raise self.erro
+        try:
+            yield self.sessao
+        finally:
+            if self.grava_o_har:
+                shutil.copyfile(HAR_DA_LOJA, har)
+
+
+@pytest.fixture
+def gravacao(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, fontes_falsas: None) -> GravacaoFalsa:
+    falsa = GravacaoFalsa()
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    monkeypatch.setattr(cli, "conferir_playwright", lambda: None)
+    monkeypatch.setattr(cli, "abrir_gravacao", falsa)
+    return falsa
+
+
+def gravar_loja(saida: Path, *opcoes: str) -> int:
+    return executar(["gravar", "https://loja.exemplo.com/", "--saida", str(saida), *opcoes])
+
+
+def pastas_das_gravacoes(raiz: Path) -> list[Path]:
+    return sorted((raiz / "Rastro" / "gravacoes").glob("*/*"))
+
+
+def test_r24_1_gravar_aparece_na_ajuda(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit):
+        executar(["--help"])
+
+    assert "gravar" in capsys.readouterr().out
+
+
+def test_r24_7_grava_a_visita_e_analisa_o_har_gravado(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    saida = tmp_path / "relatorios"
+
+    assert gravar_loja(saida, "--sem-ia", "--nao-abrir") == 0
+
+    assert gravacao.sessao.urls == ["https://loja.exemplo.com/"]
+    [pasta] = pastas_das_gravacoes(tmp_path)
+    assert pasta.parent.name == "loja.exemplo.com"
+    assert gravacao.hars == [pasta / "visita.har"]
+    relatorio = ler_relatorio(saida / PASTA_DA_LOJA / "relatorio.json")
+    assert relatorio["analise"]["har"] == "visita.har"
+    terminal = capsys.readouterr().out
+    assert f"Visita gravada em: {pasta / 'visita.har'}" in terminal
+    assert "feche a janela quando terminar" in terminal
+
+
+def test_r24_2_url_sem_http_encerra_com_1_sem_abrir_o_navegador(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    assert executar(["gravar", "loja.exemplo.com", "--sem-ia"]) == 1
+
+    assert "http:// ou https://" in capsys.readouterr().err
+    assert gravacao.hars == []
+    assert pastas_das_gravacoes(tmp_path) == []
+
+
+def test_r24_3_sem_playwright_encerra_com_1_antes_de_criar_a_pasta(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    gravacao: GravacaoFalsa,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def sem_playwright() -> None:
+        raise PlaywrightAusente()
+
+    monkeypatch.setattr(cli, "conferir_playwright", sem_playwright)
+
+    assert gravar_loja(tmp_path, "--sem-ia") == 1
+
+    assert "pip install playwright" in capsys.readouterr().err
+    assert gravacao.hars == []
+    assert pastas_das_gravacoes(tmp_path) == []
+
+
+def test_r24_4_sem_chrome_nem_edge_encerra_com_1_e_tira_a_pasta_vazia(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravacao.erro = NavegadorAusente()
+
+    assert gravar_loja(tmp_path, "--sem-ia") == 1
+
+    assert "Chrome" in capsys.readouterr().err
+    assert pastas_das_gravacoes(tmp_path) == []
+
+
+@pytest.mark.usefixtures("nenhuma_cli_instalada")
+def test_r24_5_cli_da_ia_ausente_encerra_com_1_antes_de_abrir_o_navegador(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    assert gravar_loja(tmp_path) == 1
+
+    erro = capsys.readouterr().err
+    assert "kiro-cli" in erro
+    assert "--sem-ia" in erro
+    assert gravacao.hars == []
+
+
+def test_r24_7_sem_nenhuma_requisicao_encerra_com_1_sem_relatorio(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravacao.sessao = SessaoFalsa(requisicoes=0)
+    saida = tmp_path / "relatorios"
+
+    assert gravar_loja(saida, "--sem-ia") == 1
+
+    assert "nenhuma requisição foi gravada" in capsys.readouterr().err
+    assert not saida.exists()
+
+
+def test_r24_7_har_que_nao_foi_gravado_encerra_com_1_sem_relatorio(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravacao.grava_o_har = False
+    saida = tmp_path / "relatorios"
+
+    assert gravar_loja(saida, "--sem-ia") == 1
+
+    assert "antes de gravar o HAR" in capsys.readouterr().err
+    assert not saida.exists()
+
+
+def test_r24_7_ctrl_c_encerra_a_gravacao_e_analisa_o_que_foi_gravado(
+    tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravacao.sessao = SessaoFalsa(ctrl_c=True)
+    tratador_original = signal.getsignal(signal.SIGINT)
+    saida = tmp_path / "relatorios"
+
+    assert gravar_loja(saida, "--sem-ia", "--nao-abrir") == 0
+
+    assert gravacao.sessao.esperas == 1
+    assert (saida / PASTA_DA_LOJA / "relatorio.json").is_file()
+    assert signal.getsignal(signal.SIGINT) is tratador_original
+
+
+def test_r24_1_falha_na_primeira_pagina_avisa_e_continua_gravando(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravacao.sessao = SessaoFalsa(falha_ao_ir="net::ERR_CONNECTION_REFUSED")
+
+    assert gravar_loja(tmp_path / "relatorios", "--sem-ia", "--nao-abrir") == 0
+
+    assert "ERR_CONNECTION_REFUSED" in capsys.readouterr().out

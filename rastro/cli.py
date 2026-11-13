@@ -1,14 +1,36 @@
 import argparse
 import os
+import signal
 import sys
 import webbrowser
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from rastro import atalho
 from rastro.acao.plano import ROTULO_DA_PRIORIDADE
+from rastro.captura.pasta import (
+    GravacaoJaExiste,
+    UrlInvalida,
+    caminho_da_gravacao,
+    criar_pasta_da_gravacao,
+    host_da_url,
+    pasta_padrao_das_gravacoes,
+)
+from rastro.captura.playwright import (
+    NavegadorAusente,
+    PlaywrightAusente,
+    abrir_gravacao,
+    conferir_playwright,
+)
+from rastro.captura.sessao import (
+    FalhaAoNavegar,
+    PedidoDeParada,
+    SessaoDeGravacao,
+    esperar_a_janela_fechar,
+)
 from rastro.fluxo import analisar
 from rastro.fontes.github_advisory import GitHubAdvisory
 from rastro.fontes.nvd import Nvd
@@ -81,6 +103,21 @@ TEXTO_TESTE_NO_MESMO_TERMINAL = "Teste com: rastro --help"
 TEXTO_TESTE_NUM_TERMINAL_NOVO = "Abra um terminal novo e teste com: rastro --help"
 TEXTO_DESINSTALADO = "Comando rastro removido."
 TEXTO_NADA_A_REMOVER = "O comando rastro não está instalado."
+AJUDA_GRAVAR = "abre o navegador, grava a visita num HAR e analisa ao fechar a janela"
+TEXTO_GRAVANDO = (
+    "Gravando a visita a {host}. Navegue pelo site como um usuário comum "
+    "e feche a janela quando terminar (ou aperte Ctrl+C aqui)."
+)
+TEXTO_FALHA_NA_PRIMEIRA_PAGINA = (
+    "Não foi possível abrir {url} ({motivo}). A janela continua aberta: "
+    "confira o endereço nela ou feche-a para encerrar."
+)
+TEXTO_HAR_GRAVADO = "Visita gravada em: {har}"
+TEXTO_NADA_GRAVADO = (
+    "nenhuma requisição foi gravada: a janela foi fechada antes de o site carregar. "
+    "Nenhum relatório foi gerado."
+)
+TEXTO_HAR_PERDIDO = "o navegador fechou antes de gravar o HAR. Nenhum relatório foi gerado."
 PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
     "kiro": ProvedorKiro,
     "claude": ProvedorClaude,
@@ -97,15 +134,17 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         description="Analisa um HAR e grava o relatório numa pasta nova.",
     )
     analisar_har.add_argument("har", type=Path, help="arquivo HAR exportado do navegador")
-    analisar_har.add_argument("--ia", metavar="NOME", help=AJUDA_IA)
-    analisar_har.add_argument("--sem-ia", action="store_true", help=AJUDA_SEM_IA)
-    analisar_har.add_argument(
-        "--saida",
-        type=Path,
-        metavar="PASTA",
-        help="pasta dos relatórios (padrão: Rastro/relatorios na pasta do usuário)",
+    adicionar_opcoes_da_analise(analisar_har)
+    gravar = comandos.add_parser(
+        "gravar",
+        help=AJUDA_GRAVAR,
+        description=(
+            "Abre o Chrome (ou o Edge) da máquina na URL, grava num HAR tudo o que o "
+            "navegador receber e analisa ao fechar a janela. Precisa do Playwright."
+        ),
     )
-    analisar_har.add_argument("--nao-abrir", action="store_true", help=AJUDA_NAO_ABRIR)
+    gravar.add_argument("url", help="endereço do site, com http:// ou https://")
+    adicionar_opcoes_da_analise(gravar)
     comandos.add_parser(
         "como-usar",
         help=AJUDA_COMO_USAR,
@@ -122,6 +161,18 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         description="Remove o comando rastro. O projeto e os relatórios ficam.",
     )
     return leitor
+
+
+def adicionar_opcoes_da_analise(comando: argparse.ArgumentParser) -> None:
+    comando.add_argument("--ia", metavar="NOME", help=AJUDA_IA)
+    comando.add_argument("--sem-ia", action="store_true", help=AJUDA_SEM_IA)
+    comando.add_argument(
+        "--saida",
+        type=Path,
+        metavar="PASTA",
+        help="pasta dos relatórios (padrão: Rastro/relatorios na pasta do usuário)",
+    )
+    comando.add_argument("--nao-abrir", action="store_true", help=AJUDA_NAO_ABRIR)
 
 
 def principal() -> None:
@@ -141,6 +192,8 @@ def executar(argumentos: list[str] | None = None) -> int:
     if opcoes.comando == "desinstalar":
         return desinstalar_comando()
     abrir = not opcoes.nao_abrir
+    if opcoes.comando == "gravar":
+        return gravar_e_analisar(opcoes.url, opcoes.saida, opcoes.ia, opcoes.sem_ia, abrir)
     if opcoes.sem_ia:
         return analisar_sem_ia(opcoes.har, opcoes.saida, abrir)
     return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia, abrir)
@@ -218,6 +271,63 @@ def analisar_com_ia(
         return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
     avisar_analise_com_ia(ia)
     return analisar_e_gravar(caminho_har, saida, ia, abrir)
+
+
+def gravar_e_analisar(
+    url: str, saida: Path | None, opcao_ia: str | None, sem_ia: bool, abrir: bool
+) -> int:
+    try:
+        host = host_da_url(url)
+        ia = None if sem_ia else montar_cliente_de_ia(opcao_ia)
+        conferir_playwright()
+        pasta = caminho_da_gravacao(pasta_padrao_das_gravacoes(), host, datetime.now())
+        har = criar_pasta_da_gravacao(pasta)
+    except CliDaIaAusente as erro:
+        return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
+    except (UrlInvalida, IaInvalida, PlaywrightAusente, GravacaoJaExiste) as erro:
+        return encerrar_com_erro(str(erro))
+    try:
+        requisicoes = gravar_visita(url, host, har)
+    except NavegadorAusente as erro:
+        pasta.rmdir()
+        return encerrar_com_erro(str(erro))
+    if requisicoes == 0:
+        return encerrar_com_erro(TEXTO_NADA_GRAVADO)
+    if not har.is_file():
+        return encerrar_com_erro(TEXTO_HAR_PERDIDO)
+    print(TEXTO_HAR_GRAVADO.format(har=har))
+    print()
+    if ia is None:
+        return analisar_sem_ia(har, saida, abrir)
+    avisar_analise_com_ia(ia)
+    return analisar_e_gravar(har, saida, ia, abrir)
+
+
+def gravar_visita(url: str, host: str, har: Path) -> int:
+    parada = PedidoDeParada()
+    with ctrl_c_pede_parada(parada), abrir_gravacao(har) as sessao:
+        print(TEXTO_GRAVANDO.format(host=host))
+        abrir_primeira_pagina(sessao, url)
+        esperar_a_janela_fechar(sessao, parada)
+        requisicoes = sessao.requisicoes
+    return requisicoes
+
+
+def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str) -> None:
+    try:
+        sessao.ir(url)
+    except FalhaAoNavegar as erro:
+        print(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=url, motivo=erro))
+
+
+@contextmanager
+def ctrl_c_pede_parada(parada: PedidoDeParada) -> Iterator[None]:
+    """O Ctrl+C só pede a parada, para o HAR ser gravado com o que já foi visitado."""
+    original = signal.signal(signal.SIGINT, lambda *_: parada.pedir("Ctrl+C"))
+    try:
+        yield
+    finally:
+        signal.signal(signal.SIGINT, original)
 
 
 def montar_cliente_de_ia(opcao_ia: str | None) -> ClienteDeIA:
