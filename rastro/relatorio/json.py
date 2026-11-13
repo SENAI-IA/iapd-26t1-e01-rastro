@@ -30,8 +30,11 @@ TEXTO_CONTINUA_IGUAL_SEM_IA = (
 )
 TEXTO_SEM_JAVASCRIPT = (
     "Nenhuma resposta do HAR trouxe conteúdo JavaScript, então nenhuma biblioteca pôde ser "
-    "analisada. O HAR pode ter sido gravado sem o conteúdo das respostas, ou o site não "
-    "carrega scripts. As checagens de cabeçalhos e cookies foram feitas."
+    "analisada. O HAR pode ter sido exportado com um filtro na aba Rede (como Fetch/XHR), "
+    "que deixa os scripts fora do arquivo, ou gravado com o cache ligado, que grava os "
+    "scripts sem o conteúdo. Também pode ser que o site não carregue scripts. Grave de novo "
+    "com o filtro em Todos e o cache desativado. As checagens de cabeçalhos e cookies foram "
+    "feitas."
 )
 CONSEQUENCIA_DA_IA_QUE_FALHOU = {
     "identificar_bibliotecas": (
