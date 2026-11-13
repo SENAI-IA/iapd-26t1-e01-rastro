@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 from rastro.har.modelos import Requisicao
 from rastro.har.site import descobrir_site_analisado
 
@@ -61,3 +63,14 @@ def test_r01_7_har_vazio_devolve_none() -> None:
 
 def test_r01_7_html_sem_host_na_url_devolve_none() -> None:
     assert descobrir_site_analisado([requisicao("about:blank", "text/html")]) is None
+
+
+def test_r01_7_usa_a_pagina_do_har_antes_do_primeiro_html() -> None:
+    pixel = requisicao("https://www.google.com/rmkt/collect/1/", "text/html")
+    api = requisicao("https://cursos.exemplo.org.br/api/layout", "text/html")
+    requisicoes = [
+        replace(pixel, url_da_pagina="https://cursos.exemplo.org.br/"),
+        replace(api, url_da_pagina="https://cursos.exemplo.org.br/busca"),
+    ]
+
+    assert descobrir_site_analisado(requisicoes) == "cursos.exemplo.org.br"

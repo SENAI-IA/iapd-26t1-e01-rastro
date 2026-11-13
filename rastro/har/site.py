@@ -7,6 +7,9 @@ MARCADOR_DA_QUERY_REMOVIDA = "[removido]"
 
 def descobrir_site_analisado(requisicoes: list[Requisicao]) -> str | None:
     for requisicao in requisicoes:
+        if requisicao.url_da_pagina:
+            return host_com_porta(requisicao.url_da_pagina)
+    for requisicao in requisicoes:
         if e_pagina_html(requisicao):
             return host_com_porta(requisicao.url)
     return None

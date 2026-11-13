@@ -22,3 +22,4 @@ class Requisicao:
     conteudo: str | None
     inicio: datetime | None = None
     duracao_ms: float | None = None
+    url_da_pagina: str | None = None

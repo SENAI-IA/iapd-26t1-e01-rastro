@@ -42,7 +42,7 @@ Cada requisito tem uma história e critérios de aceite em **EARS** (Easy Approa
 4. QUANDO o conteúdo de uma resposta vier em base64, o Rastro DEVE decodificá-lo antes de analisar.
 5. O Rastro DEVE abrir o HAR só para leitura e nunca alterá-lo.
 6. SE nenhuma resposta do HAR trouxer conteúdo JavaScript, ENTÃO o Rastro DEVE seguir com as checagens e avisar no relatório que nenhuma biblioteca pôde ser analisada e por quê.
-7. O Rastro DEVE considerar como **site analisado** o host da primeira resposta HTML do HAR que não seja redirecionamento.
+7. O Rastro DEVE considerar como **site analisado** o host da página da primeira requisição, quando o HAR traz a URL dela em `log.pages` (título com URL, como o Chrome grava). Sem essa URL, vale o host da primeira resposta HTML que não seja redirecionamento. A página vem antes porque o HAR gravado depois do carregamento não tem o documento principal, e a primeira resposta HTML pode ser um pixel de terceiro.
 
 ## R02 Identificar bibliotecas por assinatura (RF02)
 

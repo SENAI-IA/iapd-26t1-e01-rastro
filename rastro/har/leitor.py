@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from rastro.har.modelos import Cookie, Requisicao
 
@@ -26,9 +27,11 @@ class HarInvalido(ErroAoLerHar):
 
 def ler_har(caminho: Path) -> list[Requisicao]:
     har = carregar_json(caminho)
+    entradas = extrair_entradas(har)
+    urls_das_paginas = ler_urls_das_paginas(har["log"])
     requisicoes = []
-    for indice, entrada in enumerate(extrair_entradas(har)):
-        requisicoes.append(converter_entrada(indice, entrada))
+    for indice, entrada in enumerate(entradas):
+        requisicoes.append(converter_entrada(indice, entrada, urls_das_paginas))
     return requisicoes
 
 
@@ -81,7 +84,29 @@ def lista_de_objetos(valor: Any) -> bool:
     return isinstance(valor, list) and all(isinstance(item, dict) for item in valor)
 
 
-def converter_entrada(indice: int, entrada: dict[str, Any]) -> Requisicao:
+def ler_urls_das_paginas(log: dict[str, Any]) -> dict[str, str]:
+    paginas = log.get("pages")
+    if not isinstance(paginas, list):
+        return {}
+    urls: dict[str, str] = {}
+    for pagina in paginas:
+        if not isinstance(pagina, dict):
+            continue
+        identificador = pagina.get("id")
+        titulo = pagina.get("title")
+        if isinstance(identificador, str) and isinstance(titulo, str) and e_url_web(titulo):
+            urls[identificador] = titulo
+    return urls
+
+
+def e_url_web(texto: str) -> bool:
+    partes = urlsplit(texto.strip())
+    return partes.scheme in ("http", "https") and bool(partes.netloc)
+
+
+def converter_entrada(
+    indice: int, entrada: dict[str, Any], urls_das_paginas: dict[str, str]
+) -> Requisicao:
     pedido = entrada["request"]
     resposta = entrada["response"]
     cabecalhos = ler_cabecalhos(resposta)
@@ -97,6 +122,7 @@ def converter_entrada(indice: int, entrada: dict[str, Any]) -> Requisicao:
         conteudo=ler_conteudo(conteudo_da_resposta),
         inicio=ler_inicio(entrada),
         duracao_ms=ler_duracao_ms(entrada),
+        url_da_pagina=urls_das_paginas.get(str(entrada.get("pageref"))),
     )
 
 

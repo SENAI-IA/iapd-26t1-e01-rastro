@@ -242,3 +242,37 @@ def test_r01_5_abre_o_har_so_no_modo_de_leitura(monkeypatch: pytest.MonkeyPatch)
     ler_har(DADOS / "har-valido.har")
 
     assert modos_usados == ["r"]
+
+
+def test_r01_7_guarda_a_url_da_pagina_quando_o_titulo_e_uma_url(tmp_path: Path) -> None:
+    caminho = tmp_path / "paginas.har"
+    entrada = {
+        "request": {"url": "https://www.google.com/rmkt/collect/1/", "method": "GET"},
+        "response": {"status": 200, "headers": [], "cookies": [], "content": {}},
+    }
+    caminho.write_text(
+        json.dumps(
+            {
+                "log": {
+                    "pages": [
+                        {"id": "page_1", "title": "https://cursos.exemplo.org.br/"},
+                        {"id": "page_2", "title": "Cursos de exemplo"},
+                    ],
+                    "entries": [
+                        {**entrada, "pageref": "page_1"},
+                        {**entrada, "pageref": "page_2"},
+                        entrada,
+                    ],
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    requisicoes = ler_har(caminho)
+
+    assert [requisicao.url_da_pagina for requisicao in requisicoes] == [
+        "https://cursos.exemplo.org.br/",
+        None,
+        None,
+    ]
