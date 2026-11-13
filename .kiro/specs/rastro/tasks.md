@@ -576,12 +576,12 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Requisito: R24.10–R24.14
   - Revisão: a definir
 
-- [ ] **T63 Combinar o robô com a navegação da pessoa**
-  - Entrega: no `--robo`, a pessoa faz login antes e aperta Enter para o robô começar; ao fim, a janela fica aberta para ela visitar mais páginas antes de fechar.
-  - Aceite: sem Enter, o robô não começa; depois do robô, a gravação só termina quando a janela é fechada.
-  - Arquivos: `rastro/captura/`, testes
+- [x] **T63 Combinar o robô com a navegação da pessoa**
+  - Entrega: no `--robo`, a pessoa faz login antes e aperta Enter para o robô começar, depois de um aviso sobre usar o robô logado em produção; ao fim, a janela fica aberta para ela visitar mais páginas antes de fechar.
+  - Aceite: sem Enter, o robô não começa; Ctrl+C ou janela fechada antes do Enter encerram a gravação sem robô; o aviso recomenda o modo manual para usuário com permissão ou dados sensíveis; depois do robô, a gravação só termina quando a janela é fechada.
+  - Arquivos: `rastro/captura/sessao.py`, `rastro/cli.py`, `tests/captura/test_sessao.py`, `tests/test_cli.py`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`
   - Teste: `test_r24_*`
-  - Requisito: R24.10, R24.15
+  - Requisito: R24.10, R24.15, R24.16
   - Revisão: a definir
 
 - [ ] **T64 Ensinar a gravar a visita**

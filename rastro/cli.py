@@ -32,6 +32,7 @@ from rastro.captura.sessao import (
     PedidoDeParada,
     SessaoDeGravacao,
     esperar_a_janela_fechar,
+    esperar_o_enter,
 )
 from rastro.fluxo import analisar
 from rastro.fontes.github_advisory import GitHubAdvisory
@@ -117,6 +118,18 @@ TEXTO_FALHA_NA_PRIMEIRA_PAGINA = (
 AJUDA_ROBO = (
     "o Rastro navega sozinho pelos links do site (só links, nunca botões nem formulários), "
     "com limite de páginas, tempo e cliques"
+)
+AVISO_ANTES_DO_ROBO = (
+    "Antes de o robô começar: se o site pede login, entre agora na janela aberta e depois "
+    "aperte Enter aqui. Para o robô navegar sem login, só aperte Enter.\n"
+    "Cuidado em sistema de produção: o robô só segue links, mas um link comum pode "
+    "disparar uma ação (aprovar, arquivar, enviar). Se o usuário tem permissão de "
+    "administrador ou acesso a dados sensíveis, não entre com ele para o robô: grave sem "
+    "--robo e navegue você mesmo."
+)
+TEXTO_JANELA_CONTINUA_ABERTA = (
+    "A janela continua aberta: visite mais alguma página importante (como uma tela que fica "
+    "longe da inicial) e feche a janela para analisar. Ctrl+C aqui também encerra."
 )
 TEXTO_ROBO_COMECOU = (
     "O robô vai navegar pelos links de {host}: até {paginas} páginas, {minutos:g} minutos "
@@ -352,6 +365,10 @@ def gravar_visita(url: str, host: str, har: Path, robo: bool) -> int:
 def navegar_com_o_robo(
     sessao: SessaoDeGravacao, parada: PedidoDeParada, url: str, host: str
 ) -> None:
+    abrir_primeira_pagina(sessao, url)
+    print(AVISO_ANTES_DO_ROBO)
+    if not esperar_o_enter(sessao, parada, ler_enter):
+        return
     limites = LIMITES_PADRAO
     print(
         TEXTO_ROBO_COMECOU.format(
@@ -363,6 +380,14 @@ def navegar_com_o_robo(
     )
     robo = Robo(sessao, parada, time.monotonic, mostrar_passo_do_robo, limites)
     mostrar_fim_do_robo(robo.navegar(url))
+    if parada.motivo is not None:
+        return
+    print(TEXTO_JANELA_CONTINUA_ABERTA)
+    esperar_a_janela_fechar(sessao, parada)
+
+
+def ler_enter() -> str:
+    return input()
 
 
 def mostrar_passo_do_robo(passo: PassoDoRobo) -> None:

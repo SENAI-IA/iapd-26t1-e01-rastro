@@ -720,7 +720,7 @@ Ordem no `cli.py`, para nada abrir antes de tudo estar pronto:
 2. Importa o Playwright (`captura/playwright.py`). Sem ele, `PlaywrightAusente` com o comando `"<sys.executable>" -m pip install playwright==<versão conferida>` (R24.3). O caminho do Python vem no comando porque o atalho `rastro` usa o Python do sistema, e não o `.venv` (decisão 11).
 3. Cria a pasta nova da gravação (R24.6).
 4. Abre a sessão: `launch(channel="chrome")`, e `msedge` se o Chrome faltar (R24.4), com `headless=False` e `handle_sigint=False`. O contexto grava com `record_har_path` e `record_har_mode="minimal"`, o mesmo do `playwright open --save-har`.
-5. À mão: espera a janela fechar. Com `--robo`: espera o Enter, roda o robô e, se ele parou por limite, espera a janela fechar (R24.15).
+5. À mão: espera a janela fechar. Com `--robo`: abre a URL, mostra o aviso de produção (R24.16), espera o Enter, roda o robô e, se ele parou por limite, espera a janela fechar (R24.15). O Enter é lido numa thread (`esperar_o_enter`): um `input()` parado não sai com o Ctrl+C, e a espera em fatias vê o Ctrl+C e a janela fechada.
 6. Fecha o contexto, o que grava o HAR, mostra o caminho e o aviso da sessão (R24.8) e chama o mesmo `analisar_e_gravar` do `analisar`.
 
 ### Ctrl+C

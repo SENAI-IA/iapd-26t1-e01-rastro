@@ -3,6 +3,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import threading
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import replace
@@ -614,6 +615,7 @@ class SessaoFalsa:
         self.ctrl_c = ctrl_c
         self.urls: list[str] = []
         self.esperas = 0
+        self.urls_antes_de_fechar = 1
 
     def ir(self, url: str) -> None:
         self.urls.append(url)
@@ -633,7 +635,7 @@ class SessaoFalsa:
         self.esperas += 1
         if self.ctrl_c:
             signal.raise_signal(signal.SIGINT)
-        elif self.esperas >= 2:
+        elif self.esperas >= 2 and len(self.urls) >= self.urls_antes_de_fechar:
             self.esperas = 1000
 
 
@@ -824,9 +826,23 @@ def test_r24_9_sem_cookies_na_gravacao_nao_pede_o_har_completo(
     assert not any("HAR completo" in c["detalhe"] for c in de_cookie)
 
 
+@pytest.fixture
+def enter(monkeypatch: pytest.MonkeyPatch) -> list[str]:
+    lidos: list[str] = []
+
+    def apertar_enter() -> str:
+        lidos.append("")
+        return ""
+
+    monkeypatch.setattr(cli, "ler_enter", apertar_enter)
+    return lidos
+
+
+@pytest.mark.usefixtures("enter")
 def test_r24_14_robo_mostra_o_progresso_e_por_que_parou(
     capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
 ) -> None:
+    gravacao.sessao.urls_antes_de_fechar = 2
     saida = tmp_path / "relatorios"
 
     assert gravar_loja(saida, "--robo", "--sem-ia", "--nao-abrir") == 0
@@ -835,5 +851,59 @@ def test_r24_14_robo_mostra_o_progresso_e_por_que_parou(
     assert "O robô vai navegar pelos links de loja.exemplo.com" in terminal
     assert "páginas 1/20 · requisições 3 · scripts 1" in terminal
     assert "O robô parou: nenhum link novo" in terminal
-    assert gravacao.sessao.esperas == 0
+    assert (saida / PASTA_DA_LOJA / "relatorio.json").is_file()
+
+
+def test_r24_10_robo_avisa_sobre_login_e_espera_o_enter(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    gravacao: GravacaoFalsa,
+    enter: list[str],
+) -> None:
+    gravacao.sessao.urls_antes_de_fechar = 2
+
+    assert gravar_loja(tmp_path / "relatorios", "--robo", "--sem-ia", "--nao-abrir") == 0
+
+    terminal = capsys.readouterr().out
+    assert enter == [""]
+    assert terminal.index("entre agora na janela aberta") < terminal.index("O robô vai navegar")
+    assert "Cuidado em sistema de produção" in terminal
+    assert "grave sem --robo e navegue você mesmo" in terminal
+
+
+@pytest.mark.usefixtures("enter")
+def test_r24_15_depois_do_robo_a_janela_fica_aberta_ate_fechar(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, gravacao: GravacaoFalsa
+) -> None:
+    gravacao.sessao.urls_antes_de_fechar = 2
+
+    assert gravar_loja(tmp_path / "relatorios", "--robo", "--sem-ia", "--nao-abrir") == 0
+
+    terminal = capsys.readouterr().out
+    assert terminal.index("O robô parou") < terminal.index("A janela continua aberta")
+    assert gravacao.sessao.esperas == 1000
+    assert gravacao.sessao.urls == ["https://loja.exemplo.com/"] * 2
+
+
+def test_r24_10_ctrl_c_antes_do_enter_nao_roda_o_robo_e_analisa(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    gravacao: GravacaoFalsa,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sem_enter = threading.Event()
+
+    def nunca_aperta() -> str:
+        sem_enter.wait(5)
+        return ""
+
+    monkeypatch.setattr(cli, "ler_enter", nunca_aperta)
+    gravacao.sessao = SessaoFalsa(ctrl_c=True)
+    saida = tmp_path / "relatorios"
+
+    assert gravar_loja(saida, "--robo", "--sem-ia", "--nao-abrir") == 0
+
+    sem_enter.set()
+    assert "O robô vai navegar" not in capsys.readouterr().out
+    assert gravacao.sessao.urls == ["https://loja.exemplo.com/"]
     assert (saida / PASTA_DA_LOJA / "relatorio.json").is_file()
