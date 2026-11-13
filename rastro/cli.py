@@ -2,7 +2,8 @@ import argparse
 import os
 import sys
 import webbrowser
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -140,11 +141,35 @@ def executar(argumentos: list[str] | None = None) -> int:
 
 def abrir_como_usar() -> int:
     caminho = caminho_do_modelo()
-    if webbrowser.open(caminho.as_uri()):
+    with saida_do_terminal_silenciada():
+        aberto = webbrowser.open(caminho.as_uri())
+    if aberto:
         print(TEXTO_COMO_USAR_ABERTO.format(caminho=caminho))
     else:
         print(TEXTO_COMO_USAR_SEM_NAVEGADOR.format(caminho=caminho))
     return 0
+
+
+@contextmanager
+def saida_do_terminal_silenciada() -> Iterator[None]:
+    """Manda para o nada o que o navegador escreve no terminal.
+
+    O navegador herda o terminal de quem o abre e, já aberto, escreve avisos
+    como "Abrindo em uma sessão de navegador existente." e erros internos do Chrome.
+    """
+    sys.stdout.flush()
+    sys.stderr.flush()
+    originais = [(descritor, os.dup(descritor)) for descritor in (1, 2)]
+    nada = os.open(os.devnull, os.O_WRONLY)
+    try:
+        for descritor, _ in originais:
+            os.dup2(nada, descritor)
+        yield
+    finally:
+        for descritor, original in originais:
+            os.dup2(original, descritor)
+            os.close(original)
+        os.close(nada)
 
 
 def instalar_comando() -> int:

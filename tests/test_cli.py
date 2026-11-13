@@ -170,6 +170,26 @@ def test_r23_8_como_usar_nao_grava_nada(tmp_path: Path, monkeypatch: pytest.Monk
     assert list(tmp_path.iterdir()) == []
 
 
+def test_r23_8_como_usar_nao_deixa_o_navegador_escrever_no_terminal(
+    capfd: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def navegador_que_avisa(endereco: str) -> bool:
+        subprocess.run(
+            [sys.executable, "-c", "import sys; print('aviso'); print('erro', file=sys.stderr)"],
+            check=True,
+        )
+        return True
+
+    monkeypatch.setattr("webbrowser.open", navegador_que_avisa)
+
+    executar(["como-usar"])
+
+    saida = capfd.readouterr()
+    assert "aviso" not in saida.out
+    assert "erro" not in saida.err
+    assert "aberto no navegador" in saida.out
+
+
 @pytest.mark.usefixtures("fontes_falsas")
 def test_r13_1_analisar_sem_ia_grava_o_json_na_pasta_da_analise(tmp_path: Path) -> None:
     assert analisar_loja(tmp_path) == 0
