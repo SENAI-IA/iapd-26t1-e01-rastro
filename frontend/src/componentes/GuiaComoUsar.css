@@ -49,6 +49,60 @@
   transition: width 0.5s ease;
 }
 
+.guia__modos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.guia__modos legend {
+  margin-bottom: 10px;
+  padding: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.guia__modo {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  cursor: pointer;
+}
+
+.guia__modo input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.guia__modo:has(input:focus-visible) {
+  outline: 2px solid var(--cor-destaque);
+  outline-offset: 2px;
+}
+
+.guia__modo--escolhido {
+  border-color: var(--cor-destaque);
+  box-shadow: inset 0 0 0 1px var(--cor-destaque);
+}
+
+.guia__modo-titulo {
+  font-weight: 600;
+}
+
+.guia__modo-resumo {
+  color: var(--cor-texto-suave);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 .guia__caixa {
   padding: 18px 20px;
   border: 1px solid var(--cor-linha);
@@ -122,6 +176,10 @@
 }
 
 @media (max-width: 760px) {
+  .guia__modos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .guia__grade {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -18,6 +18,7 @@ Ordem: spike → núcleo determinístico → relatório HTML → explicação po
 | 3. IA | 30/11–04/12 | T33–T41, T52 |
 | 4. Entregar | 04–08/12 | T42–T48 |
 | Extensão: OSV e NVD (só se houver tempo) | até 02/12 | T49–T51 |
+| Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo) | até 08/12 | T58–T65 |
 
 Meta interna: tudo pronto em 08/12. Entrega: 10/12/2026, 23h59.
 
@@ -35,7 +36,7 @@ O Paulo escreve todas as tasks com o agente e é o autor dos commits. Os revisor
 
 ## Como cada task chega ao `main`
 
-Direto no `main`, sem branch e sem MR, uma task por vez:
+Direto no `main`, sem branch e sem MR, uma task por vez. A exceção é a extensão "Gravar a visita" (T58–T65), na branch `feat/gravar` (ver o fim desta lista):
 
 1. **Antes do commit:** `ruff check`, `mypy rastro` e `pytest` passam na máquina local.
 2. **Um commit por task**, autocontido (funciona sozinho), com o código, os testes, o `[x]` nesta lista e o cartão movido para "Em revisão" no kanban. Push logo depois.
@@ -527,3 +528,74 @@ Começa só se as fases 1 e 2 estiverem fechadas. Prazo limite: 02/12. O que nã
   - Teste: `test_r04a_3_*` a `test_r04a_5_*`
   - Requisito: R04A.3–R04A.5
   - Revisão: @geison.santos
+
+## Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo)
+
+O auditor grava o HAR pelo próprio Rastro, sem DevTools: abre um navegador, navega (à mão ou com um robô com travas) e a análise roda ao fechar. Base: os spikes de 13/11 (T58). Corre na branch `feat/gravar` e volta ao `main` por merge, sem rebase. Prazo limite: 08/12. O que não fechar fica nos planos futuros. T58 a T61 já entregam a gravação manual; T62 e T63 são o robô.
+
+Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher quem revisa.
+
+- [x] **T58 Registrar os spikes da gravação com Playwright**
+  - Entrega: `docs/spike/gravacao-com-playwright.md` com o que os dois spikes de 13/11 mostraram.
+  - Aceite: o documento traz como foi feito, os números contra o gabarito (Juice Shop, WebGoat, Drupal), o formato do HAR do Playwright (`mode: "minimal"`, sem `log.pages`, cookies só nos cabeçalhos), o tamanho do download, o Ctrl+C que perdia o HAR e o que fica para conferir no Windows.
+  - Arquivos: `docs/spike/gravacao-com-playwright.md`
+  - Teste: não se aplica.
+  - Requisito: base para R24
+  - Revisão: a definir
+
+- [x] **T59 Especificar a gravação da visita**
+  - Entrega: R24 no `requirements.md`, seção nova no `design.md` e a decisão 12 (o Rastro abre um navegador que a pessoa controla, com Playwright opcional).
+  - Aceite: R24 cobre o comando, as dependências que faltam, a pasta da gravação, o aviso sobre a sessão no HAR, a análise ao fim, o robô e suas travas; o `product.md` e o `tech.md` deixam de pôr o Playwright como fora do escopo e explicam a exceção à dependência zero e à regra de rede; o PRD e o pitch acompanham.
+  - Arquivos: `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`, `.kiro/specs/rastro/dependencias.md`, `docs/decisoes/12-gravar-com-playwright.md`, `.kiro/steering/product.md`, `.kiro/steering/tech.md`, `.kiro/steering/structure.md`
+  - Pendente: o PRD (`docs/prd.pdf`) e o pitch só existem em PDF, sem o fonte no repositório; ficam para quando o grupo decidir entregar a extensão.
+  - Teste: não se aplica.
+  - Requisito: R24
+  - Revisão: a definir
+
+- [x] **T60 Gravar a visita à mão com `rastro gravar`**
+  - Entrega: o comando `rastro gravar <url>` abre o Chrome (ou o Edge) pelo Playwright, espera a pessoa fechar a janela, grava o HAR numa pasta nova e roda a análise com as mesmas opções do `analisar`.
+  - Aceite: sem o Playwright, sai com 1 e diz o comando de instalação; sem Chrome nem Edge, diz o que instalar; nunca instala nada; o HAR vai para `~/Rastro/gravacoes/<site>/<AAAA-MM-DD_HH-MM-SS>/visita.har`, sem sobrescrever; o import do Playwright só acontece nesse comando.
+  - Arquivos: `rastro/captura/` (`sessao.py`, `pasta.py`, `playwright.py`), `rastro/cli.py`, `tests/captura/`, `tests/test_cli.py`, `pyproject.toml`, `requirements-dev.txt`, `docs/spike/gravacao-com-playwright.md`
+  - Teste: `test_r24_*`, com o Playwright trocado por dublê. A abertura real do navegador e o Ctrl+C foram conferidos à mão no Linux (Juice Shop); fechar a janela e o Windows ficam para a T42.
+  - Requisito: R24.1–R24.7, R16.1, R17.1, R20.2
+  - Revisão: a definir
+
+- [x] **T61 Avisar sobre a sessão gravada no HAR**
+  - Entrega: o terminal avisa que o HAR gravado pelo comando guarda a sessão (cabeçalhos `Cookie` e `Set-Cookie`), e a checagem de cookie sem dado deixa de mandar "exportar o HAR completo" quando o HAR veio do `gravar`.
+  - Aceite: o aviso aparece ao fim do `gravar`, logo depois do caminho do arquivo; a mensagem das checagens C06–C08 muda só no HAR do `gravar` (o `analisar` continua igual).
+  - Arquivos: `rastro/cli.py`, `rastro/fluxo.py`, `rastro/configuracao/checagens.py`, `tests/test_cli.py`, `tests/configuracao/test_checagens.py`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`
+  - Teste: `test_r24_*`, `test_r06_7_*`
+  - Requisito: R24.8, R24.9, R06.7
+  - Revisão: a definir
+
+- [x] **T62 Navegar sozinho com travas**
+  - Entrega: `rastro gravar <url> --robo` navega pelos links do próprio site, com limite de páginas, tempo e profundidade, no máximo 2 páginas por família de URL e sem seguir links de sair, excluir ou com `token=`.
+  - Aceite: nunca visita a mesma URL duas vezes; para no primeiro limite atingido e diz qual; o progresso aparece no terminal; Ctrl+C ou fechar a janela param o robô e o HAR é gravado com o que já foi coletado (`handle_sigint=False`).
+  - Arquivos: `rastro/captura/robo.py`, `rastro/captura/sessao.py`, `rastro/captura/playwright.py`, `rastro/cli.py`, `tests/captura/test_robo.py`, `tests/test_cli.py`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`
+  - Teste: `test_r24_*`, com a navegação trocada por dublê (sem rede).
+  - Requisito: R24.10–R24.14
+  - Revisão: a definir
+
+- [x] **T63 Combinar o robô com a navegação da pessoa**
+  - Entrega: no `--robo`, a pessoa faz login antes e aperta Enter para o robô começar, depois de um aviso sobre usar o robô logado em produção; ao fim, a janela fica aberta para ela visitar mais páginas antes de fechar.
+  - Aceite: sem Enter, o robô não começa; Ctrl+C ou janela fechada antes do Enter encerram a gravação sem robô; o aviso recomenda o modo manual para usuário com permissão ou dados sensíveis; depois do robô, a gravação só termina quando a janela é fechada.
+  - Arquivos: `rastro/captura/sessao.py`, `rastro/cli.py`, `tests/captura/test_sessao.py`, `tests/test_cli.py`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`
+  - Teste: `test_r24_*`
+  - Requisito: R24.10, R24.15, R24.16
+  - Revisão: a definir
+
+- [x] **T64 Ensinar a gravar a visita**
+  - Entrega: README, README técnico e a tela "Como usar" com o `gravar`, nos comandos de Linux e de Windows.
+  - Aceite: o passo a passo instala o Playwright e grava uma visita do zero nos dois sistemas; a tela "Como usar" deixa escolher o jeito de gravar (DevTools, o Rastro grava, o robô navega) e mostra só os passos dele (R24.17). Linux conferido; Windows na T42.
+  - Arquivos: `README.md`, `README-TECNICO.md`, `frontend/src/dados/guia.ts`, `frontend/src/dados/tour.ts`, `frontend/src/componentes/GuiaComoUsar.tsx`, `frontend/src/componentes/AnimacaoDoModo.tsx`, `frontend/src/componentes/IlustracaoDoGuia.tsx`, `rastro/relatorio/modelo.html`, `.kiro/specs/rastro/requirements.md` (painel ao vivo nos planos futuros)
+  - Teste: verificação manual.
+  - Requisito: R24 (R24.17), R20.1
+  - Revisão: a definir
+
+- [x] **T65 Mostrar no terminal que o Rastro está trabalhando**
+  - Entrega: a análise mostra a etapa (`[3/7]`), os itens e o tempo; o `gravar` mostra numa linha ao vivo se está abrindo, gravando, com o robô ou salvando, e destaca o que a pessoa precisa fazer.
+  - Aceite: num terminal, a linha gira e o tempo corre enquanto a IA ou a rede respondem, e cada etapa fica com `ok`; com a saída num arquivo, só os nomes das etapas, sem códigos de controle; conferido num pseudo-terminal com a análise do `loja.har` e com um `gravar` de verdade (Chrome, site local, Ctrl+C).
+  - Arquivos: `rastro/andamento.py`, `rastro/terminal.py`, `rastro/fluxo.py`, `rastro/cli.py`, `rastro/travas/conferencia.py`, `rastro/fontes/consulta.py`, `rastro/identificacao/ia.py`, `rastro/explicacao/ia.py`, `tests/test_terminal.py`, `tests/test_fluxo.py`, `tests/test_cli.py`, `README.md`, `README-TECNICO.md`, `frontend/src/dados/guia.ts`, `rastro/relatorio/modelo.html`, `.kiro/steering/structure.md`
+  - Teste: `test_r13_10_*`, `test_r24_18_*`, `test_r24_19_*`
+  - Requisito: R13.10, R24.18, R24.19
+  - Revisão: a definir

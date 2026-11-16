@@ -10,7 +10,7 @@ Ele gera um relatório visual com:
 - explicações e sugestões de ação;
 - origem dos dados usados na análise.
 
-A análise é passiva: Rastro lê o HAR e não acessa o site analisado.
+A análise é passiva: Rastro lê o HAR e não acessa o site analisado. Se preferir, o [`rastro gravar`](#gravar-pelo-rastro-opcional) abre o navegador e grava a visita por você; aí quem acessa o site é esse navegador.
 
 > **Importante:** use o Rastro somente em sites próprios ou em sites para os quais você tem autorização para auditar.
 
@@ -23,6 +23,7 @@ A análise é passiva: Rastro lê o HAR e não acessa o site analisado.
 - [Usar de qualquer pasta (opcional)](#usar-de-qualquer-pasta-opcional)
 - [Ver o guia sem analisar](#ver-o-guia-sem-analisar)
 - [Gravar um arquivo HAR](#gravar-um-arquivo-har)
+- [Gravar pelo Rastro (opcional)](#gravar-pelo-rastro-opcional)
 - [Fazer uma análise](#fazer-uma-análise)
 - [Abrir o relatório](#abrir-o-relatório)
 - [Usar sem IA](#usar-sem-ia)
@@ -114,7 +115,7 @@ No Windows:
 py -m rastro como-usar
 ```
 
-Esse comando abre o guia no navegador. Não lê HAR, não consulta a internet e não grava uma análise.
+Esse comando abre o guia no navegador. No alto, escolha como quer gravar a visita (no DevTools, pelo Rastro ou com o robô) e o guia mostra só os passos daquele jeito. Não lê HAR, não consulta a internet e não grava uma análise.
 
 ## Gravar um arquivo HAR
 
@@ -130,6 +131,46 @@ No Chrome ou Edge:
 Use sempre um HAR sanitizado. Ele não deve conter cookies, tokens ou cabeçalhos de autenticação.
 
 Para testar sem gravar um arquivo, use os exemplos em [`avaliacao/`](avaliacao/README.md).
+
+## Gravar pelo Rastro (opcional)
+
+Em vez de usar o DevTools, deixe o Rastro abrir o navegador e gravar por você. No fim, ele já faz a análise.
+
+**Só na primeira vez**, instale o Playwright (precisa do Chrome ou do Edge instalado):
+
+```bash
+python3 -m pip install --user playwright==1.65.1
+```
+
+No Windows: `py -m pip install --user playwright==1.65.1`. Se der erro, rode o `gravar` assim mesmo: a mensagem mostra o comando certo para o seu computador.
+
+### Você navega
+
+```bash
+rastro gravar https://site.com.br
+```
+
+1. O navegador abre no site.
+2. Navegue pelas páginas que importam.
+3. Feche a janela. A análise roda e o relatório abre.
+
+### O robô navega
+
+```bash
+rastro gravar https://site.com.br --robo
+```
+
+1. O navegador abre no site. Se precisar, faça login.
+2. Aperte Enter no terminal. O robô visita os links do site (até 20 páginas ou 3 minutos), sem clicar em botões e sem enviar formulários.
+3. Quando ele parar, feche a janela. A análise roda e o relatório abre.
+
+> **Em produção:** não use o robô com um usuário administrador ou com acesso a dados sensíveis. Um link comum pode aprovar, arquivar ou enviar algo. Nesse caso, navegue você mesmo.
+
+Enquanto grava, o terminal mostra o tempo e quantas requisições já foram gravadas.
+
+As opções do `analisar` também valem aqui: `--sem-ia`, `--ia`, `--saida` e `--nao-abrir`.
+
+A gravação fica em `~/Rastro/gravacoes/` e **guarda o seu login no site**. Não compartilhe o arquivo e apague quando não precisar mais. O relatório não traz o login.
 
 ## Fazer uma análise
 
@@ -153,6 +194,14 @@ python3 -m rastro analisar site.har --ia codex
 No Windows, troque `python3` por `py`.
 
 Durante a análise, Rastro consulta fontes públicas como GitHub Advisory, OSV, NVD e registro do npm. O site descrito no HAR não é acessado.
+
+Enquanto analisa, o terminal mostra a etapa, quantos itens já foram e o tempo. Com IA, uma etapa pode levar alguns minutos: enquanto o sinal no fim da linha girar, o Rastro está trabalhando.
+
+```text
+[1/7] Lendo o HAR · 0:00 · ok
+[2/7] Reconhecendo as bibliotecas pelos arquivos · 0:00 · ok
+[3/7] Procurando bibliotecas nos bundles com a IA · 2 de 5 · 1:12 /
+```
 
 Ao terminar, o terminal mostra os caminhos do relatório HTML e do arquivo JSON:
 
@@ -242,6 +291,18 @@ O comando `rastro` foi instalado antes de outro jeito, provavelmente com o pipx.
 ### CLI de IA não encontrada
 
 Confira se a CLI está instalada e disponível no terminal. Como alternativa, use `--ia claude`, `--ia codex` ou `--sem-ia`.
+
+### `o Playwright não está instalado` no `gravar`
+
+Rode o comando que a própria mensagem mostra. Ou grave pelo DevTools, como em [Gravar um arquivo HAR](#gravar-um-arquivo-har).
+
+### `nem o Google Chrome nem o Microsoft Edge foram encontrados`
+
+Instale um dos dois. O Rastro usa o navegador do computador e não baixa outro.
+
+### `não foi possível abrir o navegador para gravar a visita`
+
+Feche as janelas do Chrome ou do Edge que estiverem travadas e rode de novo. Se continuar, grave pelo DevTools.
 
 ### HAR inválido ou inexistente
 

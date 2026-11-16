@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { ANTES_DE_COMECAR, PASSOS_DO_GUIA, PROBLEMAS, SEUS_DADOS } from "../dados/guia.ts";
+import {
+  ANTES_DE_COMECAR,
+  MODOS_DE_USO,
+  PASSOS_POR_MODO,
+  PROBLEMAS,
+  SEUS_DADOS,
+  valeNoModo,
+  type ModoDeUso,
+} from "../dados/guia.ts";
+import AnimacaoDoModo from "./AnimacaoDoModo.tsx";
 import { plural } from "./formato.ts";
 import PassoDoGuia, { idDoPassoDoGuia } from "./PassoDoGuia.tsx";
 import TextoComMarcas from "./TextoComMarcas.tsx";
@@ -34,8 +43,15 @@ interface Props {
 }
 
 export default function GuiaComoUsar({ aoIrParaOPainel }: Props) {
+  const [modo, setModo] = useState<ModoDeUso>("devtools");
   const [feitos, setFeitos] = useState<Set<number>>(new Set());
-  const total = PASSOS_DO_GUIA.length;
+  const passos = PASSOS_POR_MODO[modo];
+  const total = passos.length;
+
+  const escolherModo = (novo: ModoDeUso) => {
+    setModo(novo);
+    setFeitos(new Set());
+  };
 
   const alternar = (indice: number) => {
     const novos = new Set(feitos);
@@ -59,7 +75,7 @@ export default function GuiaComoUsar({ aoIrParaOPainel }: Props) {
     <section className="guia" aria-labelledby="guia-titulo">
       <header className="guia__topo">
         <h1 id="guia-titulo">Como usar o Rastro</h1>
-        <p>Do site gravado no navegador ao relatório, em {total} passos. Você só precisa do navegador e de um terminal.</p>
+        <p>Do site ao relatório, em {total} passos. Você só precisa do navegador e de um terminal.</p>
         <div className="guia__progresso">
           <div className="guia__barra">
             <span style={{ width: `${(feitos.size / total) * 100}%` }} />
@@ -70,21 +86,42 @@ export default function GuiaComoUsar({ aoIrParaOPainel }: Props) {
         </div>
       </header>
 
+      <fieldset className="guia__modos">
+        <legend>Como você quer gravar a visita ao site?</legend>
+        {MODOS_DE_USO.map((opcao) => (
+          <label
+            key={opcao.modo}
+            className={opcao.modo === modo ? "guia__modo guia__modo--escolhido" : "guia__modo"}
+          >
+            <input
+              type="radio"
+              name="guia-modo"
+              value={opcao.modo}
+              checked={opcao.modo === modo}
+              onChange={() => escolherModo(opcao.modo)}
+            />
+            <AnimacaoDoModo modo={opcao.modo} />
+            <span className="guia__modo-titulo">{opcao.titulo}</span>
+            <span className="guia__modo-resumo">{opcao.resumo}</span>
+          </label>
+        ))}
+      </fieldset>
+
       <div className="guia__caixa">
         <h2>Antes de começar</h2>
         <ul>
-          {ANTES_DE_COMECAR.map((item) => (
-            <li key={item}>
-              <TextoComMarcas texto={item} />
+          {ANTES_DE_COMECAR.filter((item) => valeNoModo(item, modo)).map((item) => (
+            <li key={item.texto}>
+              <TextoComMarcas texto={item.texto} />
             </li>
           ))}
         </ul>
       </div>
 
       <ol className="guia__passos">
-        {PASSOS_DO_GUIA.map((passo, indice) => (
+        {passos.map((passo, indice) => (
           <PassoDoGuia
-            key={passo.titulo}
+            key={`${modo}-${passo.titulo}`}
             numero={indice + 1}
             passo={passo}
             feito={feitos.has(indice)}
@@ -107,7 +144,7 @@ export default function GuiaComoUsar({ aoIrParaOPainel }: Props) {
       <div className="guia__grade">
         <div className="guia__caixa">
           <h2>Se algo der errado</h2>
-          {PROBLEMAS.map((problema) => (
+          {PROBLEMAS.filter((problema) => valeNoModo(problema, modo)).map((problema) => (
             <details key={problema.sintoma} className="guia__problema">
               <summary>{problema.sintoma}</summary>
               <p>
@@ -119,8 +156,10 @@ export default function GuiaComoUsar({ aoIrParaOPainel }: Props) {
         <div className="guia__caixa">
           <h2>Seus dados</h2>
           <ul>
-            {SEUS_DADOS.map((item) => (
-              <li key={item}>{item}</li>
+            {SEUS_DADOS.filter((item) => valeNoModo(item, modo)).map((item) => (
+              <li key={item.texto}>
+                <TextoComMarcas texto={item.texto} />
+              </li>
             ))}
           </ul>
         </div>

@@ -124,6 +124,86 @@
   animation-name: ilustracao-digita-5;
 }
 
+.ilustracao__cabeca {
+  fill: var(--cor-superficie);
+}
+
+.ilustracao__olho {
+  fill: var(--cor-destaque);
+}
+
+.ilustracao__robo {
+  animation: ilustracao-robo 7s ease-in-out infinite;
+}
+
+.ilustracao__vai-fechar {
+  animation: ilustracao-vai-fechar 6s ease-in-out infinite;
+}
+
+.ilustracao__pulsa-fechar {
+  animation: ilustracao-pulsa-fechar 6s ease infinite;
+}
+
+@keyframes ilustracao-robo {
+  0%,
+  16% {
+    transform: translate(0, 0);
+  }
+  22%,
+  30% {
+    transform: translate(68px, 0);
+  }
+  36%,
+  44% {
+    transform: translate(136px, 0);
+  }
+  50%,
+  58% {
+    transform: translate(34px, 35px);
+  }
+  64%,
+  90% {
+    transform: translate(174px, 35px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes ilustracao-vai-fechar {
+  0%,
+  10% {
+    transform: translate(0, 0);
+  }
+  22%,
+  30% {
+    transform: translate(68px, 0);
+  }
+  42%,
+  50% {
+    transform: translate(136px, 0);
+  }
+  70%,
+  92% {
+    transform: translate(234px, -33px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes ilustracao-pulsa-fechar {
+  0%,
+  66%,
+  100% {
+    opacity: 1;
+  }
+  74%,
+  84% {
+    opacity: 0.25;
+  }
+}
+
 @keyframes ilustracao-linha {
   0% {
     stroke-dashoffset: 1;

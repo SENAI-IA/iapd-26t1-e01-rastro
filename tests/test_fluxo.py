@@ -3,7 +3,16 @@ from pathlib import Path
 
 import pytest
 
-from rastro.fluxo import analisar
+from rastro.fluxo import (
+    ETAPA_BUNDLES,
+    ETAPA_CONFERIR,
+    ETAPA_CONSULTAR,
+    ETAPA_EXPLICAR,
+    ETAPA_LER_O_HAR,
+    ETAPA_PLANO,
+    ETAPA_RECONHECER,
+    analisar,
+)
 from rastro.fontes.conector import FonteSemResposta
 from rastro.har.leitor import HarInvalido, HarNaoEncontrado
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
@@ -56,6 +65,66 @@ def test_r14_5_sem_ia_nao_ha_provedor_nem_explicacao() -> None:
     assert analise.provedor_de_ia is None
     assert analise.explicacoes == {}
     assert all(acao.teste_verificacao is None for acao in analise.plano_de_acao)
+
+
+class AndamentoGravado:
+    def __init__(self) -> None:
+        self.etapas = 0
+        self.eventos: list[str] = []
+
+    def comecar(self, etapas: int) -> None:
+        self.etapas = etapas
+
+    def etapa(self, nome: str) -> None:
+        self.eventos.append(nome)
+
+    def itens(self, total: int) -> None:
+        self.eventos.append(f"itens {total}")
+
+    def avancar(self) -> None:
+        self.eventos.append("+1")
+
+
+def test_r13_10_sem_ia_a_analise_avisa_as_5_etapas_e_os_itens() -> None:
+    andamento = AndamentoGravado()
+
+    analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), andamento=andamento)
+
+    assert andamento.etapas == 5
+    assert andamento.eventos == [
+        ETAPA_LER_O_HAR,
+        ETAPA_RECONHECER,
+        ETAPA_CONFERIR,
+        "itens 2",
+        "+1",
+        "+1",
+        ETAPA_CONSULTAR,
+        "itens 2",
+        "+1",
+        "+1",
+        ETAPA_PLANO,
+    ]
+
+
+def test_r13_10_com_ia_a_analise_avisa_as_7_etapas() -> None:
+    andamento = AndamentoGravado()
+    ia = ClienteDeIA(ProvedorFalso([FalhaDoProvedor("sem resposta")] * 5))
+
+    analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia, andamento=andamento)
+
+    etapas = [evento for evento in andamento.eventos if evento[0].isupper()]
+    assert andamento.etapas == 7
+    assert etapas == [
+        ETAPA_LER_O_HAR,
+        ETAPA_RECONHECER,
+        ETAPA_BUNDLES,
+        ETAPA_CONFERIR,
+        ETAPA_CONSULTAR,
+        ETAPA_EXPLICAR,
+        ETAPA_PLANO,
+    ]
+    explicar = andamento.eventos.index(ETAPA_EXPLICAR)
+    assert andamento.eventos[explicar + 1 : explicar + 3] == ["itens 1", "+1"]
 
 
 def test_r14_8_com_ia_o_relatorio_informa_o_provedor_usado() -> None:

@@ -1,14 +1,42 @@
 import argparse
 import os
+import signal
 import sys
+import time
 import webbrowser
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from rastro import atalho
 from rastro.acao.plano import ROTULO_DA_PRIORIDADE
+from rastro.captura.pasta import (
+    GravacaoJaExiste,
+    UrlInvalida,
+    caminho_da_gravacao,
+    criar_pasta_da_gravacao,
+    desfazer_pasta_da_gravacao,
+    host_da_url,
+    pasta_padrao_das_gravacoes,
+    url_sem_usuario_e_senha,
+)
+from rastro.captura.playwright import (
+    NavegadorAusente,
+    NavegadorNaoAbriu,
+    PlaywrightAusente,
+    abrir_gravacao,
+    conferir_playwright,
+)
+from rastro.captura.robo import LIMITES_PADRAO, PassoDoRobo, ResultadoDoRobo, Robo
+from rastro.captura.sessao import (
+    FalhaAoNavegar,
+    PedidoDeParada,
+    SessaoDeGravacao,
+    esperar_a_janela_fechar,
+    esperar_o_enter,
+)
 from rastro.fluxo import analisar
 from rastro.fontes.github_advisory import GitHubAdvisory
 from rastro.fontes.nvd import Nvd
@@ -44,6 +72,7 @@ from rastro.relatorio.json import (
     montar_relatorio,
 )
 from rastro.risco.nota import escrever_nota
+from rastro.terminal import AndamentoNoTerminal, LinhaAoVivo, escrever_tempo
 
 DESCRICAO = (
     "Lê um HAR, identifica as bibliotecas front-end do site e prioriza as falhas "
@@ -81,6 +110,66 @@ TEXTO_TESTE_NO_MESMO_TERMINAL = "Teste com: rastro --help"
 TEXTO_TESTE_NUM_TERMINAL_NOVO = "Abra um terminal novo e teste com: rastro --help"
 TEXTO_DESINSTALADO = "Comando rastro removido."
 TEXTO_NADA_A_REMOVER = "O comando rastro não está instalado."
+AJUDA_GRAVAR = "abre o navegador, grava a visita num HAR e analisa ao fechar a janela"
+TEXTO_GRAVANDO = (
+    "Gravando a visita a {host}. Navegue pelo site como um usuário comum "
+    "e feche a janela quando terminar (ou aperte Ctrl+C aqui)."
+)
+TEXTO_FALHA_NA_PRIMEIRA_PAGINA = (
+    "Não foi possível abrir {url} ({motivo}). A janela continua aberta: "
+    "confira o endereço nela ou feche-a para encerrar."
+)
+AJUDA_ROBO = (
+    "o Rastro navega sozinho pelos links do site (só links, nunca botões nem formulários), "
+    "com limite de páginas, tempo e cliques"
+)
+PEDIDO_ANTES_DO_ROBO = (
+    "Antes de o robô começar: se o site pede login, entre agora na janela aberta e depois "
+    "aperte Enter aqui. Para o robô navegar sem login, só aperte Enter."
+)
+AVISO_ANTES_DO_ROBO = (
+    "Cuidado em sistema de produção: o robô só segue links, mas um link comum pode "
+    "disparar uma ação (aprovar, arquivar, enviar). Se o usuário tem permissão de "
+    "administrador ou acesso a dados sensíveis, não entre com ele para o robô: grave sem "
+    "--robo e navegue você mesmo."
+)
+TEXTO_JANELA_CONTINUA_ABERTA = (
+    "A janela continua aberta: visite mais alguma página importante (como uma tela que fica "
+    "longe da inicial) e feche a janela para analisar. Ctrl+C aqui também encerra."
+)
+TEXTO_ROBO_COMECOU = (
+    "O robô vai navegar pelos links de {host}: até {paginas} páginas, {minutos:g} minutos "
+    "e {cliques} cliques da página inicial. Ctrl+C aqui ou fechar a janela param o robô."
+)
+TEXTO_PASSO_DO_ROBO = (
+    "  páginas {paginas}/{limite} · requisições {requisicoes} · scripts {scripts} · {tempo} · {url}"
+)
+TEXTO_PASSO_QUE_FALHOU = "  não abriu: {url} ({motivo})"
+TEXTO_ROBO_PAROU = (
+    "O robô parou: {motivo}. {paginas} páginas visitadas, {barrados} links perigosos ou "
+    "de fora do site não seguidos, {parecidos} páginas parecidas demais com outras puladas."
+)
+TEXTO_ABRINDO_O_NAVEGADOR = "Abrindo o navegador"
+TEXTO_ABRINDO_A_PAGINA = "Abrindo {url}"
+TEXTO_GRAVANDO_AO_VIVO = (
+    "Gravando · {tempo} · requisições {requisicoes} · scripts {scripts} · "
+    "feche a janela para analisar"
+)
+TEXTO_ROBO_AO_VIVO = (
+    "Robô navegando · páginas {paginas}/{limite} · requisições {requisicoes} · {tempo}"
+)
+TEXTO_SALVANDO_A_GRAVACAO = "Salvando a gravação"
+TEXTO_HAR_GRAVADO = "Visita gravada em: {har}"
+AVISO_SESSAO_NO_HAR = (
+    "Atenção: este HAR guarda a sessão do site (cabeçalhos Cookie e Set-Cookie). "
+    "Não compartilhe o arquivo; apague-o quando não precisar mais. "
+    "O relatório não traz esses valores."
+)
+TEXTO_NADA_GRAVADO = (
+    "nenhuma requisição foi gravada: a janela foi fechada antes de o site carregar. "
+    "Nenhum relatório foi gerado."
+)
+TEXTO_HAR_PERDIDO = "o navegador fechou antes de gravar o HAR. Nenhum relatório foi gerado."
 PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
     "kiro": ProvedorKiro,
     "claude": ProvedorClaude,
@@ -97,15 +186,18 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         description="Analisa um HAR e grava o relatório numa pasta nova.",
     )
     analisar_har.add_argument("har", type=Path, help="arquivo HAR exportado do navegador")
-    analisar_har.add_argument("--ia", metavar="NOME", help=AJUDA_IA)
-    analisar_har.add_argument("--sem-ia", action="store_true", help=AJUDA_SEM_IA)
-    analisar_har.add_argument(
-        "--saida",
-        type=Path,
-        metavar="PASTA",
-        help="pasta dos relatórios (padrão: Rastro/relatorios na pasta do usuário)",
+    adicionar_opcoes_da_analise(analisar_har)
+    gravar = comandos.add_parser(
+        "gravar",
+        help=AJUDA_GRAVAR,
+        description=(
+            "Abre o Chrome (ou o Edge) da máquina na URL, grava num HAR tudo o que o "
+            "navegador receber e analisa ao fechar a janela. Precisa do Playwright."
+        ),
     )
-    analisar_har.add_argument("--nao-abrir", action="store_true", help=AJUDA_NAO_ABRIR)
+    gravar.add_argument("url", help="endereço do site, com http:// ou https://")
+    gravar.add_argument("--robo", action="store_true", help=AJUDA_ROBO)
+    adicionar_opcoes_da_analise(gravar)
     comandos.add_parser(
         "como-usar",
         help=AJUDA_COMO_USAR,
@@ -122,6 +214,18 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         description="Remove o comando rastro. O projeto e os relatórios ficam.",
     )
     return leitor
+
+
+def adicionar_opcoes_da_analise(comando: argparse.ArgumentParser) -> None:
+    comando.add_argument("--ia", metavar="NOME", help=AJUDA_IA)
+    comando.add_argument("--sem-ia", action="store_true", help=AJUDA_SEM_IA)
+    comando.add_argument(
+        "--saida",
+        type=Path,
+        metavar="PASTA",
+        help="pasta dos relatórios (padrão: Rastro/relatorios na pasta do usuário)",
+    )
+    comando.add_argument("--nao-abrir", action="store_true", help=AJUDA_NAO_ABRIR)
 
 
 def principal() -> None:
@@ -141,6 +245,10 @@ def executar(argumentos: list[str] | None = None) -> int:
     if opcoes.comando == "desinstalar":
         return desinstalar_comando()
     abrir = not opcoes.nao_abrir
+    if opcoes.comando == "gravar":
+        return gravar_e_analisar(
+            opcoes.url, opcoes.saida, opcoes.ia, opcoes.sem_ia, abrir, opcoes.robo
+        )
     if opcoes.sem_ia:
         return analisar_sem_ia(opcoes.har, opcoes.saida, abrir)
     return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia, abrir)
@@ -220,6 +328,170 @@ def analisar_com_ia(
     return analisar_e_gravar(caminho_har, saida, ia, abrir)
 
 
+def gravar_e_analisar(
+    url: str,
+    saida: Path | None,
+    opcao_ia: str | None,
+    sem_ia: bool,
+    abrir: bool,
+    robo: bool = False,
+) -> int:
+    try:
+        host = host_da_url(url)
+        ia = None if sem_ia else montar_cliente_de_ia(opcao_ia)
+        conferir_playwright()
+        pasta = caminho_da_gravacao(pasta_padrao_das_gravacoes(), host, datetime.now())
+        har = criar_pasta_da_gravacao(pasta)
+    except CliDaIaAusente as erro:
+        return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
+    except (UrlInvalida, IaInvalida, PlaywrightAusente, GravacaoJaExiste) as erro:
+        return encerrar_com_erro(str(erro))
+    try:
+        requisicoes = gravar_visita(url, host, har, robo)
+    except (NavegadorAusente, NavegadorNaoAbriu) as erro:
+        desfazer_pasta_da_gravacao(pasta)
+        return encerrar_com_erro(str(erro))
+    if requisicoes == 0:
+        return encerrar_com_erro(TEXTO_NADA_GRAVADO)
+    if not har.is_file():
+        return encerrar_com_erro(TEXTO_HAR_PERDIDO)
+    print(TEXTO_HAR_GRAVADO.format(har=har))
+    print(AVISO_SESSAO_NO_HAR)
+    print()
+    if ia is None:
+        avisar_analise_sem_ia()
+    else:
+        avisar_analise_com_ia(ia)
+    return analisar_e_gravar(har, saida, ia, abrir, gravado_pelo_rastro=True)
+
+
+def gravar_visita(url: str, host: str, har: Path, robo: bool) -> int:
+    parada = PedidoDeParada()
+    with LinhaAoVivo() as linha:
+        linha.acompanhar(cronometrado(TEXTO_ABRINDO_O_NAVEGADOR))
+        with ctrl_c_pede_parada(parada), abrir_gravacao(har) as sessao:
+            if robo:
+                navegar_com_o_robo(sessao, parada, url, host, linha)
+            else:
+                linha.pedir(TEXTO_GRAVANDO.format(host=host))
+                abrir_primeira_pagina(sessao, url, linha)
+                esperar_gravando(sessao, parada, linha)
+            requisicoes = sessao.requisicoes
+            linha.acompanhar(cronometrado(TEXTO_SALVANDO_A_GRAVACAO))
+    return requisicoes
+
+
+def cronometrado(texto: str) -> Callable[[], str]:
+    inicio = time.monotonic()
+    return lambda: f"{texto} · {escrever_tempo(time.monotonic() - inicio)}"
+
+
+def esperar_gravando(sessao: SessaoDeGravacao, parada: PedidoDeParada, linha: LinhaAoVivo) -> None:
+    inicio = time.monotonic()
+    linha.acompanhar(
+        lambda: TEXTO_GRAVANDO_AO_VIVO.format(
+            tempo=escrever_tempo(time.monotonic() - inicio),
+            requisicoes=sessao.requisicoes,
+            scripts=sessao.scripts,
+        )
+    )
+    esperar_a_janela_fechar(sessao, parada)
+
+
+def navegar_com_o_robo(
+    sessao: SessaoDeGravacao,
+    parada: PedidoDeParada,
+    url: str,
+    host: str,
+    linha: LinhaAoVivo,
+) -> None:
+    abrir_primeira_pagina(sessao, url, linha)
+    linha.soltar()
+    linha.imprimir(AVISO_ANTES_DO_ROBO)
+    linha.pedir(PEDIDO_ANTES_DO_ROBO)
+    if not esperar_o_enter(sessao, parada, ler_enter):
+        return
+    limites = LIMITES_PADRAO
+    linha.imprimir(
+        TEXTO_ROBO_COMECOU.format(
+            host=host,
+            paginas=limites.paginas,
+            minutos=limites.segundos / 60,
+            cliques=limites.cliques,
+        )
+    )
+    inicio = time.monotonic()
+    robo = Robo(
+        sessao, parada, time.monotonic, lambda passo: mostrar_passo_do_robo(passo, linha), limites
+    )
+    linha.acompanhar(
+        lambda: TEXTO_ROBO_AO_VIVO.format(
+            paginas=robo.paginas,
+            limite=limites.paginas,
+            tempo=escrever_tempo(time.monotonic() - inicio),
+            requisicoes=sessao.requisicoes,
+        )
+    )
+    mostrar_fim_do_robo(robo.navegar(url), linha)
+    if parada.motivo is not None:
+        return
+    linha.pedir(TEXTO_JANELA_CONTINUA_ABERTA)
+    esperar_gravando(sessao, parada, linha)
+
+
+def ler_enter() -> str:
+    return input()
+
+
+def mostrar_passo_do_robo(passo: PassoDoRobo, linha: LinhaAoVivo) -> None:
+    if passo.falha is not None:
+        linha.imprimir(
+            TEXTO_PASSO_QUE_FALHOU.format(
+                url=url_sem_usuario_e_senha(passo.url), motivo=passo.falha
+            )
+        )
+        return
+    linha.imprimir(
+        TEXTO_PASSO_DO_ROBO.format(
+            paginas=passo.paginas,
+            limite=LIMITES_PADRAO.paginas,
+            requisicoes=passo.requisicoes,
+            scripts=passo.scripts,
+            tempo=escrever_tempo(passo.segundos),
+            url=url_sem_usuario_e_senha(passo.url),
+        )
+    )
+
+
+def mostrar_fim_do_robo(resultado: ResultadoDoRobo, linha: LinhaAoVivo) -> None:
+    linha.imprimir(
+        TEXTO_ROBO_PAROU.format(
+            motivo=resultado.motivo,
+            paginas=resultado.paginas,
+            barrados=resultado.barrados,
+            parecidos=resultado.parecidos,
+        )
+    )
+
+
+def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str, linha: LinhaAoVivo) -> None:
+    sem_senha = url_sem_usuario_e_senha(url)
+    linha.acompanhar(cronometrado(TEXTO_ABRINDO_A_PAGINA.format(url=sem_senha)))
+    try:
+        sessao.ir(url)
+    except FalhaAoNavegar as erro:
+        linha.pedir(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=sem_senha, motivo=erro))
+
+
+@contextmanager
+def ctrl_c_pede_parada(parada: PedidoDeParada) -> Iterator[None]:
+    original = signal.signal(signal.SIGINT, lambda *_: parada.pedir("Ctrl+C"))
+    try:
+        yield
+    finally:
+        signal.signal(signal.SIGINT, original)
+
+
 def montar_cliente_de_ia(opcao_ia: str | None) -> ClienteDeIA:
     nome_da_ia = escolher_ia(opcao_ia, os.environ.get(VARIAVEL_DA_IA))
     executavel = localizar_cli(nome_da_ia)
@@ -232,10 +504,26 @@ def analisar_sem_ia(caminho_har: Path, saida: Path | None, abrir: bool) -> int:
 
 
 def analisar_e_gravar(
-    caminho_har: Path, saida: Path | None, ia: ClienteDeIA | None, abrir: bool
+    caminho_har: Path,
+    saida: Path | None,
+    ia: ClienteDeIA | None,
+    abrir: bool,
+    gravado_pelo_rastro: bool = False,
 ) -> int:
     try:
-        analise = analisar(caminho_har, GitHubAdvisory(), RegistroNpm(), ia, Osv(), Nvd())
+        with LinhaAoVivo() as linha:
+            andamento = AndamentoNoTerminal(linha)
+            analise = analisar(
+                caminho_har,
+                GitHubAdvisory(),
+                RegistroNpm(),
+                ia,
+                Osv(),
+                Nvd(),
+                gravado_pelo_rastro=gravado_pelo_rastro,
+                andamento=andamento,
+            )
+            andamento.terminar()
     except ErroAoLerHar as erro:
         return encerrar_com_erro(str(erro))
     relatorio = montar_relatorio(analise)

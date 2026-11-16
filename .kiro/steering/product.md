@@ -12,7 +12,7 @@ Tudo precisa ser compreensível para quem não é de segurança.
 
 ## Como funciona
 
-1. **Grave:** HAR exportado no DevTools.
+1. **Grave:** HAR exportado no DevTools ou, opcional, gravado pelo próprio Rastro (`rastro gravar`, com Playwright).
 2. **Identifique:** bibliotecas e versões por assinatura; em bundles, a IA reconhece pelo código.
 3. **Confira:** travas fixas conferem tudo o que a IA sugeriu.
 4. **Consulte:** GitHub Advisory (CVE, CVSS, EPSS); OSV e NVD se houver tempo.
@@ -21,9 +21,9 @@ Tudo precisa ser compreensível para quem não é de segurança.
 
 ## Escopo
 
-Entra: CLI, relatório JSON e HTML, GitHub Advisory, OSV e NVD, bibliotecas front-end, cabeçalhos e cookies, travas contra invenção, modo foco, replay da visita, tour guiado e guia "Como usar", só análise passiva. Requisitos R01 a R23 da spec (`.kiro/specs/rastro/requirements.md`).
+Entra: CLI, relatório JSON e HTML, GitHub Advisory, OSV e NVD, bibliotecas front-end, cabeçalhos e cookies, travas contra invenção, modo foco, replay da visita, tour guiado e guia "Como usar", só análise passiva. Requisitos R01 a R23 da spec (`.kiro/specs/rastro/requirements.md`). Extensão na branch `feat/gravar`, se der tempo: gravar a visita (R24), à mão ou com um robô que só segue links.
 
-Fica fora: scan ativo, código-fonte, integração com Azure DevOps ou GitLab, outras fontes (KEV, Exploit-DB, Vulners), base de falsos positivos, execução na esteira com Playwright, CI e Docker. Planos futuros no fim do `requirements.md`.
+Fica fora: scan ativo, código-fonte, integração com Azure DevOps ou GitLab, outras fontes (KEV, Exploit-DB, Vulners), base de falsos positivos, execução na esteira (CI) e Docker. Planos futuros no fim do `requirements.md`.
 
 **Na dúvida, fica fora.** O Rastro precisa estar 100% funcional em 10/12/2026.
 

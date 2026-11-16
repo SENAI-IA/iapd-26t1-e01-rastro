@@ -173,6 +173,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 7. O JSON DEVE trazer o campo `versao_formato`, e o HTML DEVE exibir exatamente os dados do JSON, sem recalcular nada.
 8. QUANDO a análise terminar, o Rastro DEVE mostrar no terminal o caminho da pasta e do `relatorio.html` e um resumo de uma linha.
 9. QUANDO a análise terminar, o Rastro DEVE abrir o `relatorio.html` no navegador, sem que o navegador escreva no terminal. ONDE a opção `--nao-abrir` for usada, o Rastro NÃO DEVE abrir o navegador. SE não conseguir abrir o navegador, ENTÃO o Rastro DEVE dizer isso, e o caminho do `relatorio.html` continua no terminal, com código 0.
+10. ENQUANTO a análise roda, o terminal DEVE mostrar a etapa atual, o número dela e o total (`[3/7]`) e, nas etapas que andam item por item (npm, fontes de falhas, IA), quantos itens de quantos já terminaram. Num terminal interativo, a linha da etapa DEVE mostrar também o tempo da etapa e um sinal que gira, e cada etapa concluída fica com `ok`. Fora de um terminal interativo (saída redirecionada para arquivo), o Rastro DEVE escrever só o nome de cada etapa, uma por linha, sem códigos de controle.
 
 ## R14 Escolher a IA (RF14)
 
@@ -208,7 +209,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 
 ## R16 Passivo e privado
 
-1. O Rastro NÃO DEVE fazer nenhuma requisição ao site analisado.
+1. O Rastro NÃO DEVE fazer nenhuma requisição ao site analisado. A exceção é o `gravar` (R24): quem acessa o site é o navegador aberto para o auditor, como se ele mesmo navegasse.
 2. O Rastro DEVE acessar a rede só para consultar as fontes de R04 e R04A e, em modo leitura, o registro do npm (R21); a IA é acessada pela CLI do provedor.
 3. O Rastro NÃO DEVE enviar à IA cookies, cabeçalhos, corpos de requisição, query strings nem trechos que pareçam token (JWT, `Bearer`, chaves longas).
 4. O relatório NÃO DEVE conter valores de cookies, de cabeçalhos de autenticação nem tokens do HAR, mesmo quando o HAR for completo. Dos cookies, só o nome e os atributos.
@@ -216,7 +217,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 
 ## R17 Seguro para a máquina
 
-1. Na análise, o Rastro DEVE gravar só os dois arquivos do relatório, sempre como arquivos novos.
+1. Na análise, o Rastro DEVE gravar só os dois arquivos do relatório, sempre como arquivos novos. No `gravar` (R24), grava também o `visita.har`, numa pasta nova.
 2. O Rastro NÃO DEVE instalar nada global, pedir `sudo` nem, por conta própria, instalar ou apagar arquivos.
 3. QUANDO a pessoa pedir `rastro instalar`, o Rastro DEVE criar só o atalho do comando `rastro` na pasta do usuário, marcado como dele, e pôr essa pasta no PATH do usuário com um bloco marcado. QUANDO a pessoa pedir `rastro desinstalar`, o Rastro DEVE remover só o atalho e o bloco que têm a marca. SE já existir um comando `rastro` sem a marca, ENTÃO o Rastro NÃO DEVE sobrescrevê-lo nem apagá-lo, e para com mensagem clara.
 
@@ -234,7 +235,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 ## R20 Entrega
 
 1. O repositório DEVE ter um README que outra pessoa consegue seguir para instalar e rodar o Rastro na própria máquina, com comandos para Windows e Linux.
-2. Para usar, o Rastro DEVE precisar só de Python. O HTML do relatório já vai pronto no repositório; Node só é preciso para quem desenvolve o frontend.
+2. Para usar, o Rastro DEVE precisar só de Python. O HTML do relatório já vai pronto no repositório; Node só é preciso para quem desenvolve o frontend. O `gravar` (R24) é opcional e precisa também do Playwright para Python e do Chrome ou do Edge.
 3. Para a IA, o Rastro DEVE usar a CLI (Kiro, Claude ou Codex) já instalada e autenticada no sistema de quem usa. O Rastro não instala nem autentica CLI.
 4. Sem Docker: o Rastro roda com o Python da máquina, e o demo fica gravado em vídeo.
 5. Código, spec, steering, README e relatório NÃO DEVEM depender de arquivo fora do repositório; os entregáveis ficam em `docs/`.
@@ -282,6 +283,30 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 7. ENQUANTO o sistema pedir menos movimento, as ilustrações do guia e o destaque do tour DEVEM ficar sem animação. *(verificação manual)*
 8. QUANDO a pessoa rodar `python -m rastro como-usar`, o Rastro DEVE abrir no navegador o relatório sem dados de análise (o "Como usar"), sem ler HAR, sem acessar a rede e sem gravar nada, e mostrar no terminal o caminho do arquivo aberto. SE não conseguir abrir o navegador, ENTÃO o Rastro DEVE dizer isso e mostrar o caminho para abrir à mão, com código 0.
 
+## R24 Gravar a visita (extensão, branch `feat/gravar`)
+
+**Como** auditor que não usa o DevTools, **quero** que o Rastro abra um navegador, grave o que eu visitar e analise ao fim **para** não precisar exportar o HAR à mão.
+
+1. QUANDO o auditor executar `rastro gravar <url>`, o Rastro DEVE abrir o Google Chrome instalado na máquina (sem ele, o Microsoft Edge) pelo Playwright, com um perfil novo e vazio, na URL dada, e gravar num HAR tudo o que o navegador receber, com o conteúdo das respostas, até a janela ser fechada.
+2. SE a URL não começar com `http://` ou `https://`, ENTÃO o Rastro DEVE encerrar com código 1 dizendo o formato esperado, sem abrir o navegador.
+3. SE o Playwright não estiver instalado no Python que roda o Rastro, ENTÃO o Rastro DEVE encerrar com código 1, antes de abrir o navegador, mostrando o comando que instala a versão conferida nesse mesmo Python. O Rastro NÃO DEVE instalar nada.
+4. SE nem o Chrome nem o Edge forem encontrados, ENTÃO o Rastro DEVE encerrar com código 1 dizendo para instalar um dos dois. O Rastro NÃO DEVE baixar navegador. SE o navegador não abrir por outro motivo (ex.: Linux sem tela), ENTÃO o Rastro DEVE encerrar com código 1 dizendo o motivo, sem deixar a pasta da gravação para trás.
+5. O `gravar` DEVE aceitar `--ia`, `--sem-ia`, `--saida` e `--nao-abrir`, com o mesmo efeito do `analisar`. SE a CLI da IA não for encontrada, ENTÃO o Rastro DEVE encerrar com código 1 antes de abrir o navegador (R14.3).
+6. O Rastro DEVE gravar o HAR em `visita.har`, numa pasta nova `Rastro/gravacoes/<host e porta da URL>/<AAAA-MM-DD_HH-MM-SS>/` dentro da pasta do usuário, com a troca de caracteres do R13.3. A porta padrão do esquema (80, 443) fica fora do nome, e usuário e senha escritos na URL (`https://usuario:senha@site`) nunca vão para o nome da pasta nem para o terminal. SE a pasta já existir, ENTÃO o Rastro DEVE encerrar com código 1 sem abrir o navegador.
+7. QUANDO a janela for fechada ou o auditor apertar Ctrl+C no terminal, o Rastro DEVE gravar o HAR com o que já foi visitado, mostrar o caminho dele e analisá-lo como o `analisar` (R13). SE o HAR não tiver nenhuma requisição, ENTÃO o Rastro DEVE dizer isso e encerrar com código 1, sem relatório.
+8. QUANDO a gravação terminar, o terminal DEVE avisar que o HAR gravado guarda a sessão do site (cabeçalhos `Cookie` e `Set-Cookie`) e não deve ser compartilhado. A pasta da gravação DEVE ser criada só com permissão do dono (no Linux e no macOS), para outra conta da máquina não ler o HAR. O relatório continua sem esses valores (R16.4).
+9. SE o HAR gravado pelo `gravar` não trouxer cookies, ENTÃO as checagens C06 a C08 DEVEM ficar "não verificadas" dizendo que o site não criou cookie durante a visita, e não que falta exportar o HAR completo (R06.7). Fora do `gravar`, vale o R06.7 como está.
+10. ONDE a opção `--robo` for usada, o Rastro DEVE abrir a URL, esperar o auditor apertar Enter no terminal (tempo para entrar no site, se precisar) e então navegar sozinho, só por links `<a href>` do mesmo site da URL (o mesmo host, com ou sem `www.`, e a mesma porta, contando a porta padrão do esquema como sem porta), sem clicar em botão nem enviar formulário. SE o auditor apertar Ctrl+C ou fechar a janela antes do Enter, ENTÃO o robô NÃO DEVE começar, e a gravação termina como em 7.
+11. O robô NÃO DEVE visitar a mesma página duas vezes: duas URLs são a mesma página quando só mudam os valores da query, ou o fragmento que não é rota (sem `/`).
+12. O robô NÃO DEVE seguir links que tenham, depois do host (caminho, query ou fragmento), `logout`, `signout`, `sair`, `delete`, `excluir`, `remove`, `remover`, `uninstall`, `cron`, `flush`, `reset` ou `token=`, links com outro endereço na query (`/redirect?to=https://...`), nem links para arquivos (`.pdf`, `.zip`, imagens, documentos). SE uma página redirecionar para outro host, ENTÃO o robô NÃO DEVE contá-la nem seguir os links dela, e o terminal DEVE dizer para onde ela foi.
+13. O robô DEVE parar no primeiro limite atingido, dizendo qual: 20 páginas, 3 minutos, 2 cliques de distância da URL inicial, ou nenhum link novo. Ele visita no máximo 2 páginas por família (o caminho, ou a rota da SPA, sem o último trecho; uma página de um trecho só, como `/contato`, é família de si mesma). Página que não abriu não conta na família.
+14. ENQUANTO o robô navegar, o terminal DEVE mostrar, a cada página, quantas páginas de quantas, requisições, scripts, o tempo e a URL.
+15. QUANDO o robô parar por limite, o Rastro DEVE deixar a janela aberta e dizer que o auditor pode visitar mais páginas antes de fechá-la. QUANDO o auditor apertar Ctrl+C ou fechar a janela durante o robô, a gravação DEVE terminar como em 7.
+16. ONDE a opção `--robo` for usada, ANTES do Enter, o terminal DEVE avisar que, num sistema em produção, um link comum pode disparar uma ação, e recomendar não entrar para o robô com usuário que tem permissão de administrador ou acesso a dados sensíveis: nesse caso, gravar sem `--robo` e navegar à mão.
+17. A tela "Como usar" DEVE deixar escolher como gravar a visita (no DevTools, pelo Rastro ou com o robô) e mostrar só os passos, o que precisa antes, os problemas e os dados daquele jeito. Cada jeito DEVE ter uma animação curta que mostre, sem ler, quem faz o quê até o relatório. QUANDO a pessoa trocar de jeito, o progresso DEVE voltar a zero. Sem escolha, o guia DEVE mostrar o DevTools. *(verificação manual)*
+18. Num terminal interativo, ENQUANTO o `gravar` roda, o terminal DEVE mostrar numa linha que se atualiza o que está acontecendo: abrindo o navegador, abrindo a URL, gravando (com o tempo, as requisições e os scripts gravados e o lembrete de fechar a janela), o robô navegando (páginas de quantas, requisições e tempo) e salvando a gravação. As linhas fixas (R24.14) continuam por cima dela. Fora de um terminal interativo, essa linha NÃO DEVE aparecer.
+19. Num terminal interativo, o que pede uma ação da pessoa (navegar e fechar a janela, entrar e apertar Enter antes do robô, visitar mais páginas depois do robô, conferir o endereço que não abriu) DEVE sair destacado (negrito amarelo), separado dos avisos e do progresso. Fora de um terminal interativo, ou com a variável `NO_COLOR` definida, o texto DEVE sair sem códigos de cor.
+
 ---
 
 ## Fora do escopo
@@ -291,7 +316,7 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 - Outras fontes além de GitHub Advisory, OSV e NVD: CISA KEV, Exploit-DB, Vulners.
 - Integração com Azure DevOps ou GitLab: vincular a task e acompanhar no painel.
 - Base de falsos positivos por projeto (selo "FP conhecido" e pedido de inclusão).
-- Execução automática na esteira com Playwright.
+- Execução automática na esteira (CI). O Playwright entra só no `gravar` (R24), na máquina do auditor.
 - CI e Docker: o Rastro é instalado e verificado na máquina local.
 
 ## Planos futuros
@@ -304,3 +329,4 @@ Ideias para as próximas versões. Não entram na nota nem no cronograma, mas o 
 | Vincular a task no Azure DevOps ou no GitLab e acompanhar no painel | Fechar o ciclo do achado à correção | Hoje a task sai como texto pronto para copiar |
 | Base de falsos positivos por projeto | Não repetir a mesma triagem a cada análise | Selo "FP conhecido", já desenhado no demo |
 | Rodar na esteira com Playwright | Analisar a cada pipeline, com o HAR gravado pelos testes E2E (`recordHar`) | A CLI já roda sem interação e com `--sem-ia` |
+| Painel ao vivo da gravação | Ver o rastro se formando enquanto o `gravar` navega | O Playwright só grava o HAR ao fechar e o relatório é um HTML estático (decisão 05): precisaria ouvir o evento `response` e de um servidor local. Hoje, o progresso fica no terminal e o radar da visita (R22) toca o rastro logo depois |

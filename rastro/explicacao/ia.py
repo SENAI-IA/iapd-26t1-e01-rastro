@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from importlib import resources
 
 from rastro.acao.plano import agrupar_por_biblioteca
+from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.conector import Aviso
 from rastro.har.site import url_sem_query_string
@@ -34,13 +35,18 @@ class ExplicacoesDosAchados:
     travas_acionadas: list[TravaAcionada]
 
 
-def explicar_achados(achados: list[Achado], ia: ClienteDeIA | None) -> ExplicacoesDosAchados:
+def explicar_achados(
+    achados: list[Achado], ia: ClienteDeIA | None, andamento: Andamento = SEM_ANDAMENTO
+) -> ExplicacoesDosAchados:
     if ia is None:
         return ExplicacoesDosAchados({}, [])
     explicacoes: dict[str, Explicacao] = {}
     travas_acionadas: list[TravaAcionada] = []
-    for chave, achados_da_biblioteca in agrupar_por_biblioteca(achados).items():
+    por_biblioteca = agrupar_por_biblioteca(achados)
+    andamento.itens(len(por_biblioteca))
+    for chave, achados_da_biblioteca in por_biblioteca.items():
         explicacao, barrados = explicar_biblioteca(achados_da_biblioteca, ia)
+        andamento.avancar()
         explicacoes[chave] = explicacao
         travas_acionadas.extend(barrados)
     return ExplicacoesDosAchados(explicacoes, travas_acionadas)
