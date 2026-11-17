@@ -10,7 +10,7 @@ Ele gera um relatório visual com:
 - explicações e sugestões de ação;
 - origem dos dados usados na análise.
 
-A análise é passiva: Rastro lê o HAR e não acessa o site analisado. Se preferir, o [`rastro gravar`](#gravar-pelo-rastro-opcional) abre o navegador e grava a visita por você; aí quem acessa o site é esse navegador.
+A análise é passiva: Rastro lê o HAR e não acessa o site analisado. Se preferir, o [`rastro gravar`](#gravar-pelo-rastro-opcional) abre o navegador e grava a visita por você; aí quem acessa o site é esse navegador. As validações de segurança ativas ficam num comando separado e exigem `--autorizo`.
 
 > **Importante:** use o Rastro somente em sites próprios ou em sites para os quais você tem autorização para auditar.
 
@@ -24,6 +24,7 @@ A análise é passiva: Rastro lê o HAR e não acessa o site analisado. Se prefe
 - [Ver o guia sem analisar](#ver-o-guia-sem-analisar)
 - [Gravar um arquivo HAR](#gravar-um-arquivo-har)
 - [Gravar pelo Rastro (opcional)](#gravar-pelo-rastro-opcional)
+- [Validações de segurança ativas (opcional)](#validações-de-segurança-ativas-opcional)
 - [Fazer uma análise](#fazer-uma-análise)
 - [Abrir o relatório](#abrir-o-relatório)
 - [Usar sem IA](#usar-sem-ia)
@@ -171,6 +172,26 @@ Enquanto grava, o terminal mostra o tempo e quantas requisições já foram grav
 As opções do `analisar` também valem aqui: `--sem-ia`, `--ia`, `--saida` e `--nao-abrir`.
 
 A gravação fica em `~/Rastro/gravacoes/` e **guarda o seu login no site**. Não compartilhe o arquivo e apague quando não precisar mais. O relatório não traz o login.
+
+## Validações de segurança ativas (opcional)
+
+Se você tem autorização para testar o site, pode executar validações HTTP limitadas no host que aparece no HAR:
+
+```bash
+rastro pentest site.har --autorizo
+```
+
+O comando seleciona no máximo 20 URLs do mesmo host já presentes no HAR e usa somente `GET`, `HEAD` e `OPTIONS`, sem corpo, cookies, tokens ou cabeçalhos de autenticação. Ele não segue redirecionamentos e não faz payloads, XSS, injeção, CSRF, IDOR, SSRF, fuzzing, brute force ou bypass de autenticação.
+
+O resultado fica em `~/Rastro/pentest/<site>/<data e hora>/pentest.json`. Depois, leve-o ao relatório:
+
+```bash
+rastro analisar site.har --pentest <caminho-do-pentest.json>
+```
+
+A aba **Segurança ativa** fica separada da nota, das checagens passivas e do plano de ação. Sem `--autorizo`, o Rastro não lê o HAR nem acessa a rede. O comando não substitui um pentest completo.
+
+Detalhes e comparação com motores externos estão em [`docs/analise-opcoes-pentest.md`](docs/analise-opcoes-pentest.md).
 
 ## Fazer uma análise
 

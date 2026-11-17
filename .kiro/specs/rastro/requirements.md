@@ -328,6 +328,9 @@ A análise normal (`analisar`) continua passiva. O pentest ativo só existe no c
 13. O comando `pentest` NÃO DEVE chamar a IA nem consultar GitHub Advisory, OSV, NVD ou registro do npm.
 14. O `pentest.json` NÃO DEVE trazer valores de cookies, tokens, corpos de resposta, cabeçalhos de autenticação ou a query string.
 
+---
+
+## Fora do escopo
 
 - Ataques destrutivos, métodos que alteram dados, envio de payload, fuzzing, brute force, bypass de autenticação e exploração de XSS, injeção, CSRF, IDOR ou SSRF; as validações ativas de R25 são limitadas e opt-in.
 - Bibliotecas de back-end: só o que chega ao navegador.

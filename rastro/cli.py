@@ -6,6 +6,7 @@ import time
 import webbrowser
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
+from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -56,6 +57,11 @@ from rastro.ia.cliente import (
 from rastro.ia.provedores.claude import ProvedorClaude
 from rastro.ia.provedores.codex import ProvedorCodex
 from rastro.ia.provedores.kiro import ProvedorKiro
+from rastro.pentest.erros import ErroNoPentest
+from rastro.pentest.fluxo import carregar_pentest as carregar_resultado_do_pentest
+from rastro.pentest.fluxo import executar_pentest
+from rastro.pentest.gravacao import caminho_do_pentest, gravar_pentest, pasta_padrao_do_pentest
+from rastro.pentest.modelos import ResultadoDoPentest
 from rastro.relatorio.gravacao import (
     RelatorioGravado,
     RelatorioJaExiste,
@@ -76,7 +82,8 @@ from rastro.terminal import AndamentoNoTerminal, LinhaAoVivo, escrever_tempo
 
 DESCRICAO = (
     "Lê um HAR, identifica as bibliotecas front-end do site e prioriza as falhas "
-    "conhecidas nelas. Só análise passiva: o site analisado nunca é acessado."
+    "conhecidas nelas. A análise é passiva; o pentest ativo só roda com comando e "
+    "autorização explícitos."
 )
 AJUDA_SEM_IA = "analisa sem IA: não procura bibliotecas em bundles e não explica os achados"
 AVISO_SEM_IA = (
@@ -170,6 +177,20 @@ TEXTO_NADA_GRAVADO = (
     "Nenhum relatório foi gerado."
 )
 TEXTO_HAR_PERDIDO = "o navegador fechou antes de gravar o HAR. Nenhum relatório foi gerado."
+AJUDA_PENTEST = (
+    "leva para a aba Segurança ativa o resultado gerado por `rastro pentest` para este mesmo HAR; "
+    "não muda a nota nem o plano"
+)
+AJUDA_PENTEST_COMANDO = (
+    "executa validações HTTP seguras no host do HAR; envia requisições somente com --autorizo"
+)
+TEXTO_PENTEST_EXECUTADO = (
+    "Validações de segurança ativas executadas pelo Rastro com autorização explícita. "
+    "Ele usa somente GET, HEAD e OPTIONS, sem corpo, cookies ou cabeçalhos de autenticação."
+)
+TEXTO_PENTEST_NO_RELATORIO = (
+    "Segurança ativa: {resumo}, na aba Segurança ativa. Não muda a nota nem o plano de ação."
+)
 PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
     "kiro": ProvedorKiro,
     "claude": ProvedorClaude,
@@ -186,7 +207,7 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
         description="Analisa um HAR e grava o relatório numa pasta nova.",
     )
     analisar_har.add_argument("har", type=Path, help="arquivo HAR exportado do navegador")
-    adicionar_opcoes_da_analise(analisar_har)
+    adicionar_opcoes_da_analise(analisar_har, pentest=True)
     gravar = comandos.add_parser(
         "gravar",
         help=AJUDA_GRAVAR,
@@ -198,6 +219,26 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
     gravar.add_argument("url", help="endereço do site, com http:// ou https://")
     gravar.add_argument("--robo", action="store_true", help=AJUDA_ROBO)
     adicionar_opcoes_da_analise(gravar)
+    pentest = comandos.add_parser(
+        "pentest",
+        help=AJUDA_PENTEST_COMANDO,
+        description=(
+            "Executa validações HTTP seguras no host do HAR e grava o pentest.json. "
+            "O comando é opt-in: sem --autorizo nenhuma requisição é enviada."
+        ),
+    )
+    pentest.add_argument("har", type=Path, help="arquivo HAR exportado do navegador")
+    pentest.add_argument(
+        "--autorizo",
+        action="store_true",
+        help="confirma que você tem autorização para enviar requisições ao site",
+    )
+    pentest.add_argument(
+        "--saida",
+        type=Path,
+        metavar="PASTA",
+        help="pasta dos pentests (padrão: Rastro/pentest na pasta do usuário)",
+    )
     comandos.add_parser(
         "como-usar",
         help=AJUDA_COMO_USAR,
@@ -216,7 +257,9 @@ def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
     return leitor
 
 
-def adicionar_opcoes_da_analise(comando: argparse.ArgumentParser) -> None:
+def adicionar_opcoes_da_analise(
+    comando: argparse.ArgumentParser, pentest: bool = False
+) -> None:
     comando.add_argument("--ia", metavar="NOME", help=AJUDA_IA)
     comando.add_argument("--sem-ia", action="store_true", help=AJUDA_SEM_IA)
     comando.add_argument(
@@ -226,6 +269,8 @@ def adicionar_opcoes_da_analise(comando: argparse.ArgumentParser) -> None:
         help="pasta dos relatórios (padrão: Rastro/relatorios na pasta do usuário)",
     )
     comando.add_argument("--nao-abrir", action="store_true", help=AJUDA_NAO_ABRIR)
+    if pentest:
+        comando.add_argument("--pentest", type=Path, metavar="ARQUIVO", help=AJUDA_PENTEST)
 
 
 def principal() -> None:
@@ -244,14 +289,16 @@ def executar(argumentos: list[str] | None = None) -> int:
         return instalar_comando()
     if opcoes.comando == "desinstalar":
         return desinstalar_comando()
+    if opcoes.comando == "pentest":
+        return pentest_comando(opcoes.har, opcoes.saida, opcoes.autorizo)
     abrir = not opcoes.nao_abrir
     if opcoes.comando == "gravar":
         return gravar_e_analisar(
             opcoes.url, opcoes.saida, opcoes.ia, opcoes.sem_ia, abrir, opcoes.robo
         )
     if opcoes.sem_ia:
-        return analisar_sem_ia(opcoes.har, opcoes.saida, abrir)
-    return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia, abrir)
+        return analisar_sem_ia(opcoes.har, opcoes.saida, abrir, opcoes.pentest)
+    return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia, abrir, opcoes.pentest)
 
 
 def abrir_como_usar() -> int:
@@ -316,7 +363,11 @@ def desinstalar_comando() -> int:
 
 
 def analisar_com_ia(
-    caminho_har: Path, saida: Path | None, opcao_ia: str | None, abrir: bool
+    caminho_har: Path,
+    saida: Path | None,
+    opcao_ia: str | None,
+    abrir: bool,
+    caminho_pentest: Path | None,
 ) -> int:
     try:
         ia = montar_cliente_de_ia(opcao_ia)
@@ -325,9 +376,44 @@ def analisar_com_ia(
     except CliDaIaAusente as erro:
         return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
     avisar_analise_com_ia(ia)
-    return analisar_e_gravar(caminho_har, saida, ia, abrir)
+    return analisar_e_gravar(caminho_har, saida, ia, abrir, caminho_pentest)
 
 
+def pentest_comando(caminho_har: Path, saida: Path | None, autorizo: bool) -> int:
+    if not autorizo:
+        return encerrar_com_erro(
+            "o pentest ativo envia requisições ao site. Para continuar, rode o comando "
+            "novamente com --autorizo somente se você tiver autorização para testar o alvo"
+        )
+    try:
+        resultado = executar_pentest(caminho_har, momento=datetime.now())
+        momento = datetime.fromisoformat(resultado.executado_em)
+        raiz = saida or pasta_padrao_do_pentest()
+        caminho = caminho_do_pentest(raiz, resultado.site, momento)
+        gravar_pentest(caminho, resultado)
+    except (ErroAoLerHar, ErroNoPentest) as erro:
+        return encerrar_com_erro(str(erro))
+    mostrar_pentest(resultado, caminho)
+    return 0
+
+
+def mostrar_pentest(resultado: ResultadoDoPentest, caminho: Path) -> None:
+    print(TEXTO_PENTEST_EXECUTADO)
+    print(f"Site: {resultado.site} · requisições enviadas: {resultado.requisicoes_enviadas}")
+    print(f"Resumo: {texto_do_resumo_do_pentest(asdict(resultado.resumo))}")
+    print(f"Pentest gravado em: {caminho}")
+    print(
+        "Para abrir no relatório: python -m rastro analisar "
+        f'"{resultado.har}" --pentest "{caminho}"'
+    )
+
+
+def texto_do_resumo_do_pentest(resumo: dict[str, int]) -> str:
+    return (
+        f"{resumo['falharam']} falharam, {resumo['passaram']} passaram, "
+        f"{resumo['nao_verificadas']} não verificadas, "
+        f"{resumo['requisicoes_ignoradas']} requisições ignoradas"
+    )
 def gravar_e_analisar(
     url: str,
     saida: Path | None,
@@ -498,9 +584,11 @@ def montar_cliente_de_ia(opcao_ia: str | None) -> ClienteDeIA:
     return ClienteDeIA(PROVEDORES_DAS_IAS[nome_da_ia](executavel))
 
 
-def analisar_sem_ia(caminho_har: Path, saida: Path | None, abrir: bool) -> int:
+def analisar_sem_ia(
+    caminho_har: Path, saida: Path | None, abrir: bool, caminho_pentest: Path | None
+) -> int:
     avisar_analise_sem_ia()
-    return analisar_e_gravar(caminho_har, saida, None, abrir)
+    return analisar_e_gravar(caminho_har, saida, None, abrir, caminho_pentest)
 
 
 def analisar_e_gravar(
@@ -508,9 +596,15 @@ def analisar_e_gravar(
     saida: Path | None,
     ia: ClienteDeIA | None,
     abrir: bool,
+    caminho_pentest: Path | None = None,
     gravado_pelo_rastro: bool = False,
 ) -> int:
     try:
+        pentest = (
+            carregar_resultado_do_pentest(caminho_pentest, caminho_har)
+            if caminho_pentest
+            else None
+        )
         with LinhaAoVivo() as linha:
             andamento = AndamentoNoTerminal(linha)
             analise = analisar(
@@ -524,9 +618,9 @@ def analisar_e_gravar(
                 andamento=andamento,
             )
             andamento.terminar()
-    except ErroAoLerHar as erro:
+    except (ErroAoLerHar, ErroNoPentest) as erro:
         return encerrar_com_erro(str(erro))
-    relatorio = montar_relatorio(analise)
+    relatorio = montar_relatorio(analise, pentest)
     aplicacao = nome_da_aplicacao(analise.site, caminho_har)
     pasta = caminho_do_relatorio(saida or pasta_padrao(), aplicacao, analise.inicio)
     try:
@@ -563,6 +657,9 @@ def mostrar_resultado(
     print(f"HTML: {gravado.html}")
     print(f"JSON: {gravado.json}")
     print(f"Resumo: {resumo_de_uma_linha(relatorio)}")
+    if relatorio["pentest"] is not None:
+        resumo = texto_do_resumo_do_pentest(relatorio["pentest"]["resumo"])
+        print(TEXTO_PENTEST_NO_RELATORIO.format(resumo=resumo))
     if abrir:
         abrir_relatorio(gravado.html)
     if relatorio["analise"]["ia"] is None:
