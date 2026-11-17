@@ -7,6 +7,7 @@
 ```
 python -m rastro analisar loja.har [--ia kiro|claude|codex] [--sem-ia] [--saida <pasta>] [--nao-abrir]
 python -m rastro como-usar
+python -m rastro pentest loja.har --autorizo [--saida <pasta>]
 ```
 
 O código segue as etapas da apresentação, na mesma ordem e com os mesmos nomes:
@@ -92,6 +93,7 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/captura/playwright.py` | abre o Chrome ou o Edge pelo Playwright, grava o HAR e traduz o que falta (Playwright, navegador) em erro claro; único arquivo que importa o Playwright | R24.1, R24.3, R24.4 |
 | `rastro/captura/pasta.py` | monta a pasta nova da gravação (host e porta, data e hora), só do dono, e tira usuário e senha da URL mostrada | R24.6, R24.8 |
 | `rastro/captura/robo.py` | navega pelos links com as travas e diz por que parou | R24.10–R24.15 |
+| `rastro/pentest/` | validações ativas opcionais: modelos, sonda, privacidade, formato, leitura, gravação e fluxo isolado | R25 |
 | `frontend/` | React: só exibe o JSON | R09.2, R10.2, R12, R13.5, R13.6, R22.4–R22.7, R23 |
 
 **Diferenças em relação ao `structure.md`:** entram `acao/` (plano e task não cabem em `risco/`), `travas/`, `fontes/registro_npm.py`, `har/site.py`, `identificacao/bundles.py`, `ia/sanitizacao.py` e `relatorio/gravacao.py`. O `structure.md` já traz essas pastas.
@@ -667,6 +669,10 @@ Com IA, a análise pode passar minutos calada (cada chamada pode levar até 2 mi
 | `gravar` sem o Playwright | mostra o comando de instalação para o Python que roda o Rastro | código 1, sem abrir o navegador |
 | `gravar` sem Chrome nem Edge | diz para instalar um dos dois | código 1 |
 | `gravar` sem nenhuma requisição gravada | diz que nada foi gravado | código 1, sem relatório |
+| `pentest` sem `--autorizo` | exige autorização antes de ler o HAR | código 1 |
+| `pentest` sem site no HAR | não acessa rede nem grava resultado | código 1 |
+| `pentest` com timeout ou falha de rede | registra `nao_verificada` e segue | código 0 |
+| `analisar --pentest` com resultado inválido ou de outro HAR | encerra antes de gravar o relatório | código 1 |
 
 Código 0 significa que a análise terminou, mesmo com achados. As mensagens vão para a saída de erro, em texto simples.
 
@@ -700,8 +706,9 @@ Um arquivo por decisão, com contexto, decisão e alternativas (T45):
 
 11. Comando `rastro` de qualquer pasta, criado pela pessoa: `11-comando-rastro-de-qualquer-pasta.md`.
 12. Gravar a visita com o Playwright, opcional, pelo navegador da máquina: `12-gravar-com-playwright.md`.
+13. Validações de segurança ativas em comando separado, com autorização e fora da nota: `13-pentest-por-comando-separado.md`.
 
-Decisão nova ganha o próximo número (`13-<tema>.md`), com as mesmas três seções.
+Decisão nova ganha o próximo número (`14-<tema>.md`), com as mesmas três seções.
 
 ## 17. A validar no spike
 
@@ -775,4 +782,21 @@ Puro, sobre a `SessaoDeGravacao`, com relógio e pedido de parada recebidos de f
 ### HAR gravado pelo Playwright
 
 O leitor do HAR não muda: o conteúdo vem embutido, o site sai da primeira resposta HTML (não há `log.pages`) e a visita tem `startedDateTime` e `time` (T58). Muda só a mensagem das checagens de cookie (R24.9): o `gravar` chama `analisar(..., gravado_pelo_rastro=True)`, e `checar_configuracao` troca o "exporte o HAR completo" por "o site não criou nenhum cookie". A origem não sai do `log.creator.name`: os HARs da avaliação também foram gravados pelo Playwright, mas tiveram os cookies tirados depois (T61).
+
+## 19. Validações de segurança ativas (R25)
+
+O comando `pentest` é separado do `gravar`. O `analisar` continua passivo; o `pentest` só acessa o host do HAR depois de `--autorizo`.
+
+```text
+python -m rastro pentest loja.har --autorizo [--saida PASTA]
+python -m rastro analisar loja.har --pentest <caminho>/pentest.json
+```
+
+O motor próprio fica isolado em `rastro/pentest/` e usa a biblioteca padrão. Ele seleciona no máximo 20 URLs distintas já presentes no HAR, somente do mesmo host, sem query, credenciais ou caminhos que pareçam conter segredo. Envia apenas `GET`, `HEAD` e `OPTIONS`, sem corpo, cookies ou autorização, com timeout de 5 segundos, pausa entre requisições e sem seguir redirecionamentos.
+
+A sonda gera validações de CSP, HSTS, nosniff, frame, Referrer-Policy, Permissions-Policy, versão do servidor, CORS e cookies. Timeout e falha de conexão viram `nao_verificada`. A situação `falhou` significa problema observado na resposta, não exploração confirmada.
+
+O `pentest.json` leva o SHA-256 do HAR. `analisar --pentest` recusa resultado de outro HAR e nunca faz requisições novas. O JSON do relatório mantém o resultado na chave `pentest`; nota, bibliotecas, achados, checagens e plano permanecem independentes.
+
+O relatório mostra a aba **Segurança ativa** somente quando há um resultado. Um motor externo futuro, como OWASP ZAP, deve implementar o mesmo contrato, informar motor, versão, perfil, escopo e limites, e continuar fora da nota. As opções estão comparadas em `docs/analise-opcoes-pentest.md`.
 

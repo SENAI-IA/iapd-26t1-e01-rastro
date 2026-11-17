@@ -6,6 +6,7 @@ from rastro.fontes import osv
 from rastro.fontes.conector import Aviso, ConsultaNaoRealizada
 from rastro.fontes.github_advisory import converter_resposta
 from rastro.ia.cliente import FalhaDoProvedor, RespostaDoProvedor
+from rastro.pentest.sonda import RespostaHttp
 
 DADOS = Path(__file__).parent / "dados"
 HAR_DA_LOJA = DADOS / "loja.har"
@@ -118,3 +119,13 @@ class ProvedorFalso:
         if isinstance(resposta, FalhaDoProvedor):
             raise resposta
         return resposta
+
+
+class SondaFalsa:
+    def __init__(self, respostas: list[RespostaHttp]) -> None:
+        self.respostas = list(respostas)
+        self.chamadas: list[tuple[str, str, str | None]] = []
+
+    def sondar(self, url: str, metodo: str, origem: str | None) -> RespostaHttp:
+        self.chamadas.append((url, metodo, origem))
+        return self.respostas.pop(0)

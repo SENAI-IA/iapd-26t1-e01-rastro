@@ -78,6 +78,11 @@
 | T62 Navegar sozinho com travas | extensão | T60 | T63 | `robo.py` sobre a `SessaoDeGravacao` |
 | T63 Combinar o robô com a navegação da pessoa | extensão | T62 | T64 | Enter antes e janela aberta depois do robô |
 | T64 Ensinar a gravar a visita | extensão | T61, T63 | — | README e "Como usar" descrevem o comando pronto |
+| T66 Criar a sonda HTTP segura das validações ativas | extensão | T34 | T67 | sonda, privacidade e modelos |
+| T67 Selecionar alvos e validar respostas ativas | extensão | T08, T09, T66 | T68 | `Requisicao`, host analisado e sonda |
+| T68 Gravar as validações de segurança ativas | extensão | T23, T57, T67 | T69 | formato, pasta e comando |
+| T69 Levar as validações ativas ao JSON do relatório | extensão | T68 | T70 | `pentest.json` gravado pelo comando |
+| T70 Mostrar a aba Segurança ativa no relatório | extensão | T64, T69 | T48 | aba, Como usar e Tour guiado |
 
 ## Grafo
 
@@ -102,6 +107,9 @@ flowchart LR
   end
   subgraph F4[Fase 4]
     T42; T43; T44; T45; T46; T47; T48
+  end
+  subgraph PT[Extensão: segurança ativa]
+    T66; T67; T68; T69; T70
   end
 
   T03 --> T04
@@ -150,6 +158,13 @@ flowchart LR
   T04 & T52 --> T46
   T42 & T43 & T46 & T55 & T56 & T57 --> T47
   T42 & T43 & T44 & T45 & T46 & T47 & T55 & T56 & T57 --> T48
+
+  T34 --> T66
+  T08 & T09 & T66 --> T67
+  T23 & T57 & T67 --> T68
+  T68 --> T69
+  T64 & T69 --> T70
+  T42 & T43 & T44 & T45 & T46 & T47 & T55 & T56 & T57 & T70 --> T48
 ```
 
 ## Caminho crítico

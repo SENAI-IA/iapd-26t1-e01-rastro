@@ -609,3 +609,47 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Teste: `test_r17_4_*`: roda o `install.sh` com `sh` numa pasta de usuário falsa, baixando um `.tar.gz` montado do projeto por `file://` (sem rede); confere o comando criado, a atualização, a pasta alheia e o download que falha. Manual: `curl ... | bash` com bash e dash, `rastro --help` de outra pasta e `rastro desinstalar`; "Como usar" no Chrome, 1280 px claro e 390 px escuro.
   - Requisito: R17.4, R20.1
   - Revisão: a definir
+
+## Extensão: validações de segurança ativas, num comando separado
+
+O Rastro continua passivo em `analisar`. O comando `pentest --autorizo` faz validações HTTP limitadas num escopo isolado (`rastro/pentest/`) e grava o `pentest.json`; o `analisar --pentest` só leva esse resultado para a aba Segurança ativa (R25, design seção 19, decisão 13). Nada disso entra na nota, nas checagens nem no plano de ação.
+
+- [x] **T66 Criar a sonda HTTP segura das validações ativas**
+  - Entrega: modelos, privacidade e sonda HTTP sem corpo, cookies ou autorização.
+  - Aceite: a execução usa apenas `GET`, `HEAD` e `OPTIONS`, timeout de 5 segundos, pausa e sem redirecionamentos; sem `--autorizo` não lê o HAR nem acessa a rede.
+  - Arquivos: `rastro/pentest/__init__.py`, `rastro/pentest/modelos.py`, `rastro/pentest/erros.py`, `rastro/pentest/privacidade.py`, `rastro/pentest/sonda.py`, `tests/pentest/test_sonda.py`, `tests/pentest/test_privacidade.py`
+  - Teste: `test_r16_1_*`, `test_r16_3_*`, `test_r25_1_*`, `test_r25_2_*`
+  - Requisito: R16.1–R16.4, R25.1, R25.2
+  - Revisão: @ali.santos
+
+- [x] **T67 Selecionar alvos e validar respostas ativas**
+  - Entrega: seleção de até 20 URLs do mesmo host e validações de headers, CORS, cookies e disponibilidade.
+  - Aceite: outro host, credencial, query, caminho com segredo, método inseguro e URL repetida são ignorados; cada resposta fica `falhou`, `passou` ou `nao_verificada` sem inventar status ou cabeçalho.
+  - Arquivos: `rastro/pentest/fluxo.py`, `rastro/pentest/validacoes.py`, `tests/pentest/test_fluxo.py`, `tests/pentest/test_validacoes.py`
+  - Teste: `test_r25_3_*` a `test_r25_6_*`, `test_r25_13_*`
+  - Requisito: R25.3–R25.6, R25.13
+  - Revisão: @cristiano.albino
+
+- [x] **T68 Gravar as validações de segurança ativas**
+  - Entrega: comando `python -m rastro pentest <arquivo.har> --autorizo` e `pentest.json` com formato fechado.
+  - Aceite: grava em `~/Rastro/pentest/<site>/<AAAA-MM-DD_HH-MM-SS>/pentest.json`, com SHA-256 do HAR; pasta existente, HAR inválido ou sem site saem com código 1 sem gravar; terminal mostra escopo e resumo.
+  - Arquivos: `rastro/pentest/formato.py`, `rastro/pentest/leitor.py`, `rastro/pentest/gravacao.py`, `rastro/cli.py`, `tests/pentest/test_formato.py`, `tests/pentest/test_gravacao.py`, `tests/pentest/test_cli_pentest.py`, `README.md`, `README-TECNICO.md`
+  - Teste: `test_r25_7_*` a `test_r25_9_*`, `test_r25_14_*`
+  - Requisito: R25.7–R25.9, R25.14
+  - Revisão: @geison.santos
+
+- [x] **T69 Levar as validações ativas ao JSON do relatório**
+  - Entrega: `analisar --pentest <pentest.json>` lê resultado do mesmo HAR sem novas requisições.
+  - Aceite: resultado inválido ou de outro HAR sai antes de gravar; sem a opção, `pentest: null`; nota, achados, checagens e plano permanecem iguais.
+  - Arquivos: `rastro/relatorio/json.py`, `rastro/cli.py`, `tests/relatorio/test_json.py`, `tests/test_cli.py`
+  - Teste: `test_r25_10_*` a `test_r25_11_*`
+  - Requisito: R25.10, R25.11
+  - Revisão: @geison.santos
+
+- [x] **T70 Mostrar a aba Segurança ativa no relatório**
+  - Entrega: aba e painel de validações ativas, com guia e tour atualizados.
+  - Aceite: a aba só aparece com resultado; mostra host, HAR, data, resumo, três situações e autorização; o Como usar mostra o comando opcional e o Tour mostra a aba quando ela existe; claro, escuro, 400px e teclado conferidos.
+  - Arquivos: `frontend/src/tipos.ts`, `frontend/src/App.tsx`, `frontend/src/componentes/BarraSuperior.*`, `frontend/src/componentes/PainelPentest.*`, `frontend/src/componentes/ItemDoPentest.*`, `frontend/src/dados/guia.ts`, `frontend/src/dados/tour.ts`, `frontend/src/dados/glossario.ts`, `frontend/src/componentes/IlustracaoDoGuia.tsx`, `rastro/relatorio/modelo.html`, `README.md`, `README-TECNICO.md`
+  - Teste: verificação manual.
+  - Requisito: R25.12
+  - Revisão: @halan.bacca
