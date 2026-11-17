@@ -42,7 +42,7 @@ export default function BarraSuperior({
           {temPentest && (
             <button
               type="button"
-              className="barra-superior__tela"
+              className="barra-superior__tela barra-superior__tela--pentest"
               aria-current={tela === "pentest" ? "page" : undefined}
               onClick={() => aoTrocarTela("pentest")}
             >

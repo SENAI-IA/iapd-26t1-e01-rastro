@@ -11,6 +11,8 @@ export const glossario = {
     "Pedaço de texto que a IA lê ou escreve, mais ou menos uma sílaba. É a medida de uso que os provedores cobram.",
   Trava:
     "Regra fixa que confere um dado antes de ele entrar no relatório: o que a IA devolveu, o pacote no npm, a faixa de versão afetada. O que não passa é barrado e fica registrado.",
+  Pentest:
+    "Validação ativa e limitada de segurança. No Rastro, só roda no comando separado com `--autorizo`, sem payloads e fora da nota da análise.",
 } as const satisfies Record<string, string>;
 
 export type NomeDoTermo = keyof typeof glossario;
