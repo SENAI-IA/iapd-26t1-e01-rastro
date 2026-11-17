@@ -2,7 +2,7 @@ import Icone from "./Icone.tsx";
 import "./BarraSuperior.css";
 
 export type Tema = "claro" | "escuro";
-export type Tela = "painel" | "como-usar";
+export type Tela = "painel" | "pentest" | "como-usar";
 
 interface Props {
   tema: Tema;
@@ -10,9 +10,17 @@ interface Props {
   aoTrocarTema: () => void;
   aoTrocarTela: (tela: Tela) => void;
   aoAbrirTour: (() => void) | null;
+  temPentest: boolean;
 }
 
-export default function BarraSuperior({ tema, tela, aoTrocarTema, aoTrocarTela, aoAbrirTour }: Props) {
+export default function BarraSuperior({
+  tema,
+  tela,
+  aoTrocarTema,
+  aoTrocarTela,
+  aoAbrirTour,
+  temPentest,
+}: Props) {
   const proximoTema = tema === "claro" ? "escuro" : "claro";
   return (
     <header className="barra-superior">
@@ -31,6 +39,17 @@ export default function BarraSuperior({ tema, tela, aoTrocarTema, aoTrocarTela, 
             <Icone nome="painel" />
             Painel
           </button>
+          {temPentest && (
+            <button
+              type="button"
+              className="barra-superior__tela"
+              aria-current={tela === "pentest" ? "page" : undefined}
+              onClick={() => aoTrocarTela("pentest")}
+            >
+              <Icone nome="lupa" />
+              Pentest
+            </button>
+          )}
           <button
             type="button"
             className="barra-superior__tela"

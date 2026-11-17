@@ -166,6 +166,7 @@ export interface Relatorio {
   plano_de_acao: Acao[];
   ia: DadosDaIA;
   visita?: PassoDaVisita[];
+  pentest?: ResultadoDoPentest | null;
 }
 
 export type Camada = "pagina" | "script" | "estilo" | "dados" | "midia";
@@ -178,4 +179,58 @@ export interface PassoDaVisita {
   duracao_ms: number;
   bibliotecas: string[];
   prioridade: Prioridade | null;
+}
+
+export type CategoriaDoPentest =
+  | "csp"
+  | "hsts"
+  | "nosniff"
+  | "frame"
+  | "referrer_policy"
+  | "permissions_policy"
+  | "server_version"
+  | "cors"
+  | "cookie"
+  | "csp_diretiva"
+  | "execucao";
+export type SituacaoDoPentest = "falhou" | "passou" | "nao_verificada";
+export type MetodoSeguro = "GET" | "HEAD" | "OPTIONS";
+
+export interface RequisicaoDoPentest {
+  indice_har: number;
+  metodo: MetodoSeguro;
+  status: number | null;
+  url: string;
+  erro: string | null;
+}
+
+export interface ValidacaoDoPentest {
+  id: string;
+  categoria: CategoriaDoPentest;
+  titulo: string;
+  situacao: SituacaoDoPentest;
+  detalhe: string;
+  requisicao: RequisicaoDoPentest;
+}
+
+export interface ResumoDoPentest {
+  requisicoes_enviadas: number;
+  requisicoes_ignoradas: number;
+  falharam: number;
+  passaram: number;
+  nao_verificadas: number;
+}
+
+export interface ResultadoDoPentest {
+  versao_formato: number;
+  origem: "rastro";
+  modo: "ativo";
+  executado_em: string;
+  har: string;
+  har_sha256: string;
+  site: string;
+  limite_de_requisicoes: number;
+  requisicoes_enviadas: number;
+  validacoes: ValidacaoDoPentest[];
+  resumo: ResumoDoPentest;
 }

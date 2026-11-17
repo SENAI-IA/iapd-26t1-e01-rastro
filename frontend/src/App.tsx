@@ -14,6 +14,7 @@ import ListaChecagens from "./componentes/ListaChecagens.tsx";
 import { idDaLinhaDaBiblioteca } from "./componentes/LinhaBiblioteca.tsx";
 import ModalTask from "./componentes/ModalTask.tsx";
 import PainelIA from "./componentes/PainelIA.tsx";
+import PainelPentest from "./componentes/PainelPentest.tsx";
 import PainelOrigemDoDado, { type OrigemDoDado } from "./componentes/PainelOrigemDoDado.tsx";
 import PlanoDeAcao from "./componentes/PlanoDeAcao.tsx";
 import ReplayDaVisita from "./componentes/ReplayDaVisita.tsx";
@@ -172,6 +173,7 @@ export default function App({ relatorio }: Props) {
           aoTrocarTema={trocarTema}
           aoTrocarTela={trocarTela}
           aoAbrirTour={relatorio ? abrirTour : null}
+          temPentest={relatorio?.pentest != null}
         />
         {relatorio && zonaEmFoco && (
           <BarraDeFoco zonaEmFoco={zonaEmFoco} aoTrocarZona={setZonaEmFoco} aoSair={sairDoFoco} />
@@ -185,6 +187,8 @@ export default function App({ relatorio }: Props) {
           <GuiaComoUsar aoIrParaOPainel={relatorio ? () => trocarTela("painel") : null} />
         ) : relatorio === null ? (
           <p>Este arquivo não traz os dados de uma análise. Gere o relatório com o Rastro: veja em "Como usar".</p>
+        ) : tela === "pentest" && relatorio.pentest ? (
+          <PainelPentest pentest={relatorio.pentest} />
         ) : (
           <>
             {zonaEmFoco === null && <CabecalhoAnalise analise={relatorio.analise} />}
