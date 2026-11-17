@@ -159,6 +159,21 @@ Resumo: 127.0.0.1:8080 · bibliotecas: 6 (6 com falhas) · achados: 20 · nota m
 ```
 
 - Cada análise vai para uma pasta nova, `<site>/<AAAA-MM-DD_HH-MM-SS>/`. O Rastro nunca sobrescreve um relatório e nunca altera o HAR.
+
+### Validações de segurança ativas
+
+```bash
+python3 -m rastro pentest site.har --autorizo
+```
+
+No Windows:
+
+```powershell
+py -m rastro pentest site.har --autorizo
+```
+
+O comando testa somente URLs do mesmo host já presentes no HAR, no máximo 20, com `GET`, `HEAD` ou `OPTIONS`. Não envia corpo, cookies ou autorização e não faz exploração. O resultado fica em `Rastro/pentest/<site>/<data>/pentest.json` e pode ser levado ao relatório com `--pentest`. A aba aparece como **Segurança ativa** e permanece separada do risco.
+
 - Erro (HAR que não existe ou inválido, IA desconhecida, CLI de IA não encontrada, pasta da análise que já existe) encerra com código 1 e a mensagem começa com `rastro: erro:`. Exemplo: `rastro: erro: a CLI da IA kiro (kiro-cli) não foi encontrada no sistema. Escolha outra IA com --ia. Use --sem-ia (...)`.
 
 ### 3. Abrir o relatório
