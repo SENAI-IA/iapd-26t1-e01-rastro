@@ -5,6 +5,7 @@ from typing import Any
 from rastro.fluxo import Analise, analisar
 from rastro.fontes.conector import FonteSemResposta
 from rastro.ia.cliente import ChamadaIA, ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
+from rastro.pentest.modelos import ResultadoDoPentest, ResumoDoPentest
 from rastro.relatorio.json import (
     TEXTO_BUNDLES_NAO_PROCURADOS,
     TEXTO_CONTINUA_IGUAL_SEM_IA,
@@ -50,7 +51,28 @@ def ids_das_limitacoes(relatorio: dict[str, Any]) -> list[str]:
     return [limitacao["id"] for limitacao in relatorio["analise"]["limitacoes"]]
 
 
-def test_r13_7_relatorio_traz_versao_do_formato_e_todas_as_secoes() -> None:
+def test_r24_11_pentest_fica_separado_e_nao_muda_o_resumo() -> None:
+    pentest = ResultadoDoPentest(
+        versao_formato=1,
+        origem="rastro",
+        modo="ativo",
+        executado_em="2026-11-20T12:00:00",
+        har="loja.har",
+        har_sha256="a" * 64,
+        site="loja.exemplo.com",
+        limite_de_requisicoes=20,
+        requisicoes_enviadas=0,
+        validacoes=[],
+        resumo=ResumoDoPentest(0, 4, 0, 0, 0),
+    )
+    sem_pentest = relatorio_da_loja()
+    com_pentest = montar_relatorio(analise_da_loja(), pentest)
+
+    assert com_pentest["pentest"]["modo"] == "ativo"
+    assert com_pentest["resumo"] == sem_pentest["resumo"]
+    assert com_pentest["achados"] == sem_pentest["achados"]
+    assert com_pentest["plano_de_acao"] == sem_pentest["plano_de_acao"]
+
     relatorio = relatorio_da_loja()
 
     assert relatorio["versao_formato"] == VERSAO_FORMATO == 1
@@ -65,6 +87,7 @@ def test_r13_7_relatorio_traz_versao_do_formato_e_todas_as_secoes() -> None:
         "plano_de_acao",
         "ia",
         "visita",
+        "pentest",
     ]
 
 
@@ -274,7 +297,13 @@ def test_r11_1_cada_chamada_vai_para_o_painel_com_entrada_resposta_tempo_e_token
 
     assert len(chamadas) == 1
     assert list(chamadas[0]) == [
-        "etapa", "provedor", "entrada", "resposta", "duracao_s", "tokens", "sucesso",
+        "etapa",
+        "provedor",
+        "entrada",
+        "resposta",
+        "duracao_s",
+        "tokens",
+        "sucesso",
     ]
     assert chamadas[0]["etapa"] == "explicar_achado"
     assert chamadas[0]["provedor"] == "kiro"
@@ -370,7 +399,13 @@ def test_r04a_5_achado_leva_as_fontes_e_a_origem_de_cada_campo_para_o_json() -> 
     assert aviso["fontes"] == ["GitHub Advisory", "OSV"]
     assert aviso["origem_dos_campos"]["versoes_afetadas"] == "GitHub Advisory"
     assert set(aviso["origem_dos_campos"]) == {
-        "cve", "resumo", "cvss", "percentil_epss", "versoes_afetadas", "versao_corrigida", "link",
+        "cve",
+        "resumo",
+        "cvss",
+        "percentil_epss",
+        "versoes_afetadas",
+        "versao_corrigida",
+        "link",
     }
 
 
