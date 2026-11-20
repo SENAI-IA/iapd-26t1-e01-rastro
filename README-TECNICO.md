@@ -161,16 +161,17 @@ O `relatorio.json` tem os mesmos dados, para guardar ou comparar análises.
 
 ## O relatório
 
-Prints do relatório do WebGoat (`avaliacao/webgoat.har`), gerados no Linux em 09/11/2026 com o Chromium.
+Prints do relatório do WebGoat (`avaliacao/webgoat.har`), gerados no Linux em 19/11/2026 com o Chromium.
 
 | | |
 |---|---|
-| ![Tema escuro](docs/prints/02-relatorio-escuro.png) **Tema escuro.** Segue o sistema; o botão no topo troca. | ![Tela de 400px](docs/prints/03-relatorio-400px.png) **Tela de 400px.** Os indicadores viram uma coluna. |
+| ![Tema escuro](docs/prints/02-relatorio-escuro.png) **Tema escuro.** Segue o sistema; o botão no topo troca. No topo, o radar com a visita já tocada. | ![Tela de 400px](docs/prints/03-relatorio-400px.png) **Tela de 400px.** O radar desce para baixo do texto e os indicadores viram uma coluna. |
 | ![Análise sem IA](docs/prints/04-relatorio-sem-ia.png) **Sem IA.** O aviso fica no topo e "Encontradas só pela IA" mostra "Não procurado". | ![Explicação da IA](docs/prints/05-explicacao-da-ia.png) **Explicação da IA** em cada biblioteca, marcada "Sugerido pela IA: confira antes de usar". |
 | ![Origem do dado](docs/prints/06-origem-do-dado.png) **Origem do dado:** HAR → identificação → aviso → cálculo da nota. | ![Task para o board](docs/prints/07-task.png) **Task** em Markdown, pronta para colar no board. |
 | ![Modo foco](docs/prints/08-modo-foco.png) **Modo foco** na zona Agir. | ![Glossário](docs/prints/09-glossario.png) **Glossário:** a definição aparece no termo sublinhado. |
 | ![Onde a IA entrou](docs/prints/10-onde-a-ia-entrou.png) **Onde a IA entrou:** chamadas, tempo, tokens e travas acionadas. | ![Tour guiado](docs/prints/11-tour-guiado.png) **Tour guiado:** um balão por parte da tela, só com as partes que a análise tem. |
-| ![Como usar](docs/prints/12-como-usar.png) **Como usar:** do HAR ao relatório em sete passos, com ilustração e "Marcar como feito". | |
+| ![Como usar](docs/prints/12-como-usar.png) **Como usar:** primeiro a escolha do jeito de gravar (no navegador, com o Rastro gravando ou com o robô), depois os passos daquele jeito, com ilustração e "Marcar como feito". | ![Radar tocando](docs/prints/13-radar-tocando-escuro.png) **Radar tocando:** a visita pausada no meio, com os arquivos que já chegaram e o giro marcando a ordem de chegada. |
+| ![Como usar no tema escuro](docs/prints/14-como-usar-escuro.png) **Como usar no tema escuro.** | |
 
 ## Resultados
 
@@ -209,7 +210,7 @@ Os critérios marcados *(verificação manual)* na spec só se conferem olhando 
 | 11 | Apertar `Esc` ou "Sair do foco" | Volta ao layout completo, na posição da zona | R15.4 | conferido 09/11 (volta com a zona logo abaixo do topo) | a conferir (T42) |
 | 12 | Em foco, abrir a origem, um termo do glossário, uma task e, no relatório sem IA, o aviso | Tudo continua funcionando | R15.5 | conferido 09/11 (origem, glossário, task e aviso sem IA; `Esc` fecha a origem e mantém o foco) | a conferir (T42) |
 | 13 | Fazer os passos 10 e 11 só com o teclado e em 400px | Funciona por teclado e em tela estreita | R15.6 | conferido 09/11 (só teclado, em 400px, sem rolagem lateral) | a conferir (T42) |
-| 14 | Abrir o relatório e clicar em "Como usar" e de volta em "Painel" | Abre no painel; "Como usar" mostra os sete passos com ilustração, "Marcar como feito" soma no progresso e os comandos têm "Copiar" | R23.1, R23.5 | conferido 10/11 (print 12) | a conferir (T42) |
+| 14 | Abrir o relatório e clicar em "Como usar" e de volta em "Painel" | Abre no painel; "Como usar" mostra a escolha do jeito de gravar e os passos daquele jeito com ilustração, "Marcar como feito" soma no progresso e os comandos têm "Copiar" | R23.1, R23.5 | conferido 19/11 (print 12) | a conferir (T42) |
 | 15 | Clicar em "Tour guiado" e andar com "Próximo", "Voltar" e as setas; fechar com `Esc` | Destaca uma parte por vez, com "n de total" e os termos do glossário; só as partes que a análise tem; o foco volta ao botão | R23.2, R23.3, R23.4 | conferido 10/11 (print 11; WebGoat com 11 passos, `loja.har` com 10, Juice Shop sem IA com 9; claro, escuro e 400px) | a conferir (T42) |
 | 16 | Ativar "reduzir movimento" no sistema e abrir o tour e o "Como usar" | Ilustrações paradas e destaque sem transição | R23.7 | conferido 10/11 (Chromium com `prefers-reduced-motion`) | a conferir (T42) |
 | 17 | Rodar `python3 -m rastro como-usar` (Windows: `py -m rastro como-usar`) | O navegador abre o relatório sem dados já no "Como usar", sem o botão "Tour guiado"; o terminal mostra o caminho do `modelo.html` | R23.1, R23.8 | conferido 10/11 (Chromium; com dados, o relatório segue abrindo no painel) | a conferir (T42) |
