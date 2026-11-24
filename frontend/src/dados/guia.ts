@@ -73,7 +73,7 @@ export const MODOS_DE_USO: OpcaoDeModo[] = [
 export const ANTES_DE_COMECAR: Item[] = [
   { texto: "**Chrome ou Edge.** No Firefox os passos são os mesmos, com outros nomes de menu.", modos: ["devtools"] },
   { texto: "**Chrome ou Edge** instalado. O Rastro usa o navegador do computador.", modos: GRAVANDO_PELO_RASTRO },
-  { texto: "**Python e a pasta do Rastro** no computador, como na seção \"Instalar\" do README." },
+  { texto: "**Python 3.10 ou mais novo** no computador. O Rastro você instala no primeiro passo." },
   { texto: "**Uma CLI de IA** (Kiro, Claude ou Codex) para a análise completa. Sem ela, rode com `--sem-ia`." },
   {
     texto: "**Autorização para analisar o site.** O Rastro só lê o arquivo gravado e não acessa o site, mas combine com o time responsável.",
@@ -86,14 +86,17 @@ export const ANTES_DE_COMECAR: Item[] = [
 ];
 
 const INSTALAR_O_RASTRO: PassoDoGuia = {
-  titulo: "Instale o comando rastro",
+  titulo: "Instale o Rastro",
   texto:
-    "Só na primeira vez: abra o terminal na pasta do Rastro e rode o comando. Depois disso, é só digitar `rastro` no terminal, em qualquer pasta.",
+    "Só na primeira vez. No Linux, o comando baixa o Rastro e cria o comando `rastro`, sem Git e sem `sudo`. No Windows, baixe o ZIP do repositório, extraia e rode o comando dentro da pasta. Depois disso, é só digitar `rastro` no terminal, em qualquer pasta.",
   comandos: [
-    { sistema: "Linux", texto: "python3 -m rastro instalar" },
+    {
+      sistema: "Linux",
+      texto: "curl -fsSL https://raw.githubusercontent.com/SENAI-IA/iapd-26t1-e01-rastro/main/install.sh | bash",
+    },
     { sistema: "Windows", texto: "py -m rastro instalar" },
   ],
-  dica: "Se o terminal pedir, feche-o e abra outro. Confira com `rastro --help`. Já instalou antes? Marque como feito e siga.",
+  dica: "Feche o terminal e abra outro. Confira com `rastro --help`. Já instalou antes? Marque como feito e siga. Para atualizar, rode o comando de novo.",
   ilustracao: "instalar",
 };
 
@@ -265,7 +268,7 @@ export const PROBLEMAS: Problema[] = [
   },
   {
     sintoma: "\"rastro: comando não encontrado\"",
-    solucao: "Feche o terminal e abra outro. Se continuar, rode de novo `python3 -m rastro instalar` na pasta do Rastro (Windows: `py -m rastro instalar`). Se mudou a pasta do Rastro de lugar, rode também.",
+    solucao: "Feche o terminal e abra outro. Se continuar, rode de novo o comando do passo \"Instale o Rastro\" e leia o que ele mostra.",
   },
   {
     sintoma: "\"A CLI da IA não foi encontrada\"",

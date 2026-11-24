@@ -44,7 +44,8 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 |---|---|---|
 | `rastro/__main__.py` | permite `python -m rastro`, chamando `cli.principal()` | R01.1 |
 | `rastro/cli.py` | lê argumentos, escolhe o provedor, chama o fluxo, grava, imprime o resumo e abre o relatório no navegador (menos com `--nao-abrir`); `como-usar` abre o modelo no navegador; `instalar` e `desinstalar` chamam o `atalho.py`; `principal()` é a entrada do `python -m rastro` e do comando `rastro` | R13.8, R13.9, R14, R17.3, R18.1, R23.8 |
-| `rastro/atalho.py` | cria e remove o atalho marcado do comando `rastro` e o bloco marcado do PATH, na pasta do usuário | R17.3, R18.1 |
+| `rastro/atalho.py` | cria e remove o atalho marcado do comando `rastro` e o bloco marcado do PATH, na pasta do usuário; lista o que o `desinstalar` deixa para trás (a pasta do `install.sh` e a `~/Rastro`) | R17.3, R17.4, R18.1 |
+| `install.sh` | instalador de um comando só (Linux): confere o Python, baixa a `main` para `~/.local/share/rastro`, marca a pasta e roda o `rastro instalar` | R17.4 |
 | `rastro/fluxo.py` | orquestra as etapas, sem regra própria | todos |
 | `rastro/andamento.py` | interface `Andamento` (`comecar`, `etapa`, `itens`, `avancar`) e o `SEM_ANDAMENTO`, que não faz nada | R13.10 |
 | `rastro/terminal.py` | `LinhaAoVivo` (a linha que se reescreve com `\r`) e `AndamentoNoTerminal`, que mostra as etapas da análise nela | R13.10, R24.18 |

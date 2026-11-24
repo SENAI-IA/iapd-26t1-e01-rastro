@@ -10,9 +10,13 @@ from rastro.atalho import (
     FIM_DO_BLOCO,
     INICIO_DO_BLOCO,
     MARCA,
+    MARCA_DO_INSTALADOR,
     AtalhoDeOutro,
+    Sobra,
+    comando_para_apagar,
     desinstalar_no_unix,
     instalar_no_unix,
+    sobras_da_instalacao,
     texto_do_atalho_windows,
 )
 
@@ -211,6 +215,7 @@ def test_r17_3_cli_desinstalar_sem_nada_instalado_retorna_0(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     monkeypatch.setattr(atalho, "desinstalar", lambda: desinstalar_no_unix(tmp_path))
+    monkeypatch.setattr(atalho, "sobras", lambda: [])
 
     assert cli.executar(["desinstalar"]) == 0
     assert capsys.readouterr().out == "O comando rastro não está instalado.\n"
@@ -221,8 +226,75 @@ def test_r17_3_cli_desinstalar_confirma_o_que_removeu(
 ) -> None:
     instalar_no_unix(tmp_path, ambiente(tmp_path))
     monkeypatch.setattr(atalho, "desinstalar", lambda: desinstalar_no_unix(tmp_path))
+    monkeypatch.setattr(atalho, "sobras", lambda: [])
 
     assert cli.executar(["desinstalar"]) == 0
 
     assert capsys.readouterr().out == "Comando rastro removido.\n"
     assert FIM_DO_BLOCO not in (tmp_path / ".bashrc").read_text(encoding="utf-8")
+
+
+def projeto_do_install_sh(casa: Path) -> Path:
+    projeto = casa / ".local" / "share" / "rastro"
+    projeto.mkdir(parents=True)
+    (projeto / MARCA_DO_INSTALADOR).touch()
+    return projeto
+
+
+def test_r17_4_sobras_trazem_a_pasta_criada_pelo_install_sh(tmp_path: Path) -> None:
+    projeto = projeto_do_install_sh(tmp_path)
+
+    assert sobras_da_instalacao(tmp_path, projeto) == [
+        Sobra(atalho.DESCRICAO_DOS_ARQUIVOS, projeto)
+    ]
+
+
+def test_r17_4_sobras_nao_trazem_a_pasta_de_um_clone(tmp_path: Path) -> None:
+    clone = tmp_path / "meu-clone"
+    clone.mkdir()
+
+    assert sobras_da_instalacao(tmp_path, clone) == []
+
+
+def test_r17_4_sobras_trazem_as_gravacoes_e_relatorios(tmp_path: Path) -> None:
+    dados = tmp_path / "Rastro"
+    dados.mkdir()
+
+    assert sobras_da_instalacao(tmp_path, tmp_path / "clone") == [
+        Sobra(atalho.DESCRICAO_DOS_DADOS, dados)
+    ]
+
+
+def test_r17_4_comando_para_apagar_no_linux_protege_o_caminho() -> None:
+    assert comando_para_apagar(Path("/home/ana/minha pasta"), no_windows=False) == (
+        "rm -rf '/home/ana/minha pasta'"
+    )
+
+
+def test_r17_4_comando_para_apagar_no_windows_usa_o_powershell() -> None:
+    assert comando_para_apagar(Path("C:/Users/d'ana/Rastro"), no_windows=True) == (
+        "Remove-Item -Recurse -Force 'C:/Users/d''ana/Rastro'"
+    )
+
+
+@somente_unix
+def test_r17_4_cli_desinstalar_mostra_como_limpar_tudo_sem_apagar(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    projeto = projeto_do_install_sh(tmp_path)
+    (tmp_path / "Rastro").mkdir()
+    instalar_no_unix(tmp_path, ambiente(tmp_path))
+    monkeypatch.setattr(atalho, "desinstalar", lambda: desinstalar_no_unix(tmp_path))
+    monkeypatch.setattr(atalho, "sobras", lambda: sobras_da_instalacao(tmp_path, projeto))
+
+    assert cli.executar(["desinstalar"]) == 0
+
+    assert capsys.readouterr().out == (
+        "Comando rastro removido.\n"
+        "Para limpar tudo, apague também:\n"
+        f"  os arquivos do Rastro: rm -rf {projeto}\n"
+        "  suas gravações e relatórios (guarde antes o que quiser manter): "
+        f"rm -rf {tmp_path / 'Rastro'}\n"
+    )
+    assert projeto.is_dir()
+    assert (tmp_path / "Rastro").is_dir()

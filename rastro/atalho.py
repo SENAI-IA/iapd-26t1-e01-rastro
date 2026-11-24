@@ -13,6 +13,10 @@ ARQUIVOS_DO_SHELL = (".bashrc", ".zshrc", ".profile")
 CODIFICACAO_DO_CMD = "oem"
 PATH_DO_USUARIO_NO_WINDOWS = "PATH do usuário"
 CHAVE_DO_AMBIENTE = "Environment"
+MARCA_DO_INSTALADOR = ".instalado-pelo-install-sh"
+PASTA_DOS_DADOS = "Rastro"
+DESCRICAO_DOS_ARQUIVOS = "os arquivos do Rastro"
+DESCRICAO_DOS_DADOS = "suas gravações e relatórios (guarde antes o que quiser manter)"
 TEXTO_PROJETO_NAO_ENCONTRADO = (
     "rode o instalar de dentro da pasta do projeto: python3 -m rastro instalar "
     "(Windows: py -m rastro instalar)"
@@ -44,6 +48,12 @@ class Desinstalacao:
     path_removido_de: list[str]
 
 
+@dataclass(frozen=True)
+class Sobra:
+    descricao: str
+    caminho: Path
+
+
 def instalar() -> Instalacao:
     if sys.platform == "win32":
         return instalar_no_windows(Path.home(), os.environ)
@@ -54,6 +64,32 @@ def desinstalar() -> Desinstalacao:
     if sys.platform == "win32":
         return desinstalar_no_windows(Path.home(), os.environ)
     return desinstalar_no_unix(Path.home())
+
+
+def sobras() -> list[Sobra]:
+    return sobras_da_instalacao(Path.home(), pasta_do_projeto())
+
+
+def sobras_da_instalacao(casa: Path, projeto: Path) -> list[Sobra]:
+    """O que o `desinstalar` deixa para trás: a pessoa apaga se quiser (R17.2)."""
+    encontradas = []
+    if instalado_pelo_install_sh(projeto):
+        encontradas.append(Sobra(DESCRICAO_DOS_ARQUIVOS, projeto))
+    dados = casa / PASTA_DOS_DADOS
+    if dados.is_dir():
+        encontradas.append(Sobra(DESCRICAO_DOS_DADOS, dados))
+    return encontradas
+
+
+def instalado_pelo_install_sh(projeto: Path) -> bool:
+    return (projeto / MARCA_DO_INSTALADOR).is_file()
+
+
+def comando_para_apagar(caminho: Path, no_windows: bool) -> str:
+    if no_windows:
+        entre_aspas = str(caminho).replace("'", "''")
+        return f"Remove-Item -Recurse -Force '{entre_aspas}'"
+    return f"rm -rf {shlex.quote(str(caminho))}"
 
 
 def instalar_no_unix(casa: Path, ambiente: Mapping[str, str]) -> Instalacao:
@@ -93,8 +129,12 @@ def desinstalar_no_windows(casa: Path, ambiente: Mapping[str, str]) -> Desinstal
     return Desinstalacao(removido, [PATH_DO_USUARIO_NO_WINDOWS] if alterado else [])
 
 
+def pasta_do_projeto() -> Path:
+    return Path(__file__).resolve().parent.parent
+
+
 def raiz_do_projeto() -> Path:
-    raiz = Path(__file__).resolve().parent.parent
+    raiz = pasta_do_projeto()
     if not (raiz / "pyproject.toml").is_file():
         raise ProjetoNaoEncontrado(TEXTO_PROJETO_NAO_ENCONTRADO)
     return raiz

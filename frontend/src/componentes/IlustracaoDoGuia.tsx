@@ -164,7 +164,7 @@ const DESENHOS: Record<IlustracaoDoPasso, ReactNode> = {
   instalar: terminal(
     <>
       <text className="ilustracao__texto ilustracao__texto--mono ilustracao__texto--forte ilustracao__digita ilustracao__digita--1" x="22" y="60">
-        $ python3 -m rastro instalar
+        $ curl …/install.sh | bash
       </text>
       <text className="ilustracao__texto ilustracao__texto--mono ilustracao__digita ilustracao__digita--2" x="22" y="84">
         Pronto! Comando rastro instalado.

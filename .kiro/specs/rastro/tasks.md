@@ -599,3 +599,13 @@ Sem revisor definido: os commits saem sem `Co-authored-by` até o grupo escolher
   - Teste: `test_r13_10_*`, `test_r24_18_*`, `test_r24_19_*`
   - Requisito: R13.10, R24.18, R24.19
   - Revisão: a definir
+
+## Instalar com um comando
+
+- [x] **T66 Instalar o Rastro com um comando só**
+  - Entrega: `install.sh` na raiz, rodado com `curl -fsSL https://raw.githubusercontent.com/SENAI-IA/iapd-26t1-e01-rastro/main/install.sh | bash`; o `desinstalar` mostra como limpar tudo; README e "Como usar" ensinam o comando novo em vez do `git clone`.
+  - Aceite: sem Git e sem `sudo`, o instalador baixa a `main` para `~/.local/share/rastro` e cria o comando `rastro`; rodar de novo atualiza sem deixar a versão velha; uma pasta que ele não criou não é tocada; sem Python 3.10+ ou sem download, para com mensagem clara e não deixa nada; o `desinstalar` lista os comandos para apagar a pasta do instalador (só se tiver a marca, nunca a de um clone) e a `~/Rastro`, sem apagar nada; no "Como usar", o comando longo quebra a linha e o "Copiar" continua visível.
+  - Arquivos: `install.sh`, `rastro/atalho.py`, `rastro/cli.py`, `tests/test_atalho.py`, `tests/test_install_sh.py`, `README.md`, `README-TECNICO.md`, `frontend/src/dados/guia.ts`, `frontend/src/componentes/IlustracaoDoGuia.tsx`, `frontend/src/componentes/PassoDoGuia.css`, `rastro/relatorio/modelo.html`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`
+  - Teste: `test_r17_4_*`: roda o `install.sh` com `sh` numa pasta de usuário falsa, baixando um `.tar.gz` montado do projeto por `file://` (sem rede); confere o comando criado, a atualização, a pasta alheia e o download que falha. Manual: `curl ... | bash` com bash e dash, `rastro --help` de outra pasta e `rastro desinstalar`; "Como usar" no Chrome, 1280 px claro e 390 px escuro.
+  - Requisito: R17.4, R20.1
+  - Revisão: a definir
