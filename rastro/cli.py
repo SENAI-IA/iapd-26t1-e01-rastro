@@ -110,6 +110,7 @@ TEXTO_TESTE_NO_MESMO_TERMINAL = "Teste com: rastro --help"
 TEXTO_TESTE_NUM_TERMINAL_NOVO = "Abra um terminal novo e teste com: rastro --help"
 TEXTO_DESINSTALADO = "Comando rastro removido."
 TEXTO_NADA_A_REMOVER = "O comando rastro não está instalado."
+TEXTO_PARA_LIMPAR_TUDO = "Para limpar tudo, apague também:"
 AJUDA_GRAVAR = "abre o navegador, grava a visita num HAR e analisa ao fechar a janela"
 TEXTO_GRAVANDO = (
     "Gravando a visita a {host}. Navegue pelo site como um usuário comum "
@@ -312,7 +313,17 @@ def desinstalar_comando() -> int:
         print(TEXTO_NADA_A_REMOVER)
     else:
         print(TEXTO_DESINSTALADO)
+    mostrar_como_limpar_tudo(atalho.sobras())
     return 0
+
+
+def mostrar_como_limpar_tudo(sobras: list[atalho.Sobra]) -> None:
+    if not sobras:
+        return
+    print(TEXTO_PARA_LIMPAR_TUDO)
+    no_windows = sys.platform == "win32"
+    for sobra in sobras:
+        print(f"  {sobra.descricao}: {atalho.comando_para_apagar(sobra.caminho, no_windows)}")
 
 
 def analisar_com_ia(

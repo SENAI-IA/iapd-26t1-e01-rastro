@@ -220,6 +220,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 1. Na análise, o Rastro DEVE gravar só os dois arquivos do relatório, sempre como arquivos novos. No `gravar` (R24), grava também o `visita.har`, numa pasta nova.
 2. O Rastro NÃO DEVE instalar nada global, pedir `sudo` nem, por conta própria, instalar ou apagar arquivos.
 3. QUANDO a pessoa pedir `rastro instalar`, o Rastro DEVE criar só o atalho do comando `rastro` na pasta do usuário, marcado como dele, e pôr essa pasta no PATH do usuário com um bloco marcado. QUANDO a pessoa pedir `rastro desinstalar`, o Rastro DEVE remover só o atalho e o bloco que têm a marca. SE já existir um comando `rastro` sem a marca, ENTÃO o Rastro NÃO DEVE sobrescrevê-lo nem apagá-lo, e para com mensagem clara.
+4. No Linux, o Rastro DEVE poder ser instalado com um comando só (`curl -fsSL .../install.sh | bash`), sem Git e sem `sudo`: o `install.sh` confere o Python 3.10+, baixa a `main` do GitHub para `~/.local/share/rastro`, marca a pasta como dele e roda o `rastro instalar`. Rodar de novo atualiza. SE a pasta já existir sem a marca, ENTÃO o instalador NÃO DEVE mexer nela e para com mensagem clara. O `rastro desinstalar` DEVE mostrar, sem apagar, os comandos para apagar a pasta do instalador e a pasta `~/Rastro` com as gravações e os relatórios (R17.2).
 
 ## R18 Windows e Linux
 

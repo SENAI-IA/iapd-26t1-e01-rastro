@@ -20,7 +20,7 @@ A análise é passiva: Rastro lê o HAR e não acessa o site analisado. Se prefe
 
 - [Antes de começar](#antes-de-começar)
 - [Instalar](#instalar)
-- [Usar de qualquer pasta (opcional)](#usar-de-qualquer-pasta-opcional)
+- [Atualizar e remover](#atualizar-e-remover)
 - [Ver o guia sem analisar](#ver-o-guia-sem-analisar)
 - [Gravar um arquivo HAR](#gravar-um-arquivo-har)
 - [Gravar pelo Rastro (opcional)](#gravar-pelo-rastro-opcional)
@@ -44,24 +44,27 @@ Você precisa de:
 
 Node.js não é necessário para usar o Rastro. O relatório HTML já vem pronto no projeto.
 
-Rastro não instala Python, Node.js nem CLI de IA, e não pede `sudo` nem administrador. O comando `rastro` opcional só é criado se você pedir, e fica na sua pasta de usuário.
+Rastro não instala Python, Node.js nem CLI de IA, e não pede `sudo` nem administrador. Tudo fica na sua pasta de usuário.
 
 ## Instalar
 
 ### Linux
 
-Na pasta onde deseja guardar o projeto:
+Rode no terminal:
 
 ```bash
-git clone <url-do-repositorio> rastro
-cd rastro
-python3 --version
-python3 -m rastro --help
+curl -fsSL https://raw.githubusercontent.com/SENAI-IA/iapd-26t1-e01-rastro/main/install.sh | bash
 ```
 
-Troque `<url-do-repositorio>` pelo endereço do repositório. Se não usar Git, baixe o ZIP e extraia a pasta.
+O instalador confere o Python, baixa o Rastro para `~/.local/share/rastro` e cria o comando `rastro`. Não precisa de Git nem de `sudo`.
 
-O último comando confirma que o Rastro está pronto. Para análise com IA, confira também a CLI escolhida:
+Abra um terminal novo e confira:
+
+```bash
+rastro --help
+```
+
+Para análise com IA, confira também a CLI escolhida:
 
 ```bash
 kiro-cli --version
@@ -73,46 +76,52 @@ codex --version
 
 ### Windows
 
-A instalação do zero no Windows ainda está em conferência. Os comandos esperados são:
+A instalação do zero no Windows ainda está em conferência. Baixe o ZIP do repositório (botão **Code** → **Download ZIP**), extraia a pasta e, dentro dela, rode:
 
 ```powershell
-git clone <url-do-repositorio> rastro
-cd rastro
 py --version
-py -m rastro --help
+py -m rastro instalar
 ```
 
-## Usar de qualquer pasta (opcional)
+Abra um terminal novo e confira com `rastro --help`.
 
-Para digitar só `rastro` em qualquer pasta, sem entrar na pasta do projeto:
+### Com Git (para quem vai mexer no código)
 
-1. Na pasta do projeto, rode uma vez:
+```bash
+git clone https://github.com/SENAI-IA/iapd-26t1-e01-rastro.git rastro
+cd rastro
+python3 -m rastro instalar
+```
 
-   ```bash
-   python3 -m rastro instalar
-   ```
+O comando `rastro` aponta para essa pasta: um `git pull` já atualiza. Se mudar a pasta de lugar, rode o `instalar` de novo. Sem o `instalar`, use `python3 -m rastro` (Windows: `py -m rastro`) dentro da pasta.
 
-   No Windows: `py -m rastro instalar` (a conferir).
+## Atualizar e remover
 
-2. Feche o terminal e abra outro.
-3. Confira: `rastro --help`
+Para atualizar, rode de novo o mesmo comando `curl` da instalação. Ele troca os arquivos do Rastro pela versão nova; suas gravações e relatórios em `~/Rastro` não mudam.
 
-Pronto. Agora, nos exemplos abaixo, troque `python3 -m rastro` por `rastro`.
+Para remover:
 
-Para remover: `rastro desinstalar`. Se mudar a pasta do projeto de lugar, rode o passo 1 de novo.
+```bash
+rastro desinstalar
+```
+
+Ele tira o comando `rastro` e a linha que pôs no PATH, e mostra os comandos para apagar o resto, se você quiser limpar tudo:
+
+```text
+Comando rastro removido.
+Para limpar tudo, apague também:
+  os arquivos do Rastro: rm -rf /home/voce/.local/share/rastro
+  suas gravações e relatórios (guarde antes o que quiser manter): rm -rf /home/voce/Rastro
+```
+
+O Rastro não apaga essas pastas sozinho: confira e rode você mesmo. Se instalou o Playwright para o `gravar`, remova com `python3 -m pip uninstall playwright`.
 
 ## Ver o guia sem analisar
 
 O Rastro possui um guia visual com o passo a passo completo:
 
 ```bash
-python3 -m rastro como-usar
-```
-
-No Windows:
-
-```powershell
-py -m rastro como-usar
+rastro como-usar
 ```
 
 Esse comando abre o guia no navegador. No alto, escolha como quer gravar a visita (no DevTools, pelo Rastro ou com o robô) e o guia mostra só os passos daquele jeito. Não lê HAR, não consulta a internet e não grava uma análise.
@@ -174,24 +183,20 @@ A gravação fica em `~/Rastro/gravacoes/` e **guarda o seu login no site**. Nã
 
 ## Fazer uma análise
 
-Execute o comando na raiz do projeto ou, com o [comando `rastro` instalado](#usar-de-qualquer-pasta-opcional), em qualquer pasta.
-
 ### Com IA
 
 Kiro é a IA padrão:
 
 ```bash
-python3 -m rastro analisar site.har
+rastro analisar site.har
 ```
 
 Escolha outra IA:
 
 ```bash
-python3 -m rastro analisar site.har --ia claude
-python3 -m rastro analisar site.har --ia codex
+rastro analisar site.har --ia claude
+rastro analisar site.har --ia codex
 ```
-
-No Windows, troque `python3` por `py`.
 
 Durante a análise, Rastro consulta fontes públicas como GitHub Advisory, OSV, NVD e registro do npm. O site descrito no HAR não é acessado.
 
@@ -217,7 +222,7 @@ Cada análise é salva em uma pasta nova. Rastro não sobrescreve relatórios an
 ### Escolher a pasta de saída
 
 ```bash
-python3 -m rastro analisar site.har --saida meus-relatorios
+rastro analisar site.har --saida meus-relatorios
 ```
 
 Sem `--saida`, os relatórios ficam em `~/Rastro/relatorios` no Linux.
@@ -245,7 +250,7 @@ O `relatorio.json` contém os mesmos dados em formato adequado para guardar, com
 Se você não tiver uma CLI de IA, ainda pode executar a análise:
 
 ```bash
-python3 -m rastro analisar site.har --sem-ia
+rastro analisar site.har --sem-ia
 ```
 
 Essa análise é incompleta. Ela não procura bibliotecas escondidas em bundles e não gera explicações da IA. As demais etapas continuam funcionando, incluindo consultas, cálculo de risco, checagens e plano de ação.
@@ -263,14 +268,16 @@ O projeto inclui HARs sanitizados de três aplicações:
 Para analisar o exemplo do WebGoat:
 
 ```bash
-python3 -m rastro analisar avaliacao/webgoat.har
+rastro analisar ~/.local/share/rastro/avaliacao/webgoat.har
 ```
 
 Para uma execução sem IA:
 
 ```bash
-python3 -m rastro analisar avaliacao/webgoat.har --sem-ia
+rastro analisar ~/.local/share/rastro/avaliacao/webgoat.har --sem-ia
 ```
+
+Se instalou com Git, os exemplos ficam em `avaliacao/`, dentro da pasta do projeto.
 
 Detalhes dos arquivos e dos resultados ficam em [`avaliacao/README.md`](avaliacao/README.md) e [`avaliacao/resultados.md`](avaliacao/resultados.md).
 
@@ -280,13 +287,17 @@ Detalhes dos arquivos e dos resultados ficam em [`avaliacao/README.md`](avaliaca
 
 Instale Python 3.10 ou mais novo. No Windows, use o comando `py`.
 
-### `rastro: command not found` depois do `instalar`
+### `rastro: command not found` depois de instalar
 
-Abra um terminal novo: o PATH novo só vale para os terminais abertos depois do `instalar`. Se continuar, rode `python3 -m rastro instalar` (Windows: `py -m rastro instalar`) de novo na pasta do projeto e leia o que ele mostra. Enquanto isso, `python3 -m rastro` na pasta do projeto continua funcionando.
+Abra um terminal novo: o PATH novo só vale para os terminais abertos depois da instalação. Se continuar, rode o instalador de novo e leia o que ele mostra.
 
-### `já existe um comando rastro` ao rodar o `instalar`
+### `já existe um comando rastro` ao instalar
 
-O comando `rastro` foi instalado antes de outro jeito, provavelmente com o pipx. Remova com `python3 -m pipx uninstall rastro` e rode `python3 -m rastro instalar` de novo. O Rastro não apaga um comando que ele não criou.
+O comando `rastro` foi instalado antes de outro jeito, provavelmente com o pipx. Remova com `python3 -m pipx uninstall rastro` e rode o instalador de novo. O Rastro não apaga um comando que ele não criou.
+
+### `a pasta ... já existe e não foi criada por este instalador`
+
+Já existe uma pasta `~/.local/share/rastro` que não veio do instalador. Ele não mexe nela: mude-a de lugar ou apague-a, e rode o instalador de novo.
 
 ### CLI de IA não encontrada
 

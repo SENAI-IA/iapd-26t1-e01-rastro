@@ -83,10 +83,24 @@ Para não precisar entrar na pasta do projeto, a pessoa cria o comando `rastro` 
 
 - O `instalar` grava um atalho marcado (`~/.local/bin/rastro`; no Windows, `%LOCALAPPDATA%\Rastro\bin\rastro.cmd`) que roda `python -m rastro` com a raiz do projeto no `PYTHONPATH`. Se a pasta não estiver no PATH, acrescenta um bloco marcado no `.bashrc`, `.zshrc` ou `.profile`, conforme o `$SHELL` (no Windows, no PATH do usuário, no registro `HKCU\Environment`). Sem pip, sem internet e sem `sudo`.
 - O atalho usa o Python do sistema, mesmo com o `.venv` ativo, para não quebrar se o `.venv` for apagado. Como aponta para a pasta do projeto, um `git pull` já vale; mover a pasta pede outro `instalar`.
-- O `desinstalar` remove só o atalho com a marca e o bloco marcado do PATH. Um `rastro` que não tem a marca (do pipx, por exemplo) não é sobrescrito nem apagado: o comando para com mensagem clara.
+- O `desinstalar` remove só o atalho com a marca e o bloco marcado do PATH. Um `rastro` que não tem a marca (do pipx, por exemplo) não é sobrescrito nem apagado: o comando para com mensagem clara. No fim, mostra os comandos para apagar o resto (a pasta do `install.sh`, se houver, e a `~/Rastro` com gravações e relatórios), sem apagar nada.
 - Quem preferir pode instalar com o pipx (`pipx install .`): o `pyproject.toml` continua declarando o comando `rastro` e os arquivos de dados.
 - Com o comando instalado, `rastro` substitui `python3 -m rastro` (Windows: `py -m rastro`) em todos os comandos deste documento.
 - O pacote declara o `modelo.html` e os prompts de `rastro/ia/prompts/` como dados, porque o código os lê com `importlib.resources`. Arquivo novo que não seja `.py` dentro de `rastro/` precisa entrar em `[tool.setuptools.package-data]` no `pyproject.toml`; o `tests/test_instalacao.py` confere.
+
+### Instalar com um comando (Linux)
+
+Quem só vai usar não precisa clonar:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/SENAI-IA/iapd-26t1-e01-rastro/main/install.sh | bash
+```
+
+- O `install.sh` (POSIX `sh`, roda com `bash` ou `dash`) confere o Python 3.10+, baixa o `.tar.gz` da `main` pelo `codeload.github.com` para uma pasta temporária, extrai e troca a `~/.local/share/rastro` (ou `$XDG_DATA_HOME/rastro`) inteira. Depois roda `python3 -m rastro instalar` de dentro dela. Sem Git, sem pip, sem `sudo`.
+- A pasta ganha o arquivo `.instalado-pelo-install-sh`. Sem essa marca, o instalador não mexe numa pasta que já existe; com ela, o `desinstalar` sabe que pode sugerir apagar a pasta (nunca sugere apagar um clone).
+- Rodar de novo atualiza: a pasta velha é trocada pela nova. A `~/Rastro` (gravações e relatórios) fica fora disso.
+- `RASTRO_PASTA` troca a pasta de destino e `RASTRO_ORIGEM` troca o endereço do pacote. O `tests/test_install_sh.py` usa `RASTRO_ORIGEM=file://...` com um pacote montado do próprio projeto, sem rede.
+- No Windows ainda não há instalador de um comando: ZIP + `py -m rastro instalar`.
 
 ## Uso
 

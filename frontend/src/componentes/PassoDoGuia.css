@@ -88,9 +88,14 @@
 
 .passo-do-guia__comando code {
   flex: 1;
+  min-width: 0;
   font-family: var(--fonte-mono);
   font-size: 13px;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+}
+
+.passo-do-guia__comando .passo-do-guia__copiar {
+  flex-shrink: 0;
 }
 
 .passo-do-guia__copiar,
