@@ -68,6 +68,13 @@ export const PASSOS_DO_TOUR: PassoDoTour[] = [
       "Do mesmo arquivo saem as checagens de cabeçalhos de segurança e de cookies, inclusive as que passaram. Com o HAR sanitized, as de cookie ficam como não verificadas.",
   },
   {
+    seletor: ".barra-superior__tela--pentest",
+    titulo: "Segurança ativa, opcional e separada",
+    texto:
+      "Quando você executa `pentest --autorizo`, esta aba mostra as proteções que o site devolveu, em a corrigir, em ordem e não conferido, e o escopo do teste. Fica fora da nota.",
+    termos: ["Pentest", "WSTG"],
+  },
+  {
     seletor: ".zona__focar",
     titulo: "Uma zona por vez",
     texto: "\"Focar\" mostra só aquela zona, usando a tela toda. Esc ou \"Sair do foco\" volta ao relatório completo.",

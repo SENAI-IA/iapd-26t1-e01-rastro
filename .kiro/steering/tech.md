@@ -37,12 +37,14 @@ Tudo precisa funcionar nos dois.
 
 - O Rastro só lê o HAR e nunca o altera.
 - O relatório é gravado numa pasta nova, `~/Rastro/relatorios/<site>/<AAAA-MM-DD_HH-MM-SS>/` (`--saida` troca a raiz), com arquivos abertos no modo `"x"`; se a pasta já existir, para com mensagem clara. Nome de pasta sem `:` e sem caracteres que o Windows não aceita.
+- O `pentest` segue a mesma regra em `~/Rastro/pentest/<site>/<AAAA-MM-DD_HH-MM-SS>/pentest.json`, só roda com `--autorizo`, usa sondas HTTP limitadas e nunca altera o HAR.
 - Nada instalado no sistema, sem `sudo`, e o Rastro não instala nem apaga nada por conta própria. Sem o Playwright, o `gravar` só mostra o comando de instalação; o navegador é o da máquina, nunca baixado. O comando `rastro` só é criado ou removido quando a pessoa pede (`instalar` e `desinstalar`), na pasta do usuário, e só o que tem a marca do Rastro é tocado.
 - Vale também para os comandos que o agente roda durante o desenvolvimento.
 
 ## Rede
 
-- Só GitHub Advisory, registro do npm (leitura) e, se a extensão for feita, OSV e NVD. Nunca o site analisado.
+- Só GitHub Advisory, registro do npm (leitura) e, se a extensão for feita, OSV e NVD. O comando `pentest --autorizo` é a única exceção adicional: acessa somente o host autorizado, com o escopo e os limites de R25. Os demais comandos, fora `gravar`, nunca acessam o site analisado.
+- O `pentest` não chama a IA nem as fontes de vulnerabilidades: só lê o HAR e faz sondas HTTP seguras quando a pessoa autoriza.
 - Exceção: no `gravar`, o navegador aberto para a pessoa acessa o site, como se ela navegasse. O robô só segue links do mesmo host, nunca envia formulário.
 - O pacote baixado do npm é lido em memória: nada extraído em disco, nada executado.
 

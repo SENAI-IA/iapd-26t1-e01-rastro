@@ -10,6 +10,7 @@
 - **Um único ponto de chamada à IA**, que mede tempo e tokens.
 - **Dados separados da apresentação.** O núcleo gera JSON; o React só exibe.
 - **O código segue o fluxo da apresentação:** HAR → identificar → conferir → consultar → calcular → explicar → relatar, nessa ordem em `fluxo.py`.
+- **Pentest ativo isolado:** `pentest/` tem fluxo próprio para `pentest --autorizo`; o resultado nunca entra na nota nem no plano (`docs/decisoes/13-pentest-por-comando-separado.md`).
 
 ## Pastas
 
@@ -35,6 +36,7 @@ rastro/
     prompts/               prompts versionados, com exemplo de entrada e saída
   relatorio/               json.py, html.py, gravacao.py, modelo.html (build do frontend, versionado)
   captura/                 sessao.py (interface), playwright.py (único import do Playwright), pasta.py, robo.py
+  pentest/                 modelos.py, erros.py, privacidade.py, sonda.py, validacoes.py, formato.py, leitor.py, gravacao.py, fluxo.py (pentest --autorizo, isolado da análise)
 tests/                     mesma estrutura de rastro/
 frontend/                  React (ver frontend-react.md)
 docs/
@@ -53,5 +55,7 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 - **IA nova:** um arquivo em `ia/provedores/`.
 - **Assinatura nova:** em `identificacao/assinaturas.py`.
 - **Trava nova:** um arquivo em `travas/`, chamado por `conferencia.py` (trava sobre biblioteca) ou direto pelo fluxo (trava sobre aviso ou explicação), com teste em que a IA (dublê) inventa algo e a trava barra.
+
+- **Regra nova no pentest:** uma função em `pentest/validacoes.py` ou `pentest/fluxo.py`, com teste que prova o limite de segurança. O fluxo da análise não muda.
 
 A skill `rastro-nova-regra` (`.kiro/skills/rastro-nova-regra/SKILL.md`) descreve o passo a passo.

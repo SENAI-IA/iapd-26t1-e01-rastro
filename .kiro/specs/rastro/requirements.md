@@ -308,11 +308,33 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 18. Num terminal interativo, ENQUANTO o `gravar` roda, o terminal DEVE mostrar numa linha que se atualiza o que está acontecendo: abrindo o navegador, abrindo a URL, gravando (com o tempo, as requisições e os scripts gravados e o lembrete de fechar a janela), o robô navegando (páginas de quantas, requisições e tempo) e salvando a gravação. As linhas fixas (R24.14) continuam por cima dela. Fora de um terminal interativo, essa linha NÃO DEVE aparecer.
 19. Num terminal interativo, o que pede uma ação da pessoa (navegar e fechar a janela, entrar e apertar Enter antes do robô, visitar mais páginas depois do robô, conferir o endereço que não abriu) DEVE sair destacado (negrito amarelo), separado dos avisos e do progresso. Fora de um terminal interativo, ou com a variável `NO_COLOR` definida, o texto DEVE sair sem códigos de cor.
 
+## R25 Executar validações de segurança ativas (RF19)
+
+**Como** auditor autorizado, **quero** rodar um comando separado que faça validações HTTP básicas no host que visitei **para** encontrar configurações inseguras sem misturar o resultado à análise passiva.
+
+A análise normal (`analisar`) continua passiva. O pentest ativo só existe no comando `pentest` e só envia requisições quando a pessoa informa `--autorizo`. O comando não executa ataques nem envia corpos, cookies, tokens ou cabeçalhos de autenticação. Ele usa apenas URLs do mesmo host que já aparecem no HAR, remove a query string, limita a quantidade de requisições e não segue redirecionamentos.
+
+1. QUANDO o auditor executar `python -m rastro pentest <arquivo.har> --autorizo`, o Rastro DEVE ler o HAR, selecionar no máximo 20 URLs distintas do mesmo host e enviar somente requisições `GET`, `HEAD` ou `OPTIONS`, sem corpo, cookies ou cabeçalhos de autenticação. O Rastro DEVE usar tempo limite de 5 segundos, pausa entre requisições e não seguir redirecionamentos.
+2. SE `--autorizo` não for informado, ENTÃO o Rastro DEVE encerrar com código 1 antes de ler o HAR ou enviar qualquer requisição, explicando que o comando é ativo e que a pessoa precisa ter autorização.
+3. SE o HAR não tiver site analisado, ENTÃO o Rastro DEVE encerrar com código 1 sem acessar a rede e sem gravar resultado.
+4. SE uma URL do HAR for de outro host, tiver credenciais, método diferente de `GET`, `HEAD` e `OPTIONS`, ou parecer trazer um segredo no caminho, ENTÃO o Rastro NÃO DEVE sondá-la e DEVE contabilizá-la como ignorada. A query string nunca deve ser enviada nem gravada no resultado.
+5. QUANDO houver resposta HTTP, o Rastro DEVE validar, no mínimo, CSP, HSTS em HTTPS, `X-Content-Type-Options: nosniff`, proteção contra frame, `Referrer-Policy`, `Permissions-Policy`, versão em `Server`/`X-Powered-By`, CORS permissivo e atributos de cookies enviados na resposta. Cada ponto DEVE aparecer como `falhou`, `passou` ou `nao_verificada`, com a requisição, o status e um detalhe seguro.
+6. SE a resposta não vier por tempo esgotado, falha de conexão ou erro de protocolo, ENTÃO o Rastro DEVE registrar a validação como `nao_verificada`, sem inventar cabeçalhos ou status.
+7. O Rastro DEVE gravar `pentest.json` numa pasta nova, `<pasta padrão>/<site analisado>/<AAAA-MM-DD_HH-MM-SS>/`, com a pasta padrão `Rastro/pentest` dentro da pasta do usuário. ONDE `--saida <pasta>` for usada, o Rastro DEVE usar essa raiz. SE a pasta já existir, ENTÃO o Rastro DEVE encerrar com código 1 sem sobrescrever nada.
+8. O `pentest.json` DEVE trazer `versao_formato`, origem `rastro`, modo `ativo`, data, HAR, SHA-256 do HAR, host testado, limite, requisições enviadas, resumo e validações. O formato não deve aceitar campos de severidade, CVSS, EPSS, nota ou prioridade.
+9. QUANDO terminar, o Rastro DEVE mostrar no terminal o host, o número de requisições enviadas e ignoradas, o resumo, o caminho do `pentest.json` e como levá-lo ao relatório.
+10. ONDE a opção `--pentest <pentest.json>` for usada em `analisar`, o Rastro DEVE ler o resultado sem executar novas requisições e só aceitá-lo se o SHA-256 for do mesmo HAR. SE o arquivo for inválido ou de outro HAR, ENTÃO o Rastro DEVE encerrar com código 1 antes de gravar o relatório.
+11. O resultado do pentest NÃO DEVE mudar bibliotecas, achados, nota, prioridade, checagens, plano de ação nem o resumo da análise. Sem `--pentest`, o JSON traz `pentest: null` e o resto é igual.
+12. QUANDO o JSON trouxer `pentest`, o relatório DEVE ganhar a aba "Segurança ativa", com o host, HAR, data e endereços conferidos. Os resultados DEVEM aparecer agrupados por proteção, em "A corrigir" (falhou em pelo menos um endereço), "Em ordem" e "Não conferido", cada um com uma frase simples de por que importa, o que o Rastro viu e o resultado por endereço. A aba DEVE informar que o teste só ocorreu com autorização explícita, que nenhum ataque foi feito e que nada ali muda a nota. Sem `pentest`, a aba não aparece. *(verificação manual)*
+13. O comando `pentest` NÃO DEVE chamar a IA nem consultar GitHub Advisory, OSV, NVD ou registro do npm.
+14. O `pentest.json` NÃO DEVE trazer valores de cookies, tokens, corpos de resposta, cabeçalhos de autenticação ou a query string.
+15. Cada validação DEVE trazer em `referencia` o teste do OWASP Web Security Testing Guide (WSTG) que ela cobre, ou `null` quando só registra que a resposta não veio; SE a referência não corresponder à categoria, ENTÃO o leitor DEVE recusar o arquivo. O terminal, a aba e o Como usar DEVEM declarar o escopo em linguagem simples: cobre a configuração de segurança das respostas; fica fora do escopo login e sessão, permissões entre usuários, injeção de código e regras de negócio.
+
 ---
 
 ## Fora do escopo
 
-- Scan ativo (envio de ataques) e análise de código-fonte.
+- Ataques destrutivos, métodos que alteram dados, envio de payload, fuzzing, brute force, bypass de autenticação e exploração de XSS, injeção, CSRF, IDOR ou SSRF; as validações ativas de R25 são limitadas e opt-in.
 - Bibliotecas de back-end: só o que chega ao navegador.
 - Outras fontes além de GitHub Advisory, OSV e NVD: CISA KEV, Exploit-DB, Vulners.
 - Integração com Azure DevOps ou GitLab: vincular a task e acompanhar no painel.

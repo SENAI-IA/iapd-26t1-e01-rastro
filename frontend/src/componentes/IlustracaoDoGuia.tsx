@@ -393,6 +393,23 @@ const DESENHOS: Record<IlustracaoDoPasso, ReactNode> = {
       </>,
     )
   ),
+  pentest: terminal(
+    <>
+      <text className="ilustracao__texto ilustracao__texto--mono ilustracao__texto--forte ilustracao__digita ilustracao__digita--1" x="22" y="60">
+        $ rastro pentest site.har --autorizo
+      </text>
+      <text className="ilustracao__texto ilustracao__texto--mono ilustracao__digita ilustracao__digita--2" x="22" y="84">
+        Resumo: 7 falharam, 9 passaram…
+      </text>
+      <text className="ilustracao__texto ilustracao__texto--mono ilustracao__digita ilustracao__digita--3" x="22" y="102">
+        Escopo: configuração de segurança…
+      </text>
+      <text className="ilustracao__texto ilustracao__texto--mono ilustracao__texto--destaque ilustracao__texto--forte ilustracao__digita ilustracao__digita--4" x="22" y="128">
+        Pentest gravado em: …/pentest.json
+      </text>
+      <rect className="ilustracao__cursor-texto" x="22" y="138" width="7" height="12" />
+    </>
+  ),
   relatorio: (
     janela(
       <>

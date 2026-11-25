@@ -7,6 +7,7 @@ export type IlustracaoDoPasso =
   | "navegar"
   | "exportar"
   | "terminal"
+  | "pentest"
   | "gravar"
   | "robo"
   | "entrar"
@@ -127,6 +128,18 @@ const ABRIR_O_RELATORIO_GRAVADO: PassoDoGuia = {
   ilustracao: "relatorio",
 };
 
+const VALIDAR_SEGURANCA_ATIVA: PassoDoGuia = {
+  titulo: "Se quiser, confira as proteções do site",
+  texto:
+    "Com autorização para testar o site, o Rastro pede de novo algumas páginas da visita (até 20) e confere se o site devolve as proteções básicas: HTTPS obrigatório, política de conteúdo, cookies protegidos e outras. Nenhum ataque é feito. Depois, leve o `pentest.json` ao relatório.",
+  comandos: [
+    { sistema: "Testar", texto: "rastro pentest site.har --autorizo" },
+    { sistema: "Relatório", texto: "rastro analisar site.har --pentest <caminho>/pentest.json" },
+  ],
+  dica: "Escopo: configuração de segurança das respostas, conforme o guia OWASP WSTG. Fora do escopo: login e sessão, permissões entre usuários, injeção de código e regras de negócio.",
+  ilustracao: "pentest",
+};
+
 const PASSOS_PELO_DEVTOOLS: PassoDoGuia[] = [
   INSTALAR_O_RASTRO,
   {
@@ -172,6 +185,7 @@ const PASSOS_PELO_DEVTOOLS: PassoDoGuia[] = [
     dica: "Sem CLI de IA, acrescente `--sem-ia`: nota, prioridade e plano são os mesmos, mas bibliotecas em bundles não são procuradas e os achados ficam sem explicação.",
     ilustracao: "terminal",
   },
+  VALIDAR_SEGURANCA_ATIVA,
   ABRIR_O_RELATORIO,
 ];
 
@@ -196,6 +210,7 @@ const PASSOS_COM_O_RASTRO_GRAVANDO: PassoDoGuia[] = [
     dica: "Quanto mais páginas você visitar, mais bibliotecas o Rastro encontra. Também dá para parar com `Ctrl + C` no terminal.",
     ilustracao: "navegar-e-fechar",
   },
+  VALIDAR_SEGURANCA_ATIVA,
   ABRIR_O_RELATORIO_GRAVADO,
 ];
 
@@ -226,6 +241,7 @@ const PASSOS_COM_O_ROBO: PassoDoGuia[] = [
     dica: "Quando ele parar, a janela continua aberta: visite outra página, se quiser, e feche a janela.",
     ilustracao: "robo-visita",
   },
+  VALIDAR_SEGURANCA_ATIVA,
   ABRIR_O_RELATORIO_GRAVADO,
 ];
 
@@ -287,5 +303,5 @@ export const SEUS_DADOS: Item[] = [
     modos: GRAVANDO_PELO_RASTRO,
   },
   { texto: "A IA recebe só trechos de scripts, o nome e a versão das bibliotecas e os dados dos avisos, com tokens, chaves e parâmetros de endereço tirados antes." },
-  { texto: "O GitHub Advisory, o OSV e o registro do npm recebem só o nome e a versão das bibliotecas; o NVD, só o CVE." },
+  { texto: "A segurança ativa é opcional: o Rastro só acessa o site quando você executa o `pentest` com `--autorizo`, e o resultado fica separado da nota." },
 ];

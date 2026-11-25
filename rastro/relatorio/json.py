@@ -10,6 +10,7 @@ from rastro.har.site import url_sem_valores_da_query
 from rastro.har.visita import PassoDaVisita
 from rastro.ia.cliente import ChamadaIA
 from rastro.identificacao.modelos import Biblioteca, Evidencia
+from rastro.pentest.modelos import ResultadoDoPentest
 from rastro.risco.modelos import Achado, Prioridade
 from rastro.risco.prioridade import classificar_prioridade, nota_da_biblioteca
 
@@ -25,8 +26,7 @@ TEXTO_ACHADOS_SEM_EXPLICACAO = (
     "sem explicação em linguagem simples nem teste de verificação."
 )
 TEXTO_CONTINUA_IGUAL_SEM_IA = (
-    "A nota, a prioridade, as checagens e o plano de ação são os mesmos "
-    "de uma análise com IA."
+    "A nota, a prioridade, as checagens e o plano de ação são os mesmos de uma análise com IA."
 )
 TEXTO_SEM_JAVASCRIPT = (
     "Nenhuma resposta do HAR trouxe conteúdo JavaScript, então nenhuma biblioteca pôde ser "
@@ -53,7 +53,7 @@ CONSEQUENCIA_DA_FONTE_SEM_RESPOSTA = {
 }
 
 
-def montar_relatorio(analise: Analise) -> dict[str, Any]:
+def montar_relatorio(analise: Analise, pentest: ResultadoDoPentest | None = None) -> dict[str, Any]:
     return {
         "versao_formato": VERSAO_FORMATO,
         "analise": dados_da_analise(analise),
@@ -65,7 +65,14 @@ def montar_relatorio(analise: Analise) -> dict[str, Any]:
         "plano_de_acao": [asdict(acao) for acao in analise.plano_de_acao],
         "ia": dados_da_ia(analise),
         "visita": montar_visita_no_relatorio(analise),
+        "pentest": pentest_no_relatorio(pentest),
     }
+
+
+def pentest_no_relatorio(pentest: ResultadoDoPentest | None) -> dict[str, Any] | None:
+    if pentest is None:
+        return None
+    return asdict(pentest)
 
 
 def dados_da_analise(analise: Analise) -> dict[str, Any]:

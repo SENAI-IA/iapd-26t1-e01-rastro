@@ -21,9 +21,9 @@ Tudo precisa ser compreensível para quem não é de segurança.
 
 ## Escopo
 
-Entra: CLI, relatório JSON e HTML, GitHub Advisory, OSV e NVD, bibliotecas front-end, cabeçalhos e cookies, travas contra invenção, modo foco, replay da visita, tour guiado e guia "Como usar", só análise passiva. Requisitos R01 a R23 da spec (`.kiro/specs/rastro/requirements.md`). Extensão na branch `feat/gravar`, se der tempo: gravar a visita (R24), à mão ou com um robô que só segue links.
+Entra: CLI, relatório JSON e HTML, GitHub Advisory, OSV e NVD, bibliotecas front-end, cabeçalhos e cookies, travas contra invenção, modo foco, replay da visita, tour guiado e guia "Como usar", gravação opcional da visita pelo Playwright e validações de segurança ativas e opcionais no comando `pentest --autorizo`, sempre fora da nota. Requisitos R01 a R25 da spec (`.kiro/specs/rastro/requirements.md`).
 
-Fica fora: scan ativo, código-fonte, integração com Azure DevOps ou GitLab, outras fontes (KEV, Exploit-DB, Vulners), base de falsos positivos, execução na esteira (CI) e Docker. Planos futuros no fim do `requirements.md`.
+Fica fora: ataques destrutivos, payloads, fuzzing, brute force, bypass de autenticação e exploração de XSS, injeção, CSRF, IDOR ou SSRF, código-fonte, integração com Azure DevOps ou GitLab, outras fontes (KEV, Exploit-DB, Vulners), base de falsos positivos, execução na esteira (CI) e Docker. Planos futuros no fim do `requirements.md`.
 
 **Na dúvida, fica fora.** O Rastro precisa estar 100% funcional em 10/12/2026.
 

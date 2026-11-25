@@ -81,6 +81,12 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T63** Combinar o robô com a navegação da pessoa · extensão · revisão a definir · 13/11
 - [ ] **T64** Ensinar a gravar a visita · extensão · revisão a definir · 13/11 · pendente: Windows (T42)
 - [ ] **T66** Instalar o Rastro com um comando só · fora das fases · revisão a definir · 24/11
+- [ ] **T66** Criar a sonda HTTP segura das validações ativas · extensão segurança ativa · revisão @ali.santos · rebase
+- [ ] **T67** Selecionar alvos e validar respostas ativas · extensão segurança ativa · revisão @cristiano.albino · rebase
+- [ ] **T68** Gravar as validações de segurança ativas · extensão segurança ativa · revisão @geison.santos · rebase
+- [ ] **T69** Levar as validações ativas ao JSON do relatório · extensão segurança ativa · revisão @geison.santos · rebase
+- [ ] **T70** Mostrar a aba Segurança ativa no relatório · extensão segurança ativa · revisão @halan.bacca · rebase
+- [ ] **T71** Situar a segurança ativa no guia OWASP WSTG · extensão segurança ativa · revisão @luiz.pagliari · 25/11
 
 ## A fazer
 
@@ -111,6 +117,10 @@ _(vazio)_
 _(vazio)_
 
 ### Extensão: gravar a visita (branch `feat/gravar`, só se houver tempo, até 08/12)
+
+_(vazio)_
+
+### Extensão: validações de segurança ativas (até 30/11)
 
 _(vazio)_
 
