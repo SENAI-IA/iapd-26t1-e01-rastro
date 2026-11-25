@@ -46,7 +46,9 @@ p { margin: 0; }
 .abertura { display: grid; gap: 6px; }
 .abertura p { color: var(--texto-suave); }
 .legenda { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .85rem; color: var(--texto-suave); }
-.legenda span { display: inline-flex; align-items: center; gap: 8px; }
+.legenda > span { display: inline-flex; align-items: center; gap: 8px; }
+.legenda strong { color: var(--texto); font-weight: 600; }
+.amostra { flex: none; }
 .amostra { width: 24px; height: 13px; border-radius: 2px; border: 1.5px solid var(--destaque); background: var(--destaque-fundo); }
 .amostra.borda { background: var(--superficie); border-style: dashed; }
 .amostra.ia { border-color: var(--ia); background: var(--ia-fundo); }
@@ -110,8 +112,8 @@ svg { display: block; min-width: 620px; width: 100%; height: auto; color: var(--
   </header>
 
   <div class="legenda" aria-label="Legenda">
-    <span><i class="amostra"></i>Regra pura</span>
-    <span><i class="amostra borda"></i>Lê arquivo ou acessa a rede</span>
+    <span><i class="amostra"></i><span><strong>Regra pura:</strong> só calcula; não lê arquivo, não acessa a rede, não chama a IA. Mesma entrada, mesma resposta.</span></span>
+    <span><i class="amostra borda"></i><span><strong>Borda:</strong> lê arquivo ou acessa a rede.</span></span>
     <span><i class="amostra ia"></i>IA</span>
     <span><i class="amostra isolado"></i>Pentest, separado</span>
     <span><i class="amostra dado"></i>Dado que passa</span>
