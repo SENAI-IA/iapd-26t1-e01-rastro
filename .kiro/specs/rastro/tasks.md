@@ -674,10 +674,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @cristiano.albino
 
-- [ ] **T73 Dividir a linha de comando por comando**
+- [x] **T73 Dividir a linha de comando por comando**
   - Entrega: `rastro/comandos/` com um arquivo por comando (analisar, gravar, pentest, instalar), os argumentos e o resumo no terminal; `cli.py` fica só com a entrada.
   - Aceite: nenhum arquivo da linha de comando passa de ~250 linhas; `rastro.cli:principal` continua sendo a entrada; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/cli.py`, `rastro/comandos/`, `tests/test_cli.py`, `tests/test_atalho.py`, `tests/pentest/test_cli_pentest.py`
+  - Arquivos: `rastro/cli.py`, `rastro/comandos/`, `tests/test_cli.py`, `tests/test_atalho.py`, `tests/dubles.py`, `tests/comandos/`, `.kiro/steering/structure.md`, `.kiro/steering/codigo-python.md`
   - Teste: os testes atuais da CLI, apontando para o módulo novo.
   - Requisito: R19.4
   - Revisão: @luiz.pagliari

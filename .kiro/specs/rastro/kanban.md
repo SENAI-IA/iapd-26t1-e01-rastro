@@ -88,6 +88,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T70** Mostrar a aba Segurança ativa no relatório · extensão segurança ativa · revisão @halan.bacca · rebase
 - [ ] **T71** Situar a segurança ativa no guia OWASP WSTG · extensão segurança ativa · revisão @luiz.pagliari · 25/11
 - [ ] **T72** Registrar a rodada de legibilidade e o diagrama da arquitetura · rodada de legibilidade · revisão @cristiano.albino · 25/11
+- [ ] **T73** Dividir a linha de comando por comando · rodada de legibilidade · revisão @luiz.pagliari · 25/11
 
 ## A fazer
 
@@ -127,7 +128,6 @@ _(vazio)_
 
 ### Rodada de legibilidade (até 08/12)
 
-- [ ] **T73** Dividir a linha de comando por comando · rodada de legibilidade · revisão @luiz.pagliari
 - [ ] **T74** Corrigir a direção das dependências entre camadas · rodada de legibilidade · revisão @geison.santos
 - [ ] **T75** Dar nome único e claro aos arquivos · rodada de legibilidade · revisão @ali.santos
 - [ ] **T76** Dividir a montagem do relatório JSON · rodada de legibilidade · revisão @geison.santos

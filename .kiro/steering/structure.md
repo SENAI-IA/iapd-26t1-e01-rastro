@@ -16,7 +16,10 @@
 
 ```
 rastro/
-  cli.py                   lê os argumentos e chama o fluxo
+  cli.py                   entrada do comando rastro: lê os argumentos e despacha para o comando escolhido
+  comandos/                um arquivo por comando da linha de comando: comando_analisar.py, comando_gravar.py,
+                           comando_pentest.py, comando_como_usar.py, comando_instalar.py, comando_desinstalar.py;
+                           e as peças que eles dividem: argumentos.py, resumo_no_terminal.py, navegador.py, saida_de_erro.py
   atalho.py                cria e remove o comando rastro na pasta do usuário (instalar e desinstalar)
   fluxo.py                 orquestra as etapas, sem regra própria; define a Analise
   andamento.py             interface que o fluxo usa para avisar a etapa e os itens

@@ -1,7 +1,9 @@
 import json
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
+from rastro.cli import executar
 from rastro.fontes import osv
 from rastro.fontes.conector import Aviso, ConsultaNaoRealizada
 from rastro.fontes.github_advisory import converter_resposta
@@ -10,6 +12,7 @@ from rastro.pentest.sonda import RespostaHttp
 
 DADOS = Path(__file__).parent / "dados"
 HAR_DA_LOJA = DADOS / "loja.har"
+PASTA_DA_LOJA = Path("loja.exemplo.com") / "2026-11-20_14-03-00"
 HAR_DO_JUICE_SHOP = Path(__file__).parent.parent / "avaliacao" / "juiceshop.har"
 TRECHO_DO_ANGULAR = "[`ng-version`,`22.2.2`]"
 CODIGOS_PUBLICADOS = {
@@ -129,3 +132,24 @@ class SondaFalsa:
     def sondar(self, url: str, metodo: str, origem: str | None) -> RespostaHttp:
         self.chamadas.append((url, metodo, origem))
         return self.respostas.pop(0)
+
+
+class NavegadorFalso:
+    def __init__(self, abre: bool) -> None:
+        self.abre = abre
+        self.enderecos: list[str] = []
+
+    def __call__(self, endereco: str) -> bool:
+        self.enderecos.append(endereco)
+        return self.abre
+
+
+def ler_relatorio(caminho: Path) -> dict[str, Any]:
+    with caminho.open(encoding="utf-8") as arquivo:
+        dados: dict[str, Any] = json.load(arquivo)
+    return dados
+
+
+def analisar_loja(saida: Path) -> int:
+    return executar(["analisar", str(HAR_DA_LOJA), "--sem-ia", "--saida", str(saida)])
+
