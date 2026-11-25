@@ -87,6 +87,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T69** Levar as validações ativas ao JSON do relatório · extensão segurança ativa · revisão @geison.santos · rebase
 - [ ] **T70** Mostrar a aba Segurança ativa no relatório · extensão segurança ativa · revisão @halan.bacca · rebase
 - [ ] **T71** Situar a segurança ativa no guia OWASP WSTG · extensão segurança ativa · revisão @luiz.pagliari · 25/11
+- [ ] **T72** Registrar a rodada de legibilidade e o diagrama da arquitetura · rodada de legibilidade · revisão @cristiano.albino · 25/11
 
 ## A fazer
 
@@ -123,6 +124,26 @@ _(vazio)_
 ### Extensão: validações de segurança ativas (até 30/11)
 
 _(vazio)_
+
+### Rodada de legibilidade (até 08/12)
+
+- [ ] **T73** Dividir a linha de comando por comando · rodada de legibilidade · revisão @luiz.pagliari
+- [ ] **T74** Corrigir a direção das dependências entre camadas · rodada de legibilidade · revisão @geison.santos
+- [ ] **T75** Dar nome único e claro aos arquivos · rodada de legibilidade · revisão @ali.santos
+- [ ] **T76** Dividir a montagem do relatório JSON · rodada de legibilidade · revisão @geison.santos
+- [ ] **T77** Quebrar as validações ativas em uma função por validação · rodada de legibilidade · revisão @ali.santos
+- [ ] **T78** Juntar o acesso HTTP das fontes · rodada de legibilidade · revisão @cristiano.albino
+- [ ] **T79** Separar a escolha da IA e o que os provedores repetem · rodada de legibilidade · revisão @luiz.pagliari
+- [ ] **T80** Separar as travas por assunto · rodada de legibilidade · revisão @cristiano.albino
+- [ ] **T81** Separar regras, mecanismo e textos das checagens e do plano · rodada de legibilidade · revisão @geison.santos
+- [ ] **T82** Separar instalação, terminal e captura por papel · rodada de legibilidade · revisão @ali.santos
+- [ ] **T83** Trocar abreviações por nomes completos no Python · rodada de legibilidade · revisão @luiz.pagliari
+- [ ] **T84** Trocar código esperto por laço e função com nome · rodada de legibilidade · revisão @cristiano.albino
+- [ ] **T85** Organizar as pastas do frontend por responsabilidade · rodada de legibilidade · revisão @halan.bacca
+- [ ] **T86** Juntar o comportamento repetido e dividir o App · rodada de legibilidade · revisão @halan.bacca
+- [ ] **T87** Dividir os componentes grandes da tela · rodada de legibilidade · revisão @halan.bacca
+- [ ] **T88** Padronizar os nomes do frontend · rodada de legibilidade · revisão @halan.bacca
+- [ ] **T89** Atualizar diagrama, steering e documentação para a estrutura nova · rodada de legibilidade · revisão @geison.santos
 
 ## Feito
 

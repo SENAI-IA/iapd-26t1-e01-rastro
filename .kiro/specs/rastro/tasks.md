@@ -661,3 +661,151 @@ O Rastro continua passivo em `analisar`. O comando `pentest --autorizo` faz vali
   - Teste: `test_r25_15_*`; aba por verificação manual.
   - Requisito: R25.12, R25.15
   - Revisão: @luiz.pagliari
+
+## Rodada de legibilidade
+
+Polimento sem mudar comportamento, para que quem não domina Python, TypeScript ou React entenda rápido cada camada, arquivo e função (R19.4). Siglas de domínio ficam; abreviação vira nome completo; a responsabilidade se explica pelo nome, sem comentário. As chaves do JSON do relatório e do `pentest.json` não mudam nesta rodada.
+
+- [x] **T72 Registrar a rodada de legibilidade e o diagrama da arquitetura**
+  - Entrega: tasks T72–T89, critério R19.4 e diagrama interativo das camadas para o time.
+  - Aceite: as tasks estão no `tasks.md` e no kanban; o diagrama mostra cada camada, o que ela faz e a ordem do fluxo da análise e do pentest.
+  - Arquivos: `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/tasks.md`, `.kiro/specs/rastro/kanban.md`, `docs/arquitetura/arquitetura.html`
+  - Teste: não se aplica (documentação).
+  - Requisito: R19.4
+  - Revisão: @cristiano.albino
+
+- [ ] **T73 Dividir a linha de comando por comando**
+  - Entrega: `rastro/comandos/` com um arquivo por comando (analisar, gravar, pentest, instalar), os argumentos e o resumo no terminal; `cli.py` fica só com a entrada.
+  - Aceite: nenhum arquivo da linha de comando passa de ~250 linhas; `rastro.cli:principal` continua sendo a entrada; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/cli.py`, `rastro/comandos/`, `tests/test_cli.py`, `tests/test_atalho.py`, `tests/pentest/test_cli_pentest.py`
+  - Teste: os testes atuais da CLI, apontando para o módulo novo.
+  - Requisito: R19.4
+  - Revisão: @luiz.pagliari
+
+- [ ] **T74 Corrigir a direção das dependências entre camadas**
+  - Entrega: módulos neutros para o que mais de uma camada usa: gravação segura de arquivos, versão semver e nome `pacote@versao`.
+  - Aceite: `fontes/`, `explicacao/` e `captura/` deixam de importar de `acao/`, `travas/` e `relatorio/`; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/gravacao_segura.py`, `rastro/versao_semver.py`, `rastro/identificacao/modelos.py`, `rastro/relatorio/gravacao.py`, `rastro/pentest/gravacao.py`, `rastro/captura/pasta.py`, `rastro/travas/faixa_de_versao.py`, `rastro/acao/plano.py`, `rastro/fontes/`, `rastro/explicacao/ia.py`, testes espelhados
+  - Teste: os testes atuais, mais um por módulo novo.
+  - Requisito: R19.4
+  - Revisão: @geison.santos
+
+- [ ] **T75 Dar nome único e claro aos arquivos**
+  - Entrega: arquivos de nome repetido ou vago renomeados pelo que fazem (`relatorio/json.py`, `relatorio/html.py`, `pentest/fluxo.py`, `pentest/formato.py`, `pentest/leitor.py`, `identificacao/ia.py`, `explicacao/ia.py`, `travas/explicacao.py`, `fontes/juncao.py`, `acao/task.py`).
+  - Aceite: nenhum nome de arquivo se repete entre pastas (fora `modelos.py`) nem sombreia módulo do Python; testes renomeados junto; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/`, `tests/`, `pyproject.toml`
+  - Teste: os testes atuais, nos arquivos renomeados.
+  - Requisito: R19.4
+  - Revisão: @ali.santos
+
+- [ ] **T76 Dividir a montagem do relatório JSON**
+  - Entrega: montagem do relatório separada em limitações, resumo, painel da IA e visita.
+  - Aceite: o JSON gerado é idêntico ao de antes para o mesmo HAR; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/relatorio/`, `tests/relatorio/`
+  - Teste: os testes atuais do relatório.
+  - Requisito: R19.4
+  - Revisão: @geison.santos
+
+- [ ] **T77 Quebrar as validações ativas em uma função por validação**
+  - Entrega: `validar_resposta` vira uma função por proteção; constantes, resumo e `ler_pentest` deixam de existir em dobro.
+  - Aceite: nenhuma função do pentest passa de ~25 linhas; o `pentest.json` sai igual; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/pentest/`, `tests/pentest/`
+  - Teste: os testes atuais do pentest.
+  - Requisito: R19.4
+  - Revisão: @ali.santos
+
+- [ ] **T78 Juntar o acesso HTTP das fontes**
+  - Entrega: um só lugar para baixar JSON e explicar erro HTTP; pacote npm (bytes) separado do registro (rede); CVSS do NVD separado do cliente.
+  - Aceite: os quatro conectores usam o mesmo código de HTTP; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/fontes/`, `tests/fontes/`
+  - Teste: os testes atuais das fontes.
+  - Requisito: R19.4
+  - Revisão: @cristiano.albino
+
+- [ ] **T79 Separar a escolha da IA e o que os provedores repetem**
+  - Entrega: escolha da IA, contrato do provedor e execução da CLI em arquivos próprios; prompt montado num só lugar.
+  - Aceite: os três provedores usam a mesma execução de CLI; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/ia/`, `rastro/identificacao/`, `rastro/explicacao/`, `tests/ia/`
+  - Teste: os testes atuais da IA.
+  - Requisito: R19.4
+  - Revisão: @luiz.pagliari
+
+- [ ] **T80 Separar as travas por assunto**
+  - Entrega: JSON estrito, strings de JavaScript e a trava do pacote existente em arquivos próprios.
+  - Aceite: cada arquivo de `travas/` é uma trava ou um apoio de uma trava; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/travas/`, `tests/travas/`
+  - Teste: os testes atuais das travas.
+  - Requisito: R19.4
+  - Revisão: @cristiano.albino
+
+- [ ] **T81 Separar regras, mecanismo e textos das checagens e do plano**
+  - Entrega: `configuracao/` com regras, avaliação e testes de cabeçalho em arquivos próprios; `acao/` com os textos das correções fora do plano.
+  - Aceite: `checagens.py` fica com as checagens e a tupla `CHECAGENS`; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/configuracao/`, `rastro/acao/`, `rastro/risco/prioridade.py`, testes espelhados
+  - Teste: os testes atuais.
+  - Requisito: R19.4
+  - Revisão: @geison.santos
+
+- [ ] **T82 Separar instalação, terminal e captura por papel**
+  - Entrega: `atalho.py` vira `instalacao/`, `terminal.py` vira `terminal/`, e `captura/` separa regras dos links, endereço e espera.
+  - Aceite: cada arquivo novo tem um papel só; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/atalho.py`, `rastro/terminal.py`, `rastro/captura/`, testes espelhados
+  - Teste: os testes atuais.
+  - Requisito: R19.4
+  - Revisão: @ali.santos
+
+- [ ] **T83 Trocar abreviações por nomes completos no Python**
+  - Entrega: sem `e_`/`eh_`, `_s`, `_ms`, `_mb`, `ia` como variável, `b`, `p`, `r`, `i`, `casa`; nomes internos completos.
+  - Aceite: as chaves do JSON do relatório e do `pentest.json` não mudam; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/`, `tests/`
+  - Teste: os testes atuais.
+  - Requisito: R19.4
+  - Revisão: @luiz.pagliari
+
+- [ ] **T84 Trocar código esperto por laço e função com nome**
+  - Entrega: walrus, lambdas, compreensões aninhadas, ternários encadeados e regex sem nome viram passos com nome.
+  - Aceite: quem não domina Python lê cada função de cima para baixo; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
+  - Arquivos: `rastro/`
+  - Teste: os testes atuais.
+  - Requisito: R19.4
+  - Revisão: @cristiano.albino
+
+- [ ] **T85 Organizar as pastas do frontend por responsabilidade**
+  - Entrega: `relatorio/`, `conteudo/`, `estilos/`, `moldura/`, `zonas/`, `janelas/`, `guia/`, `segurancaAtiva/`, `basicos/`, `hooks/`, `calculosDeTela/`, `formatacao/`.
+  - Aceite: `dados.ts` e `dados/` deixam de conflitar; Verificação: `npm run build` passa e o `modelo.html` gerado de novo abre igual (claro, escuro, 400px).
+  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`
+  - Teste: verificação manual.
+  - Requisito: R19.4
+  - Revisão: @halan.bacca
+
+- [ ] **T86 Juntar o comportamento repetido e dividir o App**
+  - Entrega: janela modal, rolagem e movimento reduzido num só lugar; tema, foco e painel saem do `App.tsx`.
+  - Aceite: `App.tsx` só liga as telas; Verificação: `npm run build` passa e o `modelo.html` gerado de novo abre igual (claro, escuro, 400px).
+  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`
+  - Teste: verificação manual (foco, Esc, tour, painel lateral).
+  - Requisito: R19.4
+  - Revisão: @halan.bacca
+
+- [ ] **T87 Dividir os componentes grandes da tela**
+  - Entrega: `IlustracaoDoGuia`, `AnimacaoDoModo`, `PainelOrigemDoDado`, `TourGuiado`, `PainelPentest`, `ReplayDaVisita`, `RadarDaVisita`, `PainelIA` e `GuiaComoUsar` em partes com um papel só.
+  - Aceite: nenhum componente passa de ~40 linhas de JSX; Verificação: `npm run build` passa e o `modelo.html` gerado de novo abre igual (claro, escuro, 400px).
+  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`
+  - Teste: verificação manual.
+  - Requisito: R19.4
+  - Revisão: @halan.bacca
+
+- [ ] **T88 Padronizar os nomes do frontend**
+  - Entrega: sem colisão entre tipo e componente, `Da`/`Do` padronizado, Task vira Tarefa no código, sem abreviação e sem ternário encadeado.
+  - Aceite: as chaves do JSON não mudam; seletores do tour atualizados junto; Verificação: `npm run build` passa e o `modelo.html` gerado de novo abre igual (claro, escuro, 400px).
+  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`
+  - Teste: verificação manual (tour completo).
+  - Requisito: R19.4
+  - Revisão: @halan.bacca
+
+- [ ] **T89 Atualizar diagrama, steering e documentação para a estrutura nova**
+  - Entrega: diagrama, `structure.md`, `codigo-python.md`, `frontend-react.md`, skill `rastro-nova-regra` e README técnico com os nomes novos.
+  - Aceite: nenhum documento cita arquivo que não existe mais.
+  - Arquivos: `.kiro/steering/`, `.kiro/skills/rastro-nova-regra/SKILL.md`, `README-TECNICO.md`, `README.md`
+  - Teste: não se aplica (documentação).
+  - Requisito: R19.4
+  - Revisão: @geison.santos

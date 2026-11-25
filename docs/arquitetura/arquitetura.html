@@ -1,0 +1,361 @@
+<title>Arquitetura do Rastro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: diagrama de faixas (comandos, entrada, fluxo, apoio, saída, isolado) em cima; ficha da camada clicada embaixo. */
+:root {
+  --fundo: #F5F8F9;
+  --superficie: #FFFFFF;
+  --texto: #142228;
+  --texto-suave: #4E6670;
+  --linha: #C3D2D8;
+  --destaque: #0F5F7A;
+  --destaque-fundo: #E1EEF2;
+  --ia: #6B4FBB;
+  --ia-fundo: #EEEAFA;
+  --isolado: #7A5A0F;
+  --isolado-fundo: #F7F0DF;
+  --fonte-texto: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --fonte-titulo: "IBM Plex Sans Condensed", "Arial Narrow", "IBM Plex Sans", sans-serif;
+  --fonte-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --raio: 4px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fundo: #0E171B; --superficie: #16232A; --texto: #E3ECEF; --texto-suave: #9AB0B8;
+    --linha: #2E434C; --destaque: #5BB9D4; --destaque-fundo: #173540;
+    --ia: #B4A2F0; --ia-fundo: #2A2445; --isolado: #E2C27A; --isolado-fundo: #33291A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fundo: #0E171B; --superficie: #16232A; --texto: #E3ECEF; --texto-suave: #9AB0B8;
+  --linha: #2E434C; --destaque: #5BB9D4; --destaque-fundo: #173540;
+  --ia: #B4A2F0; --ia-fundo: #2A2445; --isolado: #E2C27A; --isolado-fundo: #33291A;
+  color-scheme: dark;
+}
+body { background: var(--fundo); color: var(--texto); font: 15px/1.55 var(--fonte-texto); }
+.pagina { max-width: 1180px; margin: 0 auto; padding-block: 32px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 2rem; line-height: 1.15; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-suave); font-weight: 500; }
+p { margin: 0; max-width: 68ch; }
+code { font-family: var(--fonte-mono); font-size: .88em; }
+.abertura { display: grid; gap: 10px; }
+.abertura .sobre { color: var(--texto-suave); font-family: var(--fonte-mono); font-size: .8rem; letter-spacing: .04em; }
+.legenda { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: .85rem; color: var(--texto-suave); }
+.legenda span { display: inline-flex; align-items: center; gap: 8px; }
+.amostra { width: 26px; height: 14px; border-radius: 2px; border: 1.5px solid var(--destaque); background: var(--destaque-fundo); }
+.amostra.borda { background: var(--superficie); border-style: dashed; }
+.amostra.ia { border-color: var(--ia); background: var(--ia-fundo); }
+.amostra.isolado { border-color: var(--isolado); background: var(--isolado-fundo); border-style: dashed; }
+figure { margin: 0; display: grid; gap: 10px; }
+.rolagem { overflow-x: auto; background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio); }
+svg { display: block; min-width: 880px; width: 100%; height: auto; color: var(--texto); font-family: var(--fonte-texto); }
+figcaption { font-size: .85rem; color: var(--texto-suave); max-width: 80ch; }
+.faixa-nome { font: 600 11px var(--fonte-titulo); letter-spacing: .08em; text-transform: uppercase; fill: var(--texto-suave); }
+.faixa-fundo { fill: var(--fundo); }
+.no { cursor: pointer; }
+.no rect.caixa { fill: var(--destaque-fundo); stroke: var(--destaque); stroke-width: 1.5; }
+.no.borda rect.caixa { fill: var(--superficie); stroke-dasharray: 5 3; }
+.no.ia rect.caixa { fill: var(--ia-fundo); stroke: var(--ia); }
+.no.isolado rect.caixa { fill: var(--isolado-fundo); stroke: var(--isolado); stroke-dasharray: 5 3; }
+.no text.nome { font: 600 13px var(--fonte-mono); fill: var(--texto); }
+.no text.papel { font-size: 11px; fill: var(--texto-suave); }
+.no text.passo { font: 600 11px var(--fonte-titulo); fill: var(--destaque); }
+.no:hover rect.caixa, .no:focus-visible rect.caixa { stroke-width: 3; }
+.no:focus { outline: none; }
+.no.escolhido rect.caixa { stroke-width: 3.5; }
+.seta { stroke: currentColor; stroke-width: 1.3; fill: none; opacity: .75; }
+.seta.ia { stroke: var(--ia); opacity: 1; }
+.seta.isolado { stroke: var(--isolado); opacity: 1; stroke-dasharray: 5 3; }
+.rotulo { font-size: 10.5px; fill: var(--texto-suave); }
+.rotulo.ia { fill: var(--ia); }
+.rotulo.isolado { fill: var(--isolado); }
+.moldura-fluxo { fill: none; stroke: var(--linha); stroke-width: 1; stroke-dasharray: 2 3; }
+.ficha { background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio); padding: 22px clamp(16px, 3vw, 28px);
+  display: grid; gap: 18px; }
+.ficha-topo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+.selo { font: 500 .75rem var(--fonte-mono); padding: 2px 8px; border-radius: 2px; border: 1px solid currentColor; color: var(--destaque); }
+.selo.borda { color: var(--texto-suave); border-style: dashed; }
+.selo.ia { color: var(--ia); }
+.selo.isolado { color: var(--isolado); border-style: dashed; }
+.ficha-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px 28px; }
+.ficha-grade > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.ficha ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.ficha li { overflow-wrap: anywhere; }
+.regras { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.regra { border-top: 2px solid var(--destaque); padding-top: 10px; display: grid; gap: 4px; }
+.regra strong { font-family: var(--fonte-titulo); font-weight: 600; font-size: 1.02rem; }
+.regra p { font-size: .9rem; color: var(--texto-suave); }
+.dica { font-size: .85rem; color: var(--texto-suave); }
+@media (prefers-reduced-motion: no-preference) { .no rect.caixa { transition: stroke-width .12s; } }
+</style>
+
+<main class="pagina">
+  <header class="abertura">
+    <span class="sobre">rastro · mapa das camadas</span>
+    <h1>Arquitetura do Rastro</h1>
+    <p>O Rastro lê a visita gravada a um site (o HAR), descobre as bibliotecas que o navegador carregou, procura falhas conhecidas e diz o que corrigir primeiro. Cada caixa abaixo é uma pasta do código com uma responsabilidade só. Clique numa caixa para ver o que ela faz, os arquivos e o que ela pode usar.</p>
+  </header>
+
+  <div class="legenda" aria-label="Legenda">
+    <span><i class="amostra"></i>Núcleo puro: só regra, sem arquivo, rede ou IA</span>
+    <span><i class="amostra borda"></i>Borda: lê arquivo, acessa a rede ou o terminal</span>
+    <span><i class="amostra ia"></i>IA: só sugere, a regra confirma</span>
+    <span><i class="amostra isolado"></i>Isolado: pentest ativo, fora da nota e do plano</span>
+  </div>
+
+  <figure>
+    <div class="rolagem">
+      <svg viewBox="0 0 1100 700" role="img" aria-label="Fluxo do Rastro: a linha de comando chama a captura, que grava o HAR, e o fluxo da análise, que passa por identificar, conferir, consultar, calcular, explicar, checar e montar o plano; a IA só é chamada pela identificação e pela explicação; o relatório recebe a análise e embute o JSON no HTML do React; o pentest roda isolado e só chega ao relatório como uma aba.">
+        <defs>
+          <marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+          <marker id="ponta-ia" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#8A72D6"/>
+          </marker>
+          <marker id="ponta-isolado" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#B08A30"/>
+          </marker>
+        </defs>
+
+        <rect class="faixa-fundo" x="0" y="14" width="1100" height="80"/>
+        <rect class="faixa-fundo" x="0" y="230" width="1100" height="120"/>
+        <rect class="faixa-fundo" x="0" y="490" width="1100" height="80"/>
+        <text class="faixa-nome" x="16" y="58">Comandos</text>
+        <text class="faixa-nome" x="16" y="166">Entrada</text>
+        <text class="faixa-nome" x="16" y="286">Fluxo da</text>
+        <text class="faixa-nome" x="16" y="300">análise</text>
+        <text class="faixa-nome" x="16" y="426">Apoio</text>
+        <text class="faixa-nome" x="16" y="534">Saída</text>
+        <text class="faixa-nome" x="16" y="646">Isolado</text>
+
+        <!-- setas -->
+        <path class="seta" d="M220 84 L220 128" marker-end="url(#ponta)"/>
+        <text class="rotulo" x="228" y="112">gravar</text>
+        <path class="seta" d="M370 84 L370 238" marker-end="url(#ponta)"/>
+        <text class="rotulo" x="378" y="112">analisar</text>
+        <path class="seta" d="M340 160 L398 160" marker-end="url(#ponta)"/>
+        <text class="rotulo" x="344" y="152">grava .har</text>
+        <path class="seta" d="M500 190 L500 214 L199 214 L199 256" marker-end="url(#ponta)"/>
+        <text class="rotulo" x="300" y="208">1 · requisições lidas</text>
+        <path class="seta" d="M258 288 L270 288" marker-end="url(#ponta)"/>
+        <path class="seta" d="M390 288 L402 288" marker-end="url(#ponta)"/>
+        <path class="seta" d="M522 288 L534 288" marker-end="url(#ponta)"/>
+        <path class="seta" d="M654 288 L666 288" marker-end="url(#ponta)"/>
+        <path class="seta" d="M786 288 L798 288" marker-end="url(#ponta)"/>
+        <path class="seta" d="M918 288 L930 288" marker-end="url(#ponta)"/>
+        <path class="seta ia" d="M400 398 L210 324" marker-end="url(#ponta-ia)"/>
+        <text class="rotulo ia" x="236" y="372">pergunta (bundles)</text>
+        <path class="seta ia" d="M560 398 L720 324" marker-end="url(#ponta-ia)"/>
+        <text class="rotulo ia" x="652" y="372">pergunta (explicar)</text>
+        <path class="seta" d="M991 322 L991 470 L270 470 L270 498" marker-end="url(#ponta)"/>
+        <text class="rotulo" x="760" y="464">Analise pronta</text>
+        <path class="seta" d="M400 530 L438 530" marker-end="url(#ponta)"/>
+        <text class="rotulo" x="402" y="522">JSON</text>
+        <path class="seta isolado" d="M140 54 L128 54 L128 640 L138 640" marker-end="url(#ponta-isolado)"/>
+        <text class="rotulo isolado" x="146" y="604">pentest --autorizo</text>
+        <path class="seta isolado" d="M300 612 L300 564" marker-end="url(#ponta-isolado)"/>
+        <text class="rotulo isolado" x="308" y="594">pentest.json · só a aba</text>
+
+        <rect class="moldura-fluxo" x="134" y="240" width="922" height="96" rx="4"/>
+
+        <!-- nós -->
+        <g class="no borda" data-no="cli" tabindex="0" role="button" aria-label="Linha de comando">
+          <rect class="caixa" x="140" y="24" width="240" height="60" rx="4"/>
+          <text class="nome" x="154" y="48">cli.py</text>
+          <text class="papel" x="154" y="68">lê os argumentos e chama</text>
+        </g>
+        <g class="no borda" data-no="terminal" tabindex="0" role="button" aria-label="Terminal e andamento">
+          <rect class="caixa" x="400" y="24" width="230" height="60" rx="4"/>
+          <text class="nome" x="414" y="48">terminal · andamento</text>
+          <text class="papel" x="414" y="68">mostra a etapa ao vivo</text>
+        </g>
+        <g class="no borda" data-no="atalho" tabindex="0" role="button" aria-label="Instalação">
+          <rect class="caixa" x="650" y="24" width="230" height="60" rx="4"/>
+          <text class="nome" x="664" y="48">atalho.py</text>
+          <text class="papel" x="664" y="68">instala o comando rastro</text>
+        </g>
+
+        <g class="no borda" data-no="captura" tabindex="0" role="button" aria-label="Captura">
+          <rect class="caixa" x="140" y="130" width="200" height="60" rx="4"/>
+          <text class="nome" x="154" y="154">captura/</text>
+          <text class="papel" x="154" y="174">grava a visita no navegador</text>
+        </g>
+        <g class="no borda" data-no="har" tabindex="0" role="button" aria-label="HAR">
+          <rect class="caixa" x="400" y="130" width="200" height="60" rx="4"/>
+          <text class="nome" x="414" y="154">har/</text>
+          <text class="papel" x="414" y="174">lê o HAR em requisições</text>
+        </g>
+
+        <text class="rotulo" x="140" y="234">fluxo.py · chama cada etapa na ordem, sem regra própria</text>
+        <g class="no" data-no="identificacao" tabindex="0" role="button" aria-label="Identificação">
+          <rect class="caixa" x="140" y="256" width="118" height="66" rx="4"/>
+          <text class="passo" x="150" y="274">2 · IDENTIFICAR</text>
+          <text class="nome" x="150" y="294">identificacao/</text>
+          <text class="papel" x="150" y="312">acha bibliotecas</text>
+        </g>
+        <g class="no borda" data-no="travas" tabindex="0" role="button" aria-label="Travas">
+          <rect class="caixa" x="272" y="256" width="118" height="66" rx="4"/>
+          <text class="passo" x="282" y="274">3 · CONFERIR</text>
+          <text class="nome" x="282" y="294">travas/</text>
+          <text class="papel" x="282" y="312">barra invenção</text>
+        </g>
+        <g class="no borda" data-no="fontes" tabindex="0" role="button" aria-label="Fontes">
+          <rect class="caixa" x="404" y="256" width="118" height="66" rx="4"/>
+          <text class="passo" x="414" y="274">4 · CONSULTAR</text>
+          <text class="nome" x="414" y="294">fontes/</text>
+          <text class="papel" x="414" y="312">busca falhas</text>
+        </g>
+        <g class="no" data-no="risco" tabindex="0" role="button" aria-label="Risco">
+          <rect class="caixa" x="536" y="256" width="118" height="66" rx="4"/>
+          <text class="passo" x="546" y="274">5 · CALCULAR</text>
+          <text class="nome" x="546" y="294">risco/</text>
+          <text class="papel" x="546" y="312">nota e prioridade</text>
+        </g>
+        <g class="no" data-no="explicacao" tabindex="0" role="button" aria-label="Explicação">
+          <rect class="caixa" x="668" y="256" width="118" height="66" rx="4"/>
+          <text class="passo" x="678" y="274">6 · EXPLICAR</text>
+          <text class="nome" x="678" y="294">explicacao/</text>
+          <text class="papel" x="678" y="312">texto do achado</text>
+        </g>
+        <g class="no" data-no="configuracao" tabindex="0" role="button" aria-label="Configuração">
+          <rect class="caixa" x="800" y="256" width="118" height="66" rx="4"/>
+          <text class="passo" x="810" y="274">7 · CHECAR</text>
+          <text class="nome" x="810" y="294">configuracao/</text>
+          <text class="papel" x="810" y="312">cabeçalho, cookie</text>
+        </g>
+        <g class="no" data-no="acao" tabindex="0" role="button" aria-label="Plano de ação">
+          <rect class="caixa" x="932" y="256" width="118" height="66" rx="4"/>
+          <text class="passo" x="942" y="274">8 · PLANO</text>
+          <text class="nome" x="942" y="294">acao/</text>
+          <text class="papel" x="942" y="312">o que fazer</text>
+        </g>
+
+        <g class="no ia" data-no="ia" tabindex="0" role="button" aria-label="IA">
+          <rect class="caixa" x="330" y="398" width="300" height="60" rx="4"/>
+          <text class="nome" x="344" y="422">ia/</text>
+          <text class="papel" x="344" y="442">único ponto de chamada à IA · mede tempo</text>
+        </g>
+
+        <g class="no borda" data-no="relatorio" tabindex="0" role="button" aria-label="Relatório">
+          <rect class="caixa" x="140" y="500" width="260" height="60" rx="4"/>
+          <text class="nome" x="154" y="524">relatorio/</text>
+          <text class="papel" x="154" y="544">monta o JSON e grava o HTML</text>
+        </g>
+        <g class="no" data-no="frontend" tabindex="0" role="button" aria-label="Frontend">
+          <rect class="caixa" x="440" y="500" width="250" height="60" rx="4"/>
+          <text class="nome" x="454" y="524">frontend/ (React)</text>
+          <text class="papel" x="454" y="544">só exibe o JSON, sem regra</text>
+        </g>
+
+        <g class="no isolado" data-no="pentest" tabindex="0" role="button" aria-label="Pentest">
+          <rect class="caixa" x="140" y="612" width="330" height="60" rx="4"/>
+          <text class="nome" x="154" y="636">pentest/</text>
+          <text class="papel" x="154" y="656">validações HTTP ativas, só com autorização</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>As etapas 2 a 8 rodam nessa ordem dentro de <code>fluxo.py</code>. A IA só é chamada em dois pontos e tudo o que ela devolve passa pelas travas. O pentest nunca entra no fluxo da análise: ele grava o próprio <code>pentest.json</code>, que vira só uma aba do relatório.</figcaption>
+  </figure>
+
+  <section class="ficha" id="ficha" aria-live="polite">
+    <div class="ficha-topo">
+      <h2 id="ficha-titulo"></h2>
+      <span class="selo" id="ficha-selo"></span>
+    </div>
+    <p id="ficha-papel"></p>
+    <div class="ficha-grade">
+      <div><h3>Arquivos</h3><ul id="ficha-arquivos"></ul></div>
+      <div><h3>Pode usar</h3><ul id="ficha-usa"></ul></div>
+      <div><h3>Algo novo aqui</h3><p id="ficha-novo"></p></div>
+    </div>
+  </section>
+
+  <section class="regras" aria-label="Regras que valem para todas as camadas">
+    <div class="regra"><strong>Uma responsabilidade por nome</strong><p>Pasta, arquivo e função dizem o que fazem. Se a descrição precisa de "e", são duas coisas.</p></div>
+    <div class="regra"><strong>Regra no meio, entrada e saída nas bordas</strong><p>Nota, prioridade, checagens e travas são funções puras. Arquivo, rede, IA e terminal ficam nas bordas.</p></div>
+    <div class="regra"><strong>A IA sugere, a regra confirma</strong><p>Tudo o que a IA devolve passa por <code>travas/</code>. A IA nunca preenche CVE, versão, CVSS, EPSS ou nota.</p></div>
+    <div class="regra"><strong>Dependência só para trás</strong><p>Uma etapa usa as anteriores e os modelos, nunca uma que vem depois dela no fluxo.</p></div>
+  </section>
+  <p class="dica">Fonte: <code>.kiro/steering/structure.md</code>. Os testes ficam em <code>tests/</code>, com a mesma estrutura de <code>rastro/</code>.</p>
+</main>
+
+<script>
+const CAMADAS = {
+  cli: { titulo: "Linha de comando", tipo: "borda", papel: "Lê os argumentos de cada comando (analisar, gravar, pentest, instalar, desinstalar, como-usar), chama a camada certa e transforma erro da borda em mensagem e código de saída.",
+    arquivos: ["rastro/cli.py", "rastro/__main__.py"], usa: ["fluxo.py, captura/, pentest/, relatorio/, atalho.py", "terminal.py para mostrar o andamento"], novo: "Comando novo: o argumento aqui e o trabalho numa camada própria. A linha de comando não decide regra." },
+  terminal: { titulo: "Terminal e andamento", tipo: "borda", papel: "Mostra no terminal a etapa em que a análise está, com uma linha ao vivo. O fluxo só conhece a interface Andamento, nunca o terminal.",
+    arquivos: ["rastro/terminal.py", "rastro/andamento.py"], usa: ["nada do núcleo"], novo: "Outra forma de mostrar o andamento: implemente a interface de andamento.py." },
+  atalho: { titulo: "Instalação do comando", tipo: "borda", papel: "Cria e remove o comando rastro na pasta do usuário e acerta o PATH no Linux e no Windows.",
+    arquivos: ["rastro/atalho.py", "install.sh"], usa: ["só a biblioteca padrão"], novo: "Mudança de instalação: aqui e no install.sh, com teste numa pasta de usuário falsa." },
+  captura: { titulo: "Captura da visita", tipo: "borda", papel: "Abre o navegador com o Playwright, grava a visita (à mão ou com o robô que navega sozinho, com travas) e salva o HAR numa pasta nova.",
+    arquivos: ["captura/sessao.py (interface)", "captura/playwright.py (único import do Playwright)", "captura/robo.py", "captura/pasta.py"], usa: ["a interface SessaoDeGravacao, trocada por dublê nos testes"], novo: "Regra nova do robô: em robo.py, com teste do link que ele deve barrar." },
+  har: { titulo: "HAR", tipo: "borda", papel: "Lê o arquivo HAR e devolve uma lista de requisições. Descobre o site analisado e monta a linha do tempo da visita.",
+    arquivos: ["har/leitor.py", "har/modelos.py", "har/site.py", "har/visita.py"], usa: ["só a biblioteca padrão"], novo: "Campo novo do HAR: em modelos.py e leitor.py, com um HAR pequeno feito à mão em tests/dados/." },
+  identificacao: { titulo: "Identificação das bibliotecas", tipo: "puro", papel: "Descobre quais bibliotecas e versões o navegador carregou: primeiro pelas assinaturas conhecidas (nome do arquivo, comentário de versão), depois, se houver IA, nos bundles sem assinatura.",
+    arquivos: ["identificacao/assinaturas.py", "identificacao/bundles.py", "identificacao/ia.py", "identificacao/modelos.py"], usa: ["har/ (requisições)", "ia/ (só para os bundles)", "travas/ (confere o que a IA sugeriu)"], novo: "Assinatura nova: em assinaturas.py, com teste." },
+  travas: { titulo: "Travas contra invenção", tipo: "borda", papel: "Confere o que veio da IA ou das fontes antes de virar dado: formato fechado, trecho real no código, versão dentro da faixa afetada, pacote que existe no npm, explicação sem fato novo. O que não passa vai para \"a confirmar\".",
+    arquivos: ["travas/formato.py", "travas/ancoragem.py", "travas/codigo_publicado.py", "travas/faixa_de_versao.py", "travas/explicacao.py", "travas/conferencia.py", "travas/modelos.py"], usa: ["fontes/registro_npm.py (pacote existe e código publicado)"], novo: "Trava nova: um arquivo aqui, chamado por conferencia.py ou pelo fluxo, com teste em que a IA (dublê) inventa algo e a trava barra." },
+  fontes: { titulo: "Fontes de falhas conhecidas", tipo: "borda", papel: "Consulta GitHub Advisory, OSV e NVD pela biblioteca e versão, junta o mesmo aviso vindo de fontes diferentes e completa o CVSS. Também baixa o pacote do npm só em memória.",
+    arquivos: ["fontes/conector.py (interface)", "fontes/github_advisory.py", "fontes/osv.py", "fontes/nvd.py", "fontes/registro_npm.py", "fontes/consulta.py", "fontes/juncao.py"], usa: ["a interface ConectorDeAvisos, trocada por dublê nos testes"], novo: "Fonte nova: um arquivo aqui que implementa conector.py." },
+  risco: { titulo: "Risco", tipo: "puro", papel: "Calcula a nota de risco de cada falha pela fórmula fixa (CVSS e EPSS) e a prioridade (alta, média, baixa), e ordena os achados.",
+    arquivos: ["risco/nota.py", "risco/prioridade.py", "risco/achados.py", "risco/modelos.py"], usa: ["fontes/ (avisos já conferidos)"], novo: "Mudança na fórmula: em nota.py, com decisão em docs/decisoes/ e teste." },
+  explicacao: { titulo: "Explicação dos achados", tipo: "puro", papel: "Pede à IA um texto simples sobre cada falha e passa pela trava de explicação. Sem IA, monta uma explicação de reserva só com os dados.",
+    arquivos: ["explicacao/ia.py", "explicacao/modelos.py"], usa: ["risco/ (achados)", "ia/", "travas/explicacao.py"], novo: "Campo novo na explicação: no prompt de ia/prompts/, em modelos.py e na trava." },
+  configuracao: { titulo: "Checagens de configuração", tipo: "puro", papel: "Confere cabeçalhos de segurança e cookies nas respostas do próprio site (CSP, HSTS, nosniff, frame, versão exposta, HttpOnly). Uma função por checagem.",
+    arquivos: ["configuracao/checagens.py", "configuracao/modelos.py"], usa: ["har/ (requisições)"], novo: "Checagem nova: uma função em checagens.py, na tupla CHECAGENS, com teste, e o que fazer em acao/plano.py." },
+  acao: { titulo: "Plano de ação", tipo: "puro", papel: "Transforma achados e checagens em ações ordenadas: o que fazer, por quê, o impacto, quem resolve e como verificar. Gera o texto da task para colar no quadro do time.",
+    arquivos: ["acao/plano.py", "acao/task.py", "acao/modelos.py"], usa: ["risco/, explicacao/, configuracao/"], novo: "Ação de uma checagem nova: o texto da correção em plano.py." },
+  ia: { titulo: "Cliente de IA", tipo: "ia", papel: "Único ponto de chamada à IA. Escolhe o provedor (Kiro, Claude ou Codex, pela CLI instalada), tira dados sensíveis antes de enviar e mede tempo e tokens de cada chamada.",
+    arquivos: ["ia/cliente.py", "ia/sanitizacao.py", "ia/provedores/ (kiro, claude, codex)", "ia/prompts/ (prompts versionados)"], usa: ["só a CLI da IA, pela entrada padrão, com tempo limite"], novo: "IA nova: um arquivo em ia/provedores/. Prompt novo: um .md em ia/prompts/." },
+  relatorio: { titulo: "Relatório", tipo: "borda", papel: "Transforma a análise no JSON do relatório e embute esse JSON no HTML pronto do React. Grava numa pasta nova por análise, nunca sobrescreve.",
+    arquivos: ["relatorio/json.py", "relatorio/html.py", "relatorio/gravacao.py", "relatorio/modelo.html (build do frontend)"], usa: ["a Analise montada pelo fluxo", "o pentest.json, se vier com analisar --pentest"], novo: "Dado novo na tela: aqui no JSON e no tipos.ts do frontend, no mesmo commit." },
+  frontend: { titulo: "Relatório na tela (React)", tipo: "puro", papel: "Monta a tela a partir do JSON embutido no HTML. Abre offline com duplo clique. Não calcula regra de negócio: nota, prioridade e contagens já vêm prontas.",
+    arquivos: ["frontend/src/App.tsx", "frontend/src/componentes/", "frontend/src/dados/", "frontend/src/tipos.ts"], usa: ["só o JSON do relatório"], novo: "Componente novo: um .tsx com o .css ao lado. Depois do build, copiar dist/index.html para rastro/relatorio/modelo.html." },
+  pentest: { titulo: "Segurança ativa (pentest)", tipo: "isolado", papel: "Com --autorizo, faz poucas requisições GET, HEAD e OPTIONS aos endereços do HAR e confere as proteções da resposta. Grava o próprio pentest.json. Nunca entra na nota, nas checagens nem no plano.",
+    arquivos: ["pentest/fluxo.py", "pentest/sonda.py", "pentest/validacoes.py", "pentest/formato.py", "pentest/leitor.py", "pentest/gravacao.py", "pentest/privacidade.py", "pentest/modelos.py", "pentest/erros.py"], usa: ["har/ (endereços do site)", "nada do fluxo da análise"], novo: "Regra nova: em validacoes.py, com teste que prova o limite de segurança. O fluxo da análise não muda." },
+};
+const ROTULO_DO_TIPO = { puro: "núcleo puro", borda: "borda", ia: "IA", isolado: "isolado" };
+
+function preencherLista(elemento, itens) {
+  elemento.replaceChildren();
+  for (const item of itens) {
+    const linha = document.createElement("li");
+    linha.textContent = item;
+    elemento.append(linha);
+  }
+}
+
+function mostrarCamada(chave) {
+  const camada = CAMADAS[chave];
+  document.getElementById("ficha-titulo").textContent = camada.titulo;
+  const selo = document.getElementById("ficha-selo");
+  selo.textContent = ROTULO_DO_TIPO[camada.tipo];
+  selo.className = "selo " + camada.tipo;
+  document.getElementById("ficha-papel").textContent = camada.papel;
+  preencherLista(document.getElementById("ficha-arquivos"), camada.arquivos);
+  preencherLista(document.getElementById("ficha-usa"), camada.usa);
+  document.getElementById("ficha-novo").textContent = camada.novo;
+  for (const no of document.querySelectorAll(".no")) {
+    no.classList.toggle("escolhido", no.dataset.no === chave);
+  }
+}
+
+for (const no of document.querySelectorAll(".no")) {
+  no.addEventListener("click", () => mostrarCamada(no.dataset.no));
+  no.addEventListener("keydown", (evento) => {
+    if (evento.key === "Enter" || evento.key === " ") {
+      evento.preventDefault();
+      mostrarCamada(no.dataset.no);
+    }
+  });
+}
+mostrarCamada("identificacao");
+</script>

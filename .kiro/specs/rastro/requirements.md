@@ -232,6 +232,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 1. A cobertura das regras de negócio DEVE ser de pelo menos 60% (meta 80%), medida com `pytest-cov`, com relatório em `docs/cobertura/`.
 2. Os testes NÃO DEVEM acessar a rede nem chamar a IA de verdade.
 3. O código DEVE passar no `ruff` e no `mypy` sem erros.
+4. Cada pasta, arquivo e função DEVE ter uma responsabilidade só, dita pelo próprio nome, sem abreviação. Siglas de domínio (HAR, IA, CVE, CVSS, NVD, OSV, npm, HTML, JSON, CLI, URL) são aceitas. Uma camada não DEVE importar de outra que vem depois dela no fluxo.
 
 ## R20 Entrega
 
