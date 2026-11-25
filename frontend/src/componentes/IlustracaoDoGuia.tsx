@@ -399,13 +399,13 @@ const DESENHOS: Record<IlustracaoDoPasso, ReactNode> = {
         $ rastro pentest site.har --autorizo
       </text>
       <text className="ilustracao__texto ilustracao__texto--mono ilustracao__digita ilustracao__digita--2" x="22" y="84">
-        Só use com autorização.
+        Resumo: 7 falharam, 9 passaram…
       </text>
       <text className="ilustracao__texto ilustracao__texto--mono ilustracao__digita ilustracao__digita--3" x="22" y="102">
-        Requisições: 2 · validações: 14
+        Escopo: configuração de segurança…
       </text>
       <text className="ilustracao__texto ilustracao__texto--mono ilustracao__texto--destaque ilustracao__texto--forte ilustracao__digita ilustracao__digita--4" x="22" y="128">
-        Segurança ativa: …/pentest.json
+        Pentest gravado em: …/pentest.json
       </text>
       <rect className="ilustracao__cursor-texto" x="22" y="138" width="7" height="12" />
     </>

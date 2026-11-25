@@ -53,8 +53,8 @@ export const DESCRICAO_DA_VALIDACAO: Record<CategoriaDoPentest, DescricaoDaValid
   },
 };
 
-/** O que um pentest de verdade cobre e o Rastro não testa. */
-export const FORA_DO_ALCANCE: string[] = [
+/** Itens de um pentest que ficam fora do escopo da segurança ativa do Rastro. */
+export const FORA_DO_ESCOPO: string[] = [
   "Login e sessão",
   "Permissões entre usuários",
   "Injeção de código (SQL, XSS)",

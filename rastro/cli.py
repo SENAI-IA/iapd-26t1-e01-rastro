@@ -190,9 +190,9 @@ TEXTO_PENTEST_EXECUTADO = (
     "Ele usa somente GET, HEAD e OPTIONS, sem corpo, cookies ou cabeçalhos de autenticação."
 )
 TEXTO_PENTEST_ALCANCE = (
-    "Cada validação cita o teste do guia OWASP WSTG que ela cobre. Login, permissões entre "
-    "usuários, injeção (como SQL e XSS) e regras de negócio não são testados: isso pede um "
-    "pentest feito por especialista."
+    "Escopo: configuração de segurança das respostas, conforme o guia OWASP WSTG. "
+    "Fora do escopo: login e sessão, permissões entre usuários, injeção de código e "
+    "regras de negócio."
 )
 TEXTO_PENTEST_NO_RELATORIO = (
     "Segurança ativa: {resumo}, na aba Segurança ativa. Não muda a nota nem o plano de ação."

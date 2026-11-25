@@ -71,7 +71,7 @@ export const PASSOS_DO_TOUR: PassoDoTour[] = [
     seletor: ".barra-superior__tela--pentest",
     titulo: "Segurança ativa, opcional e separada",
     texto:
-      "Quando você executa `pentest --autorizo`, esta aba mostra que proteções o site devolveu, agrupadas em a corrigir, em ordem e não conferido. Fica fora da nota e não substitui um pentest completo.",
+      "Quando você executa `pentest --autorizo`, esta aba mostra as proteções que o site devolveu, em a corrigir, em ordem e não conferido, e o escopo do teste. Fica fora da nota.",
     termos: ["Pentest", "WSTG"],
   },
   {

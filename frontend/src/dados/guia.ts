@@ -129,14 +129,14 @@ const ABRIR_O_RELATORIO_GRAVADO: PassoDoGuia = {
 };
 
 const VALIDAR_SEGURANCA_ATIVA: PassoDoGuia = {
-  titulo: "Se quiser, rode as validações de segurança ativas",
+  titulo: "Se quiser, confira as proteções do site",
   texto:
-    "Se você tem autorização para testar o site, rode o comando separado. Ele revisita no máximo 20 URLs do mesmo host que aparecem no HAR e faz apenas validações HTTP seguras. Para enviar requisições, `--autorizo` é obrigatório.",
+    "Com autorização para testar o site, o Rastro pede de novo algumas páginas da visita (até 20) e confere se o site devolve as proteções básicas: HTTPS obrigatório, política de conteúdo, cookies protegidos e outras. Nenhum ataque é feito. Depois, leve o `pentest.json` ao relatório.",
   comandos: [
-    { sistema: "Linux", texto: "rastro pentest site.har --autorizo" },
-    { sistema: "Windows", texto: "rastro pentest site.har --autorizo" },
+    { sistema: "Testar", texto: "rastro pentest site.har --autorizo" },
+    { sistema: "Relatório", texto: "rastro analisar site.har --pentest <caminho>/pentest.json" },
   ],
-  dica: "O comando só confere proteções que o site devolve; não tenta invadir nada. Login, permissões, injeção e regras de negócio ficam para um pentest feito por especialista. Ele grava um `pentest.json`; leve esse arquivo ao relatório.",
+  dica: "Escopo: configuração de segurança das respostas, conforme o guia OWASP WSTG. Fora do escopo: login e sessão, permissões entre usuários, injeção de código e regras de negócio.",
   ilustracao: "pentest",
 };
 
