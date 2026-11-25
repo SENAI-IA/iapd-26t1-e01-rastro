@@ -69,10 +69,10 @@ export const PASSOS_DO_TOUR: PassoDoTour[] = [
   },
   {
     seletor: ".barra-superior__tela--pentest",
-    titulo: "Pentest opcional e separado",
+    titulo: "Segurança ativa, opcional e separada",
     texto:
-      "Quando você executa `pentest --autorizo`, esta aba mostra as validações HTTP limitadas do Rastro. Elas ficam fora da nota, das checagens passivas e do plano de ação. Use o comando somente em um site autorizado.",
-    termos: ["Pentest"],
+      "Quando você executa `pentest --autorizo`, esta aba mostra que proteções o site devolveu, agrupadas em a corrigir, em ordem e não conferido. Fica fora da nota e não substitui um pentest completo.",
+    termos: ["Pentest", "WSTG"],
   },
   {
     seletor: ".zona__focar",

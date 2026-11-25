@@ -12,7 +12,9 @@ export const glossario = {
   Trava:
     "Regra fixa que confere um dado antes de ele entrar no relatório: o que a IA devolveu, o pacote no npm, a faixa de versão afetada. O que não passa é barrado e fica registrado.",
   Pentest:
-    "Validação ativa e limitada de segurança. No Rastro, só roda no comando separado com `--autorizo`, sem payloads e fora da nota da análise.",
+    "Teste de segurança completo, feito por especialista com autorização: tenta de fato invadir o site. O Rastro faz só uma parte automática e limitada, a segurança ativa, sem ataques e fora da nota.",
+  WSTG:
+    "Guia aberto da OWASP com os testes de segurança de sites. O código, como WSTG-CONF-12, diz qual teste do guia foi feito.",
 } as const satisfies Record<string, string>;
 
 export type NomeDoTermo = keyof typeof glossario;

@@ -83,6 +83,7 @@
 | T68 Gravar as validações de segurança ativas | extensão | T23, T57, T67 | T69 | formato, pasta e comando |
 | T69 Levar as validações ativas ao JSON do relatório | extensão | T68 | T70 | `pentest.json` gravado pelo comando |
 | T70 Mostrar a aba Segurança ativa no relatório | extensão | T64, T69 | T48 | aba, Como usar e Tour guiado |
+| T71 Situar a segurança ativa no guia OWASP WSTG | extensão | T67, T70 | T48 | referência por validação e aba agrupada |
 
 ## Grafo
 
@@ -109,7 +110,7 @@ flowchart LR
     T42; T43; T44; T45; T46; T47; T48
   end
   subgraph PT[Extensão: segurança ativa]
-    T66; T67; T68; T69; T70
+    T66; T67; T68; T69; T70; T71
   end
 
   T03 --> T04
@@ -164,7 +165,8 @@ flowchart LR
   T23 & T57 & T67 --> T68
   T68 --> T69
   T64 & T69 --> T70
-  T42 & T43 & T44 & T45 & T46 & T47 & T55 & T56 & T57 & T70 --> T48
+  T67 & T70 --> T71
+  T42 & T43 & T44 & T45 & T46 & T47 & T55 & T56 & T57 & T70 & T71 --> T48
 ```
 
 ## Caminho crítico

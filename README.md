@@ -198,7 +198,9 @@ O resultado fica em `~/Rastro/pentest/<site>/<data e hora>/pentest.json`. Depois
 rastro analisar site.har --pentest <caminho-do-pentest.json>
 ```
 
-A aba **Segurança ativa** fica separada da nota, das checagens passivas e do plano de ação. Sem `--autorizo`, o Rastro não lê o HAR nem acessa a rede. O comando não substitui um pentest completo.
+A aba **Segurança ativa** mostra as proteções em três grupos (a corrigir, em ordem e não conferido), com o teste do guia OWASP WSTG que cada uma segue. Ela fica separada da nota, das checagens passivas e do plano de ação. Sem `--autorizo`, o Rastro não lê o HAR nem acessa a rede.
+
+O comando não substitui um pentest completo: login e sessão, permissões entre usuários, injeção de código e regras de negócio ficam para um especialista.
 
 Detalhes e comparação com motores externos estão em [`docs/analise-opcoes-pentest.md`](docs/analise-opcoes-pentest.md).
 

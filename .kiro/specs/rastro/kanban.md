@@ -86,6 +86,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T68** Gravar as validações de segurança ativas · extensão segurança ativa · revisão @geison.santos · rebase
 - [ ] **T69** Levar as validações ativas ao JSON do relatório · extensão segurança ativa · revisão @geison.santos · rebase
 - [ ] **T70** Mostrar a aba Segurança ativa no relatório · extensão segurança ativa · revisão @halan.bacca · rebase
+- [ ] **T71** Situar a segurança ativa no guia OWASP WSTG · extensão segurança ativa · revisão @luiz.pagliari · 25/11
 
 ## A fazer
 

@@ -210,6 +210,7 @@ export interface ValidacaoDoPentest {
   titulo: string;
   situacao: SituacaoDoPentest;
   detalhe: string;
+  referencia: string | null;
   requisicao: RequisicaoDoPentest;
 }
 

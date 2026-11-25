@@ -47,7 +47,7 @@ export default function BarraSuperior({
               onClick={() => aoTrocarTela("pentest")}
             >
               <Icone nome="lupa" />
-              Pentest
+              Segurança ativa
             </button>
           )}
           <button

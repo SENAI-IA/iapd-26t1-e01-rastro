@@ -1,0 +1,62 @@
+import type { CategoriaDoPentest } from "../tipos.ts";
+
+export interface DescricaoDaValidacao {
+  nome: string;
+  porQue: string;
+}
+
+/** Nome curto e, em uma frase, por que cada validação importa para quem não é da área. */
+export const DESCRICAO_DA_VALIDACAO: Record<CategoriaDoPentest, DescricaoDaValidacao> = {
+  csp: {
+    nome: "Política de conteúdo (CSP)",
+    porQue: "Diz ao navegador de onde a página pode carregar scripts. Sem ela, um script injetado roda sem barreira.",
+  },
+  csp_diretiva: {
+    nome: "Brechas na política de conteúdo",
+    porQue: "As opções unsafe-inline e unsafe-eval liberam justamente o tipo de script que a CSP deveria barrar.",
+  },
+  hsts: {
+    nome: "HTTPS obrigatório (HSTS)",
+    porQue: "Faz o navegador usar sempre HTTPS. Sem isso, uma conexão numa rede insegura pode ser desviada.",
+  },
+  nosniff: {
+    nome: "Tipo de arquivo travado (nosniff)",
+    porQue: "Impede o navegador de tratar como script um arquivo que não é script.",
+  },
+  frame: {
+    nome: "Proteção contra moldura (frame)",
+    porQue: "Impede outro site de exibir esta página escondida dentro dele para enganar cliques.",
+  },
+  referrer_policy: {
+    nome: "Endereço enviado a outros sites",
+    porQue: "Controla quanto do endereço da página vai junto quando a pessoa clica num link para fora.",
+  },
+  permissions_policy: {
+    nome: "Recursos do navegador (câmera, local…)",
+    porQue: "Desliga recursos que a página não usa. É uma boa prática, não uma falha grave.",
+  },
+  server_version: {
+    nome: "Versão do servidor à mostra",
+    porQue: "Mostrar a versão ajuda quem procura falhas conhecidas daquela versão.",
+  },
+  cors: {
+    nome: "Leitura por outros sites (CORS)",
+    porQue: "Define quais outros sites podem ler as respostas deste. Liberado demais, outro site lê dados de quem está logado.",
+  },
+  cookie: {
+    nome: "Proteção dos cookies",
+    porQue: "HttpOnly, Secure e SameSite evitam que o cookie seja lido por scripts, enviado sem HTTPS ou usado por outro site.",
+  },
+  execucao: {
+    nome: "Endereços sem resposta",
+    porQue: "O site não respondeu a tempo, então nada pôde ser conferido nesses endereços.",
+  },
+};
+
+/** O que um pentest de verdade cobre e o Rastro não testa. */
+export const FORA_DO_ALCANCE: string[] = [
+  "Login e sessão",
+  "Permissões entre usuários",
+  "Injeção de código (SQL, XSS)",
+  "Regras de negócio",
+];

@@ -136,7 +136,7 @@ const VALIDAR_SEGURANCA_ATIVA: PassoDoGuia = {
     { sistema: "Linux", texto: "rastro pentest site.har --autorizo" },
     { sistema: "Windows", texto: "rastro pentest site.har --autorizo" },
   ],
-  dica: "O comando não faz payloads, XSS, injeção, CSRF, IDOR, SSRF ou bypass de autenticação. Ele grava um `pentest.json`; leve esse arquivo ao relatório.",
+  dica: "O comando só confere proteções que o site devolve; não tenta invadir nada. Login, permissões, injeção e regras de negócio ficam para um pentest feito por especialista. Ele grava um `pentest.json`; leve esse arquivo ao relatório.",
   ilustracao: "pentest",
 };
 
@@ -303,5 +303,5 @@ export const SEUS_DADOS: Item[] = [
     modos: GRAVANDO_PELO_RASTRO,
   },
   { texto: "A IA recebe só trechos de scripts, o nome e a versão das bibliotecas e os dados dos avisos, com tokens, chaves e parâmetros de endereço tirados antes." },
-  { texto: "O pentest é opcional: só o navegador acessa o host, quando você executa o comando com `--autorizo`; o resultado fica separado da nota." },
+  { texto: "A segurança ativa é opcional: o Rastro só acessa o site quando você executa o `pentest` com `--autorizo`, e o resultado fica separado da nota." },
 ];

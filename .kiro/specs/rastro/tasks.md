@@ -653,3 +653,11 @@ O Rastro continua passivo em `analisar`. O comando `pentest --autorizo` faz vali
   - Teste: verificação manual.
   - Requisito: R25.12
   - Revisão: @halan.bacca
+
+- [x] **T71 Situar a segurança ativa no guia OWASP WSTG**
+  - Entrega: cada validação cita o teste do WSTG que cobre, e a aba agrupa os resultados por proteção, em linguagem simples, com o que fica para um pentest de especialista.
+  - Aceite: `pentest.json` na versão 2 com `referencia` por validação; referência errada ou formato 1 são recusados; terminal e aba dizem o que não foi testado; aba "Segurança ativa" com "A corrigir", "Em ordem" e "Não conferido"; claro, escuro e 400px conferidos.
+  - Arquivos: `rastro/pentest/modelos.py`, `rastro/pentest/validacoes.py`, `rastro/pentest/formato.py`, `rastro/pentest/fluxo.py`, `rastro/cli.py`, `tests/pentest/test_validacoes.py`, `tests/pentest/test_formato.py`, `tests/pentest/test_cli_pentest.py`, `frontend/src/dados/segurancaAtiva.ts`, `frontend/src/componentes/PainelPentest.*`, `frontend/src/componentes/ItemDoPentest.*`, `frontend/src/componentes/BarraSuperior.tsx`, `frontend/src/dados/glossario.ts`, `frontend/src/dados/guia.ts`, `frontend/src/dados/tour.ts`, `frontend/src/tipos.ts`, `rastro/relatorio/modelo.html`
+  - Teste: `test_r25_15_*`; aba por verificação manual.
+  - Requisito: R25.12, R25.15
+  - Revisão: @luiz.pagliari

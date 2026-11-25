@@ -189,6 +189,11 @@ TEXTO_PENTEST_EXECUTADO = (
     "Validações de segurança ativas executadas pelo Rastro com autorização explícita. "
     "Ele usa somente GET, HEAD e OPTIONS, sem corpo, cookies ou cabeçalhos de autenticação."
 )
+TEXTO_PENTEST_ALCANCE = (
+    "Cada validação cita o teste do guia OWASP WSTG que ela cobre. Login, permissões entre "
+    "usuários, injeção (como SQL e XSS) e regras de negócio não são testados: isso pede um "
+    "pentest feito por especialista."
+)
 TEXTO_PENTEST_NO_RELATORIO = (
     "Segurança ativa: {resumo}, na aba Segurança ativa. Não muda a nota nem o plano de ação."
 )
@@ -412,6 +417,7 @@ def mostrar_pentest(resultado: ResultadoDoPentest, caminho: Path) -> None:
     print(TEXTO_PENTEST_EXECUTADO)
     print(f"Site: {resultado.site} · requisições enviadas: {resultado.requisicoes_enviadas}")
     print(f"Resumo: {texto_do_resumo_do_pentest(asdict(resultado.resumo))}")
+    print(TEXTO_PENTEST_ALCANCE)
     print(f"Pentest gravado em: {caminho}")
     print(
         "Para abrir no relatório: python -m rastro analisar "

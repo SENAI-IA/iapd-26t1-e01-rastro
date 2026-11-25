@@ -53,7 +53,7 @@ def ids_das_limitacoes(relatorio: dict[str, Any]) -> list[str]:
 
 def test_r24_11_pentest_fica_separado_e_nao_muda_o_resumo() -> None:
     pentest = ResultadoDoPentest(
-        versao_formato=1,
+        versao_formato=2,
         origem="rastro",
         modo="ativo",
         executado_em="2026-11-20T12:00:00",
