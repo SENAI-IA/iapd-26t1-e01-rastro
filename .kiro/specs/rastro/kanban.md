@@ -145,6 +145,11 @@ _(vazio)_
 
 ### Rodada de legibilidade (até 08/12)
 
+- [ ] **T92** Separar o histórico e versionar a decisão 11 · rodada de legibilidade · revisão @cristiano.albino
+- [ ] **T93** Numerar as travas como a decisão 06 · rodada de legibilidade · revisão @cristiano.albino
+- [ ] **T94** Reescrever o README no ritmo do Como usar · rodada de legibilidade · revisão @halan.bacca
+- [ ] **T95** Deixar o README técnico só para desenvolvimento · rodada de legibilidade · revisão @luiz.pagliari
+- [ ] **T96** Enxugar a spec viva, as decisões e o steering · rodada de legibilidade · revisão @geison.santos
 - [ ] **T89** Atualizar diagrama, steering e documentação para a estrutura nova · rodada de legibilidade · revisão @geison.santos
 
 ## Feito

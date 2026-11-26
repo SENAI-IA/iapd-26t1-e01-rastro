@@ -664,7 +664,7 @@ O Rastro continua passivo em `analisar`. O comando `pentest --autorizo` faz vali
 
 ## Rodada de legibilidade
 
-Polimento sem mudar comportamento, para que quem não domina Python, TypeScript ou React entenda rápido cada camada, arquivo e função (R19.4). A T89 fecha a rodada, depois da T90 e da T91. Siglas de domínio ficam; abreviação vira nome completo; a responsabilidade se explica pelo nome, sem comentário. As chaves do JSON do relatório e do `pentest.json` não mudam nesta rodada.
+Polimento sem mudar comportamento, para que quem não domina Python, TypeScript ou React entenda rápido cada camada, arquivo e função (R19.4). A T89 fecha a rodada, depois da T90, da T91 e do polimento da documentação (T92 a T96). Siglas de domínio ficam; abreviação vira nome completo; a responsabilidade se explica pelo nome, sem comentário. As chaves do JSON do relatório e do `pentest.json` não mudam nesta rodada.
 
 - [x] **T72 Registrar a rodada de legibilidade e o diagrama da arquitetura**
   - Entrega: tasks T72–T89, critério R19.4 e diagrama interativo das camadas para o time.
@@ -817,6 +817,46 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Teste: `npm run build` roda `conferirAninhamento.mjs`, que falha se alguma função tiver mais de dois níveis de bloco; 60 telas, 310 quadros do guia, sonda de comportamento e passos do tour iguais aos de antes.
   - Requisito: R19.4
   - Revisão: @halan.bacca
+
+- [ ] **T92 Separar o histórico e versionar a decisão 11**
+  - Entrega: `docs/historico/` com os registros de uma etapa (spikes, análise inicial do pentest, `dependencias.md`, pitch inicial), cada um com uma linha no topo dizendo a data e que nomes de arquivo podem ter mudado; a decisão 11 entra no repositório.
+  - Aceite: nenhum link aponta para o lugar antigo; a decisão 11 deixa de estar no `.git/info/exclude` e cita os caminhos atuais.
+  - Arquivos: `docs/historico/`, `docs/decisoes/11-comando-rastro-de-qualquer-pasta.md`, documentos que linkam os movidos
+  - Teste: não se aplica (documentação); conferência de links quebrados.
+  - Requisito: R19.4
+  - Revisão: @cristiano.albino
+
+- [ ] **T93 Numerar as travas como a decisão 06**
+  - Entrega: a faixa de versão é a trava 6 e a explicação sem fato novo é a trava 7 em todo lugar: R21.6 e R21.7 trocam de lugar na spec e os testes `test_r21_6_*`/`test_r21_7_*` são renomeados junto.
+  - Aceite: spec, design, decisão 06, skill, avaliação e testes usam a mesma numeração; `ruff`, `mypy` e `pytest` passam com o mesmo número de testes.
+  - Arquivos: `.kiro/specs/rastro/requirements.md`, `tests/travas/`, `tests/`, documentos que citam a trava pelo número
+  - Teste: os testes renomeados.
+  - Requisito: R19.4
+  - Revisão: @cristiano.albino
+
+- [ ] **T94 Reescrever o README no ritmo do Como usar**
+  - Entrega: `README.md` para ler e sair usando, na ordem do guia "Como usar" (antes de começar, instalar, escolher o modo de gravar e seus passos, abrir o relatório, proteções opcionais, problemas comuns, seus dados), com uma seção curta "Desenvolvido com IA" e links de uma linha para o detalhe técnico.
+  - Aceite: os passos e nomes batem com `frontend/src/conteudo/guia.ts`; nenhum link quebrado; nada técnico repetido do `README-TECNICO.md`.
+  - Arquivos: `README.md`
+  - Teste: não se aplica (documentação); comandos conferidos no terminal.
+  - Requisito: R19.4
+  - Revisão: @halan.bacca
+
+- [ ] **T95 Deixar o README técnico só para desenvolvimento**
+  - Entrega: `README-TECNICO.md` com o que só o time precisa (preparar o ambiente, verificação, build do frontend, mapa da documentação, resultados com link) e o roteiro manual com as pendências do Windows numa lista só em `docs/verificacao-manual.md`.
+  - Aceite: nenhum passo de uso repetido do `README.md`; números e nomes atuais.
+  - Arquivos: `README-TECNICO.md`, `docs/verificacao-manual.md`
+  - Teste: não se aplica (documentação).
+  - Requisito: R19.4
+  - Revisão: @luiz.pagliari
+
+- [ ] **T96 Enxugar a spec viva, as decisões e o steering**
+  - Entrega: `design.md` sem lista arquivo a arquivo (aponta para `structure.md`), sem histórico de tasks e com nomes atuais; decisões com os caminhos atuais, a 13 absorvendo a análise do pentest; steering e skill sem repetir o que tem fonte única.
+  - Aceite: cada assunto tem uma fonte única e os outros apontam para ela; nenhuma menção a arquivo que não existe mais.
+  - Arquivos: `.kiro/specs/rastro/design.md`, `.kiro/specs/rastro/requirements.md`, `docs/decisoes/`, `.kiro/steering/`, `.kiro/skills/rastro-nova-regra/SKILL.md`, `avaliacao/`
+  - Teste: não se aplica (documentação); busca por nomes antigos.
+  - Requisito: R19.4
+  - Revisão: @geison.santos
 
 - [ ] **T89 Atualizar diagrama, steering e documentação para a estrutura nova**
   - Entrega: diagrama, `structure.md`, `codigo-python.md`, `frontend-react.md`, skill `rastro-nova-regra` e README técnico com os nomes novos.
