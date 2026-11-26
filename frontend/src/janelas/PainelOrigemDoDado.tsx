@@ -1,17 +1,13 @@
-import { useEffect, useRef, type MouseEvent } from "react";
-import type { Achado, Aviso, Biblioteca, CampoComOrigem } from "../relatorio/tiposDoRelatorio.ts";
+import type { Aviso, Biblioteca, CampoComOrigem } from "../relatorio/tiposDoRelatorio.ts";
+import type { OrigemDoDado } from "../telas/tiposDaTela.ts";
 import EtapaDaOrigem from "./EtapaDaOrigem.tsx";
 import Icone from "../basicos/Icone.tsx";
 import SeloDePrioridade from "../basicos/SeloDePrioridade.tsx";
 import SeloDoMetodo from "../basicos/SeloDoMetodo.tsx";
 import { formatarNota, formatarPercentil } from "../formatacao/formato.ts";
 import Termo from "../basicos/Termo.tsx";
+import { usarJanelaModal } from "../hooks/usarJanelaModal.ts";
 import "./PainelOrigemDoDado.css";
-
-export interface OrigemDoDado {
-  biblioteca: Biblioteca;
-  achados: Achado[];
-}
 
 interface Props {
   origem: OrigemDoDado;
@@ -19,24 +15,13 @@ interface Props {
 }
 
 export default function PainelOrigemDoDado({ origem, aoFechar }: Props) {
-  const painel = useRef<HTMLDialogElement>(null);
+  const { janela, fechar, fecharAoClicarFora } = usarJanelaModal();
   const { biblioteca, achados } = origem;
   const naoConsultada = biblioteca.motivo_nao_consultada !== null;
 
-  useEffect(() => {
-    painel.current?.showModal();
-  }, []);
-
-  const fechar = () => painel.current?.close();
-  const fecharAoClicarFora = (evento: MouseEvent<HTMLDialogElement>) => {
-    if (evento.target === evento.currentTarget) {
-      fechar();
-    }
-  };
-
   return (
     <dialog
-      ref={painel}
+      ref={janela}
       className="painel-origem"
       aria-labelledby="painel-origem-titulo"
       onClose={aoFechar}

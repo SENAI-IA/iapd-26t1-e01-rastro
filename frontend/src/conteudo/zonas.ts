@@ -10,7 +10,3 @@ export const ZONAS: Zona[] = [
   { id: "agir", nome: "Agir" },
   { id: "detalhes", nome: "Detalhes" },
 ];
-
-export function idDaZona(zona: NomeDaZona): string {
-  return `zona-${zona}`;
-}

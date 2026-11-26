@@ -778,11 +778,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @halan.bacca
 
-- [ ] **T86 Juntar o comportamento repetido e dividir o App**
+- [x] **T86 Juntar o comportamento repetido e dividir o App**
   - Entrega: janela modal, rolagem e movimento reduzido num só lugar; tema, foco e painel saem do `App.tsx`.
   - Aceite: `App.tsx` só liga as telas; Verificação: `npm run build` passa e o `modelo.html` gerado de novo abre igual (claro, escuro, 400px).
-  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`
-  - Teste: verificação manual (foco, Esc, tour, painel lateral).
+  - Arquivos: `frontend/src/` (`hooks/`, `calculosDeTela/`, `telas/`, `App.tsx` e os componentes que usavam o comportamento repetido), `rastro/relatorio/modelo.html`, `.kiro/steering/frontend-react.md`
+  - Teste: 60 telas iguais pixel a pixel às de antes; sonda de comportamento (rolagem, foco, diálogo aberto e tema depois de 90 ações em 1280 e 400 px, com e sem movimento reduzido) igual entre o build antigo e o novo.
   - Requisito: R19.4
   - Revisão: @halan.bacca
 

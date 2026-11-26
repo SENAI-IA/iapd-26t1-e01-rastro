@@ -1,6 +1,6 @@
 import type { Achado, Biblioteca } from "../../relatorio/tiposDoRelatorio.ts";
 import LinhaBiblioteca from "./LinhaBiblioteca.tsx";
-import type { OrigemDoDado } from "../../janelas/PainelOrigemDoDado.tsx";
+import type { OrigemDoDado } from "../../telas/tiposDaTela.ts";
 import Termo from "../../basicos/Termo.tsx";
 import "./ListaBibliotecas.css";
 

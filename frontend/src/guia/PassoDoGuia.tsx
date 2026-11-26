@@ -3,6 +3,7 @@ import type { Comando, PassoDoGuia as DadosDoPasso } from "../conteudo/guia.ts";
 import Icone from "../basicos/Icone.tsx";
 import IlustracaoDoGuia from "./IlustracaoDoGuia.tsx";
 import TextoComMarcas from "../basicos/TextoComMarcas.tsx";
+import { idDoPassoDoGuia } from "../calculosDeTela/identificadores.ts";
 import "./PassoDoGuia.css";
 
 interface Props {
@@ -10,10 +11,6 @@ interface Props {
   passo: DadosDoPasso;
   feito: boolean;
   aoMarcar: () => void;
-}
-
-export function idDoPassoDoGuia(numero: number): string {
-  return `passo-do-guia-${numero}`;
 }
 
 export default function PassoDoGuia({ numero, passo, feito, aoMarcar }: Props) {

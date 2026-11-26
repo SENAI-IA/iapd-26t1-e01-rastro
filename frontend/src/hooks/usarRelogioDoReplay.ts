@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { prefereMenosMovimento } from "../calculosDeTela/movimento.ts";
 
 export interface RelogioDoReplay {
   tempo: number;
@@ -6,10 +7,6 @@ export interface RelogioDoReplay {
   tocar: () => void;
   pausar: () => void;
   irPara: (tempo: number) => void;
-}
-
-function prefereMenosMovimento(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 export function usarRelogioDoReplay(duracao: number): RelogioDoReplay {

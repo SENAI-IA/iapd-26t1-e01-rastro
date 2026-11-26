@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { idDaZona, type Zona as DadosDaZona } from "../conteudo/zonas.ts";
+import type { Zona as DadosDaZona } from "../conteudo/zonas.ts";
+import { idDaZona } from "../calculosDeTela/identificadores.ts";
 import Icone from "../basicos/Icone.tsx";
 import "./Zona.css";
 

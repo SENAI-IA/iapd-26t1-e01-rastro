@@ -1,8 +1,6 @@
 import Icone from "../basicos/Icone.tsx";
+import type { Tela, Tema } from "../telas/tiposDaTela.ts";
 import "./BarraSuperior.css";
-
-export type Tema = "claro" | "escuro";
-export type Tela = "painel" | "pentest" | "como-usar";
 
 interface Props {
   tema: Tema;

@@ -3,22 +3,19 @@ import Evidencias from "./Evidencias.tsx";
 import ExplicacaoIA from "./ExplicacaoIA.tsx";
 import Icone from "../../basicos/Icone.tsx";
 import ListaFalhas from "./ListaFalhas.tsx";
-import type { OrigemDoDado } from "../../janelas/PainelOrigemDoDado.tsx";
+import type { OrigemDoDado } from "../../telas/tiposDaTela.ts";
 import Selo from "../../basicos/Selo.tsx";
 import SeloDePrioridade from "../../basicos/SeloDePrioridade.tsx";
 import SeloDoMetodo from "../../basicos/SeloDoMetodo.tsx";
 import { formatarNota, plural } from "../../formatacao/formato.ts";
 import Termo from "../../basicos/Termo.tsx";
+import { idDaLinhaDaBiblioteca } from "../../calculosDeTela/identificadores.ts";
 import "./LinhaBiblioteca.css";
 
 interface Props {
   biblioteca: Biblioteca;
   achados: Achado[];
   aoVerOrigem: (origem: OrigemDoDado) => void;
-}
-
-export function idDaLinhaDaBiblioteca(idDaBiblioteca: string): string {
-  return `biblioteca-${idDaBiblioteca}`;
 }
 
 export default function LinhaBiblioteca({ biblioteca, achados, aoVerOrigem }: Props) {

@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { glossario } from "../conteudo/glossario.ts";
 import type { PassoDoTour } from "../conteudo/tour.ts";
 import { posicaoDoBalao, retanguloDoDestaque, rolagemParaMostrar, type Ponto, type Retangulo } from "../calculosDeTela/posicaoDoTour.ts";
+import { prefereMenosMovimento } from "../calculosDeTela/movimento.ts";
+import { usarJanelaModal } from "../hooks/usarJanelaModal.ts";
 import "./TourGuiado.css";
 
 interface Props {
@@ -24,12 +26,8 @@ function telaAtual() {
   return { largura: document.documentElement.clientWidth, altura: window.innerHeight };
 }
 
-function preferePoucoMovimento(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
 export default function TourGuiado({ passos, topo, aoFechar }: Props) {
-  const modal = useRef<HTMLDialogElement>(null);
+  const { janela, fechar, fecharAoClicarFora } = usarJanelaModal();
   const balao = useRef<HTMLDivElement>(null);
   const botaoProximo = useRef<HTMLButtonElement>(null);
   const [indice, setIndice] = useState(0);
@@ -50,14 +48,10 @@ export default function TourGuiado({ passos, topo, aoFechar }: Props) {
   }, [passo, topo]);
 
   useLayoutEffect(() => {
-    modal.current?.showModal();
-  }, []);
-
-  useLayoutEffect(() => {
     const alvo = document.querySelector(passo.seletor);
     if (alvo) {
       const destino = rolagemParaMostrar(retanguloDe(alvo), window.scrollY, telaAtual(), topo?.offsetHeight ?? 0);
-      window.scrollTo({ top: destino, behavior: preferePoucoMovimento() ? "auto" : "smooth" });
+      window.scrollTo({ top: destino, behavior: prefereMenosMovimento() ? "auto" : "smooth" });
     }
     medir();
   }, [passo, topo, medir]);
@@ -78,7 +72,6 @@ export default function TourGuiado({ passos, topo, aoFechar }: Props) {
     };
   }, [medir]);
 
-  const fechar = () => modal.current?.close();
   const avancar = () => (ultimo ? fechar() : setIndice(indice + 1));
   const voltar = () => indice > 0 && setIndice(indice - 1);
 
@@ -92,15 +85,9 @@ export default function TourGuiado({ passos, topo, aoFechar }: Props) {
     }
   };
 
-  const fecharAoClicarFora = (evento: MouseEvent<HTMLDialogElement>) => {
-    if (evento.target === evento.currentTarget) {
-      fechar();
-    }
-  };
-
   return (
     <dialog
-      ref={modal}
+      ref={janela}
       className="tour"
       aria-labelledby="tour-titulo"
       onClose={aoFechar}

@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Acao } from "../../relatorio/tiposDoRelatorio.ts";
 import Icone from "../../basicos/Icone.tsx";
+import { usarJanelaModal } from "../../hooks/usarJanelaModal.ts";
 import "./ModalTask.css";
 
 type EstadoDaCopia = "pronta" | "copiada" | "selecionada";
@@ -17,22 +18,14 @@ interface Props {
 }
 
 export default function ModalTask({ acao, aoFechar }: Props) {
-  const modal = useRef<HTMLDialogElement>(null);
+  const { janela, fechar, fecharAoClicarFora } = usarJanelaModal();
   const texto = useRef<HTMLTextAreaElement>(null);
   const botaoCopiar = useRef<HTMLButtonElement>(null);
   const [estadoDaCopia, setEstadoDaCopia] = useState<EstadoDaCopia>("pronta");
 
   useEffect(() => {
-    modal.current?.showModal();
     botaoCopiar.current?.focus();
   }, []);
-
-  const fechar = () => modal.current?.close();
-  const fecharAoClicarFora = (evento: MouseEvent<HTMLDialogElement>) => {
-    if (evento.target === evento.currentTarget) {
-      fechar();
-    }
-  };
 
   const selecionarTexto = () => {
     texto.current?.focus();
@@ -50,7 +43,7 @@ export default function ModalTask({ acao, aoFechar }: Props) {
 
   return (
     <dialog
-      ref={modal}
+      ref={janela}
       className="modal-task"
       aria-labelledby="modal-task-titulo"
       onClose={aoFechar}

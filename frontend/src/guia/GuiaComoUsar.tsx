@@ -10,15 +10,15 @@ import {
 } from "../conteudo/guia.ts";
 import AnimacaoDoModo from "./AnimacaoDoModo.tsx";
 import { plural } from "../formatacao/formato.ts";
-import PassoDoGuia, { idDoPassoDoGuia } from "./PassoDoGuia.tsx";
+import PassoDoGuia from "./PassoDoGuia.tsx";
 import TextoComMarcas from "../basicos/TextoComMarcas.tsx";
+import { depoisDeDesenhar } from "../calculosDeTela/desenho.ts";
+import { idDoPassoDoGuia } from "../calculosDeTela/identificadores.ts";
+import { prefereMenosMovimento } from "../calculosDeTela/movimento.ts";
+import { rolarAteOElemento } from "../calculosDeTela/rolagem.ts";
 import "./GuiaComoUsar.css";
 
 const ID_DO_FIM_DO_GUIA = "guia-ir-para-o-painel";
-
-function preferePoucoMovimento(): boolean {
-  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-}
 
 function proximoPassoPendente(depoisDe: number, feitos: Set<number>, total: number): number | null {
   for (let indice = depoisDe + 1; indice < total; indice++) {
@@ -29,24 +29,21 @@ function proximoPassoPendente(depoisDe: number, feitos: Set<number>, total: numb
   return null;
 }
 
-function rolarAte(elemento: HTMLElement) {
-  const alturaDoTopo = document.querySelector<HTMLElement>(".app__topo")?.offsetHeight ?? 0;
-  window.scrollTo({
-    top: elemento.getBoundingClientRect().top + window.scrollY - alturaDoTopo - 12,
-    behavior: preferePoucoMovimento() ? "auto" : "smooth",
-  });
-  elemento.focus({ preventScroll: true });
-}
-
 interface Props {
   aoIrParaOPainel: (() => void) | null;
+  medirAlturaDoCabecalhoFixo: () => number;
 }
 
-export default function GuiaComoUsar({ aoIrParaOPainel }: Props) {
+export default function GuiaComoUsar({ aoIrParaOPainel, medirAlturaDoCabecalhoFixo }: Props) {
   const [modo, setModo] = useState<ModoDeUso>("devtools");
   const [feitos, setFeitos] = useState<Set<number>>(new Set());
   const passos = PASSOS_POR_MODO[modo];
   const total = passos.length;
+
+  const rolarAte = (elemento: HTMLElement) => {
+    rolarAteOElemento(elemento, medirAlturaDoCabecalhoFixo(), prefereMenosMovimento() ? "auto" : "smooth");
+    elemento.focus({ preventScroll: true });
+  };
 
   const escolherModo = (novo: ModoDeUso) => {
     setModo(novo);
@@ -67,7 +64,7 @@ export default function GuiaComoUsar({ aoIrParaOPainel }: Props) {
       proximo === null ? ID_DO_FIM_DO_GUIA : idDoPassoDoGuia(proximo + 1),
     );
     if (destino) {
-      requestAnimationFrame(() => rolarAte(destino));
+      depoisDeDesenhar(() => rolarAte(destino));
     }
   };
 
