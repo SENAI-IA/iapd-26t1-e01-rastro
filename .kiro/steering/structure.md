@@ -80,8 +80,8 @@ frontend/                  React (ver frontend-react.md)
 docs/
   decisoes/                um arquivo por decisão importante
   arquitetura/             diagrama interativo das camadas (arquitetura.html)
-  cobertura/               resultado da verificação (linux.md, windows.md) e html/ (relatório do pytest-cov)
-  prints/                  telas do relatório usadas no README
+  cobertura/               resultado da verificação, um arquivo por sistema (linux.md; windows.md na T42), e html/ (relatório do pytest-cov)
+  prints/                  telas do relatório usadas nos READMEs
   historico/               registros de uma etapa, mantidos como foram escritos: spike/, análise inicial do pentest, dependências das tasks, pitch inicial
 .kiro/                     specs (com tasks e kanban), steering, skills
 ```
@@ -93,10 +93,9 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 - **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `listas.py`, `data_e_hora.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` e `achados_da_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade e `valor_para_ordem_decrescente` em `risco/prioridade.py`).
 - **Checagem nova:** a `RegraDeChecagem` em `configuracao/regras_das_checagens.py`; o teste que diz se uma resposta ou um cookie falha em `configuracao/falhas_nos_cabecalhos.py` ou `configuracao/falhas_nos_cookies.py`; uma função `checar_*` em `configuracao/checagens.py` (e na tupla `CHECAGENS`), que usa o mecanismo de `configuracao/avaliacao_do_site.py`; os testes de cada uma; e o que fazer e o impacto dela em `acao/correcoes_das_checagens.py`.
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
-- **IA nova:** um arquivo em `ia/provedores/` (que roda a CLI com `execucao_da_cli.py`) e o nome em `EXECUTAVEIS_DAS_IAS` (`ia/escolha_da_ia.py`).
+- **IA nova:** um arquivo em `ia/provedores/` (que roda a CLI com `execucao_da_cli.py`), o nome em `EXECUTAVEIS_DAS_IAS` (`ia/escolha_da_ia.py`) e a classe em `PROVEDORES_DAS_IAS` (`comandos/comando_analisar.py`).
 - **Assinatura nova:** em `identificacao/assinaturas.py`.
 - **Trava nova:** um arquivo em `travas/`, chamado por `conferencia_das_bibliotecas.py` (trava sobre biblioteca) ou direto pelo fluxo (trava sobre aviso ou explicação), com teste em que a IA (dublê) inventa algo e a trava barra.
-
 - **Regra nova no pentest:** uma função `validar_*` em `pentest/validacoes.py` (chamada por `validar_cabecalhos`), com a leitura do cabeçalho em `pentest/regras_dos_cabecalhos.py`, ou uma regra de escolha de alvo em `pentest/alvos_da_sonda.py`, com teste que prova o limite de segurança. O fluxo da análise não muda.
 
 A skill `rastro-nova-regra` (`.kiro/skills/rastro-nova-regra/SKILL.md`) descreve o passo a passo.

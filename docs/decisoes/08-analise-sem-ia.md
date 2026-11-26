@@ -1,6 +1,6 @@
 # Decisão 08: análise sem IA permitida, mas sempre marcada como incompleta
 
-Requisitos: R14.3, R14.5 a R14.7. Código: `rastro/cli.py` e `rastro/relatorio/json.py`; no frontend, `AvisoSemIA`.
+Requisitos: R14.3, R14.5 a R14.7. Código: `rastro/comandos/comando_analisar.py` e `rastro/relatorio/limitacoes_da_analise.py`; no frontend, `AvisoDeLimitacoes`.
 
 ## Contexto
 

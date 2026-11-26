@@ -90,7 +90,7 @@ O relatório é React + TypeScript, num único HTML. Mudou algo em `frontend/`, 
 | 2. Gerar o HTML | `npm run build` | `npm run build` |
 | 3. Levar para o pacote | `cp dist/index.html ../rastro/relatorio/modelo.html` | `Copy-Item dist\index.html ..\rastro\relatorio\modelo.html` |
 
-- O tour guiado acha cada parte da tela pela classe CSS (`frontend/src/conteudo/tour.ts`). Renomeou a classe de um bloco, mude o seletor ali também: passo sem elemento some do tour sem erro.
+- Antes de renomear classe CSS, leia o tour guiado em [`frontend-react.md`](.kiro/steering/frontend-react.md#organização-da-tela): ele acha cada parte da tela pela classe.
 - Arquivo novo que não seja `.py` dentro de `rastro/` precisa entrar em `[tool.setuptools.package-data]` no `pyproject.toml`; o `tests/test_instalacao.py` confere.
 
 ## O relatório

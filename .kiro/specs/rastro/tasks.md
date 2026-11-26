@@ -850,10 +850,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @luiz.pagliari
 
-- [ ] **T96 Enxugar a spec viva, as decisões e o steering**
+- [x] **T96 Enxugar a spec viva, as decisões e o steering**
   - Entrega: `design.md` sem lista arquivo a arquivo (aponta para `structure.md`), sem histórico de tasks e com nomes atuais; decisões com os caminhos atuais, a 13 absorvendo a análise do pentest; steering e skill sem repetir o que tem fonte única.
   - Aceite: cada assunto tem uma fonte única e os outros apontam para ela; nenhuma menção a arquivo que não existe mais.
-  - Arquivos: `.kiro/specs/rastro/design.md`, `.kiro/specs/rastro/requirements.md`, `docs/decisoes/`, `.kiro/steering/`, `.kiro/skills/rastro-nova-regra/SKILL.md`, `avaliacao/`
+  - Arquivos: `.kiro/specs/rastro/design.md`, `.kiro/specs/rastro/requirements.md`, `docs/decisoes/`, `.kiro/steering/`, `.kiro/skills/rastro-nova-regra/SKILL.md`, `avaliacao/`, `README-TECNICO.md` (aviso do tour aponta para o steering)
   - Teste: não se aplica (documentação); busca por nomes antigos.
   - Requisito: R19.4
   - Revisão: @geison.santos

@@ -15,7 +15,7 @@ Tudo precisa ser compreensível para quem não é de segurança.
 1. **Grave:** HAR exportado no DevTools ou, opcional, gravado pelo próprio Rastro (`rastro gravar`, com Playwright).
 2. **Identifique:** bibliotecas e versões por assinatura; em bundles, a IA reconhece pelo código.
 3. **Confira:** travas fixas conferem tudo o que a IA sugeriu.
-4. **Consulte:** GitHub Advisory (CVE, CVSS, EPSS); OSV e NVD se houver tempo.
+4. **Consulte:** GitHub Advisory (CVE, CVSS, EPSS), com OSV e NVD como complemento.
 5. **Priorize:** `nota = 10 × (0,5 × CVSS/10 + 0,5 × percentil EPSS)`. Alta ≥ 7,5; média ≥ 6,5.
 6. **Aja:** plano de ação explicado pela IA, com teste de verificação e task pronta.
 
@@ -32,7 +32,7 @@ Fica fora: ataques destrutivos, payloads, fuzzing, brute force, bypass de autent
 - **Faz:** reconhece bibliotecas em bundles, explica achados em linguagem simples, sugere teste de verificação, dá contexto.
 - **Não faz:** calcula a nota, esconde achados, pesquisa na internet, recebe cookies, senhas ou tokens.
 - **A IA sugere, a regra confirma.** Toda saída da IA passa pelas travas antes de virar dado. O que não passa fica "a confirmar", fora da nota.
-- Nunca preenche CVE, versão, CVSS, EPSS, nota ou versão-alvo: isso vem só das fontes e da fórmula.
+- Os fatos do relatório vêm só das fontes e da fórmula, nunca da IA ([R21.8](../specs/rastro/requirements.md#r21-travas-contra-invenção-rf16) e [decisão 03](../../docs/decisoes/03-papel-da-ia.md)).
 - O relatório mostra o que a IA fez: chamadas, o que recebeu e devolveu, tokens, tempo e o que cada trava barrou.
 - Sem IA (`--sem-ia`) a análise roda, mas o terminal e o relatório avisam que ela é incompleta.
 

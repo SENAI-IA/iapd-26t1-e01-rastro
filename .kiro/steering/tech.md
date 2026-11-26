@@ -5,7 +5,7 @@
 - **Núcleo e CLI:** Python 3.10 ou mais novo, biblioteca padrão primeiro (`argparse`, `json`, `pathlib`, `dataclasses`, `urllib.request`, `subprocess`).
 - **Relatório:** React + TypeScript (template padrão do Vite) + `vite-plugin-singlefile`, gerando um único HTML. O Python embute o JSON da análise nesse HTML.
 - **IA:** Kiro (padrão), Claude ou Codex, chamados pela CLI já instalada e autenticada na máquina. Escolha por `--ia` ou `RASTRO_IA`.
-- **Dados:** GitHub Advisory; OSV e NVD como extensão opcional. Registro do npm só com leitura, para as travas.
+- **Dados:** GitHub Advisory, com OSV e NVD como complemento (R04A). Registro do npm só com leitura, para as travas.
 - **Qualidade:** pytest, pytest-cov, ruff, mypy.
 - **Entrega:** instalação local, só com Python (o HTML do relatório vai pronto no repo). Opcional: o comando `rastro`, criado pela pessoa com `python -m rastro instalar`. Sem Docker e sem CI; o demo gravado cumpre o requisito "Docker ou vídeo".
 
@@ -30,7 +30,6 @@ Tudo precisa funcionar nos dois.
 - Executável das CLIs de IA localizado com `shutil.which` (no Windows pode ser `.cmd`).
 - **Prompt para a IA sempre pela entrada padrão, nunca como argumento.**
 - Saída do terminal em texto simples, sem depender de cor ou emoji.
-- Sem CI: `ruff`, `mypy` e `pytest` rodados na máquina local, no Windows e no Linux, antes de cada entrega.
 - README com os comandos dos dois sistemas lado a lado.
 
 ## Nada destrutivo
@@ -43,14 +42,14 @@ Tudo precisa funcionar nos dois.
 
 ## Rede
 
-- Só GitHub Advisory, registro do npm (leitura) e, se a extensão for feita, OSV e NVD. O comando `pentest --autorizo` é a única exceção adicional: acessa somente o host autorizado, com o escopo e os limites de R25. Os demais comandos, fora `gravar`, nunca acessam o site analisado.
+- Só GitHub Advisory, OSV, NVD e registro do npm (leitura). O comando `pentest --autorizo` é a única exceção adicional: acessa somente o host autorizado, com o escopo e os limites de R25. Os demais comandos, fora `gravar`, nunca acessam o site analisado.
 - O `pentest` não chama a IA nem as fontes de vulnerabilidades: só lê o HAR e faz sondas HTTP seguras quando a pessoa autoriza.
 - Exceção: no `gravar`, o navegador aberto para a pessoa acessa o site, como se ela navegasse. O robô só segue links do mesmo host, nunca envia formulário.
 - O pacote baixado do npm é lido em memória: nada extraído em disco, nada executado.
 
 ## Testes
 
-- Cobertura mínima de 60% nas regras de negócio (meta 80%), medida com `pytest-cov`. Relatório versionado em `docs/cobertura/`.
-- Verificação: `ruff check`, `mypy rastro` e `pytest --cov=rastro --cov-report=term`, com o `.venv` ativo (comandos na seção "Verificação" do README). O resultado de cada sistema fica em `docs/cobertura/linux.md` e `docs/cobertura/windows.md`. O HTML da cobertura nunca vai direto para `docs/cobertura/`: o `pytest-cov` cria ali um `.gitignore` com `*`. Ele fica em `docs/cobertura/html/` (`--cov-report=html:docs/cobertura/html`), que tem um `.gitignore` versionado que não ignora nada; com a pasta não vazia, o `pytest-cov` não cria o dele. O número das regras de negócio vai para o README a cada atualização.
+- Sem CI: `ruff`, `mypy` e `pytest` rodam na máquina local, no Windows e no Linux, antes de cada entrega. Os comandos, a cobertura (mínimo de 60% nas regras de negócio, meta 80%) e o relatório HTML estão na [Verificação do README técnico](../../README-TECNICO.md#verificação).
+- O resultado de cada sistema, com o número das regras de negócio, fica em `docs/cobertura/<sistema>.md`, atualizado a cada verificação.
 - Fonte de dados, registro do npm e IA trocados por dublês: testes não acessam rede (um `conftest.py` bloqueia).
 - Testes de frontend não são obrigatórios.

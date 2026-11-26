@@ -17,7 +17,7 @@ O detalhe de cada biblioteca (em arquivo ou em bundle, onde a versão aparece, m
 | Arquivo | Conteúdo |
 |---|---|
 | `gabarito.json` | bibliotecas, versões e avisos de cada alvo |
-| `resultados.md` | o que o Rastro achou em cada alvo, com e sem IA, contra o gabarito (T46) |
+| [`resultados.md`](resultados.md) | o que o Rastro achou em cada alvo, com e sem IA, contra o gabarito (T46) |
 | `webgoat.har` | 72 entradas, 39 scripts, 2,1 MB |
 | `drupal.har` | 157 entradas, 27 scripts, 4,2 MB |
 | `juiceshop.har` | 50 entradas, 7 scripts, 3,0 MB |
@@ -58,9 +58,9 @@ Um protótipo das assinaturas, rodado nos três HARs (fora do repositório), ach
 3. **Nome × conteúdo:** o WebGoat serve `jquery-ui-1.10.4.js` com a jQuery UI 1.10.3 dentro. Vale o comentário.
 4. **Versão na URL:** o Drupal serve `ckeditor.js?v=4.10.1`. O `?v=` e o `?ver=` contam como nome do arquivo.
 
-E três pontos que ainda não mudaram a spec:
+E três pontos que não mudaram as assinaturas:
 
-- **A decidir: trava 4 nas assinaturas.** A jQuery UI 1.10.3 (6 avisos, um alto) não foi publicada no npm, que só tem a jQuery UI a partir da 1.10.4. Pela R21.4, a trava 4 vale também para a assinatura, e a biblioteca iria para "a confirmar", fora da nota e do plano. O GitHub Advisory responde normalmente para essa versão.
+- **Trava 4 nas assinaturas (decidido: vale, R21.4).** A jQuery UI 1.10.3 (6 avisos, um alto) não foi publicada no npm, que só tem a jQuery UI a partir da 1.10.4, e por isso fica "a confirmar", fora da nota e do plano ([`resultados.md`](resultados.md)).
 - **Pacote renomeado:** a 4.10.1 do CKEditor só existe no npm como `ckeditor`, que tem 1 aviso. Os avisos posteriores a 2020 estão em `ckeditor4`, que começa na 4.13.0. Pela faixa, 13 deles também valem para a 4.10.1, mas a consulta por `ckeditor` não os traz.
 - **Fora do alcance:** a versão do Backbone só aparece no código (`VERSION="1.2.3"`), e jQuery Form, jquery.cookie, jQuery Once e Modernizr não estão na lista de assinaturas. Nenhum deles tem aviso. Os avisos do próprio Drupal (pacote `drupal/core` do Composer) não são de front-end npm.
 
@@ -68,10 +68,10 @@ Na IA: no Juice Shop, a única prova possível é o `@angular/core` (spike T03).
 
 ## Pendente: exportação manual no Chrome
 
-Os HARs daqui foram gravados pelo Playwright. Falta exportar à mão, do DevTools do Chrome, numa mesma navegação de um dos alvos com sessão (Drupal logado, por exemplo), o HAR **sanitized** e o **completo** (*with sensitive data*), e conferir a lista "A conferir no Chrome" de `docs/historico/spike/har-e-bundles.md`:
+Os HARs daqui foram gravados pelo Playwright. Falta exportar à mão, do DevTools do Chrome, numa mesma navegação de um dos alvos com sessão (Drupal logado, por exemplo), o HAR **sanitized** e o **completo** (*with sensitive data*), e conferir a lista "A conferir no Chrome" de [`docs/historico/spike/har-e-bundles.md`](../docs/historico/spike/har-e-bundles.md):
 
 - se o conteúdo dos scripts vem em `text` nos dois, e se algum vem em base64;
 - o que o sanitized remove além de `Cookie`, `Set-Cookie` e `Authorization` (`cookies[]`, query string, corpo, outros cabeçalhos);
 - se a regra de R06.7 separa o HAR sanitized do site que cria cookies só por JavaScript (Juice Shop).
 
-O resultado entra neste README e na seção 17 do design. Se o sanitized do Chrome remover mais do que a sanitização daqui, os HARs desta pasta são gerados de novo com a mesma regra.
+O resultado entra neste README e na seção 17 do [design](../.kiro/specs/rastro/design.md#17-perguntas-do-spike). Se o sanitized do Chrome remover mais do que a sanitização daqui, os HARs desta pasta são gerados de novo com a mesma regra.

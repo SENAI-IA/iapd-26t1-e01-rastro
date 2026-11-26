@@ -1,6 +1,6 @@
 # Decisão 03: a IA identifica e explica, mas não decide
 
-Requisitos: R03, R07, R11 e R21. Código: `rastro/identificacao/ia.py`, `rastro/explicacao/ia.py` e `rastro/ia/`.
+Requisitos: R03, R07, R11 e R21. Código: `rastro/identificacao/bibliotecas_pela_ia.py`, `rastro/explicacao/explicacao_dos_achados.py` e `rastro/ia/`.
 
 ## Contexto
 
@@ -18,7 +18,7 @@ Há duas coisas que regra fixa não faz bem:
 | Sugere bibliotecas e versões em bundles, citando o trecho | Calcula nota, prioridade ou ordem (R05.7) |
 | Explica cada achado: o que é, impacto, como corrigir | Preenche CVE, GHSA, versão, CVSS, EPSS, link ou versão-alvo (R21.8) |
 | Sugere um teste de verificação, marcado "sugerido pela IA: confira antes de usar" | Esconde achado ou decide o que entra no plano de ação |
-| | Escreve o texto da task (é um modelo fixo, `acao/task.py`) |
+| | Escreve o texto da task (é um modelo fixo, `acao/texto_da_tarefa.py`) |
 | | Pesquisa na internet ou recebe cookies, senhas e tokens |
 
 - **A IA sugere, a regra confirma.** Tudo o que ela devolve passa pelas travas antes de virar dado ([decisão 06](06-travas-contra-invencao.md)).

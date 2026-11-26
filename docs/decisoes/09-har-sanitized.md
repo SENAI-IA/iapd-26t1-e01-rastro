@@ -1,6 +1,6 @@
 # Decisão 09: HAR sanitized como recomendado
 
-Requisitos: R06.7, R16.4 e R16.5. Código: `rastro/har/leitor.py` e `rastro/configuracao/checagens.py`.
+Requisitos: R06.7, R16.4 e R16.5. Código: `rastro/har/leitor_do_har.py` e `rastro/configuracao/checagens.py`.
 
 ## Contexto
 

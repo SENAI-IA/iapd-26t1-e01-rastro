@@ -1,6 +1,6 @@
 # Decisão 05: relatório em React num único HTML, com o JSON embutido
 
-Requisitos: R13 e R20.2. Código: `frontend/`, `rastro/relatorio/html.py` e `rastro/relatorio/modelo.html`.
+Requisitos: R13 e R20.2. Código: `frontend/`, `rastro/relatorio/pagina_do_relatorio.py` e `rastro/relatorio/modelo.html`.
 
 ## Contexto
 
@@ -14,7 +14,7 @@ O relatório é lido pelo auditor, pelo dev e pelo PO, e por isso precisa ser in
 
 - **React + TypeScript**, com o Vite padrão e o `vite-plugin-singlefile`, sem outras bibliotecas. O build gera um `index.html` com JavaScript, CSS, fontes IBM Plex e logo embutidos.
 - **O build é versionado** como `rastro/relatorio/modelo.html` (cerca de 470 KB). Quem usa não precisa de Node: só quem mexe no frontend.
-- **O Python embute o JSON** da análise no modelo, dentro de `<script id="dados" type="application/json">`, trocando todo `<` por `<`. Assim nenhum `</script>` dos dados fecha a tag antes da hora.
+- **O Python embute o JSON** da análise no modelo, dentro de `<script id="dados" type="application/json">`, trocando todo `<` por `\u003c`. Assim nenhum `</script>` dos dados fecha a tag antes da hora.
 - **O React só mostra.** Toda contagem e todo texto vêm prontos no JSON, e a tela não recalcula nada (R13.7). As regras ficam no Python, onde estão os testes.
 - O `relatorio.json` é gravado ao lado do HTML, para quem quiser ler ou integrar os dados.
 

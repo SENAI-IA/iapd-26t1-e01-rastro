@@ -1,6 +1,6 @@
 # Decisão 06: travas contra invenção. A IA sugere, a regra confirma
 
-Requisito: R21. Código: `rastro/travas/` e `rastro/fontes/registro_npm.py`.
+Requisito: R21. Código: `rastro/travas/`, `rastro/fontes/registro_npm.py` e `rastro/fontes/pacote_npm.py`.
 
 ## Contexto
 

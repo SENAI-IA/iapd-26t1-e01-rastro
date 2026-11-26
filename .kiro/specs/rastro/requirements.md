@@ -285,7 +285,7 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 7. ENQUANTO o sistema pedir menos movimento, as ilustrações do guia e o destaque do tour DEVEM ficar sem animação. *(verificação manual)*
 8. QUANDO a pessoa rodar `python -m rastro como-usar`, o Rastro DEVE abrir no navegador o relatório sem dados de análise (o "Como usar"), sem ler HAR, sem acessar a rede e sem gravar nada, e mostrar no terminal o caminho do arquivo aberto. SE não conseguir abrir o navegador, ENTÃO o Rastro DEVE dizer isso e mostrar o caminho para abrir à mão, com código 0.
 
-## R24 Gravar a visita (extensão, branch `feat/gravar`)
+## R24 Gravar a visita (extensão)
 
 **Como** auditor que não usa o DevTools, **quero** que o Rastro abra um navegador, grave o que eu visitar e analise ao fim **para** não precisar exportar o HAR à mão.
 
