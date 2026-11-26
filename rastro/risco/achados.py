@@ -21,3 +21,7 @@ def agrupar_por_biblioteca(achados: list[Achado]) -> dict[str, list[Achado]]:
             continue
         grupos.setdefault(nome_com_versao(achado.biblioteca), []).append(achado)
     return grupos
+
+
+def achados_da_biblioteca(chave: str, achados: list[Achado]) -> list[Achado]:
+    return [achado for achado in achados if nome_com_versao(achado.biblioteca) == chave]

@@ -41,7 +41,9 @@ rastro/
     sanitizacao.py         tira dados sensíveis do que vai para a IA
     provedores/            kiro.py, claude.py, codex.py
     prompts/               prompts versionados, com exemplo de entrada e saída
-  relatorio/               montagem_do_relatorio.py, pagina_do_relatorio.py, gravacao_do_relatorio.py, modelo.html (build do frontend, versionado)
+  relatorio/               montagem_do_relatorio.py (esqueleto do JSON), limitacoes_da_analise.py, resumo_do_relatorio.py,
+                           painel_da_ia.py, visita_no_relatorio.py, pagina_do_relatorio.py, gravacao_do_relatorio.py,
+                           modelo.html (build do frontend, versionado)
   captura/                 sessao.py (interface), navegador_playwright.py (único import do Playwright), pasta.py, robo.py
   pentest/                 modelos.py, erros.py, privacidade.py, sonda.py, validacoes.py, conferencia_do_resultado.py,
                            leitura_do_resultado.py, gravacao_do_resultado.py, execucao_do_pentest.py (pentest --autorizo, isolado da análise)
@@ -58,7 +60,7 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 
 ## Onde colocar algo novo
 
-- **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade em `risco/prioridade.py`).
+- **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` e `achados_da_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade em `risco/prioridade.py`).
 - **Checagem nova:** uma função em `configuracao/checagens.py` (e na tupla `CHECAGENS`) e seu teste, e o que fazer e o impacto dela em `acao/plano_de_acao.py`.
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
 - **IA nova:** um arquivo em `ia/provedores/`.

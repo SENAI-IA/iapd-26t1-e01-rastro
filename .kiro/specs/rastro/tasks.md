@@ -698,10 +698,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @ali.santos
 
-- [ ] **T76 Dividir a montagem do relatório JSON**
+- [x] **T76 Dividir a montagem do relatório JSON**
   - Entrega: montagem do relatório separada em limitações, resumo, painel da IA e visita.
   - Aceite: o JSON gerado é idêntico ao de antes para o mesmo HAR; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/relatorio/`, `tests/relatorio/`
+  - Arquivos: `rastro/relatorio/`, `rastro/risco/achados.py`, `rastro/comandos/comando_analisar.py`, `tests/relatorio/`, `tests/dubles.py`, `.kiro/steering/structure.md`
   - Teste: os testes atuais do relatório.
   - Requisito: R19.4
   - Revisão: @geison.santos

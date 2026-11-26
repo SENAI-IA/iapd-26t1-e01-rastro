@@ -1,54 +1,20 @@
 from dataclasses import asdict, replace
 from typing import Any
 
-from rastro.acao.modelos import Acao
-from rastro.configuracao.modelos import Checagem, SituacaoDaChecagem
-from rastro.fontes.conector import FonteSemResposta
+from rastro.configuracao.modelos import Checagem
 from rastro.har.site import url_sem_valores_da_query
-from rastro.har.visita import PassoDaVisita
-from rastro.ia.cliente import ChamadaIA
 from rastro.identificacao.modelos import Biblioteca, Evidencia, nome_com_versao
 from rastro.modelos_da_analise import Analise
 from rastro.pentest.modelos import ResultadoDoPentest
-from rastro.risco.modelos import Achado, Prioridade
-from rastro.risco.prioridade import PRIORIDADES, classificar_prioridade, nota_da_biblioteca
+from rastro.relatorio.limitacoes_da_analise import continua_igual, listar_limitacoes
+from rastro.relatorio.painel_da_ia import montar_painel_da_ia
+from rastro.relatorio.resumo_do_relatorio import montar_resumo
+from rastro.relatorio.visita_no_relatorio import montar_visita_no_relatorio
+from rastro.risco.achados import achados_da_biblioteca
+from rastro.risco.modelos import Achado
+from rastro.risco.prioridade import classificar_prioridade, nota_da_biblioteca
 
 VERSAO_FORMATO = 1
-
-TEXTO_BUNDLES_NAO_PROCURADOS = (
-    "Bibliotecas escondidas em bundles não foram procuradas: "
-    "podem existir falhas que não aparecem aqui."
-)
-TEXTO_ACHADOS_SEM_EXPLICACAO = (
-    "Os achados trazem o resumo do próprio aviso, "
-    "sem explicação em linguagem simples nem teste de verificação."
-)
-TEXTO_CONTINUA_IGUAL_SEM_IA = (
-    "A nota, a prioridade, as checagens e o plano de ação são os mesmos de uma análise com IA."
-)
-TEXTO_SEM_JAVASCRIPT = (
-    "Nenhuma resposta do HAR trouxe conteúdo JavaScript, então nenhuma biblioteca pôde ser "
-    "analisada. O HAR pode ter sido exportado com um filtro na aba Rede (como Fetch/XHR), "
-    "que deixa os scripts fora do arquivo, ou gravado com o cache ligado, que grava os "
-    "scripts sem o conteúdo. Também pode ser que o site não carregue scripts. Grave de novo "
-    "com o filtro em Todos e o cache desativado. As checagens de cabeçalhos e cookies foram "
-    "feitas."
-)
-CONSEQUENCIA_DA_IA_QUE_FALHOU = {
-    "identificar_bibliotecas": (
-        "ia_falhou_identificacao",
-        "procurar bibliotecas em bundles: esses bundles ficaram sem análise e podem "
-        "esconder falhas que não aparecem aqui.",
-    ),
-    "explicar_achado": (
-        "ia_falhou_explicacao",
-        "explicar achados: esses achados trazem só o resumo do próprio aviso.",
-    ),
-}
-CONSEQUENCIA_DA_FONTE_SEM_RESPOSTA = {
-    "OSV": "Esses avisos vêm só do GitHub Advisory.",
-    "NVD": "Esses avisos seguem sem o CVSS do NVD.",
-}
 
 
 def montar_relatorio(analise: Analise, pentest: ResultadoDoPentest | None = None) -> dict[str, Any]:
@@ -61,7 +27,7 @@ def montar_relatorio(analise: Analise, pentest: ResultadoDoPentest | None = None
         "achados": [achado_no_relatorio(achado) for achado in analise.achados],
         "checagens": [checagem_no_relatorio(checagem) for checagem in analise.checagens],
         "plano_de_acao": [asdict(acao) for acao in analise.plano_de_acao],
-        "ia": dados_da_ia(analise),
+        "ia": montar_painel_da_ia(analise),
         "visita": montar_visita_no_relatorio(analise),
         "pentest": pentest_no_relatorio(pentest),
     }
@@ -83,90 +49,6 @@ def dados_da_analise(analise: Analise) -> dict[str, Any]:
         "continua_igual": continua_igual(analise),
         "duracao_s": analise.duracao_s,
     }
-
-
-def listar_limitacoes(analise: Analise) -> list[dict[str, str]]:
-    limitacoes = []
-    if analise.provedor_de_ia is None:
-        limitacoes.append(limitacao("bundles_nao_procurados", TEXTO_BUNDLES_NAO_PROCURADOS))
-        limitacoes.append(limitacao("achados_sem_explicacao", TEXTO_ACHADOS_SEM_EXPLICACAO))
-    if not analise.tem_javascript:
-        limitacoes.append(limitacao("sem_javascript", TEXTO_SEM_JAVASCRIPT))
-    limitacoes.extend(limitacoes_da_ia_que_falhou(analise))
-    for fonte in fontes_que_nao_responderam(analise.fontes_sem_resposta):
-        texto = texto_da_fonte_sem_resposta(fonte, analise.fontes_sem_resposta)
-        limitacoes.append(limitacao(f"fonte_sem_resposta_{fonte.lower()}", texto))
-    return limitacoes
-
-
-def limitacoes_da_ia_que_falhou(analise: Analise) -> list[dict[str, str]]:
-    limitacoes = []
-    for etapa, (identificador, consequencia) in CONSEQUENCIA_DA_IA_QUE_FALHOU.items():
-        chamadas = [chamada for chamada in analise.chamadas_de_ia if chamada.etapa == etapa]
-        falhas = [chamada for chamada in chamadas if not chamada.sucesso]
-        if falhas:
-            texto = (
-                f"A IA ({analise.provedor_de_ia}) falhou em {len(falhas)} de {len(chamadas)} "
-                f"chamadas para {consequencia} O motivo está no painel da IA."
-            )
-            limitacoes.append(limitacao(identificador, texto))
-    return limitacoes
-
-
-def fontes_que_nao_responderam(sem_resposta: list[FonteSemResposta]) -> list[str]:
-    return list(dict.fromkeys(item.fonte for item in sem_resposta))
-
-
-def texto_da_fonte_sem_resposta(fonte: str, sem_resposta: list[FonteSemResposta]) -> str:
-    alvos = "; ".join(f"{item.alvo}: {item.motivo}" for item in sem_resposta if item.fonte == fonte)
-    return f"O {fonte} não respondeu ({alvos}). {CONSEQUENCIA_DA_FONTE_SEM_RESPOSTA[fonte]}"
-
-
-def limitacao(identificador: str, texto: str) -> dict[str, str]:
-    return {"id": identificador, "texto": texto}
-
-
-def continua_igual(analise: Analise) -> str | None:
-    if analise.provedor_de_ia is None:
-        return TEXTO_CONTINUA_IGUAL_SEM_IA
-    return None
-
-
-def montar_resumo(analise: Analise) -> dict[str, Any]:
-    return {
-        "nota_maxima": nota_da_biblioteca(analise.achados),
-        "acoes": len(analise.plano_de_acao),
-        "acoes_por_prioridade": contar_acoes_por_prioridade(analise.plano_de_acao),
-        "bibliotecas": len(analise.bibliotecas),
-        "bibliotecas_vulneraveis": len(chaves_das_bibliotecas_com_achados(analise.achados)),
-        "bibliotecas_a_confirmar": len(analise.a_confirmar),
-        "bibliotecas_nao_consultadas": len(analise.nao_consultadas),
-        "achados": len(analise.achados),
-        "checagens_com_falha": contar_checagens(analise, "falhou"),
-        "checagens_nao_verificadas": contar_checagens(analise, "nao_verificada"),
-        "encontradas_so_pela_ia": encontradas_so_pela_ia(analise),
-    }
-
-
-def contar_acoes_por_prioridade(acoes: list[Acao]) -> dict[str, int]:
-    contagem: dict[str, int] = {prioridade: 0 for prioridade in PRIORIDADES}
-    for acao in acoes:
-        contagem[acao.prioridade] += 1
-    return contagem
-
-
-def chaves_das_bibliotecas_com_achados(achados: list[Achado]) -> set[str]:
-    return {nome_com_versao(achado.biblioteca) for achado in achados}
-
-
-def contar_checagens(analise: Analise, situacao: SituacaoDaChecagem) -> int:
-    return sum(1 for checagem in analise.checagens if checagem.situacao == situacao)
-
-
-def encontradas_so_pela_ia(analise: Analise) -> int | None:
-    if analise.provedor_de_ia is None:
-        return None
-    return sum(1 for biblioteca in analise.bibliotecas if biblioteca.metodo == "ia")
 
 
 def biblioteca_no_relatorio(biblioteca: Biblioteca, analise: Analise) -> dict[str, Any]:
@@ -199,99 +81,9 @@ def checagem_no_relatorio(checagem: Checagem) -> dict[str, Any]:
     return asdict(replace(checagem, evidencia=evidencia_sem_valores(checagem.evidencia)))
 
 
-def achados_da_biblioteca(chave: str, achados: list[Achado]) -> list[Achado]:
-    return [achado for achado in achados if nome_com_versao(achado.biblioteca) == chave]
-
-
 def achado_no_relatorio(achado: Achado) -> dict[str, Any]:
     return {
         "biblioteca": nome_com_versao(achado.biblioteca),
         "aviso": asdict(achado.aviso),
         "nota": asdict(achado.nota),
     }
-
-
-def dados_da_ia(analise: Analise) -> dict[str, Any]:
-    return {
-        "chamadas": [asdict(chamada) for chamada in analise.chamadas_de_ia],
-        "travas_acionadas": [asdict(trava) for trava in analise.travas_acionadas],
-        "com_e_sem_ia": comparar_com_e_sem_ia(analise),
-        "tokens_total": tokens_total(analise),
-    }
-
-
-def comparar_com_e_sem_ia(analise: Analise) -> dict[str, dict[str, int]] | None:
-    if analise.provedor_de_ia is None:
-        return None
-    achados_por_assinatura = [
-        achado for achado in analise.achados if achado.biblioteca.metodo == "assinatura"
-    ]
-    bibliotecas_por_assinatura = [
-        biblioteca for biblioteca in analise.bibliotecas if biblioteca.metodo == "assinatura"
-    ]
-    return {
-        "bibliotecas": contagem(len(bibliotecas_por_assinatura), len(analise.bibliotecas)),
-        "achados": contagem(len(achados_por_assinatura), len(analise.achados)),
-    }
-
-
-def contagem(so_por_assinatura: int, com_ia: int) -> dict[str, int]:
-    return {"so_por_assinatura": so_por_assinatura, "com_ia": com_ia}
-
-
-def tokens_total(analise: Analise) -> int | None:
-    if analise.provedor_de_ia is None:
-        return None
-    return somar_tokens(analise.chamadas_de_ia)
-
-
-def somar_tokens(chamadas: list[ChamadaIA]) -> int | None:
-    total = 0
-    for chamada in chamadas:
-        if chamada.tokens is None:
-            return None
-        total += chamada.tokens
-    return total
-
-
-def montar_visita_no_relatorio(analise: Analise) -> list[dict[str, Any]]:
-    bibliotecas_por_requisicao = agrupar_bibliotecas_por_requisicao(analise.bibliotecas)
-    return [
-        passo_no_relatorio(
-            passo, bibliotecas_por_requisicao.get(passo.indice_requisicao, []), analise.achados
-        )
-        for passo in analise.visita
-    ]
-
-
-def agrupar_bibliotecas_por_requisicao(bibliotecas: list[Biblioteca]) -> dict[int, list[str]]:
-    agrupadas: dict[int, list[str]] = {}
-    for biblioteca in bibliotecas:
-        for indice in {evidencia.indice_requisicao for evidencia in biblioteca.evidencias}:
-            agrupadas.setdefault(indice, []).append(nome_com_versao(biblioteca))
-    return agrupadas
-
-
-def passo_no_relatorio(
-    passo: PassoDaVisita, chaves: list[str], achados: list[Achado]
-) -> dict[str, Any]:
-    prioridades = [prioridade_da_biblioteca(chave, achados) for chave in chaves]
-    return {
-        **asdict(replace(passo, url=url_sem_valores_da_query(passo.url))),
-        "bibliotecas": chaves,
-        "prioridade": prioridade_mais_alta(prioridades),
-    }
-
-
-def prioridade_da_biblioteca(chave: str, achados: list[Achado]) -> Prioridade | None:
-    achados_da_chave = achados_da_biblioteca(chave, achados)
-    if not achados_da_chave:
-        return None
-    return classificar_prioridade(nota_da_biblioteca(achados_da_chave))
-
-
-def prioridade_mais_alta(prioridades: list[Prioridade | None]) -> Prioridade | None:
-    for prioridade in PRIORIDADES:
-        if prioridade in prioridades:
-            return prioridade
-    return None

@@ -4,11 +4,14 @@ from pathlib import Path
 from typing import Any
 
 from rastro.cli import executar
+from rastro.fluxo_da_analise import analisar
 from rastro.fontes import osv
 from rastro.fontes.conector import Aviso, ConsultaNaoRealizada
 from rastro.fontes.github_advisory import converter_resposta
-from rastro.ia.cliente import FalhaDoProvedor, RespostaDoProvedor
+from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
+from rastro.modelos_da_analise import Analise
 from rastro.pentest.sonda import RespostaHttp
+from rastro.relatorio.montagem_do_relatorio import montar_relatorio
 
 DADOS = Path(__file__).parent / "dados"
 HAR_DA_LOJA = DADOS / "loja.har"
@@ -153,3 +156,15 @@ def ler_relatorio(caminho: Path) -> dict[str, Any]:
 def analisar_loja(saida: Path) -> int:
     return executar(["analisar", str(HAR_DA_LOJA), "--sem-ia", "--saida", str(saida)])
 
+
+def analise_da_loja(fonte: ConectorFalso | None = None) -> Analise:
+    return analisar(HAR_DA_LOJA, fonte or ConectorFalso(), RegistroFalso())
+
+
+def relatorio_da_loja() -> dict[str, Any]:
+    return montar_relatorio(analise_da_loja())
+
+
+def analise_da_loja_com_ia(*respostas: RespostaDoProvedor | FalhaDoProvedor) -> Analise:
+    ia = ClienteDeIA(ProvedorFalso(list(respostas), nome="kiro"))
+    return analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)

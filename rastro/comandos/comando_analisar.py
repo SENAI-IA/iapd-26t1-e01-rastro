@@ -32,11 +32,11 @@ from rastro.relatorio.gravacao_do_relatorio import (
     nome_da_aplicacao,
     pasta_padrao,
 )
-from rastro.relatorio.montagem_do_relatorio import (
+from rastro.relatorio.limitacoes_da_analise import (
     TEXTO_ACHADOS_SEM_EXPLICACAO,
     TEXTO_CONTINUA_IGUAL_SEM_IA,
-    montar_relatorio,
 )
+from rastro.relatorio.montagem_do_relatorio import montar_relatorio
 from rastro.terminal import AndamentoNoTerminal, LinhaAoVivo
 
 SUGESTAO_SEM_IA = f"Use --sem-ia ({AJUDA_SEM_IA})."
