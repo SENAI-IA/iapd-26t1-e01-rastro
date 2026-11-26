@@ -1,6 +1,6 @@
 import pytest
 
-from rastro.fontes.conector import Aviso
+from rastro.fontes.modelos import Aviso
 from rastro.travas.faixa_de_versao import descartar_fora_da_faixa
 from rastro.travas.modelos import TravaAcionada
 

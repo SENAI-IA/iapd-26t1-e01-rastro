@@ -13,7 +13,7 @@ from rastro.fluxo_da_analise import (
     ETAPA_RECONHECER,
     analisar,
 )
-from rastro.fontes.conector import FonteSemResposta
+from rastro.fontes.modelos import FonteSemResposta
 from rastro.har.leitor_do_har import HarInvalido, HarNaoEncontrado
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
 from rastro.relatorio.montagem_do_relatorio import montar_relatorio
@@ -291,7 +291,9 @@ def test_r01_3_har_invalido_para_a_analise() -> None:
 
 def test_r04a_3_fluxo_junta_github_e_osv_antes_da_trava_da_faixa() -> None:
     osv = OsvFalso()
-    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), osv=osv, nvd=NvdFalso())
+    analise = analisar(
+        HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), conector_osv=osv, busca_de_cvss=NvdFalso()
+    )
 
     assert osv.consultas == [("jquery", "3.4.1"), ("lodash", "4.17.21")]
     assert [achado.aviso.ghsa for achado in analise.achados] == [
@@ -307,7 +309,7 @@ def test_r04a_3_fluxo_junta_github_e_osv_antes_da_trava_da_faixa() -> None:
 
 def test_r04a_6_osv_sem_resposta_segue_so_com_o_github_e_registra_a_fonte() -> None:
     analise = analisar(
-        HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), osv=OsvFalso(sem_resposta=True)
+        HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), conector_osv=OsvFalso(sem_resposta=True)
     )
 
     assert len(analise.achados) == 2
@@ -322,7 +324,7 @@ def test_r04a_6_github_sem_resposta_nao_consulta_o_osv_da_biblioteca() -> None:
     osv = OsvFalso()
     fonte = ConectorFalso(sem_resposta_para=frozenset({"jquery"}))
 
-    analise = analisar(HAR_DA_LOJA, fonte, RegistroFalso(), osv=osv)
+    analise = analisar(HAR_DA_LOJA, fonte, RegistroFalso(), conector_osv=osv)
 
     assert "jquery@3.4.1" in analise.nao_consultadas
     assert osv.consultas == [("lodash", "4.17.21")]

@@ -1,7 +1,7 @@
 from dataclasses import replace
 from typing import Any
 
-from rastro.fontes.conector import FonteSemResposta
+from rastro.fontes.modelos import FonteSemResposta
 from rastro.relatorio.limitacoes_da_analise import (
     TEXTO_BUNDLES_NAO_PROCURADOS,
     TEXTO_CONTINUA_IGUAL_SEM_IA,

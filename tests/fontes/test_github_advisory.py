@@ -8,9 +8,10 @@ from urllib.request import Request
 
 import pytest
 
-from rastro.fontes import github_advisory
-from rastro.fontes.conector import CAMPOS_COM_ORIGEM, Aviso, ConectorDeAvisos, ConsultaNaoRealizada
+from rastro.fontes import github_advisory, requisicao_http
+from rastro.fontes.conector import ConectorDeAvisos, ConsultaNaoRealizada
 from rastro.fontes.github_advisory import GitHubAdvisory
+from rastro.fontes.modelos import CAMPOS_COM_ORIGEM, Aviso
 
 PASTA_DE_DADOS = Path(__file__).resolve().parents[1] / "dados"
 AVISO_SEM_RESUMO = (
@@ -39,7 +40,7 @@ def resposta_gravada(nome: str) -> bytes:
 
 
 def trocar_urlopen(monkeypatch: pytest.MonkeyPatch, urlopen_falso: UrlopenFalso) -> None:
-    monkeypatch.setattr(github_advisory, "urlopen", urlopen_falso)
+    monkeypatch.setattr(requisicao_http, "urlopen", urlopen_falso)
 
 
 def consultar_jquery(

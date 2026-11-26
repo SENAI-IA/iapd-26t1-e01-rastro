@@ -1,4 +1,4 @@
-from rastro.fontes.consulta_dos_avisos import AvisosDaBiblioteca
+from rastro.fontes.modelos import AvisosDaBiblioteca
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.achados import calcular_risco
 from tests.dubles import avisos_gravados_do_jquery
@@ -15,7 +15,7 @@ JQUERY = Biblioteca(
 
 
 def test_r05_6_um_achado_por_aviso_em_ordem_de_nota_decrescente() -> None:
-    avisos: list[AvisosDaBiblioteca] = [(JQUERY, avisos_gravados_do_jquery())]
+    avisos: list[AvisosDaBiblioteca] = [AvisosDaBiblioteca(JQUERY, avisos_gravados_do_jquery())]
 
     achados = calcular_risco(avisos)
 
@@ -26,4 +26,4 @@ def test_r05_6_um_achado_por_aviso_em_ordem_de_nota_decrescente() -> None:
 
 
 def test_r05_1_sem_avisos_nao_ha_achado() -> None:
-    assert calcular_risco([(JQUERY, [])]) == []
+    assert calcular_risco([AvisosDaBiblioteca(JQUERY, [])]) == []

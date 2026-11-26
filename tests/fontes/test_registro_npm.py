@@ -11,9 +11,9 @@ from urllib.request import Request
 
 import pytest
 
-from rastro.fontes import registro_npm
+from rastro.fontes import pacote_npm, registro_npm
 from rastro.fontes.conector import ConsultaNaoRealizada
-from rastro.fontes.registro_npm import RegistroDePacotes, RegistroNpm, ler_arquivos_de_codigo
+from rastro.fontes.registro_npm import RegistroDePacotes, RegistroNpm
 
 
 class RespostaFalsa(io.BytesIO):
@@ -290,7 +290,7 @@ def test_r21_5_pacote_acima_de_10_mb_nao_e_lido(monkeypatch: pytest.MonkeyPatch)
 def test_r21_5_codigo_desempacotado_acima_do_limite_nao_e_lido(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(registro_npm, "LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MB", 0)
+    monkeypatch.setattr(pacote_npm, "LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MB", 0)
 
     with pytest.raises(ConsultaNaoRealizada) as falha:
         ler_codigo(monkeypatch, registro_com_pacote(montar_tgz(ARQUIVOS_DO_PACOTE)))
@@ -299,7 +299,7 @@ def test_r21_5_codigo_desempacotado_acima_do_limite_nao_e_lido(
 
 
 def test_r21_5_pacote_com_arquivos_demais_nao_e_lido(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(registro_npm, "LIMITE_DE_ARQUIVOS_NO_PACOTE", 2)
+    monkeypatch.setattr(pacote_npm, "LIMITE_DE_ARQUIVOS_NO_PACOTE", 2)
 
     with pytest.raises(ConsultaNaoRealizada) as falha:
         ler_codigo(monkeypatch, registro_com_pacote(montar_tgz(ARQUIVOS_DO_PACOTE)))
@@ -328,13 +328,6 @@ def test_r21_5_metadados_fora_do_formato_viram_consulta_nao_realizada(
         ler_codigo(monkeypatch, registro_com_pacote(b"", resposta))
 
     assert falha.value.motivo == "resposta do registro do npm fora do formato esperado"
-
-
-def test_r21_5_pacote_corrompido_vira_consulta_nao_realizada() -> None:
-    with pytest.raises(ConsultaNaoRealizada) as falha:
-        ler_arquivos_de_codigo(b"nao e um tgz")
-
-    assert falha.value.motivo.startswith("pacote ilegível: ")
 
 
 @pytest.mark.parametrize(

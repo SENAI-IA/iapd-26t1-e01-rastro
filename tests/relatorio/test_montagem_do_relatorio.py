@@ -180,7 +180,9 @@ def test_r08_5_plano_de_acao_vai_inteiro_na_ordem_com_o_texto_da_task() -> None:
 
 def test_r04a_5_achado_leva_as_fontes_e_a_origem_de_cada_campo_para_o_json() -> None:
     osv, nvd = OsvFalso(), NvdFalso()
-    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), osv=osv, nvd=nvd)
+    analise = analisar(
+        HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), conector_osv=osv, busca_de_cvss=nvd
+    )
 
     aviso = montar_relatorio(analise)["achados"][0]["aviso"]
 

@@ -93,6 +93,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T75** Dar nome único e claro aos arquivos · rodada de legibilidade · revisão @ali.santos · 25/11
 - [ ] **T76** Dividir a montagem do relatório JSON · rodada de legibilidade · revisão @geison.santos · 25/11
 - [ ] **T77** Quebrar as validações ativas em uma função por validação · rodada de legibilidade · revisão @ali.santos · 25/11
+- [ ] **T78** Juntar o acesso HTTP das fontes · rodada de legibilidade · revisão @cristiano.albino · 25/11
 
 ## A fazer
 
@@ -132,7 +133,6 @@ _(vazio)_
 
 ### Rodada de legibilidade (até 08/12)
 
-- [ ] **T78** Juntar o acesso HTTP das fontes · rodada de legibilidade · revisão @cristiano.albino
 - [ ] **T79** Separar a escolha da IA e o que os provedores repetem · rodada de legibilidade · revisão @luiz.pagliari
 - [ ] **T80** Separar as travas por assunto · rodada de legibilidade · revisão @cristiano.albino
 - [ ] **T81** Separar regras, mecanismo e textos das checagens e do plano · rodada de legibilidade · revisão @geison.santos

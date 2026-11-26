@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from rastro.fontes.conector import Aviso
+from rastro.fontes.modelos import Aviso
 from rastro.identificacao.modelos import Biblioteca
 
 Prioridade = Literal["alta", "media", "baixa", "a avaliar"]

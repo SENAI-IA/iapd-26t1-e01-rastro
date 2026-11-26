@@ -31,7 +31,11 @@ rastro/
   identificacao/           modelos.py, assinaturas.py, trechos_dos_bundles.py, bibliotecas_pela_ia.py
   travas/                  formato_das_bibliotecas.py, ancoragem.py, codigo_publicado.py, faixa_de_versao.py,
                            explicacao_sem_fato_novo.py, conferencia_das_bibliotecas.py
-  fontes/                  conector.py (interface), github_advisory.py, registro_npm.py, consulta_dos_avisos.py; opcionais: osv.py, faixas_do_osv.py, nvd.py, juncao_dos_avisos.py
+  fontes/                  modelos.py (Aviso, FonteSemResposta, AvisosDaBiblioteca, marcar_origem), conector.py (interface e ConsultaNaoRealizada),
+                           requisicao_http.py (baixa o JSON e monta os motivos de falha, comum a todas as fontes),
+                           filtro_do_pacote_npm.py, github_advisory.py, consulta_dos_avisos.py,
+                           registro_npm.py (HTTP do registro) e pacote_npm.py (integridade e leitura do tar em memória);
+                           opcionais: osv.py, faixas_do_osv.py, nvd.py (cliente), completar_cvss.py (BuscaDeCvss), juncao_dos_avisos.py
   risco/                   modelos.py, nota.py, prioridade.py, achados.py
   configuracao/            checagens.py (uma função por checagem)
   explicacao/              modelos.py, explicacao_dos_achados.py

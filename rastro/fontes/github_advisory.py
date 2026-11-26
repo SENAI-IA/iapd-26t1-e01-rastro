@@ -1,16 +1,14 @@
-import json
 import os
-from http.client import HTTPException
 from typing import Any
-from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.request import Request
 
-from rastro.fontes.conector import Aviso, ConsultaNaoRealizada, marcar_origem
+from rastro.fontes.filtro_do_pacote_npm import e_o_pacote_npm
+from rastro.fontes.modelos import Aviso, marcar_origem
+from rastro.fontes.requisicao_http import baixar_json, ler_resposta
 
 NOME_DA_FONTE = "GitHub Advisory"
 ENDERECO_DA_API = "https://api.github.com/advisories"
-TEMPO_LIMITE_EM_SEGUNDOS = 15
 AVISOS_POR_PAGINA = 100
 
 
@@ -20,26 +18,10 @@ class GitHubAdvisory:
 
     def consultar(self, pacote: str, versao: str) -> list[Aviso]:
         resposta = self.baixar_avisos(pacote, versao)
-        try:
-            return converter_resposta(resposta, pacote)
-        except (KeyError, TypeError, ValueError, AttributeError) as erro:
-            raise ConsultaNaoRealizada(f"resposta inesperada do {NOME_DA_FONTE}") from erro
+        return ler_resposta(lambda: converter_resposta(resposta, pacote), NOME_DA_FONTE)
 
     def baixar_avisos(self, pacote: str, versao: str) -> Any:
-        requisicao = montar_requisicao(pacote, versao, self.token)
-        try:
-            with urlopen(requisicao, timeout=TEMPO_LIMITE_EM_SEGUNDOS) as resposta:
-                return json.loads(resposta.read().decode("utf-8"))
-        except HTTPError as erro:
-            raise ConsultaNaoRealizada(motivo_do_erro_http(erro.code)) from erro
-        except URLError as erro:
-            raise ConsultaNaoRealizada(f"sem resposta do {NOME_DA_FONTE}: {erro.reason}") from erro
-        except TimeoutError as erro:
-            raise ConsultaNaoRealizada(f"sem resposta do {NOME_DA_FONTE}: tempo esgotado") from erro
-        except (UnicodeDecodeError, json.JSONDecodeError) as erro:
-            raise ConsultaNaoRealizada(f"resposta do {NOME_DA_FONTE} não é JSON") from erro
-        except (HTTPException, OSError) as erro:
-            raise ConsultaNaoRealizada(motivo_de_conexao_interrompida(erro)) from erro
+        return baixar_json(montar_requisicao(pacote, versao, self.token), NOME_DA_FONTE)
 
 
 def montar_requisicao(pacote: str, versao: str, token: str | None) -> Request:
@@ -53,18 +35,6 @@ def montar_requisicao(pacote: str, versao: str, token: str | None) -> Request:
     if token is not None:
         cabecalhos["Authorization"] = f"Bearer {token}"
     return Request(endereco, headers=cabecalhos)
-
-
-def motivo_de_conexao_interrompida(erro: Exception) -> str:
-    return f"conexão com o {NOME_DA_FONTE} interrompida: {erro}"
-
-
-def motivo_do_erro_http(codigo: int) -> str:
-    if codigo in (403, 429):
-        return f"limite de consultas do {NOME_DA_FONTE} atingido (HTTP {codigo})"
-    if codigo >= 500:
-        return f"erro no servidor do {NOME_DA_FONTE} (HTTP {codigo})"
-    return f"o {NOME_DA_FONTE} recusou a consulta (HTTP {codigo})"
 
 
 def converter_resposta(avisos_da_fonte: Any, pacote: str) -> list[Aviso]:
@@ -86,14 +56,9 @@ def aviso_retirado(aviso_da_fonte: Any) -> bool:
 def faixas_do_pacote(aviso_da_fonte: Any, pacote: str) -> list[Any]:
     faixas = []
     for vulnerabilidade in aviso_da_fonte.get("vulnerabilities") or []:
-        if vulnerabilidade_do_pacote_npm(vulnerabilidade, pacote):
+        if e_o_pacote_npm(vulnerabilidade["package"], pacote):
             faixas.append(vulnerabilidade)
     return faixas
-
-
-def vulnerabilidade_do_pacote_npm(vulnerabilidade: Any, pacote: str) -> bool:
-    pacote_da_fonte = vulnerabilidade["package"]
-    return bool(pacote_da_fonte["ecosystem"] == "npm" and pacote_da_fonte["name"] == pacote)
 
 
 def converter_aviso(aviso_da_fonte: Any, faixa: Any) -> Aviso:

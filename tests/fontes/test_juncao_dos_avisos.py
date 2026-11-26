@@ -1,8 +1,8 @@
 from dataclasses import replace
 
-from rastro.fontes.conector import Aviso, marcar_origem
+from rastro.fontes.completar_cvss import completar_cvss
 from rastro.fontes.juncao_dos_avisos import juntar_avisos
-from rastro.fontes.nvd import completar_cvss
+from rastro.fontes.modelos import Aviso, marcar_origem
 from tests.dubles import NvdFalso, avisos_gravados_do_jquery, avisos_gravados_do_jquery_no_osv
 
 GHSA_DO_CVE_11022 = "GHSA-gxr4-xjj5-5px2"

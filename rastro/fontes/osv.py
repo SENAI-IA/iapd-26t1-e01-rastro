@@ -1,42 +1,27 @@
 import json
-from http.client import HTTPException
 from typing import Any
-from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+from urllib.request import Request
 
-from rastro.fontes.conector import Aviso, ConsultaNaoRealizada, marcar_origem
 from rastro.fontes.faixas_do_osv import FaixaSemver, faixas_dos_eventos_semver
+from rastro.fontes.filtro_do_pacote_npm import e_o_pacote_npm
+from rastro.fontes.modelos import Aviso, marcar_origem
+from rastro.fontes.requisicao_http import baixar_json, ler_resposta
 
 NOME_DA_FONTE = "OSV"
 ENDERECO_DA_API = "https://api.osv.dev/v1/query"
 ENDERECO_DO_AVISO = "https://osv.dev/vulnerability/"
-TEMPO_LIMITE_EM_SEGUNDOS = 15
+CODIGOS_DE_LIMITE_DO_OSV = (429,)
 FAIXA_SEM_SEMVER = FaixaSemver("", None)
 
 
 class Osv:
     def consultar(self, pacote: str, versao: str) -> list[Aviso]:
         resposta = self.baixar_avisos(pacote, versao)
-        try:
-            return converter_resposta(resposta, pacote)
-        except (KeyError, TypeError, ValueError, AttributeError) as erro:
-            raise ConsultaNaoRealizada(f"resposta inesperada do {NOME_DA_FONTE}") from erro
+        return ler_resposta(lambda: converter_resposta(resposta, pacote), NOME_DA_FONTE)
 
     def baixar_avisos(self, pacote: str, versao: str) -> Any:
         requisicao = montar_requisicao(pacote, versao)
-        try:
-            with urlopen(requisicao, timeout=TEMPO_LIMITE_EM_SEGUNDOS) as resposta:
-                return json.loads(resposta.read().decode("utf-8"))
-        except HTTPError as erro:
-            raise ConsultaNaoRealizada(motivo_do_erro_http(erro.code)) from erro
-        except URLError as erro:
-            raise ConsultaNaoRealizada(f"sem resposta do {NOME_DA_FONTE}: {erro.reason}") from erro
-        except TimeoutError as erro:
-            raise ConsultaNaoRealizada(f"sem resposta do {NOME_DA_FONTE}: tempo esgotado") from erro
-        except (UnicodeDecodeError, json.JSONDecodeError) as erro:
-            raise ConsultaNaoRealizada(f"resposta do {NOME_DA_FONTE} não é JSON") from erro
-        except (HTTPException, OSError) as erro:
-            raise ConsultaNaoRealizada(motivo_de_conexao_interrompida(erro)) from erro
+        return baixar_json(requisicao, NOME_DA_FONTE, CODIGOS_DE_LIMITE_DO_OSV)
 
 
 def montar_requisicao(pacote: str, versao: str) -> Request:
@@ -47,18 +32,6 @@ def montar_requisicao(pacote: str, versao: str) -> Request:
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-
-
-def motivo_de_conexao_interrompida(erro: Exception) -> str:
-    return f"conexão com o {NOME_DA_FONTE} interrompida: {erro}"
-
-
-def motivo_do_erro_http(codigo: int) -> str:
-    if codigo == 429:
-        return f"limite de consultas do {NOME_DA_FONTE} atingido (HTTP {codigo})"
-    if codigo >= 500:
-        return f"erro no servidor do {NOME_DA_FONTE} (HTTP {codigo})"
-    return f"o {NOME_DA_FONTE} recusou a consulta (HTTP {codigo})"
 
 
 def converter_resposta(resposta: Any, pacote: str) -> list[Aviso]:
@@ -80,14 +53,9 @@ def aviso_retirado(aviso_da_fonte: Any) -> bool:
 def faixas_do_pacote(aviso_da_fonte: Any, pacote: str) -> list[FaixaSemver]:
     faixas = []
     for afetado in aviso_da_fonte.get("affected") or []:
-        if pacote_npm(afetado, pacote):
+        if e_o_pacote_npm(afetado["package"], pacote):
             faixas.extend(faixas_semver(afetado) or [FAIXA_SEM_SEMVER])
     return faixas
-
-
-def pacote_npm(afetado: Any, pacote: str) -> bool:
-    pacote_da_fonte = afetado["package"]
-    return bool(pacote_da_fonte["ecosystem"] == "npm" and pacote_da_fonte["name"] == pacote)
 
 
 def faixas_semver(afetado: Any) -> list[FaixaSemver]:

@@ -1,9 +1,10 @@
 from collections.abc import Iterable
 from dataclasses import replace
 
-from rastro.fontes.conector import Aviso
+from rastro.fontes import github_advisory, nvd, osv
+from rastro.fontes.modelos import Aviso
 
-ORDEM_DAS_FONTES = ("GitHub Advisory", "OSV", "NVD")
+ORDEM_DAS_FONTES = (github_advisory.NOME_DA_FONTE, osv.NOME_DA_FONTE, nvd.NOME_DA_FONTE)
 CAMPOS_PELA_ORDEM_DAS_FONTES = ("cve", "resumo", "cvss", "percentil_epss")
 CAMPOS_DA_FAIXA = ("versoes_afetadas", "versao_corrigida", "link")
 

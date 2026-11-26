@@ -1,5 +1,4 @@
-from rastro.fontes.conector import Aviso
-from rastro.fontes.consulta_dos_avisos import AvisosDaBiblioteca
+from rastro.fontes.modelos import Aviso, AvisosDaBiblioteca
 from rastro.travas.modelos import TravaAcionada
 from rastro.versao_semver import FaixaIlegivel, versao_na_faixa
 
@@ -11,11 +10,12 @@ def conferir_faixas(
 ) -> tuple[list[AvisosDaBiblioteca], list[TravaAcionada]]:
     mantidos: list[AvisosDaBiblioteca] = []
     travas_acionadas: list[TravaAcionada] = []
-    for biblioteca, avisos_da_biblioteca in avisos:
+    for avisos_da_biblioteca in avisos:
+        biblioteca = avisos_da_biblioteca.biblioteca
         na_faixa, barrados = descartar_fora_da_faixa(
-            biblioteca.pacote, biblioteca.versao, avisos_da_biblioteca
+            biblioteca.pacote, biblioteca.versao, avisos_da_biblioteca.avisos
         )
-        mantidos.append((biblioteca, na_faixa))
+        mantidos.append(AvisosDaBiblioteca(biblioteca, na_faixa))
         travas_acionadas.extend(barrados)
     return mantidos, travas_acionadas
 

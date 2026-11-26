@@ -1,4 +1,4 @@
-from rastro.fontes.conector import FonteSemResposta
+from rastro.fontes.modelos import FonteSemResposta
 from rastro.modelos_da_analise import Analise
 
 TEXTO_BUNDLES_NAO_PROCURADOS = (

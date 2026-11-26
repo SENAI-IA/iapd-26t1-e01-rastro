@@ -4,7 +4,7 @@ import pytest
 
 from rastro.explicacao.explicacao_dos_achados import ETAPA, explicar_achados
 from rastro.explicacao.modelos import Explicacao
-from rastro.fontes.conector import Aviso
+from rastro.fontes.modelos import Aviso
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
 from rastro.identificacao.modelos import Biblioteca, Evidencia, SituacaoDaBiblioteca
 from rastro.risco.modelos import Achado

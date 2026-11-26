@@ -1,4 +1,4 @@
-from rastro.fontes.conector import Aviso
+from rastro.fontes.modelos import Aviso
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.modelos import Achado
 from rastro.risco.nota import calcular_nota

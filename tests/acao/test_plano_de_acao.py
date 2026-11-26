@@ -7,8 +7,8 @@ from rastro.acao.plano_de_acao import CORRECOES_DAS_CHECAGENS, montar_plano_de_a
 from rastro.configuracao import checagens as regras
 from rastro.configuracao.modelos import Checagem, RegraDeChecagem, SituacaoDaChecagem
 from rastro.explicacao.modelos import Explicacao
-from rastro.fontes.conector import Aviso
 from rastro.fontes.github_advisory import converter_resposta
+from rastro.fontes.modelos import Aviso
 from rastro.identificacao.modelos import Biblioteca, SituacaoDaBiblioteca
 from rastro.risco.modelos import Achado
 from rastro.risco.nota import calcular_nota

@@ -4,7 +4,7 @@ from importlib import resources
 
 from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.explicacao.modelos import Explicacao
-from rastro.fontes.conector import Aviso
+from rastro.fontes.modelos import Aviso
 from rastro.har.site import url_sem_query_string
 from rastro.ia.cliente import ClienteDeIA
 from rastro.ia.sanitizacao import sanitizar

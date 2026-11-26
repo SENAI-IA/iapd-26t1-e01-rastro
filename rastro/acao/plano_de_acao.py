@@ -4,7 +4,7 @@ from rastro.acao.modelos import Acao, CorrecaoDaChecagem
 from rastro.acao.texto_da_tarefa import gerar_texto_da_tarefa
 from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.modelos import Explicacao
-from rastro.fontes.conector import Aviso
+from rastro.fontes.modelos import Aviso
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.achados import agrupar_por_biblioteca
 from rastro.risco.modelos import Achado, Prioridade

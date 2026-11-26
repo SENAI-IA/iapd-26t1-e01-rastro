@@ -4,7 +4,7 @@ from datetime import datetime
 from rastro.acao.modelos import Acao
 from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.modelos import Explicacao
-from rastro.fontes.conector import FonteSemResposta
+from rastro.fontes.modelos import FonteSemResposta
 from rastro.har.visita import PassoDaVisita
 from rastro.ia.cliente import ChamadaIA
 from rastro.identificacao.modelos import Biblioteca

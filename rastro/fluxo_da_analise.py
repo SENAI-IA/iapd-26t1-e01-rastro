@@ -6,9 +6,9 @@ from rastro.acao.plano_de_acao import montar_plano_de_acao
 from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.configuracao.checagens import checar_configuracao
 from rastro.explicacao.explicacao_dos_achados import explicar_achados
+from rastro.fontes.completar_cvss import BuscaDeCvss
 from rastro.fontes.conector import ConectorDeAvisos
 from rastro.fontes.consulta_dos_avisos import consultar_avisos
-from rastro.fontes.nvd import BuscaDeCvss
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.har.leitor_do_har import ler_har
 from rastro.har.site import descobrir_site_analisado
@@ -37,8 +37,8 @@ def analisar(
     fonte: ConectorDeAvisos,
     registro: RegistroDePacotes,
     ia: ClienteDeIA | None = None,
-    osv: ConectorDeAvisos | None = None,
-    nvd: BuscaDeCvss | None = None,
+    conector_osv: ConectorDeAvisos | None = None,
+    busca_de_cvss: BuscaDeCvss | None = None,
     gravado_pelo_rastro: bool = False,
     andamento: Andamento = SEM_ANDAMENTO,
 ) -> Analise:
@@ -57,7 +57,9 @@ def analisar(
     andamento.etapa(ETAPA_CONFERIR)
     bibliotecas = conferir_bibliotecas(por_assinatura + em_bundles.bibliotecas, registro, andamento)
     andamento.etapa(ETAPA_CONSULTAR)
-    consultados = consultar_avisos(bibliotecas.confirmadas, fonte, osv, nvd, andamento)
+    consultados = consultar_avisos(
+        bibliotecas.confirmadas, fonte, conector_osv, busca_de_cvss, andamento
+    )
     avisos_na_faixa, travas_da_faixa = conferir_faixas(consultados.avisos)
     achados = calcular_risco(avisos_na_faixa)
     if ia is not None:

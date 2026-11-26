@@ -6,8 +6,9 @@ from typing import Any
 from rastro.cli import executar
 from rastro.fluxo_da_analise import analisar
 from rastro.fontes import osv
-from rastro.fontes.conector import Aviso, ConsultaNaoRealizada
+from rastro.fontes.conector import ConsultaNaoRealizada
 from rastro.fontes.github_advisory import converter_resposta
+from rastro.fontes.modelos import Aviso
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
 from rastro.modelos_da_analise import Analise
 from rastro.pentest.sonda import RespostaHttp

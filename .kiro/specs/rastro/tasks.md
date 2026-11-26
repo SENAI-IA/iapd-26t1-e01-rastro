@@ -714,10 +714,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @ali.santos
 
-- [ ] **T78 Juntar o acesso HTTP das fontes**
+- [x] **T78 Juntar o acesso HTTP das fontes**
   - Entrega: um só lugar para baixar JSON e explicar erro HTTP; pacote npm (bytes) separado do registro (rede); CVSS do NVD separado do cliente.
   - Aceite: os quatro conectores usam o mesmo código de HTTP; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/fontes/`, `tests/fontes/`
+  - Arquivos: `rastro/fontes/`, `rastro/fluxo_da_analise.py`, `rastro/risco/achados.py`, `rastro/travas/faixa_de_versao.py`, `tests/fontes/`, `tests/dubles.py`, `.kiro/steering/structure.md`, `.kiro/skills/rastro-nova-regra/SKILL.md`
   - Teste: os testes atuais das fontes.
   - Requisito: R19.4
   - Revisão: @cristiano.albino

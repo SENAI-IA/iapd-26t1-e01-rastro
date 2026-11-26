@@ -9,14 +9,10 @@ from urllib.request import Request
 
 import pytest
 
-from rastro.fontes import osv
-from rastro.fontes.conector import (
-    Aviso,
-    ConectorDeAvisos,
-    ConsultaNaoRealizada,
-    FonteSemResposta,
-)
+from rastro.fontes import osv, requisicao_http
+from rastro.fontes.conector import ConectorDeAvisos, ConsultaNaoRealizada
 from rastro.fontes.consulta_dos_avisos import consultar_avisos
+from rastro.fontes.modelos import Aviso, FonteSemResposta
 from rastro.fontes.osv import Osv
 from rastro.identificacao.modelos import Biblioteca
 from rastro.travas.faixa_de_versao import descartar_fora_da_faixa
@@ -63,7 +59,7 @@ def consultar(
     pacote: str = "jquery",
     versao: str = "3.4.1",
 ) -> list[Aviso]:
-    monkeypatch.setattr(osv, "urlopen", urlopen_falso)
+    monkeypatch.setattr(requisicao_http, "urlopen", urlopen_falso)
     return Osv().consultar(pacote, versao)
 
 
@@ -79,7 +75,7 @@ def erro_http(codigo: int) -> HTTPError:
 def test_r04a_1_consulta_o_osv_por_pacote_npm_e_versao(monkeypatch: pytest.MonkeyPatch) -> None:
     urlopen_falso = UrlopenFalso()
     conector: ConectorDeAvisos = Osv()
-    monkeypatch.setattr(osv, "urlopen", urlopen_falso)
+    monkeypatch.setattr(requisicao_http, "urlopen", urlopen_falso)
 
     conector.consultar("@angular/core", "11.0.0")
 
@@ -252,11 +248,11 @@ def test_r04a_6_resposta_ilegivel_do_osv_vira_nao_consultada(
 def test_r04a_6_falha_do_osv_segue_so_com_o_github_e_registra_a_fonte(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(osv, "urlopen", UrlopenFalso(erro=URLError("sem rede")))
+    monkeypatch.setattr(requisicao_http, "urlopen", UrlopenFalso(erro=URLError("sem rede")))
 
-    consultados = consultar_avisos([JQUERY], ConectorFalso(), osv=Osv())
+    consultados = consultar_avisos([JQUERY], ConectorFalso(), conector_osv=Osv())
 
-    assert consultados.avisos[0][1] != []
+    assert consultados.avisos[0].avisos != []
     assert consultados.nao_consultadas == {}
     assert consultados.fontes_sem_resposta == [
         FonteSemResposta("OSV", "jquery@3.4.1", "sem resposta do OSV: sem rede")
