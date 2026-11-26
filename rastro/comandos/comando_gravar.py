@@ -5,6 +5,13 @@ from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
+from rastro.captura.navegador_playwright import (
+    NavegadorAusente,
+    NavegadorNaoAbriu,
+    PlaywrightAusente,
+    abrir_gravacao,
+    conferir_playwright,
+)
 from rastro.captura.pasta import (
     GravacaoJaExiste,
     UrlInvalida,
@@ -14,13 +21,6 @@ from rastro.captura.pasta import (
     host_da_url,
     pasta_padrao_das_gravacoes,
     url_sem_usuario_e_senha,
-)
-from rastro.captura.playwright import (
-    NavegadorAusente,
-    NavegadorNaoAbriu,
-    PlaywrightAusente,
-    abrir_gravacao,
-    conferir_playwright,
 )
 from rastro.captura.robo import LIMITES_PADRAO, PassoDoRobo, ResultadoDoRobo, Robo
 from rastro.captura.sessao import (

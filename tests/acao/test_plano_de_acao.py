@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from rastro.acao.plano import CORRECOES_DAS_CHECAGENS, montar_plano_de_acao
+from rastro.acao.plano_de_acao import CORRECOES_DAS_CHECAGENS, montar_plano_de_acao
 from rastro.configuracao import checagens as regras
 from rastro.configuracao.modelos import Checagem, RegraDeChecagem, SituacaoDaChecagem
 from rastro.explicacao.modelos import Explicacao

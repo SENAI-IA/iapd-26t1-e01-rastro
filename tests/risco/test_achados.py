@@ -1,4 +1,4 @@
-from rastro.fontes.consulta import AvisosDaBiblioteca
+from rastro.fontes.consulta_dos_avisos import AvisosDaBiblioteca
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.achados import calcular_risco
 from tests.dubles import avisos_gravados_do_jquery

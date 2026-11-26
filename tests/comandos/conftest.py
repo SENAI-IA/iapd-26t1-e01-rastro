@@ -6,7 +6,7 @@ import pytest
 
 from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.comandos import comando_analisar
-from rastro.fluxo import analisar
+from rastro.fluxo_da_analise import analisar
 from rastro.fontes.conector import ConectorDeAvisos
 from rastro.fontes.nvd import BuscaDeCvss
 from rastro.fontes.registro_npm import RegistroDePacotes

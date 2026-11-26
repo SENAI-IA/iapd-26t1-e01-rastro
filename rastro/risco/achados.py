@@ -1,4 +1,4 @@
-from rastro.fontes.consulta import AvisosDaBiblioteca
+from rastro.fontes.consulta_dos_avisos import AvisosDaBiblioteca
 from rastro.identificacao.modelos import nome_com_versao
 from rastro.risco.modelos import Achado
 from rastro.risco.nota import calcular_nota

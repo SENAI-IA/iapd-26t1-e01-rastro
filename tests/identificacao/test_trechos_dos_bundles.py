@@ -1,7 +1,7 @@
-from rastro.har.leitor import ler_har
+from rastro.har.leitor_do_har import ler_har
 from rastro.har.modelos import Requisicao
 from rastro.identificacao.assinaturas import identificar_por_assinatura
-from rastro.identificacao.bundles import (
+from rastro.identificacao.trechos_dos_bundles import (
     MAXIMO_DE_TRECHOS_POR_BUNDLE,
     TAMANHO_DA_JANELA,
     escolher_bundles,

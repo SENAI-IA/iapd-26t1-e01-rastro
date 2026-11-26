@@ -16,7 +16,7 @@ from rastro.fontes.conector import (
     ConsultaNaoRealizada,
     FonteSemResposta,
 )
-from rastro.fontes.consulta import consultar_avisos
+from rastro.fontes.consulta_dos_avisos import consultar_avisos
 from rastro.fontes.osv import Osv
 from rastro.identificacao.modelos import Biblioteca
 from rastro.travas.faixa_de_versao import descartar_fora_da_faixa

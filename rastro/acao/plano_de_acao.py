@@ -1,7 +1,7 @@
 from dataclasses import replace
 
 from rastro.acao.modelos import Acao, CorrecaoDaChecagem
-from rastro.acao.task import gerar_texto_da_task
+from rastro.acao.texto_da_tarefa import gerar_texto_da_tarefa
 from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.conector import Aviso
@@ -69,7 +69,7 @@ def montar_plano_de_acao(
 
 
 def com_texto_da_task(acao: Acao) -> Acao:
-    return replace(acao, texto_task=gerar_texto_da_task(acao))
+    return replace(acao, texto_task=gerar_texto_da_tarefa(acao))
 
 
 def acoes_das_bibliotecas(achados: list[Achado], explicacoes: dict[str, Explicacao]) -> list[Acao]:

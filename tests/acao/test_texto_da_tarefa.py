@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 
 from rastro.acao.modelos import Acao
-from rastro.acao.plano import montar_plano_de_acao
-from rastro.acao.task import gerar_texto_da_task
+from rastro.acao.plano_de_acao import montar_plano_de_acao
+from rastro.acao.texto_da_tarefa import gerar_texto_da_tarefa
 from rastro.configuracao import checagens as regras
 from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.modelos import Explicacao
@@ -49,7 +49,7 @@ def acao(teste_verificacao: str | None = None) -> Acao:
 
 
 def test_r09_1_texto_segue_o_modelo_do_design() -> None:
-    texto = gerar_texto_da_task(acao("Colar <img src=x onerror=alert(1)> na busca"))
+    texto = gerar_texto_da_tarefa(acao("Colar <img src=x onerror=alert(1)> na busca"))
 
     assert texto == (
         "## [Rastro] Atualizar jquery de 3.4.1 para 3.5.0\n"

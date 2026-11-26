@@ -1,6 +1,6 @@
 from rastro.fontes.conector import ConsultaNaoRealizada
 from rastro.identificacao.modelos import Biblioteca, Evidencia, MetodoDeIdentificacao
-from rastro.travas.conferencia import conferir_bibliotecas
+from rastro.travas.conferencia_das_bibliotecas import conferir_bibliotecas
 from rastro.travas.modelos import TravaAcionada
 
 PUBLICADOS = {("jquery", "3.4.1"), ("@angular/core", "11.0.0")}

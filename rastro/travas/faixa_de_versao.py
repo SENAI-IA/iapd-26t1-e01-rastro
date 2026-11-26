@@ -1,5 +1,5 @@
 from rastro.fontes.conector import Aviso
-from rastro.fontes.consulta import AvisosDaBiblioteca
+from rastro.fontes.consulta_dos_avisos import AvisosDaBiblioteca
 from rastro.travas.modelos import TravaAcionada
 from rastro.versao_semver import FaixaIlegivel, versao_na_faixa
 

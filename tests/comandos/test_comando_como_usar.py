@@ -6,7 +6,7 @@ import pytest
 
 import rastro.comandos.navegador
 from rastro.cli import executar
-from rastro.relatorio.html import TAG_DOS_DADOS_VAZIA
+from rastro.relatorio.pagina_do_relatorio import TAG_DOS_DADOS_VAZIA
 from tests.dubles import NavegadorFalso
 
 

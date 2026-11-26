@@ -690,10 +690,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @geison.santos
 
-- [ ] **T75 Dar nome único e claro aos arquivos**
+- [x] **T75 Dar nome único e claro aos arquivos**
   - Entrega: arquivos de nome repetido ou vago renomeados pelo que fazem (`relatorio/json.py`, `relatorio/html.py`, `pentest/fluxo.py`, `pentest/formato.py`, `pentest/leitor.py`, `identificacao/ia.py`, `explicacao/ia.py`, `travas/explicacao.py`, `fontes/juncao.py`, `acao/task.py`).
   - Aceite: nenhum nome de arquivo se repete entre pastas (fora `modelos.py`) nem sombreia módulo do Python; testes renomeados junto; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/`, `tests/`, `pyproject.toml`
+  - Arquivos: `rastro/`, `tests/`, `.kiro/steering/structure.md`, `.kiro/steering/codigo-python.md`, `.kiro/skills/rastro-nova-regra/SKILL.md`
   - Teste: os testes atuais, nos arquivos renomeados.
   - Requisito: R19.4
   - Revisão: @ali.santos

@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 from playwright.sync_api import Error, TimeoutError
 
-from rastro.captura.playwright import (
+from rastro.captura.navegador_playwright import (
     VERSAO_DO_PLAYWRIGHT,
     NavegadorAusente,
     NavegadorNaoAbriu,

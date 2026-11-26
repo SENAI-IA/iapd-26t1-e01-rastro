@@ -5,12 +5,12 @@ from pathlib import Path
 from rastro.comandos.argumentos import AJUDA_SEM_IA
 from rastro.comandos.resumo_no_terminal import AVISO_SEM_IA, mostrar_resultado
 from rastro.comandos.saida_de_erro import encerrar_com_erro
-from rastro.fluxo import analisar
+from rastro.fluxo_da_analise import analisar
 from rastro.fontes.github_advisory import GitHubAdvisory
 from rastro.fontes.nvd import Nvd
 from rastro.fontes.osv import Osv
 from rastro.fontes.registro_npm import RegistroNpm
-from rastro.har.leitor import ErroAoLerHar
+from rastro.har.leitor_do_har import ErroAoLerHar
 from rastro.ia.cliente import (
     VARIAVEL_DA_IA,
     CliDaIaAusente,
@@ -24,15 +24,15 @@ from rastro.ia.provedores.claude import ProvedorClaude
 from rastro.ia.provedores.codex import ProvedorCodex
 from rastro.ia.provedores.kiro import ProvedorKiro
 from rastro.pentest.erros import ErroNoPentest
-from rastro.pentest.fluxo import carregar_pentest as carregar_resultado_do_pentest
-from rastro.relatorio.gravacao import (
+from rastro.pentest.execucao_do_pentest import carregar_resultado_do_pentest
+from rastro.relatorio.gravacao_do_relatorio import (
     RelatorioJaExiste,
     caminho_do_relatorio,
     gravar_relatorio,
     nome_da_aplicacao,
     pasta_padrao,
 )
-from rastro.relatorio.json import (
+from rastro.relatorio.montagem_do_relatorio import (
     TEXTO_ACHADOS_SEM_EXPLICACAO,
     TEXTO_CONTINUA_IGUAL_SEM_IA,
     montar_relatorio,

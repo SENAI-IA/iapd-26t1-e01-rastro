@@ -90,6 +90,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T72** Registrar a rodada de legibilidade e o diagrama da arquitetura · rodada de legibilidade · revisão @cristiano.albino · 25/11
 - [ ] **T73** Dividir a linha de comando por comando · rodada de legibilidade · revisão @luiz.pagliari · 25/11
 - [ ] **T74** Corrigir a direção das dependências entre camadas · rodada de legibilidade · revisão @geison.santos · 25/11
+- [ ] **T75** Dar nome único e claro aos arquivos · rodada de legibilidade · revisão @ali.santos · 25/11
 
 ## A fazer
 
@@ -129,7 +130,6 @@ _(vazio)_
 
 ### Rodada de legibilidade (até 08/12)
 
-- [ ] **T75** Dar nome único e claro aos arquivos · rodada de legibilidade · revisão @ali.santos
 - [ ] **T76** Dividir a montagem do relatório JSON · rodada de legibilidade · revisão @geison.santos
 - [ ] **T77** Quebrar as validações ativas em uma função por validação · rodada de legibilidade · revisão @ali.santos
 - [ ] **T78** Juntar o acesso HTTP das fontes · rodada de legibilidade · revisão @cristiano.albino

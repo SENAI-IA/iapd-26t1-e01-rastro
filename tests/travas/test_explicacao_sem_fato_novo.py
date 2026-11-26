@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from rastro.travas.explicacao import conferir_explicacao
+from rastro.travas.explicacao_sem_fato_novo import conferir_explicacao
 from rastro.travas.modelos import TravaAcionada
 
 ENTRADA_DO_JQUERY = json.dumps(

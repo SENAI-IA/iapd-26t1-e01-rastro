@@ -2,23 +2,23 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from rastro.acao.plano import montar_plano_de_acao
+from rastro.acao.plano_de_acao import montar_plano_de_acao
 from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.configuracao.checagens import checar_configuracao
-from rastro.explicacao.ia import explicar_achados
+from rastro.explicacao.explicacao_dos_achados import explicar_achados
 from rastro.fontes.conector import ConectorDeAvisos
-from rastro.fontes.consulta import consultar_avisos
+from rastro.fontes.consulta_dos_avisos import consultar_avisos
 from rastro.fontes.nvd import BuscaDeCvss
 from rastro.fontes.registro_npm import RegistroDePacotes
-from rastro.har.leitor import ler_har
+from rastro.har.leitor_do_har import ler_har
 from rastro.har.site import descobrir_site_analisado
 from rastro.har.visita import montar_visita
 from rastro.ia.cliente import ChamadaIA, ClienteDeIA
 from rastro.identificacao.assinaturas import algum_script_com_conteudo, identificar_por_assinatura
-from rastro.identificacao.ia import identificar_em_bundles
+from rastro.identificacao.bibliotecas_pela_ia import identificar_em_bundles
 from rastro.modelos_da_analise import Analise
 from rastro.risco.achados import calcular_risco
-from rastro.travas.conferencia import conferir_bibliotecas
+from rastro.travas.conferencia_das_bibliotecas import conferir_bibliotecas
 from rastro.travas.faixa_de_versao import conferir_faixas
 
 ETAPA_LER_O_HAR = "Lendo o HAR"

@@ -1,6 +1,6 @@
 from dataclasses import replace
 
-from rastro.fontes.consulta import consultar_avisos
+from rastro.fontes.consulta_dos_avisos import consultar_avisos
 from rastro.identificacao.modelos import Biblioteca
 from tests.dubles import ConectorFalso, OsvFalso
 

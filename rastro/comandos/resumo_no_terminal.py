@@ -3,7 +3,7 @@ from typing import Any
 
 from rastro.comandos.comando_pentest import texto_do_resumo_do_pentest
 from rastro.comandos.navegador import abrir_relatorio
-from rastro.relatorio.gravacao import RelatorioGravado
+from rastro.relatorio.gravacao_do_relatorio import RelatorioGravado
 from rastro.risco.nota import escrever_nota
 from rastro.risco.prioridade import PRIORIDADES, ROTULO_DA_PRIORIDADE
 

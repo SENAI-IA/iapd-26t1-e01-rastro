@@ -1,5 +1,5 @@
 from rastro.comandos.navegador import abrir_no_navegador
-from rastro.relatorio.html import caminho_do_modelo
+from rastro.relatorio.pagina_do_relatorio import caminho_do_modelo
 
 TEXTO_COMO_USAR_ABERTO = 'Guia "Como usar" aberto no navegador: {caminho}'
 TEXTO_COMO_USAR_SEM_NAVEGADOR = (

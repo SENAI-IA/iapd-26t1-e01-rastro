@@ -9,7 +9,7 @@ from rastro.fontes.conector import (
     ConsultaNaoRealizada,
     FonteSemResposta,
 )
-from rastro.fontes.juncao import juntar_avisos
+from rastro.fontes.juncao_dos_avisos import juntar_avisos
 from rastro.fontes.nvd import BuscaDeCvss, completar_cvss
 from rastro.identificacao.modelos import Biblioteca, nome_com_versao
 

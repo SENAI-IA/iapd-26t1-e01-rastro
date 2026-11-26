@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from rastro.har.leitor import ler_har
+from rastro.har.leitor_do_har import ler_har
 from rastro.har.modelos import Requisicao
 from rastro.identificacao.assinaturas import (
     ASSINATURAS,

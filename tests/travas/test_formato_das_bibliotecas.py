@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from rastro.travas.formato import BibliotecaSugerida, conferir_formato
+from rastro.travas.formato_das_bibliotecas import BibliotecaSugerida, conferir_formato
 
 TRECHO_DO_ANGULAR = "let i=e?[`ng-version`,`22.2.2`]:uI(n.selectors[0])"
 

@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from rastro.explicacao.ia import ETAPA, explicar_achados
+from rastro.explicacao.explicacao_dos_achados import ETAPA, explicar_achados
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.conector import Aviso
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor

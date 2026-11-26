@@ -10,7 +10,7 @@ from rastro.gravacao_segura import (
     criar_pasta_nova,
     gravar_arquivo_novo,
 )
-from rastro.relatorio.html import NOME_DO_HTML, ler_modelo, montar_html
+from rastro.relatorio.pagina_do_relatorio import NOME_DO_HTML, ler_modelo, montar_html
 
 NOME_DO_JSON = "relatorio.json"
 

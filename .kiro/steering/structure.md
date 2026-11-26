@@ -9,7 +9,7 @@
 - **A IA sugere, a regra confirma:** toda saída da IA passa por `travas/` antes de virar dado.
 - **Um único ponto de chamada à IA**, que mede tempo e tokens.
 - **Dados separados da apresentação.** O núcleo gera JSON; o React só exibe.
-- **O código segue o fluxo da apresentação:** HAR → identificar → conferir → consultar → calcular → explicar → relatar, nessa ordem em `fluxo.py`.
+- **O código segue o fluxo da apresentação:** HAR → identificar → conferir → consultar → calcular → explicar → relatar, nessa ordem em `fluxo_da_analise.py`.
 - **Pentest ativo isolado:** `pentest/` tem fluxo próprio para `pentest --autorizo`; o resultado nunca entra na nota nem no plano (`docs/decisoes/13-pentest-por-comando-separado.md`).
 
 ## Pastas
@@ -21,28 +21,30 @@ rastro/
                            comando_pentest.py, comando_como_usar.py, comando_instalar.py, comando_desinstalar.py;
                            e as peças que eles dividem: argumentos.py, resumo_no_terminal.py, navegador.py, saida_de_erro.py
   atalho.py                cria e remove o comando rastro na pasta do usuário (instalar e desinstalar)
-  fluxo.py                 orquestra as etapas, sem regra própria
+  fluxo_da_analise.py      orquestra as etapas, sem regra própria
   modelos_da_analise.py    a Analise: o resultado completo que o fluxo entrega ao relatório
   versao_semver.py         lê e compara versões e faixas semver (usado por travas/, fontes/ e acao/)
   gravacao_segura.py       grava sem sobrescrever: pasta nova, arquivo novo e nome de pasta seguro no Windows
   andamento.py             interface que o fluxo usa para avisar a etapa e os itens
   terminal.py              linha ao vivo e andamento da análise no terminal
-  har/                     leitor.py, modelos.py, site.py, visita.py
-  identificacao/           modelos.py, assinaturas.py, bundles.py, ia.py
-  travas/                  formato.py, ancoragem.py, codigo_publicado.py, faixa_de_versao.py, explicacao.py, conferencia.py
-  fontes/                  conector.py (interface), github_advisory.py, registro_npm.py, consulta.py; opcionais: osv.py, faixas_do_osv.py, nvd.py, juncao.py
+  har/                     leitor_do_har.py, modelos.py, site.py, visita.py
+  identificacao/           modelos.py, assinaturas.py, trechos_dos_bundles.py, bibliotecas_pela_ia.py
+  travas/                  formato_das_bibliotecas.py, ancoragem.py, codigo_publicado.py, faixa_de_versao.py,
+                           explicacao_sem_fato_novo.py, conferencia_das_bibliotecas.py
+  fontes/                  conector.py (interface), github_advisory.py, registro_npm.py, consulta_dos_avisos.py; opcionais: osv.py, faixas_do_osv.py, nvd.py, juncao_dos_avisos.py
   risco/                   modelos.py, nota.py, prioridade.py, achados.py
   configuracao/            checagens.py (uma função por checagem)
-  explicacao/              modelos.py, ia.py
-  acao/                    modelos.py, plano.py, task.py
+  explicacao/              modelos.py, explicacao_dos_achados.py
+  acao/                    modelos.py, plano_de_acao.py, texto_da_tarefa.py
   ia/
     cliente.py             interface única, escolha do provedor, medição
     sanitizacao.py         tira dados sensíveis do que vai para a IA
     provedores/            kiro.py, claude.py, codex.py
     prompts/               prompts versionados, com exemplo de entrada e saída
-  relatorio/               json.py, html.py, gravacao.py, modelo.html (build do frontend, versionado)
-  captura/                 sessao.py (interface), playwright.py (único import do Playwright), pasta.py, robo.py
-  pentest/                 modelos.py, erros.py, privacidade.py, sonda.py, validacoes.py, formato.py, leitor.py, gravacao.py, fluxo.py (pentest --autorizo, isolado da análise)
+  relatorio/               montagem_do_relatorio.py, pagina_do_relatorio.py, gravacao_do_relatorio.py, modelo.html (build do frontend, versionado)
+  captura/                 sessao.py (interface), navegador_playwright.py (único import do Playwright), pasta.py, robo.py
+  pentest/                 modelos.py, erros.py, privacidade.py, sonda.py, validacoes.py, conferencia_do_resultado.py,
+                           leitura_do_resultado.py, gravacao_do_resultado.py, execucao_do_pentest.py (pentest --autorizo, isolado da análise)
 tests/                     mesma estrutura de rastro/
 frontend/                  React (ver frontend-react.md)
 docs/
@@ -57,12 +59,12 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 ## Onde colocar algo novo
 
 - **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade em `risco/prioridade.py`).
-- **Checagem nova:** uma função em `configuracao/checagens.py` (e na tupla `CHECAGENS`) e seu teste, e o que fazer e o impacto dela em `acao/plano.py`.
+- **Checagem nova:** uma função em `configuracao/checagens.py` (e na tupla `CHECAGENS`) e seu teste, e o que fazer e o impacto dela em `acao/plano_de_acao.py`.
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
 - **IA nova:** um arquivo em `ia/provedores/`.
 - **Assinatura nova:** em `identificacao/assinaturas.py`.
-- **Trava nova:** um arquivo em `travas/`, chamado por `conferencia.py` (trava sobre biblioteca) ou direto pelo fluxo (trava sobre aviso ou explicação), com teste em que a IA (dublê) inventa algo e a trava barra.
+- **Trava nova:** um arquivo em `travas/`, chamado por `conferencia_das_bibliotecas.py` (trava sobre biblioteca) ou direto pelo fluxo (trava sobre aviso ou explicação), com teste em que a IA (dublê) inventa algo e a trava barra.
 
-- **Regra nova no pentest:** uma função em `pentest/validacoes.py` ou `pentest/fluxo.py`, com teste que prova o limite de segurança. O fluxo da análise não muda.
+- **Regra nova no pentest:** uma função em `pentest/validacoes.py` ou `pentest/execucao_do_pentest.py`, com teste que prova o limite de segurança. O fluxo da análise não muda.
 
 A skill `rastro-nova-regra` (`.kiro/skills/rastro-nova-regra/SKILL.md`) descreve o passo a passo.

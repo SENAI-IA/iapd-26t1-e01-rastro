@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from rastro.relatorio.gravacao import (
+from rastro.relatorio.gravacao_do_relatorio import (
     RelatorioJaExiste,
     caminho_do_relatorio,
     gravar_relatorio,

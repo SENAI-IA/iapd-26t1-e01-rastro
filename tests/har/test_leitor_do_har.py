@@ -7,7 +7,7 @@ from typing import IO, Any
 
 import pytest
 
-from rastro.har.leitor import (
+from rastro.har.leitor_do_har import (
     MENSAGEM_HAR_INVALIDO,
     HarInvalido,
     HarNaoEncontrado,

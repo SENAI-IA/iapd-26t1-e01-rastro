@@ -5,10 +5,14 @@ from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.har.modelos import Requisicao
 from rastro.ia.cliente import ClienteDeIA
 from rastro.ia.sanitizacao import sanitizar
-from rastro.identificacao.bundles import Bundle, escolher_bundles
 from rastro.identificacao.modelos import Biblioteca, Evidencia, nome_com_versao
+from rastro.identificacao.trechos_dos_bundles import Bundle, escolher_bundles
 from rastro.travas.ancoragem import conferir_ancoragem
-from rastro.travas.formato import BibliotecaSugerida, conferir_formato, tirar_cerca_de_codigo
+from rastro.travas.formato_das_bibliotecas import (
+    BibliotecaSugerida,
+    conferir_formato,
+    tirar_cerca_de_codigo,
+)
 from rastro.travas.modelos import TravaAcionada
 
 ETAPA = "identificar_bibliotecas"

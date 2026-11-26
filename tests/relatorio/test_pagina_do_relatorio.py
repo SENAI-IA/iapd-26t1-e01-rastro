@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from rastro.relatorio.html import (
+from rastro.relatorio.pagina_do_relatorio import (
     TAG_DOS_DADOS_VAZIA,
     ModeloSemTagDosDados,
     ler_modelo,

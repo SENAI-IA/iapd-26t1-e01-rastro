@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from rastro.fluxo import (
+from rastro.fluxo_da_analise import (
     ETAPA_BUNDLES,
     ETAPA_CONFERIR,
     ETAPA_CONSULTAR,
@@ -14,9 +14,9 @@ from rastro.fluxo import (
     analisar,
 )
 from rastro.fontes.conector import FonteSemResposta
-from rastro.har.leitor import HarInvalido, HarNaoEncontrado
+from rastro.har.leitor_do_har import HarInvalido, HarNaoEncontrado
 from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
-from rastro.relatorio.json import montar_relatorio
+from rastro.relatorio.montagem_do_relatorio import montar_relatorio
 from tests.dubles import (
     DADOS,
     HAR_DA_LOJA,

@@ -8,7 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from rastro.captura.playwright import NavegadorAusente, NavegadorNaoAbriu, PlaywrightAusente
+from rastro.captura.navegador_playwright import (
+    NavegadorAusente,
+    NavegadorNaoAbriu,
+    PlaywrightAusente,
+)
 from rastro.captura.sessao import FalhaAoNavegar
 from rastro.cli import executar
 from rastro.comandos import comando_analisar, comando_gravar

@@ -4,7 +4,7 @@ AVISO_DO_TESTE_DA_IA = "sugerido pela IA: confira antes de usar"
 TESTE_SEM_SUGESTAO = "descrever o teste feito (sem sugestão da IA)"
 
 
-def gerar_texto_da_task(acao: Acao) -> str:
+def gerar_texto_da_tarefa(acao: Acao) -> str:
     linhas = [
         f"## [Rastro] {acao.o_que_fazer}",
         "",

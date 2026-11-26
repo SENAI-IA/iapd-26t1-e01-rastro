@@ -16,7 +16,7 @@ from rastro.configuracao.checagens import (
     checar_versao_do_servidor,
 )
 from rastro.configuracao.modelos import Checagem
-from rastro.har.leitor import ler_har
+from rastro.har.leitor_do_har import ler_har
 from rastro.har.modelos import Cookie, Requisicao
 from rastro.har.site import descobrir_site_analisado
 

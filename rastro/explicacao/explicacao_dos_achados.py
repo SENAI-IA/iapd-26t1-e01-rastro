@@ -12,9 +12,9 @@ from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.achados import agrupar_por_biblioteca
 from rastro.risco.modelos import Achado
 from rastro.risco.prioridade import ordenar_achados
-from rastro.travas import formato
-from rastro.travas.explicacao import conferir_explicacao
-from rastro.travas.formato import (
+from rastro.travas import formato_das_bibliotecas
+from rastro.travas.explicacao_sem_fato_novo import conferir_explicacao
+from rastro.travas.formato_das_bibliotecas import (
     ForaDoFormato,
     exigir_campos,
     ler_json_sem_texto_fora,
@@ -68,7 +68,7 @@ def explicar_biblioteca(
         campos = ler_campos_da_explicacao(resposta)
     except ForaDoFormato as erro:
         motivo = f"explicação descartada: {erro}"
-        return sem_ia, [TravaAcionada(formato.NOME_DA_TRAVA, alvo, motivo)]
+        return sem_ia, [TravaAcionada(formato_das_bibliotecas.NOME_DA_TRAVA, alvo, motivo)]
     conferida, barrados = conferir_explicacao(biblioteca.pacote, biblioteca.versao, campos, entrada)
     if conferida is None:
         return sem_ia, barrados
