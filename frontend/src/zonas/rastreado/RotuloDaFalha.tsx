@@ -12,10 +12,12 @@ const TOM_DA_PRIORIDADE: Record<Prioridade, string> = {
 
 function acionarComTeclado(acao: () => void) {
   return (evento: KeyboardEvent) => {
-    if (evento.key === "Enter" || evento.key === " ") {
-      evento.preventDefault();
-      acao();
+    const teclaQueAciona = evento.key === "Enter" || evento.key === " ";
+    if (!teclaQueAciona) {
+      return;
     }
+    evento.preventDefault();
+    acao();
   };
 }
 

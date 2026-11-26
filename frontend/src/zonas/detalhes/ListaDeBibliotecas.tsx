@@ -17,26 +17,33 @@ function achadosDaBiblioteca(biblioteca: Biblioteca, achados: Achado[]): Achado[
 }
 
 export default function ListaDeBibliotecas({ bibliotecas, achados, semJavascript, aoVerOrigem }: Props) {
+  const cabecalho = (
+    <div>
+      <h2 id="lista-de-bibliotecas-titulo">Bibliotecas encontradas</h2>
+      <p>Abra uma biblioteca para ver onde ela apareceu no <Termo nome="HAR" /> e as falhas conhecidas. Clique na nota para ver a conta.</p>
+    </div>
+  );
+  if (bibliotecas.length === 0) {
+    return (
+      <section className="lista-de-bibliotecas" aria-labelledby="lista-de-bibliotecas-titulo">
+        {cabecalho}
+        <ListaDeBibliotecasVazia semJavascript={semJavascript} />
+      </section>
+    );
+  }
   return (
     <section className="lista-de-bibliotecas" aria-labelledby="lista-de-bibliotecas-titulo">
-      <div>
-        <h2 id="lista-de-bibliotecas-titulo">Bibliotecas encontradas</h2>
-        <p>Abra uma biblioteca para ver onde ela apareceu no <Termo nome="HAR" /> e as falhas conhecidas. Clique na nota para ver a conta.</p>
-      </div>
-      {bibliotecas.length === 0 ? (
-        <ListaDeBibliotecasVazia semJavascript={semJavascript} />
-      ) : (
-        <ul className="lista-de-bibliotecas__lista">
-          {bibliotecas.map((biblioteca) => (
-            <ItemDaBiblioteca
-              key={biblioteca.id}
-              biblioteca={biblioteca}
-              achados={achadosDaBiblioteca(biblioteca, achados)}
-              aoVerOrigem={aoVerOrigem}
-            />
-          ))}
-        </ul>
-      )}
+      {cabecalho}
+      <ul className="lista-de-bibliotecas__lista">
+        {bibliotecas.map((biblioteca) => (
+          <ItemDaBiblioteca
+            key={biblioteca.id}
+            biblioteca={biblioteca}
+            achados={achadosDaBiblioteca(biblioteca, achados)}
+            aoVerOrigem={aoVerOrigem}
+          />
+        ))}
+      </ul>
     </section>
   );
 }

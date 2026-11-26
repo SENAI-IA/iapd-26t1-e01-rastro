@@ -12,14 +12,14 @@ interface Props {
 }
 
 function andarPelasSetas(avancar: () => void, voltar: () => void) {
+  const acaoDaSeta: Partial<Record<string, () => void>> = { ArrowRight: avancar, ArrowLeft: voltar };
   return (evento: KeyboardEvent<HTMLDialogElement>) => {
-    if (evento.key === "ArrowRight") {
-      evento.preventDefault();
-      avancar();
-    } else if (evento.key === "ArrowLeft") {
-      evento.preventDefault();
-      voltar();
+    const acao = acaoDaSeta[evento.key];
+    if (acao === undefined) {
+      return;
     }
+    evento.preventDefault();
+    acao();
   };
 }
 
@@ -38,9 +38,10 @@ export default function TourGuiado({ passos, cabecalhoFixo, aoFechar }: Props) {
   };
 
   const voltar = () => {
-    if (indice > 0) {
-      setIndice(indice - 1);
+    if (indice === 0) {
+      return;
     }
+    setIndice(indice - 1);
   };
 
   return (

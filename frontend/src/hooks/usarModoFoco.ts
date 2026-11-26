@@ -25,10 +25,11 @@ export function usarModoFoco(cabecalhoFixo: RefObject<HTMLElement | null>) {
       window.scrollTo({ top: 0 });
       return;
     }
-    if (zonaQueSaiuDoFoco.current) {
-      rolarAteAZona(zonaQueSaiuDoFoco.current, cabecalhoFixo.current);
-      zonaQueSaiuDoFoco.current = null;
+    if (zonaQueSaiuDoFoco.current === null) {
+      return;
     }
+    rolarAteAZona(zonaQueSaiuDoFoco.current, cabecalhoFixo.current);
+    zonaQueSaiuDoFoco.current = null;
   }, [zonaEmFoco, cabecalhoFixo]);
 
   useEffect(() => {
@@ -36,10 +37,12 @@ export function usarModoFoco(cabecalhoFixo: RefObject<HTMLElement | null>) {
       return;
     }
     const sairComEsc = (evento: KeyboardEvent) => {
-      if (evento.key === "Escape" && !evento.defaultPrevented && !algumDialogoAberto()) {
-        zonaQueSaiuDoFoco.current = zonaEmFoco;
-        setZonaEmFoco(null);
+      const pediuParaSair = evento.key === "Escape" && !evento.defaultPrevented && !algumDialogoAberto();
+      if (!pediuParaSair) {
+        return;
       }
+      zonaQueSaiuDoFoco.current = zonaEmFoco;
+      setZonaEmFoco(null);
     };
     document.addEventListener("keydown", sairComEsc);
     return () => document.removeEventListener("keydown", sairComEsc);

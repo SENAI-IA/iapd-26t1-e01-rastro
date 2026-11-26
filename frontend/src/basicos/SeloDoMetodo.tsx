@@ -1,21 +1,27 @@
 import type { MetodoDeIdentificacao } from "../relatorio/tiposDoRelatorio.ts";
-import Selo from "./Selo.tsx";
+import type { NomeDoIcone } from "./Icone.tsx";
+import Selo, { type TomDoSelo } from "./Selo.tsx";
+
+interface AparenciaDoMetodo {
+  rotulo: string;
+  tom: TomDoSelo;
+  icone: NomeDoIcone;
+}
+
+const APARENCIA_DO_METODO: Record<MetodoDeIdentificacao, AparenciaDoMetodo> = {
+  ia: { rotulo: "Encontrada pela IA", tom: "ia", icone: "ia" },
+  assinatura: { rotulo: "Por assinatura", tom: "neutro", icone: "lupa" },
+};
 
 interface Props {
   metodo: MetodoDeIdentificacao;
 }
 
 export default function SeloDoMetodo({ metodo }: Props) {
-  if (metodo === "ia") {
-    return (
-      <Selo tom="ia" icone="ia">
-        Encontrada pela IA
-      </Selo>
-    );
-  }
+  const { rotulo, tom, icone } = APARENCIA_DO_METODO[metodo];
   return (
-    <Selo tom="neutro" icone="lupa">
-      Por assinatura
+    <Selo tom={tom} icone={icone}>
+      {rotulo}
     </Selo>
   );
 }

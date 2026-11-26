@@ -27,20 +27,22 @@ function espacoAntes(linha: LinhaDoTerminal, anterior: LinhaDoTerminal): number 
   return ENTRE_LINHAS;
 }
 
+function posicionarDepoisDe(linha: LinhaDoTerminal, anterior: LinhaPosicionada | undefined): LinhaPosicionada {
+  if (anterior === undefined) {
+    return { ...linha, y: PRIMEIRA_LINHA, ordemDeAparecer: 1 };
+  }
+  const mesmaVez = linha.destaque === "continuacao";
+  return {
+    ...linha,
+    y: anterior.y + espacoAntes(linha, anterior),
+    ordemDeAparecer: mesmaVez ? anterior.ordemDeAparecer : anterior.ordemDeAparecer + 1,
+  };
+}
+
 export function posicionarLinhas(linhas: LinhaDoTerminal[]): LinhaPosicionada[] {
   const posicionadas: LinhaPosicionada[] = [];
   for (const linha of linhas) {
-    const anterior = posicionadas.at(-1);
-    if (anterior === undefined) {
-      posicionadas.push({ ...linha, y: PRIMEIRA_LINHA, ordemDeAparecer: 1 });
-      continue;
-    }
-    const mesmaVez = linha.destaque === "continuacao";
-    posicionadas.push({
-      ...linha,
-      y: anterior.y + espacoAntes(linha, anterior),
-      ordemDeAparecer: mesmaVez ? anterior.ordemDeAparecer : anterior.ordemDeAparecer + 1,
-    });
+    posicionadas.push(posicionarDepoisDe(linha, posicionadas.at(-1)));
   }
   return posicionadas;
 }

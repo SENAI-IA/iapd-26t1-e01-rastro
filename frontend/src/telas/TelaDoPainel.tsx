@@ -29,27 +29,18 @@ export default function TelaDoPainel({
 }: Props) {
   const zonasVisiveis = zonaEmFoco === null ? ZONAS : ZONAS.filter((zona) => zona.id === zonaEmFoco);
 
-  const conteudoDaZona = (zona: NomeDaZona): ReactNode => {
-    switch (zona) {
-      case "rastreado":
-        return (
-          <>
-            {relatorio.visita && relatorio.visita.length > 0 && (
-              <ReplayDaVisita
-                passos={relatorio.visita}
-                bibliotecas={relatorio.bibliotecas}
-                aoIrParaBiblioteca={aoIrParaBiblioteca}
-              />
-            )}
-            <Indicadores resumo={relatorio.resumo} primeiraAcao={relatorio.plano_de_acao[0]} />
-            <PainelDaIA ia={relatorio.ia} provedor={relatorio.analise.ia} />
-          </>
-        );
-      case "agir":
-        return <PlanoDeAcao acoes={relatorio.plano_de_acao} aoAbrirTarefa={aoAbrirTarefa} />;
-      case "detalhes":
-        return <ConteudoDosDetalhes relatorio={relatorio} aoVerOrigem={aoVerOrigem} />;
-    }
+  const conteudoDaZona: Record<NomeDaZona, ReactNode> = {
+    rastreado: (
+      <>
+        {relatorio.visita && relatorio.visita.length > 0 && (
+          <ReplayDaVisita passos={relatorio.visita} bibliotecas={relatorio.bibliotecas} aoIrParaBiblioteca={aoIrParaBiblioteca} />
+        )}
+        <Indicadores resumo={relatorio.resumo} primeiraAcao={relatorio.plano_de_acao[0]} />
+        <PainelDaIA ia={relatorio.ia} provedor={relatorio.analise.ia} />
+      </>
+    ),
+    agir: <PlanoDeAcao acoes={relatorio.plano_de_acao} aoAbrirTarefa={aoAbrirTarefa} />,
+    detalhes: <ConteudoDosDetalhes relatorio={relatorio} aoVerOrigem={aoVerOrigem} />,
   };
 
   return (
@@ -57,7 +48,7 @@ export default function TelaDoPainel({
       {zonaEmFoco === null && <CabecalhoDaAnalise analise={relatorio.analise} />}
       {zonasVisiveis.map((zona) => (
         <ZonaDoPainel key={zona.id} zona={zona} aoFocar={zonaEmFoco ? undefined : () => aoFocar(zona.id)}>
-          {conteudoDaZona(zona.id)}
+          {conteudoDaZona[zona.id]}
         </ZonaDoPainel>
       ))}
     </>

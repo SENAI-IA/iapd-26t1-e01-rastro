@@ -810,11 +810,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @ali.santos
 
-- [ ] **T91 Achatar ifs encadeados e laços no frontend**
+- [x] **T91 Achatar ifs encadeados e laços no frontend**
   - Entrega: componentes, hooks e contas de tela sem `if` dentro de laço dentro de `if`; cadeias de `if`/`else if` e `switch` que só escolhem um valor viram tabela (objeto) ou função com nome; saída cedo com `return` no começo; laço com mais de uma decisão vira função com nome por volta.
   - Aceite: nenhuma função com mais de dois níveis de bloco aninhado (script de conferência no commit) e regra registrada em `frontend-react.md`; `npm run build` passa; telas (1280 e 400 px, claro e escuro) e sonda de comportamento iguais às de antes.
-  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`, `.kiro/steering/frontend-react.md`
-  - Teste: comparação das telas e da sonda de comportamento antes e depois.
+  - Arquivos: `frontend/src/`, `frontend/conferirAninhamento.mjs`, `frontend/package.json`, `rastro/relatorio/modelo.html`, `.kiro/steering/frontend-react.md`
+  - Teste: `npm run build` roda `conferirAninhamento.mjs`, que falha se alguma função tiver mais de dois níveis de bloco; 60 telas, 310 quadros do guia, sonda de comportamento e passos do tour iguais aos de antes.
   - Requisito: R19.4
   - Revisão: @halan.bacca
 

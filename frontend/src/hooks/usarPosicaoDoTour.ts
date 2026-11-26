@@ -19,10 +19,11 @@ function tamanhoDaTela() {
 
 function rolarAteOAlvo(seletor: string, alturaDoCabecalhoFixo: number) {
   const alvo = document.querySelector(seletor);
-  if (alvo) {
-    const destino = rolagemParaMostrar(retanguloDe(alvo), window.scrollY, tamanhoDaTela(), alturaDoCabecalhoFixo);
-    window.scrollTo({ top: destino, behavior: prefereMenosMovimento() ? "auto" : "smooth" });
+  if (!alvo) {
+    return;
   }
+  const destino = rolagemParaMostrar(retanguloDe(alvo), window.scrollY, tamanhoDaTela(), alturaDoCabecalhoFixo);
+  window.scrollTo({ top: destino, behavior: prefereMenosMovimento() ? "auto" : "smooth" });
 }
 
 export function usarPosicaoDoTour(

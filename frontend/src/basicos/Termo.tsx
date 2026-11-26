@@ -15,11 +15,13 @@ export default function Termo({ nome, children }: Props) {
   const [comFoco, setComFoco] = useState(false);
 
   const fecharComEsc = (evento: KeyboardEvent) => {
-    if (evento.key === "Escape" && (sobOPonteiro || comFoco)) {
-      evento.preventDefault();
-      setSobOPonteiro(false);
-      setComFoco(false);
+    const dicaAberta = sobOPonteiro || comFoco;
+    if (evento.key !== "Escape" || !dicaAberta) {
+      return;
     }
+    evento.preventDefault();
+    setSobOPonteiro(false);
+    setComFoco(false);
   };
 
   const focarAoTocar = (evento: MouseEvent<HTMLSpanElement>) => {
