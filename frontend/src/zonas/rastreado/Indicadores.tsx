@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Acao, Resumo } from "../../relatorio/tiposDoRelatorio.ts";
 import Indicador from "./Indicador.tsx";
 import Selo from "../../basicos/Selo.tsx";
@@ -19,11 +20,7 @@ export default function Indicadores({ resumo, primeiraAcao }: Props) {
         icone="alvo"
         valor={resumo.nota_maxima === null ? "–" : formatarNota(resumo.nota_maxima)}
         complemento={resumo.nota_maxima === null ? undefined : "/ 10"}
-        descricao={
-          resumo.nota_maxima === null
-            ? "Nenhuma falha com nota nesta gravação."
-            : "Maior nota entre as falhas encontradas nas bibliotecas."
-        }
+        descricao={descreverRisco(resumo)}
       />
       <Indicador
         titulo="Bibliotecas vulneráveis"
@@ -41,11 +38,7 @@ export default function Indicadores({ resumo, primeiraAcao }: Props) {
             IA
           </Selo>
         }
-        descricao={
-          resumo.encontradas_so_pela_ia === null
-            ? <>Análise sem IA: bibliotecas escondidas em <Termo nome="Bundle">bundles</Termo> não foram procuradas.</>
-            : <>Bibliotecas escondidas em <Termo nome="Bundle">bundles</Termo>, que só a IA reconheceu.</>
-        }
+        descricao={descreverSoPelaIA(resumo)}
       />
       <Indicador
         titulo="Primeira ação"
@@ -53,18 +46,17 @@ export default function Indicadores({ resumo, primeiraAcao }: Props) {
         valor={String(resumo.acoes)}
         complemento={resumo.acoes === 1 ? "ação no plano" : "ações no plano"}
         selo={primeiraAcao && <SeloDePrioridade prioridade={primeiraAcao.prioridade} />}
-        descricao={
-          primeiraAcao ? (
-            <>
-              Comece por: <strong>{primeiraAcao.o_que_fazer}</strong>.
-            </>
-          ) : (
-            "Nada a corrigir nesta gravação."
-          )
-        }
+        descricao={descreverPrimeiraAcao(primeiraAcao)}
       />
     </section>
   );
+}
+
+function descreverRisco(resumo: Resumo): string {
+  if (resumo.nota_maxima === null) {
+    return "Nenhuma falha com nota nesta gravação.";
+  }
+  return "Maior nota entre as falhas encontradas nas bibliotecas.";
 }
 
 function descreverBibliotecas(resumo: Resumo): string {
@@ -76,4 +68,30 @@ function descreverBibliotecas(resumo: Resumo): string {
     partes.push(`${resumo.bibliotecas_a_confirmar} a confirmar`);
   }
   return partes.join(" · ");
+}
+
+function descreverSoPelaIA(resumo: Resumo): ReactNode {
+  if (resumo.encontradas_so_pela_ia === null) {
+    return (
+      <>
+        Análise sem IA: bibliotecas escondidas em <Termo nome="Bundle">bundles</Termo> não foram procuradas.
+      </>
+    );
+  }
+  return (
+    <>
+      Bibliotecas escondidas em <Termo nome="Bundle">bundles</Termo>, que só a IA reconheceu.
+    </>
+  );
+}
+
+function descreverPrimeiraAcao(primeiraAcao: Acao | undefined): ReactNode {
+  if (!primeiraAcao) {
+    return "Nada a corrigir nesta gravação.";
+  }
+  return (
+    <>
+      Comece por: <strong>{primeiraAcao.o_que_fazer}</strong>.
+    </>
+  );
 }

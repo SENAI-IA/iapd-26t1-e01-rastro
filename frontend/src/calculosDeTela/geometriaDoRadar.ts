@@ -11,9 +11,17 @@ export const RAIO_DA_CAMADA: Record<Camada, number> = {
   midia: 186,
 };
 
+const ANGULO_DO_TOPO = -90;
+const VOLTA_COMPLETA = 360;
 const ABERTURA_NO_TOPO = 44;
+const FAIXAS_DE_ESPALHAMENTO = 3;
+const DISTANCIA_ENTRE_FAIXAS = 6;
 const DISTANCIA_DA_COLUNA_DE_ROTULOS = 222;
+const LARGURA_DA_COLUNA_DE_ROTULOS = 175;
 const ESPACO_ENTRE_ROTULOS = 27;
+const FOLGA_DO_DISCO = 14;
+const FOLGA_DO_COTOVELO = 8;
+const FOLGA_ANTES_DO_ROTULO = 6;
 const MARGEM = 18;
 
 export interface Ponto {
@@ -23,16 +31,23 @@ export interface Ponto {
 
 export type Lado = "direita" | "esquerda";
 
-export interface Rotulo<T> {
-  item: T;
+export interface ItemComAncora<Item> {
+  item: Item;
   ancora: Ponto;
-  lado: Lado;
+}
+
+interface ItemEmpilhado<Item> extends ItemComAncora<Item> {
   y: number;
+}
+
+export interface Rotulo<Item> extends ItemEmpilhado<Item> {
+  lado: Lado;
   x: number;
 }
 
-const LARGURA_DA_COLUNA_DE_ROTULOS = 175;
-const FOLGA_DO_DISCO = 14;
+function sentidoDoLado(lado: Lado): number {
+  return lado === "direita" ? 1 : -1;
+}
 
 export function enquadramento(ladosComRotulo: Set<Lado>): string {
   const alcanceDoLado = (lado: Lado) =>
@@ -50,7 +65,7 @@ export function ladoDoPonto(ponto: Ponto): Lado {
 
 export function anguloDaOrdem(ordem: number, total: number): number {
   const fracao = total === 0 ? 0 : ordem / total;
-  return -90 + ABERTURA_NO_TOPO / 2 + fracao * (360 - ABERTURA_NO_TOPO);
+  return ANGULO_DO_TOPO + ABERTURA_NO_TOPO / 2 + fracao * (VOLTA_COMPLETA - ABERTURA_NO_TOPO);
 }
 
 export function pontoNoCirculo(raio: number, angulo: number): Ponto {
@@ -59,7 +74,8 @@ export function pontoNoCirculo(raio: number, angulo: number): Ponto {
 }
 
 export function raioComEspalhamento(camada: Camada, indice: number): number {
-  return RAIO_DA_CAMADA[camada] + ((indice % 3) - 1) * 6;
+  const faixaEntreMenosUmEUm = (indice % FAIXAS_DE_ESPALHAMENTO) - 1;
+  return RAIO_DA_CAMADA[camada] + faixaEntreMenosUmEUm * DISTANCIA_ENTRE_FAIXAS;
 }
 
 export function fatiaDoRastro(anguloFinal: number, abertura: number): string {
@@ -68,24 +84,19 @@ export function fatiaDoRastro(anguloFinal: number, abertura: number): string {
   return `M${CENTRO.x},${CENTRO.y} L${inicio.x},${inicio.y} A${RAIO_EXTERNO},${RAIO_EXTERNO} 0 0 1 ${fim.x},${fim.y} Z`;
 }
 
-export function posicionarRotulos<T>(itens: { item: T; ancora: Ponto }[]): Rotulo<T>[] {
+export function posicionarRotulos<Item>(itens: ItemComAncora<Item>[]): Rotulo<Item>[] {
   const lados: Lado[] = ["direita", "esquerda"];
   return lados.flatMap((lado) => {
     const doLado = itens
       .filter(({ ancora }) => ladoDoPonto(ancora) === lado)
-      .sort((a, b) => a.ancora.y - b.ancora.y);
-    return empilharSemSobrepor(doLado).map(({ item, ancora }, posicao, todos) => ({
-      item,
-      ancora,
-      lado,
-      y: todos[posicao].y,
-      x: CENTRO.x + (lado === "direita" ? 1 : -1) * DISTANCIA_DA_COLUNA_DE_ROTULOS,
-    }));
+      .sort((primeiro, segundo) => primeiro.ancora.y - segundo.ancora.y);
+    const x = CENTRO.x + sentidoDoLado(lado) * DISTANCIA_DA_COLUNA_DE_ROTULOS;
+    return empilharSemSobrepor(doLado).map((empilhado) => ({ ...empilhado, lado, x }));
   });
 }
 
-function empilharSemSobrepor<T>(itens: { item: T; ancora: Ponto }[]): { item: T; ancora: Ponto; y: number }[] {
-  const empilhados: { item: T; ancora: Ponto; y: number }[] = [];
+function empilharSemSobrepor<Item>(itens: ItemComAncora<Item>[]): ItemEmpilhado<Item>[] {
+  const empilhados: ItemEmpilhado<Item>[] = [];
   for (const { item, ancora } of itens) {
     const anterior = empilhados.at(-1);
     const y = Math.max(ancora.y, MARGEM, anterior ? anterior.y + ESPACO_ENTRE_ROTULOS : -Infinity);
@@ -100,8 +111,8 @@ function empilharSemSobrepor<T>(itens: { item: T; ancora: Ponto }[]): { item: T;
 }
 
 export function caminhoDoFio(ancora: Ponto, rotulo: { x: number; y: number; lado: Lado }): string {
-  const sentido = rotulo.lado === "direita" ? 1 : -1;
-  const cotovelo = CENTRO.x + sentido * (RAIO_EXTERNO + 8);
-  const fim = rotulo.x - sentido * 6;
+  const sentido = sentidoDoLado(rotulo.lado);
+  const cotovelo = CENTRO.x + sentido * (RAIO_EXTERNO + FOLGA_DO_COTOVELO);
+  const fim = rotulo.x - sentido * FOLGA_ANTES_DO_ROTULO;
   return `M${ancora.x},${ancora.y} L${cotovelo},${rotulo.y} L${fim},${rotulo.y}`;
 }

@@ -1,14 +1,13 @@
 import type { Achado, Biblioteca } from "../../relatorio/tiposDoRelatorio.ts";
+import AlertasDaBiblioteca from "./AlertasDaBiblioteca.tsx";
 import Evidencias from "./Evidencias.tsx";
 import ExplicacaoIA from "./ExplicacaoIA.tsx";
 import Icone from "../../basicos/Icone.tsx";
 import ListaFalhas from "./ListaFalhas.tsx";
 import type { OrigemDoDado } from "../../telas/tiposDaTela.ts";
+import ResumoDoRisco from "./ResumoDoRisco.tsx";
 import Selo from "../../basicos/Selo.tsx";
-import SeloDePrioridade from "../../basicos/SeloDePrioridade.tsx";
 import SeloDoMetodo from "../../basicos/SeloDoMetodo.tsx";
-import { formatarNota, plural } from "../../formatacao/formato.ts";
-import Termo from "../../basicos/Termo.tsx";
 import { idDaLinhaDaBiblioteca } from "../../calculosDeTela/identificadores.ts";
 import "./LinhaBiblioteca.css";
 
@@ -19,7 +18,6 @@ interface Props {
 }
 
 export default function LinhaBiblioteca({ biblioteca, achados, aoVerOrigem }: Props) {
-  const naoConsultada = biblioteca.motivo_nao_consultada !== null;
   return (
     <li className="linha-biblioteca" id={idDaLinhaDaBiblioteca(biblioteca.id)}>
       <details>
@@ -38,71 +36,23 @@ export default function LinhaBiblioteca({ biblioteca, achados, aoVerOrigem }: Pr
               </Selo>
             )}
           </span>
-          <span className="linha-biblioteca__risco">{riscoDaBiblioteca(biblioteca, achados)}</span>
+          <span className="linha-biblioteca__risco">
+            <ResumoDoRisco biblioteca={biblioteca} achados={achados} />
+          </span>
         </summary>
         <div className="linha-biblioteca__corpo">
-          <button
-            type="button"
-            className="linha-biblioteca__origem"
-            onClick={() => aoVerOrigem({ biblioteca, achados })}
-          >
+          <button type="button" className="linha-biblioteca__origem" onClick={() => aoVerOrigem({ biblioteca, achados })}>
             <Icone nome="lupa" />
             Ver a origem: HAR, identificação, aviso e nota
           </button>
-          {naoConsultada && (
-            <p className="linha-biblioteca__alerta">
-              <Icone nome="triangulo" />
-              <span>
-                Não consultada no GitHub Advisory: {biblioteca.motivo_nao_consultada}. As falhas desta
-                biblioteca podem não aparecer aqui; rode a análise de novo com rede.
-              </span>
-            </p>
-          )}
-          {biblioteca.conferida_no_npm === null && (
-            <p className="linha-biblioteca__alerta">
-              <Icone nome="pacote" />
-              <span>
-                O registro do <Termo nome="npm" /> não respondeu, então não deu para conferir que{" "}
-                <code>
-                  {biblioteca.pacote}@{biblioteca.versao}
-                </code>{" "}
-                foi publicado. A identificação vem da <Termo nome="Assinatura">assinatura</Termo>.
-              </span>
-            </p>
-          )}
+          <AlertasDaBiblioteca biblioteca={biblioteca} />
           {biblioteca.explicacao && <ExplicacaoIA explicacao={biblioteca.explicacao} />}
           <Evidencias evidencias={biblioteca.evidencias} />
-          {!naoConsultada && (
+          {biblioteca.motivo_nao_consultada === null && (
             <ListaFalhas achados={achados} aoVerOrigem={(achado) => aoVerOrigem({ biblioteca, achados: [achado] })} />
           )}
         </div>
       </details>
     </li>
-  );
-}
-
-function riscoDaBiblioteca(biblioteca: Biblioteca, achados: Achado[]) {
-  if (biblioteca.motivo_nao_consultada !== null) {
-    return (
-      <Selo tom="serio" icone="triangulo">
-        Não consultada
-      </Selo>
-    );
-  }
-  if (achados.length === 0 || biblioteca.prioridade === null) {
-    return (
-      <Selo tom="bom" icone="certo">
-        Sem falhas conhecidas
-      </Selo>
-    );
-  }
-  return (
-    <>
-      <span>{plural(achados.length, "falha", "falhas")}</span>
-      <span className="linha-biblioteca__nota">
-        {biblioteca.nota === null ? "Sem nota" : `Nota ${formatarNota(biblioteca.nota)}`}
-      </span>
-      <SeloDePrioridade prioridade={biblioteca.prioridade} />
-    </>
   );
 }

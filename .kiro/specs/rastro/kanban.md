@@ -102,6 +102,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T84** Trocar código esperto por laço e função com nome · rodada de legibilidade · revisão @cristiano.albino · 26/11
 - [ ] **T85** Organizar as pastas do frontend por responsabilidade · rodada de legibilidade · revisão @halan.bacca · 26/11
 - [ ] **T86** Juntar o comportamento repetido e dividir o App · rodada de legibilidade · revisão @halan.bacca · 26/11
+- [ ] **T87** Dividir os componentes grandes da tela · rodada de legibilidade · revisão @halan.bacca · 26/11
 
 ## A fazer
 
@@ -141,7 +142,6 @@ _(vazio)_
 
 ### Rodada de legibilidade (até 08/12)
 
-- [ ] **T87** Dividir os componentes grandes da tela · rodada de legibilidade · revisão @halan.bacca
 - [ ] **T88** Padronizar os nomes do frontend · rodada de legibilidade · revisão @halan.bacca
 - [ ] **T90** Achatar ifs encadeados e laços no Python · rodada de legibilidade · revisão @ali.santos
 - [ ] **T91** Achatar ifs encadeados e laços no frontend · rodada de legibilidade · revisão @halan.bacca

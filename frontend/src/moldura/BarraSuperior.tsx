@@ -1,3 +1,5 @@
+import AcoesDaBarra from "./AcoesDaBarra.tsx";
+import BotaoDaAba from "./BotaoDaAba.tsx";
 import Icone from "../basicos/Icone.tsx";
 import type { Tela, Tema } from "../telas/tiposDaTela.ts";
 import "./BarraSuperior.css";
@@ -11,15 +13,7 @@ interface Props {
   temPentest: boolean;
 }
 
-export default function BarraSuperior({
-  tema,
-  tela,
-  aoTrocarTema,
-  aoTrocarTela,
-  aoAbrirTour,
-  temPentest,
-}: Props) {
-  const proximoTema = tema === "claro" ? "escuro" : "claro";
+export default function BarraSuperior({ tema, tela, aoTrocarTema, aoTrocarTela, aoAbrirTour, temPentest }: Props) {
   return (
     <header className="barra-superior">
       <div className="barra-superior__conteudo">
@@ -28,59 +22,25 @@ export default function BarraSuperior({
           rastro
         </span>
         <nav className="barra-superior__telas" aria-label="Telas do relatório">
-          <button
-            type="button"
-            className="barra-superior__tela"
-            aria-current={tela === "painel" ? "page" : undefined}
-            onClick={() => aoTrocarTela("painel")}
-          >
-            <Icone nome="painel" />
+          <BotaoDaAba tela="painel" telaAberta={tela} icone="painel" aoTrocarTela={aoTrocarTela}>
             Painel
-          </button>
+          </BotaoDaAba>
           {temPentest && (
-            <button
-              type="button"
-              className="barra-superior__tela barra-superior__tela--pentest"
-              aria-current={tela === "pentest" ? "page" : undefined}
-              onClick={() => aoTrocarTela("pentest")}
+            <BotaoDaAba
+              tela="pentest"
+              telaAberta={tela}
+              icone="lupa"
+              classeExtra="barra-superior__tela--pentest"
+              aoTrocarTela={aoTrocarTela}
             >
-              <Icone nome="lupa" />
               Segurança ativa
-            </button>
+            </BotaoDaAba>
           )}
-          <button
-            type="button"
-            className="barra-superior__tela"
-            aria-current={tela === "como-usar" ? "page" : undefined}
-            onClick={() => aoTrocarTela("como-usar")}
-          >
-            <Icone nome="livro" />
+          <BotaoDaAba tela="como-usar" telaAberta={tela} icone="livro" aoTrocarTela={aoTrocarTela}>
             Como usar
-          </button>
+          </BotaoDaAba>
         </nav>
-        <div className="barra-superior__acoes">
-          {aoAbrirTour && (
-            <button
-              type="button"
-              className="barra-superior__tour"
-              onClick={aoAbrirTour}
-              aria-label="Tour guiado pelo relatório"
-              title="Tour guiado pelo relatório"
-            >
-              <Icone nome="bussola" tamanho={16} />
-              <span className="barra-superior__rotulo">Tour guiado</span>
-            </button>
-          )}
-          <button
-            type="button"
-            className="barra-superior__tema"
-            onClick={aoTrocarTema}
-            aria-label={`Mudar para o tema ${proximoTema}`}
-            title={`Mudar para o tema ${proximoTema}`}
-          >
-            <Icone nome={tema === "claro" ? "lua" : "sol"} tamanho={16} />
-          </button>
-        </div>
+        <AcoesDaBarra tema={tema} aoTrocarTema={aoTrocarTema} aoAbrirTour={aoAbrirTour} />
       </div>
     </header>
   );

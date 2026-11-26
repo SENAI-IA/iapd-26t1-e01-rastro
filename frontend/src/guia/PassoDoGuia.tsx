@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { Comando, PassoDoGuia as DadosDoPasso } from "../conteudo/guia.ts";
+import type { PassoDoGuia as DadosDoPasso } from "../conteudo/guia.ts";
+import ComandosDoPasso from "./ComandosDoPasso.tsx";
 import Icone from "../basicos/Icone.tsx";
 import IlustracaoDoGuia from "./IlustracaoDoGuia.tsx";
 import TextoComMarcas from "../basicos/TextoComMarcas.tsx";
@@ -14,15 +14,6 @@ interface Props {
 }
 
 export default function PassoDoGuia({ numero, passo, feito, aoMarcar }: Props) {
-  const [copiado, setCopiado] = useState<string | null>(null);
-
-  const copiar = (comando: Comando) => {
-    navigator.clipboard?.writeText(comando.texto).then(
-      () => setCopiado(comando.sistema),
-      () => setCopiado(null),
-    );
-  };
-
   return (
     <li
       id={idDoPassoDoGuia(numero)}
@@ -40,20 +31,7 @@ export default function PassoDoGuia({ numero, passo, feito, aoMarcar }: Props) {
         <p>
           <TextoComMarcas texto={passo.texto} />
         </p>
-        {passo.comandos?.map((comando) => (
-          <div key={comando.sistema} className="passo-do-guia__comando">
-            <span className="passo-do-guia__sistema">{comando.sistema}</span>
-            <code>{comando.texto}</code>
-            <button
-              type="button"
-              className="passo-do-guia__copiar"
-              onClick={() => copiar(comando)}
-              aria-label={`Copiar o comando para ${comando.sistema}`}
-            >
-              {copiado === comando.sistema ? "Copiado" : "Copiar"}
-            </button>
-          </div>
-        ))}
+        {passo.comandos && <ComandosDoPasso comandos={passo.comandos} />}
         {passo.dica && (
           <p className="passo-do-guia__dica">
             <TextoComMarcas texto={passo.dica} />

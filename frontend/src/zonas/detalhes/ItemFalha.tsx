@@ -1,8 +1,8 @@
 import type { Achado } from "../../relatorio/tiposDoRelatorio.ts";
+import DadosDaFalha from "./DadosDaFalha.tsx";
 import Selo from "../../basicos/Selo.tsx";
 import SeloDePrioridade from "../../basicos/SeloDePrioridade.tsx";
-import { formatarNota, formatarPercentil } from "../../formatacao/formato.ts";
-import Termo from "../../basicos/Termo.tsx";
+import { formatarNota } from "../../formatacao/formato.ts";
 import "./ItemFalha.css";
 
 interface Props {
@@ -38,30 +38,7 @@ export default function ItemFalha({ achado, aoVerOrigem }: Props) {
         </button>
       </div>
       <p className="item-falha__resumo">{aviso.resumo}</p>
-      <dl className="item-falha__dados">
-        <div>
-          <dt>
-            <Termo nome="CVSS" />
-          </dt>
-          <dd>{aviso.cvss === null ? "sem CVSS" : formatarNota(aviso.cvss)}</dd>
-        </div>
-        <div>
-          <dt>
-            Percentil <Termo nome="EPSS" />
-          </dt>
-          <dd>{aviso.percentil_epss === null ? "sem EPSS" : formatarPercentil(aviso.percentil_epss)}</dd>
-        </div>
-        <div>
-          <dt>Versões afetadas</dt>
-          <dd>
-            <code>{aviso.versoes_afetadas}</code>
-          </dd>
-        </div>
-        <div>
-          <dt>Corrigida em</dt>
-          <dd>{aviso.versao_corrigida === null ? "sem versão corrigida" : <code>{aviso.versao_corrigida}</code>}</dd>
-        </div>
-      </dl>
+      <DadosDaFalha aviso={aviso} />
     </li>
   );
 }

@@ -51,6 +51,10 @@ export function valeNoModo(item: { modos?: ModoDeUso[] }, modo: ModoDeUso): bool
   return !item.modos || item.modos.includes(modo);
 }
 
+export function soDoModo<ItemDoGuia extends { modos?: ModoDeUso[] }>(itens: ItemDoGuia[], modo: ModoDeUso): ItemDoGuia[] {
+  return itens.filter((item) => valeNoModo(item, modo));
+}
+
 const GRAVANDO_PELO_RASTRO: ModoDeUso[] = ["gravar", "robo"];
 
 export const MODOS_DE_USO: OpcaoDeModo[] = [

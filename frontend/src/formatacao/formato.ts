@@ -27,3 +27,22 @@ export function plural(quantidade: number, singular: string, varios: string): st
 export function formatarTokens(tokens: number | null): string {
   return tokens === null ? "não informado" : INTEIRO.format(tokens);
 }
+
+export function textoDoNpm(conferida: boolean | null): string {
+  if (conferida === null) {
+    return "não respondeu; versão não conferida";
+  }
+  return conferida ? "versão publicada" : "versão não encontrada";
+}
+
+export function escreverStatus(status: number | null): string {
+  return status === null ? "sem resposta" : `status ${status}`;
+}
+
+export function caminhoDaUrl(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    return url;
+  }
+}

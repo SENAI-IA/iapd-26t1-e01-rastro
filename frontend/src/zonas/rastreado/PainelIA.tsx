@@ -1,6 +1,8 @@
 import type { DadosDaIA } from "../../relatorio/tiposDoRelatorio.ts";
-import ChamadaDaIA from "./ChamadaDaIA.tsx";
-import Icone from "../../basicos/Icone.tsx";
+import ListaDeChamadas from "./ListaDeChamadas.tsx";
+import AvisoDeIADesligada from "./AvisoDeIADesligada.tsx";
+import ComparacaoComESemIA from "./ComparacaoComESemIA.tsx";
+import ListaDeTravas from "./ListaDeTravas.tsx";
 import Selo from "../../basicos/Selo.tsx";
 import { formatarTokens, plural } from "../../formatacao/formato.ts";
 import Termo from "../../basicos/Termo.tsx";
@@ -12,7 +14,6 @@ interface Props {
 }
 
 export default function PainelIA({ ia, provedor }: Props) {
-  const comparacao = ia.com_e_sem_ia;
   return (
     <section className="painel-ia" aria-labelledby="painel-ia-titulo">
       <div className="painel-ia__cabecalho">
@@ -24,47 +25,11 @@ export default function PainelIA({ ia, provedor }: Props) {
         </h2>
         <p>A IA sugere, a regra confirma. A nota de risco e a prioridade vêm sempre da fórmula.</p>
       </div>
-
       {provedor === null ? (
-        <p className="painel-ia__desligada">
-          <Icone nome="info" />
-          <span>
-            <b>IA desligada nesta análise.</b> Nenhuma chamada foi feita. As travas que conferem o registro do{" "}
-            <Termo nome="npm" /> e a faixa de versão afetada rodam também sem IA.
-          </span>
-        </p>
+        <AvisoDeIADesligada />
       ) : (
         <>
-          {comparacao && (
-            <div className="painel-ia__tabela">
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">
-                      <span className="painel-ia__oculto">Medida</span>
-                    </th>
-                    <th scope="col">
-                      Só por <Termo nome="Assinatura">assinatura</Termo>
-                    </th>
-                    <th scope="col">Com a IA</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">Bibliotecas confirmadas</th>
-                    <td>{comparacao.bibliotecas.so_por_assinatura}</td>
-                    <td>{comparacao.bibliotecas.com_ia}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Falhas encontradas</th>
-                    <td>{comparacao.achados.so_por_assinatura}</td>
-                    <td>{comparacao.achados.com_ia}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-
+          {ia.com_e_sem_ia && <ComparacaoComESemIA comparacao={ia.com_e_sem_ia} />}
           <div className="painel-ia__bloco">
             <h3>O que a IA recebeu e devolveu</h3>
             <p>
@@ -72,42 +37,15 @@ export default function PainelIA({ ia, provedor }: Props) {
               <Termo nome="Token">tokens</Termo>: {formatarTokens(ia.tokens_total)}. A IA recebe só trechos
               escolhidos pelo Rastro, sem cookies, senhas ou tokens de sessão.
             </p>
-            {ia.chamadas.length === 0 ? (
-              <p className="painel-ia__vazio">Nenhuma chamada à IA: não havia achado para explicar.</p>
-            ) : (
-              <ol className="painel-ia__lista">
-                {ia.chamadas.map((chamada, indice) => (
-                  <ChamadaDaIA key={indice} chamada={chamada} />
-                ))}
-              </ol>
-            )}
+            <ListaDeChamadas chamadas={ia.chamadas} />
           </div>
         </>
       )}
-
       <div className="painel-ia__bloco">
         <h3>
           <Termo nome="Trava">Travas</Termo> acionadas
         </h3>
-        {ia.travas_acionadas.length === 0 ? (
-          <p className="painel-ia__vazio">Nenhuma trava precisou barrar nada nesta análise.</p>
-        ) : (
-          <ul className="painel-ia__lista">
-            {ia.travas_acionadas.map((trava, indice) => (
-              <li key={indice} className="painel-ia__trava">
-                <Selo tom="serio" icone="triangulo">
-                  Trava "{trava.trava}"
-                </Selo>
-                <span>
-                  <b>Barrou:</b> {trava.alvo}
-                </span>
-                <span>
-                  <b>Por quê:</b> {trava.motivo}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ListaDeTravas travas={ia.travas_acionadas} />
       </div>
     </section>
   );

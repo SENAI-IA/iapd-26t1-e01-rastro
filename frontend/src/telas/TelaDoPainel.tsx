@@ -4,9 +4,7 @@ import type { OrigemDoDado } from "./tiposDaTela.ts";
 import { ZONAS, type NomeDaZona } from "../conteudo/zonas.ts";
 import CabecalhoAnalise from "../moldura/CabecalhoAnalise.tsx";
 import Indicadores from "../zonas/rastreado/Indicadores.tsx";
-import ListaAConfirmar from "../zonas/detalhes/ListaAConfirmar.tsx";
-import ListaBibliotecas from "../zonas/detalhes/ListaBibliotecas.tsx";
-import ListaChecagens from "../zonas/detalhes/ListaChecagens.tsx";
+import ConteudoDosDetalhes from "./ConteudoDosDetalhes.tsx";
 import PainelIA from "../zonas/rastreado/PainelIA.tsx";
 import PlanoDeAcao from "../zonas/agir/PlanoDeAcao.tsx";
 import ReplayDaVisita from "../zonas/rastreado/ReplayDaVisita.tsx";
@@ -50,24 +48,7 @@ export default function TelaDoPainel({
       case "agir":
         return <PlanoDeAcao acoes={relatorio.plano_de_acao} aoAbrirTask={aoAbrirTask} />;
       case "detalhes":
-        return (
-          <>
-            <ListaBibliotecas
-              bibliotecas={relatorio.bibliotecas}
-              achados={relatorio.achados}
-              semJavascript={relatorio.analise.limitacoes.some((limitacao) => limitacao.id === "sem_javascript")}
-              aoVerOrigem={aoVerOrigem}
-            />
-            {relatorio.a_confirmar.length > 0 && (
-              <ListaAConfirmar bibliotecas={relatorio.a_confirmar} travasAcionadas={relatorio.ia.travas_acionadas} />
-            )}
-            <ListaChecagens
-              checagens={relatorio.checagens}
-              comFalha={relatorio.resumo.checagens_com_falha}
-              naoVerificadas={relatorio.resumo.checagens_nao_verificadas}
-            />
-          </>
-        );
+        return <ConteudoDosDetalhes relatorio={relatorio} aoVerOrigem={aoVerOrigem} />;
     }
   };
 

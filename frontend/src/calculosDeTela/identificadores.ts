@@ -11,3 +11,5 @@ export function idDaLinhaDaBiblioteca(idDaBiblioteca: string): string {
 export function idDoPassoDoGuia(numero: number): string {
   return `passo-do-guia-${numero}`;
 }
+
+export const ID_DO_FIM_DO_GUIA = "guia-ir-para-o-painel";

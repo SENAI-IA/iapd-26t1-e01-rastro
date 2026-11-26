@@ -1,5 +1,6 @@
 import type { Achado, Biblioteca } from "../../relatorio/tiposDoRelatorio.ts";
 import LinhaBiblioteca from "./LinhaBiblioteca.tsx";
+import ListaVazia from "./ListaVazia.tsx";
 import type { OrigemDoDado } from "../../telas/tiposDaTela.ts";
 import Termo from "../../basicos/Termo.tsx";
 import "./ListaBibliotecas.css";
@@ -11,6 +12,10 @@ interface Props {
   aoVerOrigem: (origem: OrigemDoDado) => void;
 }
 
+function achadosDaBiblioteca(biblioteca: Biblioteca, achados: Achado[]): Achado[] {
+  return achados.filter((achado) => achado.biblioteca === biblioteca.id);
+}
+
 export default function ListaBibliotecas({ bibliotecas, achados, semJavascript, aoVerOrigem }: Props) {
   return (
     <section className="lista-bibliotecas" aria-labelledby="lista-bibliotecas-titulo">
@@ -18,13 +23,8 @@ export default function ListaBibliotecas({ bibliotecas, achados, semJavascript, 
         <h2 id="lista-bibliotecas-titulo">Bibliotecas encontradas</h2>
         <p>Abra uma biblioteca para ver onde ela apareceu no <Termo nome="HAR" /> e as falhas conhecidas. Clique na nota para ver a conta.</p>
       </div>
-      {bibliotecas.length === 0 && semJavascript ? (
-        <p className="lista-bibliotecas__vazio">
-          <strong>Nenhuma biblioteca pôde ser analisada:</strong> o <Termo nome="HAR" /> não trouxe nenhum script.
-          Grave de novo com o filtro da aba Rede em <strong>Todos</strong> e o cache desativado.
-        </p>
-      ) : bibliotecas.length === 0 ? (
-        <p className="lista-bibliotecas__vazio">Nenhuma biblioteca confirmada nesta gravação.</p>
+      {bibliotecas.length === 0 ? (
+        <ListaVazia semJavascript={semJavascript} />
       ) : (
         <ul className="lista-bibliotecas__lista">
           {bibliotecas.map((biblioteca) => (
@@ -39,8 +39,4 @@ export default function ListaBibliotecas({ bibliotecas, achados, semJavascript, 
       )}
     </section>
   );
-}
-
-function achadosDaBiblioteca(biblioteca: Biblioteca, achados: Achado[]): Achado[] {
-  return achados.filter((achado) => achado.biblioteca === biblioteca.id);
 }

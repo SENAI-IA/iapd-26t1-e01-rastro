@@ -1,11 +1,11 @@
 import type { CategoriaDoPentest } from "../relatorio/tiposDoRelatorio.ts";
+import type { Veredito } from "../segurancaAtiva/agruparValidacoes.ts";
 
 export interface DescricaoDaValidacao {
   nome: string;
   porQue: string;
 }
 
-/** Nome curto e, em uma frase, por que cada validação importa para quem não é da área. */
 export const DESCRICAO_DA_VALIDACAO: Record<CategoriaDoPentest, DescricaoDaValidacao> = {
   csp: {
     nome: "Política de conteúdo (CSP)",
@@ -53,10 +53,21 @@ export const DESCRICAO_DA_VALIDACAO: Record<CategoriaDoPentest, DescricaoDaValid
   },
 };
 
-/** Itens de um pentest que ficam fora do escopo da segurança ativa do Rastro. */
 export const FORA_DO_ESCOPO: string[] = [
   "Login e sessão",
   "Permissões entre usuários",
   "Injeção de código (SQL, XSS)",
   "Regras de negócio",
+];
+
+export interface GrupoDoPentest {
+  veredito: Veredito;
+  titulo: string;
+  legenda: string;
+}
+
+export const GRUPOS_DO_PENTEST: GrupoDoPentest[] = [
+  { veredito: "corrigir", titulo: "A corrigir", legenda: "falhou em pelo menos um endereço" },
+  { veredito: "em_ordem", titulo: "Em ordem", legenda: "passou em todos os endereços que responderam" },
+  { veredito: "sem_resposta", titulo: "Não conferido", legenda: "não deu para conferir nesta execução" },
 ];

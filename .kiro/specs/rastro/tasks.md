@@ -786,11 +786,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @halan.bacca
 
-- [ ] **T87 Dividir os componentes grandes da tela**
+- [x] **T87 Dividir os componentes grandes da tela**
   - Entrega: `IlustracaoDoGuia`, `AnimacaoDoModo`, `PainelOrigemDoDado`, `TourGuiado`, `PainelPentest`, `ReplayDaVisita`, `RadarDaVisita`, `PainelIA` e `GuiaComoUsar` em partes com um papel só.
   - Aceite: nenhum componente passa de ~40 linhas de JSX; Verificação: `npm run build` passa e o `modelo.html` gerado de novo abre igual (claro, escuro, 400px).
-  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`
-  - Teste: verificação manual.
+  - Arquivos: `frontend/src/` (componentes divididos, `guia/desenhos/`, `conteudo/terminaisDoGuia.ts`, contas novas em `calculosDeTela/`), `rastro/relatorio/modelo.html`, `.kiro/steering/frontend-react.md`, `.kiro/skills/rastro-nova-regra/SKILL.md`
+  - Teste: 60 telas iguais pixel a pixel; sonda de comportamento igual; 310 quadros das animações do guia (cinco momentos, claro e escuro) iguais aos de antes.
   - Requisito: R19.4
   - Revisão: @halan.bacca
 

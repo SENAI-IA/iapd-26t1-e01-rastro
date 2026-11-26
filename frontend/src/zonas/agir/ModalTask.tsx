@@ -1,16 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { Acao } from "../../relatorio/tiposDoRelatorio.ts";
+import AcoesDaCopia from "./AcoesDaCopia.tsx";
 import Icone from "../../basicos/Icone.tsx";
+import { usarCopiaDoTexto } from "../../hooks/usarCopiaDoTexto.ts";
 import { usarJanelaModal } from "../../hooks/usarJanelaModal.ts";
 import "./ModalTask.css";
-
-type EstadoDaCopia = "pronta" | "copiada" | "selecionada";
-
-const TEXTO_DO_BOTAO: Record<EstadoDaCopia, string> = {
-  pronta: "Copiar task",
-  copiada: "Copiada",
-  selecionada: "Texto selecionado: use Ctrl + C",
-};
 
 interface Props {
   acao: Acao;
@@ -21,25 +15,11 @@ export default function ModalTask({ acao, aoFechar }: Props) {
   const { janela, fechar, fecharAoClicarFora } = usarJanelaModal();
   const texto = useRef<HTMLTextAreaElement>(null);
   const botaoCopiar = useRef<HTMLButtonElement>(null);
-  const [estadoDaCopia, setEstadoDaCopia] = useState<EstadoDaCopia>("pronta");
+  const { estadoDaCopia, copiar } = usarCopiaDoTexto(acao.texto_task, texto);
 
   useEffect(() => {
     botaoCopiar.current?.focus();
   }, []);
-
-  const selecionarTexto = () => {
-    texto.current?.focus();
-    texto.current?.select();
-    setEstadoDaCopia("selecionada");
-  };
-
-  const copiar = () => {
-    if (!navigator.clipboard) {
-      selecionarTexto();
-      return;
-    }
-    navigator.clipboard.writeText(acao.texto_task).then(() => setEstadoDaCopia("copiada"), selecionarTexto);
-  };
 
   return (
     <dialog
@@ -59,7 +39,6 @@ export default function ModalTask({ acao, aoFechar }: Props) {
             <Icone nome="fechar" tamanho={16} />
           </button>
         </header>
-
         <label htmlFor="modal-task-texto" className="modal-task__explicacao">
           Título e descrição em Markdown, prontos para colar no Azure DevOps ou no GitLab.
         </label>
@@ -71,21 +50,7 @@ export default function ModalTask({ acao, aoFechar }: Props) {
           readOnly
           spellCheck={false}
         />
-
-        <div className="modal-task__acoes">
-          <button
-            type="button"
-            className={`modal-task__copiar modal-task__copiar--${estadoDaCopia}`}
-            ref={botaoCopiar}
-            onClick={copiar}
-          >
-            {estadoDaCopia === "copiada" && <Icone nome="certo" tamanho={14} />}
-            {TEXTO_DO_BOTAO[estadoDaCopia]}
-          </button>
-          <span className="modal-task__aviso" role="status">
-            {estadoDaCopia === "copiada" ? "Task copiada para a área de transferência." : ""}
-          </span>
-        </div>
+        <AcoesDaCopia estadoDaCopia={estadoDaCopia} botaoCopiar={botaoCopiar} aoCopiar={copiar} />
       </div>
     </dialog>
   );
