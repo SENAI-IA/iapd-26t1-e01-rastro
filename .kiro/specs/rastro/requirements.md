@@ -118,7 +118,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 
 1. QUANDO uma biblioteca tiver achados, o Rastro DEVE pedir à IA uma explicação em linguagem simples (o que é, o impacto descrito no aviso, como corrigir), sem afirmar nada sobre o site que não esteja na entrada e um teste de verificação.
 2. O Rastro DEVE enviar à IA só pacote, versão, avisos (ID, resumo, versões afetadas e corrigidas) e a URL do script sem query string.
-3. SE a IA falhar, responder fora do formato ou não passar nas travas de R21.6, ENTÃO o Rastro DEVE mostrar o resumo do próprio aviso e o selo "sem explicação da IA".
+3. SE a IA falhar, responder fora do formato ou não passar nas travas de R21.7, ENTÃO o Rastro DEVE mostrar o resumo do próprio aviso e o selo "sem explicação da IA".
 4. O Rastro DEVE marcar todo texto gerado pela IA como "gerado por IA" no relatório, e o teste de verificação como "sugerido pela IA: confira antes de usar".
 
 ## R08 Montar o plano de ação (RF08)
@@ -253,8 +253,8 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 3. **Ancoragem:** SE a versão devolvida não aparecer literalmente no trecho de evidência, ENTÃO a biblioteca não é confirmada.
 4. **Pacote existe:** QUANDO uma biblioteca for identificada, por assinatura ou por IA, o Rastro DEVE confirmar no registro do npm, só com leitura, que `pacote@versão` foi publicado. SE não foi, ENTÃO a biblioteca não é confirmada.
 5. **Código confere:** QUANDO a biblioteca vier da IA, o Rastro DEVE ler o pacote publicado naquela versão (em memória, sem instalar, extrair em disco nem executar) e conferir que o trecho de evidência aparece no código dele: cada string do trecho existe, com o mesmo valor, como string no pacote, e o trecho tem a versão e pelo menos uma string além dela (spike T03). SE não aparecer, ENTÃO a biblioteca não é confirmada.
-6. **Explicação sem fato novo:** SE a explicação da IA citar CVE, GHSA, versão ou número que não estava na entrada enviada, ENTÃO o Rastro DEVE descartar a explicação (R07.3).
-7. **Faixa conferida:** O Rastro DEVE conferir localmente que a versão está dentro da faixa afetada de cada aviso. SE não estiver, ENTÃO o Rastro DEVE descartar o aviso para aquela biblioteca e registrar o motivo.
+6. **Faixa conferida:** O Rastro DEVE conferir localmente que a versão está dentro da faixa afetada de cada aviso. SE não estiver, ENTÃO o Rastro DEVE descartar o aviso para aquela biblioteca e registrar o motivo.
+7. **Explicação sem fato novo:** SE a explicação da IA citar CVE, GHSA, versão ou número que não estava na entrada enviada, ENTÃO o Rastro DEVE descartar a explicação (R07.3).
 8. **Fatos só da fonte:** versão-alvo, CVE, GHSA, CVSS, EPSS, links, nota e prioridade DEVEM vir só das fontes de avisos (GitHub Advisory e, como complemento, OSV e NVD), do registro do npm e da fórmula. A IA nunca preenche esses campos.
 9. SE o registro do npm não responder, ENTÃO o Rastro DEVE manter a biblioteca por assinatura com o selo "não conferida no npm" e mandar a da IA para "a confirmar".
 10. O Rastro DEVE registrar no painel da IA cada vez que uma trava barrar algo: qual trava, o que foi barrado e por quê.

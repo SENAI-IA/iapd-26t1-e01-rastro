@@ -225,14 +225,14 @@ def test_r03_3_biblioteca_da_ia_passa_pelas_travas_antes_do_relatorio() -> None:
     assert montar_relatorio(analise)["resumo"]["encontradas_so_pela_ia"] == 1
 
 
-def test_r21_7_aviso_fora_da_faixa_vira_trava_acionada() -> None:
+def test_r21_6_aviso_fora_da_faixa_vira_trava_acionada() -> None:
     analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso())
 
     assert [trava.trava for trava in analise.travas_acionadas] == ["faixa conferida"]
     assert analise.travas_acionadas[0].alvo == "GHSA-rmxg-73gg-4p98 em jquery@3.4.1"
 
 
-def test_r21_7_aviso_com_uma_faixa_valida_nao_vira_trava_acionada() -> None:
+def test_r21_6_aviso_com_uma_faixa_valida_nao_vira_trava_acionada() -> None:
     analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso())
 
     assert "GHSA-jpcq-cgw6-v4j6" in [achado.aviso.ghsa for achado in analise.achados]

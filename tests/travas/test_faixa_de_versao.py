@@ -20,7 +20,7 @@ def aviso(ghsa: str, versoes_afetadas: str) -> Aviso:
     )
 
 
-def test_r21_7_aviso_dentro_da_faixa_e_mantido_sem_registro() -> None:
+def test_r21_6_aviso_dentro_da_faixa_e_mantido_sem_registro() -> None:
     avisos = [aviso("GHSA-gxr4-xjj5-5px2", ">= 1.2, < 3.5.0")]
 
     mantidos, travas_acionadas = descartar_fora_da_faixa("jquery", "3.4.1", avisos)
@@ -29,7 +29,7 @@ def test_r21_7_aviso_dentro_da_faixa_e_mantido_sem_registro() -> None:
     assert travas_acionadas == []
 
 
-def test_r21_7_aviso_fora_da_faixa_e_descartado_e_registrado() -> None:
+def test_r21_6_aviso_fora_da_faixa_e_descartado_e_registrado() -> None:
     dentro = aviso("GHSA-gxr4-xjj5-5px2", ">= 1.2, < 3.5.0")
     fora = aviso("GHSA-rmxg-73gg-4p98", "< 1.9.0")
 
@@ -45,7 +45,7 @@ def test_r21_7_aviso_fora_da_faixa_e_descartado_e_registrado() -> None:
     ]
 
 
-def test_r21_7_escolhe_a_faixa_que_contem_a_versao_no_aviso_com_varias_faixas() -> None:
+def test_r21_6_escolhe_a_faixa_que_contem_a_versao_no_aviso_com_varias_faixas() -> None:
     primeira_faixa = aviso("GHSA-6c3j-c64m-qhgq", "< 1.0.3")
     segunda_faixa = aviso("GHSA-6c3j-c64m-qhgq", ">= 1.0.3, < 3.5.0")
 
@@ -57,7 +57,7 @@ def test_r21_7_escolhe_a_faixa_que_contem_a_versao_no_aviso_com_varias_faixas() 
     assert travas_acionadas == []
 
 
-def test_r21_7_aviso_com_todas_as_faixas_fora_e_registrado_uma_vez() -> None:
+def test_r21_6_aviso_com_todas_as_faixas_fora_e_registrado_uma_vez() -> None:
     primeira_faixa = aviso("GHSA-6c3j-c64m-qhgq", "< 1.0.3")
     segunda_faixa = aviso("GHSA-6c3j-c64m-qhgq", ">= 1.0.3, < 3.4.0")
 
@@ -78,7 +78,7 @@ def test_r21_7_aviso_com_todas_as_faixas_fora_e_registrado_uma_vez() -> None:
     ]
 
 
-def test_r21_7_versao_inventada_fora_da_faixa_barra_o_aviso() -> None:
+def test_r21_6_versao_inventada_fora_da_faixa_barra_o_aviso() -> None:
     avisos = [aviso("GHSA-gxr4-xjj5-5px2", ">= 1.2, < 3.5.0")]
 
     mantidos, travas_acionadas = descartar_fora_da_faixa("jquery", "3.7.1", avisos)
@@ -89,7 +89,7 @@ def test_r21_7_versao_inventada_fora_da_faixa_barra_o_aviso() -> None:
 
 
 @pytest.mark.parametrize("faixa", ["", ">= 1.2.0,", "~> 1.2", ">= latest", "< 1.2.3.4"])
-def test_r21_7_faixa_ilegivel_descarta_o_aviso_e_diz_por_que(faixa: str) -> None:
+def test_r21_6_faixa_ilegivel_descarta_o_aviso_e_diz_por_que(faixa: str) -> None:
     avisos = [aviso("GHSA-xxxx", faixa)]
 
     mantidos, travas_acionadas = descartar_fora_da_faixa("jquery", "3.4.1", avisos)
@@ -98,7 +98,7 @@ def test_r21_7_faixa_ilegivel_descarta_o_aviso_e_diz_por_que(faixa: str) -> None
     assert travas_acionadas[0].motivo.startswith(f"não foi possível conferir a faixa `{faixa}`")
 
 
-def test_r21_7_versao_ilegivel_descarta_o_aviso() -> None:
+def test_r21_6_versao_ilegivel_descarta_o_aviso() -> None:
     avisos = [aviso("GHSA-gxr4-xjj5-5px2", ">= 1.2, < 3.5.0")]
 
     mantidos, travas_acionadas = descartar_fora_da_faixa("jquery", "versão nova", avisos)

@@ -67,8 +67,8 @@ Os losangos são as **travas** (R21): a IA sugere, a regra confirma. Nada da IA 
 | `rastro/travas/formato.py` | aceita só o JSON fechado da IA | R21.1 |
 | `rastro/travas/ancoragem.py` | trecho real e versão dentro do trecho | R21.2, R21.3 |
 | `rastro/travas/codigo_publicado.py` | procura o trecho nos arquivos do pacote | R21.5 |
-| `rastro/travas/faixa_de_versao.py` | confere se a versão está na faixa afetada | R21.7 |
-| `rastro/travas/explicacao.py` | barra explicação com fato que não estava na entrada | R21.6 |
+| `rastro/travas/faixa_de_versao.py` | confere se a versão está na faixa afetada | R21.6 |
+| `rastro/travas/explicacao.py` | barra explicação com fato que não estava na entrada | R21.7 |
 | `rastro/travas/conferencia.py` | aplica as travas e decide "confirmada" ou "a confirmar" | R03.3, R03.4, R21.10 |
 | `rastro/risco/modelos.py` | `Nota`, `Achado`, `Prioridade` | R05 |
 | `rastro/risco/nota.py` | fórmula da nota | R05.1, R05.3, R05.4 |

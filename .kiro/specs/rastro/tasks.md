@@ -171,8 +171,8 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Entrega: trava `faixa_de_versao.py`, aplicada a cada aviso.
   - Aceite: `>= 1.2.0, < 3.5.0` contém 3.4.1 e não contém 3.5.0; pré-lançamento é menor que a final; aviso fora da faixa é descartado e registrado.
   - Arquivos: `rastro/travas/faixa_de_versao.py`, `rastro/travas/modelos.py`, `tests/travas/test_faixa_de_versao.py`
-  - Teste: `test_r21_7_*`
-  - Requisito: R21.7
+  - Teste: `test_r21_6_*`
+  - Requisito: R21.6
   - Revisão: @cristiano.albino
 
 - [x] **T14 Conferir no npm se o pacote existe**
@@ -195,8 +195,8 @@ Assim, o histórico levado para a org SENAI-IA conta a construção task por tas
   - Entrega: trava `travas/explicacao.py`.
   - Aceite: explicação que cita CVE, GHSA, versão ou porcentagem fora da entrada é descartada; a que só repete a entrada passa.
   - Arquivos: `rastro/travas/explicacao.py`, `tests/travas/test_explicacao.py`
-  - Teste: `test_r21_6_*`
-  - Requisito: R21.6, R21.8
+  - Teste: `test_r21_7_*`
+  - Requisito: R21.7, R21.8
   - Revisão: @cristiano.albino
 
 - [x] **T17 Calcular a nota de risco**
@@ -826,10 +826,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @cristiano.albino
 
-- [ ] **T93 Numerar as travas como a decisão 06**
-  - Entrega: a faixa de versão é a trava 6 e a explicação sem fato novo é a trava 7 em todo lugar: R21.6 e R21.7 trocam de lugar na spec e os testes `test_r21_6_*`/`test_r21_7_*` são renomeados junto.
+- [x] **T93 Numerar as travas como a decisão 06**
+  - Entrega: a faixa de versão é a trava 6 e a explicação sem fato novo é a trava 7 em todo lugar: R21.7 e R21.6 trocam de lugar na spec e os testes `test_r21_7_*`/`test_r21_6_*` são renomeados junto.
   - Aceite: spec, design, decisão 06, skill, avaliação e testes usam a mesma numeração; `ruff`, `mypy` e `pytest` passam com o mesmo número de testes.
-  - Arquivos: `.kiro/specs/rastro/requirements.md`, `tests/travas/`, `tests/`, documentos que citam a trava pelo número
+  - Arquivos: `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`, `.kiro/specs/rastro/tasks.md` (citações R21.6 e R21.7), `tests/travas/test_faixa_de_versao.py`, `tests/travas/test_explicacao_sem_fato_novo.py`, `tests/test_versao_semver.py`, `tests/test_fluxo_da_analise.py`
   - Teste: os testes renomeados.
   - Requisito: R19.4
   - Revisão: @cristiano.albino
