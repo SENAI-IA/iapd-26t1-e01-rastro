@@ -4,10 +4,15 @@ import "./estilos/fontes.css";
 import "./estilos/tokens.css";
 import "./estilos/base.css";
 import App from "./App.tsx";
-import { lerRelatorio } from "./relatorio/lerRelatorio.ts";
+import { lerRelatorioSemValidar } from "./relatorio/lerRelatorioSemValidar.ts";
 
-createRoot(document.getElementById("raiz")!).render(
+const raiz = document.getElementById("raiz");
+if (raiz === null) {
+  throw new Error('A página não tem o elemento com id "raiz", onde o relatório é montado.');
+}
+
+createRoot(raiz).render(
   <StrictMode>
-    <App relatorio={lerRelatorio(document)} />
+    <App relatorio={lerRelatorioSemValidar(document)} />
   </StrictMode>,
 );

@@ -4,8 +4,8 @@ export default function MiniaturaDaPaginaComLinks() {
   return (
     <>
       <MenuDeLinks tamanho="pequeno" />
-      <line className="modo-anim__traco modo-anim__traco--suave" x1="8" y1="34" x2="60" y2="34" />
-      <line className="modo-anim__traco modo-anim__traco--suave" x1="8" y1="42" x2="48" y2="42" />
+      <line className="animacao-do-modo__traco animacao-do-modo__traco--suave" x1="8" y1="34" x2="60" y2="34" />
+      <line className="animacao-do-modo__traco animacao-do-modo__traco--suave" x1="8" y1="42" x2="48" y2="42" />
     </>
   );
 }

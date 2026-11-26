@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState, type RefObject } from "react";
 
-const PADDING_DO_PAINEL = 36;
+const ESPACAMENTO_INTERNO_DO_PAINEL = 36;
 const FOLGA_EMBAIXO = 16;
 const ALTURA_MINIMA = 320;
 const LARGURA_MINIMA_LADO_A_LADO = 900;
@@ -10,7 +10,7 @@ function medirAlturaAteADobra(elemento: HTMLElement): number | null {
     return null;
   }
   const topoNaPagina = elemento.getBoundingClientRect().top + window.scrollY;
-  return Math.max(ALTURA_MINIMA, window.innerHeight - topoNaPagina - PADDING_DO_PAINEL - FOLGA_EMBAIXO);
+  return Math.max(ALTURA_MINIMA, window.innerHeight - topoNaPagina - ESPACAMENTO_INTERNO_DO_PAINEL - FOLGA_EMBAIXO);
 }
 
 export function usarAlturaAteADobra(referencia: RefObject<HTMLElement | null>): number | null {

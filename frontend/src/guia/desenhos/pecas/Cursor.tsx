@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function Cursor({ x, y, tamanho, animacao }: Props) {
-  const prefixo = tamanho === "pequeno" ? "modo-anim" : "ilustracao";
+  const prefixo = tamanho === "pequeno" ? "animacao-do-modo" : "ilustracao-do-guia";
   return (
     <path
       className={`${prefixo}__traco ${prefixo}__traco--destaque ${animacao}`}

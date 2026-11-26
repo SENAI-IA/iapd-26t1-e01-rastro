@@ -794,11 +794,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @halan.bacca
 
-- [ ] **T88 Padronizar os nomes do frontend**
+- [x] **T88 Padronizar os nomes do frontend**
   - Entrega: sem colisão entre tipo e componente, `Da`/`Do` padronizado, Task vira Tarefa no código, sem abreviação e sem ternário encadeado.
   - Aceite: as chaves do JSON não mudam; seletores do tour atualizados junto; Verificação: `npm run build` passa e o `modelo.html` gerado de novo abre igual (claro, escuro, 400px).
-  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`
-  - Teste: verificação manual (tour completo).
+  - Arquivos: `frontend/src/` (componentes, tipos, classes CSS e ids renomeados), `rastro/relatorio/modelo.html`, `.kiro/steering/frontend-react.md`
+  - Teste: 60 telas e 310 quadros do guia iguais pixel a pixel; o tour mostra os mesmos passos (11 com IA, 10 sem IA, em 1280 e 400 px); a sonda de comportamento só muda no nome das classes.
   - Requisito: R19.4
   - Revisão: @halan.bacca
 

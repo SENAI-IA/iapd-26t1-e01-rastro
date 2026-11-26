@@ -1,8 +1,8 @@
-import type { Item } from "../conteudo/guia.ts";
+import type { ItemDoGuia } from "../conteudo/guia.ts";
 import TextoComMarcas from "../basicos/TextoComMarcas.tsx";
 
 interface Props {
-  itens: Item[];
+  itens: ItemDoGuia[];
 }
 
 export default function ListaDoGuia({ itens }: Props) {

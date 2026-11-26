@@ -6,8 +6,8 @@ interface Props {
 
 export default function TermosDoPasso({ termos }: Props) {
   return (
-    <dl className="tour__termos">
-      <span className="tour__rotulo">No glossário</span>
+    <dl className="tour-guiado__termos">
+      <span className="tour-guiado__rotulo">No glossário</span>
       {termos.map((termo) => (
         <div key={termo}>
           <dt>{termo}</dt>

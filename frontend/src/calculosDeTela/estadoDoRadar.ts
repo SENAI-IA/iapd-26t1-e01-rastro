@@ -1,5 +1,5 @@
 import type { Camada, PassoDaVisita } from "../relatorio/tiposDoRelatorio.ts";
-import type { Chegada } from "./chegadasDaVisita.ts";
+import type { ChegadaDeBiblioteca } from "./chegadasDaVisita.ts";
 import {
   anguloDaOrdem,
   ladoDoPonto,
@@ -31,7 +31,7 @@ export interface EstadoDoRadar {
   chegaram: PontoDaRequisicao[];
   recentes: PontoDaRequisicao[];
   falhasRepetidas: PontoDaRequisicao[];
-  rotulos: Rotulo<Chegada>[];
+  rotulos: Rotulo<ChegadaDeBiblioteca>[];
   ladosComRotulo: Set<Lado>;
 }
 
@@ -44,27 +44,27 @@ function comPonto(passos: PassoDaVisita[], ordens: number[]): PontoDaRequisicao[
   return ordens.map((ordem) => ({ ordem, ponto: pontoDaOrdem(passos, ordem) }));
 }
 
-function estaEmAlerta(comFalha: number[], progresso: number): boolean {
+function estaEmAlerta(comFalha: number[], requisicoesTocadas: number): boolean {
   const ultimaFalha = comFalha.at(-1);
-  return ultimaFalha !== undefined && progresso - ultimaFalha < ALERTA_DEPOIS_DA_FALHA;
+  return ultimaFalha !== undefined && requisicoesTocadas - ultimaFalha < ALERTA_DEPOIS_DA_FALHA;
 }
 
-function rotulosQueChegaram(passos: PassoDaVisita[], chegadas: Chegada[], progresso: number): Rotulo<Chegada>[] {
-  const queChegaram = chegadas.filter((chegada) => chegada.ordem < progresso);
-  return posicionarRotulos(queChegaram.map((chegada) => ({ item: chegada, ancora: pontoDaOrdem(passos, chegada.ordem) })));
+function rotulosQueChegaram(passos: PassoDaVisita[], chegadas: ChegadaDeBiblioteca[], requisicoesTocadas: number): Rotulo<ChegadaDeBiblioteca>[] {
+  const queChegaram = chegadas.filter((chegada) => chegada.ordemDaRequisicao < requisicoesTocadas);
+  return posicionarRotulos(queChegaram.map((chegada) => ({ item: chegada, ancora: pontoDaOrdem(passos, chegada.ordemDaRequisicao) })));
 }
 
-export function estadoDoRadar(passos: PassoDaVisita[], chegadas: Chegada[], progresso: number): EstadoDoRadar {
+export function estadoDoRadar(passos: PassoDaVisita[], chegadas: ChegadaDeBiblioteca[], requisicoesTocadas: number): EstadoDoRadar {
   const total = passos.length;
-  const chegaram = passos.map((_, ordem) => ordem).filter((ordem) => ordem < progresso);
+  const chegaram = [...passos.keys()].filter((ordem) => ordem < requisicoesTocadas);
   const comFalha = chegaram.filter((ordem) => passos[ordem].prioridade !== null);
-  const terminou = progresso >= total;
-  const recentes = terminou ? [] : chegaram.filter((ordem) => progresso - ordem < RASTRO_RECENTE);
-  const anguloAtual = anguloDaOrdem(Math.min(progresso, total), total);
-  const repetidas = comFalha.filter((ordem) => !chegadas.some((chegada) => chegada.ordem === ordem));
+  const terminou = requisicoesTocadas >= total;
+  const recentes = terminou ? [] : chegaram.filter((ordem) => requisicoesTocadas - ordem < RASTRO_RECENTE);
+  const anguloAtual = anguloDaOrdem(Math.min(requisicoesTocadas, total), total);
+  const repetidas = comFalha.filter((ordem) => !chegadas.some((chegada) => chegada.ordemDaRequisicao === ordem));
   return {
     terminou,
-    emAlerta: estaEmAlerta(comFalha, progresso),
+    emAlerta: estaEmAlerta(comFalha, requisicoesTocadas),
     temFalha: comFalha.length > 0,
     camadasComFalha: new Set(comFalha.map((ordem) => passos[ordem].camada)),
     anguloAtual,
@@ -73,7 +73,7 @@ export function estadoDoRadar(passos: PassoDaVisita[], chegadas: Chegada[], prog
     chegaram: comPonto(passos, chegaram),
     recentes: comPonto(passos, recentes),
     falhasRepetidas: comPonto(passos, repetidas),
-    rotulos: rotulosQueChegaram(passos, chegadas, progresso),
-    ladosComRotulo: new Set(chegadas.map((chegada) => ladoDoPonto(pontoDaOrdem(passos, chegada.ordem)))),
+    rotulos: rotulosQueChegaram(passos, chegadas, requisicoesTocadas),
+    ladosComRotulo: new Set(chegadas.map((chegada) => ladoDoPonto(pontoDaOrdem(passos, chegada.ordemDaRequisicao)))),
   };
 }

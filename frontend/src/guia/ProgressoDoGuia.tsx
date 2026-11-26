@@ -1,4 +1,4 @@
-import { plural } from "../formatacao/formato.ts";
+import { comPlural } from "../formatacao/formato.ts";
 
 interface Props {
   feitos: number;
@@ -7,12 +7,12 @@ interface Props {
 
 export default function ProgressoDoGuia({ feitos, total }: Props) {
   return (
-    <div className="guia__progresso">
-      <div className="guia__barra">
+    <div className="guia-como-usar__progresso">
+      <div className="guia-como-usar__barra">
         <span style={{ width: `${(feitos / total) * 100}%` }} />
       </div>
       <span role="status">
-        {feitos} de {plural(total, "passo feito", "passos feitos")}
+        {feitos} de {comPlural(total, "passo feito", "passos feitos")}
       </span>
     </div>
   );

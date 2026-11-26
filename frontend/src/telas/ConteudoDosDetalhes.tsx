@@ -1,8 +1,8 @@
 import type { Relatorio } from "../relatorio/tiposDoRelatorio.ts";
 import type { OrigemDoDado } from "./tiposDaTela.ts";
 import ListaAConfirmar from "../zonas/detalhes/ListaAConfirmar.tsx";
-import ListaBibliotecas from "../zonas/detalhes/ListaBibliotecas.tsx";
-import ListaChecagens from "../zonas/detalhes/ListaChecagens.tsx";
+import ListaDeBibliotecas from "../zonas/detalhes/ListaDeBibliotecas.tsx";
+import ListaDeChecagens from "../zonas/detalhes/ListaDeChecagens.tsx";
 
 interface Props {
   relatorio: Relatorio;
@@ -12,7 +12,7 @@ interface Props {
 export default function ConteudoDosDetalhes({ relatorio, aoVerOrigem }: Props) {
   return (
     <>
-      <ListaBibliotecas
+      <ListaDeBibliotecas
         bibliotecas={relatorio.bibliotecas}
         achados={relatorio.achados}
         semJavascript={relatorio.analise.limitacoes.some((limitacao) => limitacao.id === "sem_javascript")}
@@ -21,7 +21,7 @@ export default function ConteudoDosDetalhes({ relatorio, aoVerOrigem }: Props) {
       {relatorio.a_confirmar.length > 0 && (
         <ListaAConfirmar bibliotecas={relatorio.a_confirmar} travasAcionadas={relatorio.ia.travas_acionadas} />
       )}
-      <ListaChecagens
+      <ListaDeChecagens
         checagens={relatorio.checagens}
         comFalha={relatorio.resumo.checagens_com_falha}
         naoVerificadas={relatorio.resumo.checagens_nao_verificadas}

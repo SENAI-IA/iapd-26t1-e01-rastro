@@ -12,7 +12,7 @@ export default function MiniaturaDoRoboNavegando() {
       {CONTADORES.map((numero) => (
         <text
           key={numero}
-          className={`modo-anim__texto modo-anim__texto--mono modo-anim__texto--destaque modo-anim__contador modo-anim__contador--${numero}`}
+          className={`animacao-do-modo__texto animacao-do-modo__texto--mono animacao-do-modo__texto--destaque animacao-do-modo__contador animacao-do-modo__contador--${numero}`}
           x="46"
           y="52"
         >

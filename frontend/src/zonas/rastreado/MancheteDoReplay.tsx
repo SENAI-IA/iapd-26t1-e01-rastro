@@ -1,10 +1,10 @@
-import type { Chegada } from "../../calculosDeTela/chegadasDaVisita.ts";
+import type { ChegadaDeBiblioteca } from "../../calculosDeTela/chegadasDaVisita.ts";
 import { formatarDuracao } from "../../formatacao/formato.ts";
 
 interface Props {
   chegaram: number;
   total: number;
-  falhas: Chegada[];
+  falhas: ChegadaDeBiblioteca[];
 }
 
 export default function MancheteDoReplay({ chegaram, total, falhas }: Props) {

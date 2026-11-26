@@ -23,7 +23,7 @@ export interface OpcaoDeModo {
   resumo: string;
 }
 
-export interface Item {
+export interface ItemDoGuia {
   texto: string;
   modos?: ModoDeUso[];
 }
@@ -33,10 +33,10 @@ export interface Comando {
   texto: string;
 }
 
-export interface PassoDoGuia {
+export interface DescricaoDoPasso {
   titulo: string;
   texto: string;
-  dica?: string;
+  observacao?: string;
   comandos?: Comando[];
   ilustracao: IlustracaoDoPasso;
 }
@@ -51,7 +51,7 @@ export function valeNoModo(item: { modos?: ModoDeUso[] }, modo: ModoDeUso): bool
   return !item.modos || item.modos.includes(modo);
 }
 
-export function soDoModo<ItemDoGuia extends { modos?: ModoDeUso[] }>(itens: ItemDoGuia[], modo: ModoDeUso): ItemDoGuia[] {
+export function soDoModo<ItemComModos extends { modos?: ModoDeUso[] }>(itens: ItemComModos[], modo: ModoDeUso): ItemComModos[] {
   return itens.filter((item) => valeNoModo(item, modo));
 }
 
@@ -75,7 +75,7 @@ export const MODOS_DE_USO: OpcaoDeModo[] = [
   },
 ];
 
-export const ANTES_DE_COMECAR: Item[] = [
+export const ANTES_DE_COMECAR: ItemDoGuia[] = [
   { texto: "**Chrome ou Edge.** No Firefox os passos são os mesmos, com outros nomes de menu.", modos: ["devtools"] },
   { texto: "**Chrome ou Edge** instalado. O Rastro usa o navegador do computador.", modos: GRAVANDO_PELO_RASTRO },
   { texto: "**Python 3.10 ou mais novo** no computador. O Rastro você instala no primeiro passo." },
@@ -90,7 +90,7 @@ export const ANTES_DE_COMECAR: Item[] = [
   },
 ];
 
-const INSTALAR_O_RASTRO: PassoDoGuia = {
+const INSTALAR_O_RASTRO: DescricaoDoPasso = {
   titulo: "Instale o Rastro",
   texto:
     "Só na primeira vez. No Linux, o comando baixa o Rastro e cria o comando `rastro`, sem Git e sem `sudo`. No Windows, baixe o ZIP do repositório, extraia e rode o comando dentro da pasta. Depois disso, é só digitar `rastro` no terminal, em qualquer pasta.",
@@ -101,38 +101,38 @@ const INSTALAR_O_RASTRO: PassoDoGuia = {
     },
     { sistema: "Windows", texto: "py -m rastro instalar" },
   ],
-  dica: "Feche o terminal e abra outro. Confira com `rastro --help`. Já instalou antes? Marque como feito e siga. Para atualizar, rode o comando de novo.",
+  observacao: "Feche o terminal e abra outro. Confira com `rastro --help`. Já instalou antes? Marque como feito e siga. Para atualizar, rode o comando de novo.",
   ilustracao: "instalar",
 };
 
-const INSTALAR_O_PLAYWRIGHT: PassoDoGuia = {
+const INSTALAR_O_PLAYWRIGHT: DescricaoDoPasso = {
   titulo: "Instale o Playwright",
   texto: "Só na primeira vez. É o que deixa o Rastro abrir e controlar o Chrome ou o Edge.",
   comandos: [
     { sistema: "Linux", texto: "python3 -m pip install --user playwright==1.65.1" },
     { sistema: "Windows", texto: "py -m pip install --user playwright==1.65.1" },
   ],
-  dica: "Deu erro? Siga para o próximo passo: se faltar o Playwright, o Rastro mostra o comando certo para o seu computador.",
+  observacao: "Deu erro? Siga para o próximo passo: se faltar o Playwright, o Rastro mostra o comando certo para o seu computador.",
   ilustracao: "playwright",
 };
 
-const ABRIR_O_RELATORIO: PassoDoGuia = {
+const ABRIR_O_RELATORIO: DescricaoDoPasso = {
   titulo: "Abra o relatório",
   texto:
     "O relatório abre sozinho no navegador ao fim da análise e funciona sem internet. Para abrir de novo, dê dois cliques no `relatorio.html`. Comece pela **primeira ação** e por **O que fazer agora**. Na primeira vez, clique em **Tour guiado**.",
-  dica: "Cada análise fica numa pasta nova, em `Rastro/relatorios/<site>/<data e hora>/` dentro da pasta do usuário.",
+  observacao: "Cada análise fica numa pasta nova, em `Rastro/relatorios/<site>/<data e hora>/` dentro da pasta do usuário.",
   ilustracao: "relatorio",
 };
 
-const ABRIR_O_RELATORIO_GRAVADO: PassoDoGuia = {
+const ABRIR_O_RELATORIO_GRAVADO: DescricaoDoPasso = {
   titulo: "Abra o relatório",
   texto:
     "Ao fechar a janela, o Rastro analisa o que foi gravado e abre o relatório no navegador. Com IA, pode levar alguns minutos: o terminal mostra a etapa e o tempo, e enquanto o sinal no fim da linha girar, o Rastro está trabalhando. Comece pela **primeira ação** e por **O que fazer agora**. Na primeira vez, clique em **Tour guiado**.",
-  dica: "A gravação fica em `Rastro/gravacoes/` e o relatório em `Rastro/relatorios/`, dentro da pasta do usuário.",
+  observacao: "A gravação fica em `Rastro/gravacoes/` e o relatório em `Rastro/relatorios/`, dentro da pasta do usuário.",
   ilustracao: "relatorio",
 };
 
-const VALIDAR_SEGURANCA_ATIVA: PassoDoGuia = {
+const VALIDAR_SEGURANCA_ATIVA: DescricaoDoPasso = {
   titulo: "Se quiser, confira as proteções do site",
   texto:
     "Com autorização para testar o site, o Rastro pede de novo algumas páginas da visita (até 20) e confere se o site devolve as proteções básicas: HTTPS obrigatório, política de conteúdo, cookies protegidos e outras. Nenhum ataque é feito. Depois, leve o `pentest.json` ao relatório.",
@@ -140,11 +140,11 @@ const VALIDAR_SEGURANCA_ATIVA: PassoDoGuia = {
     { sistema: "Testar", texto: "rastro pentest site.har --autorizo" },
     { sistema: "Relatório", texto: "rastro analisar site.har --pentest <caminho>/pentest.json" },
   ],
-  dica: "Escopo: configuração de segurança das respostas, conforme o guia OWASP WSTG. Fora do escopo: login e sessão, permissões entre usuários, injeção de código e regras de negócio.",
+  observacao: "Escopo: configuração de segurança das respostas, conforme o guia OWASP WSTG. Fora do escopo: login e sessão, permissões entre usuários, injeção de código e regras de negócio.",
   ilustracao: "pentest",
 };
 
-const PASSOS_PELO_DEVTOOLS: PassoDoGuia[] = [
+const PASSOS_PELO_DEVTOOLS: DescricaoDoPasso[] = [
   INSTALAR_O_RASTRO,
   {
     titulo: "Abra o site",
@@ -161,21 +161,21 @@ const PASSOS_PELO_DEVTOOLS: PassoDoGuia[] = [
     titulo: "Desative o cache e recarregue",
     texto:
       "Marque **Desativar cache** (Disable cache), deixe o filtro em **Todos** (All) e recarregue a página com `Ctrl + R`. Assim os scripts vêm com o conteúdo, que é onde o Rastro lê as versões.",
-    dica: "O HAR só leva o que aparece na lista: com o filtro em Fetch/XHR, por exemplo, ele sai sem nenhum script. Se a lista ficar vazia, recarregue de novo com o DevTools aberto.",
+    observacao: "O HAR só leva o que aparece na lista: com o filtro em Fetch/XHR, por exemplo, ele sai sem nenhum script. Se a lista ficar vazia, recarregue de novo com o DevTools aberto.",
     ilustracao: "cache",
   },
   {
     titulo: "Navegue pelo site",
     texto:
       "Use o site como quem usa de verdade e passe pelas páginas que importam. Cada linha nova na aba Rede é um arquivo gravado.",
-    dica: "Quanto mais páginas você visitar, mais bibliotecas o Rastro encontra.",
+    observacao: "Quanto mais páginas você visitar, mais bibliotecas o Rastro encontra.",
     ilustracao: "navegar",
   },
   {
     titulo: "Exporte o HAR",
     texto:
       "Clique no ícone de download da aba Rede e escolha **Exportar HAR (sanitized)**. Salve como `site.har`.",
-    dica: "O sanitized sai sem cookies e cabeçalhos de autenticação e é o mais seguro. Com ele, as checagens de cookie ficam como não verificadas; para elas, exporte o HAR completo e apague o arquivo depois.",
+    observacao: "O sanitized sai sem cookies e cabeçalhos de autenticação e é o mais seguro. Com ele, as checagens de cookie ficam como não verificadas; para elas, exporte o HAR completo e apague o arquivo depois.",
     ilustracao: "exportar",
   },
   {
@@ -186,14 +186,14 @@ const PASSOS_PELO_DEVTOOLS: PassoDoGuia[] = [
       { sistema: "Linux", texto: "rastro analisar site.har" },
       { sistema: "Windows", texto: "rastro analisar site.har" },
     ],
-    dica: "Sem CLI de IA, acrescente `--sem-ia`: nota, prioridade e plano são os mesmos, mas bibliotecas em bundles não são procuradas e os achados ficam sem explicação.",
+    observacao: "Sem CLI de IA, acrescente `--sem-ia`: nota, prioridade e plano são os mesmos, mas bibliotecas em bundles não são procuradas e os achados ficam sem explicação.",
     ilustracao: "terminal",
   },
   VALIDAR_SEGURANCA_ATIVA,
   ABRIR_O_RELATORIO,
 ];
 
-const PASSOS_COM_O_RASTRO_GRAVANDO: PassoDoGuia[] = [
+const PASSOS_COM_O_RASTRO_GRAVANDO: DescricaoDoPasso[] = [
   INSTALAR_O_RASTRO,
   INSTALAR_O_PLAYWRIGHT,
   {
@@ -204,21 +204,21 @@ const PASSOS_COM_O_RASTRO_GRAVANDO: PassoDoGuia[] = [
       { sistema: "Linux", texto: "rastro gravar https://site.com.br" },
       { sistema: "Windows", texto: "rastro gravar https://site.com.br" },
     ],
-    dica: "Sem CLI de IA, acrescente `--sem-ia` no fim do comando.",
+    observacao: "Sem CLI de IA, acrescente `--sem-ia` no fim do comando.",
     ilustracao: "gravar",
   },
   {
     titulo: "Navegue e feche a janela",
     texto:
       "Use o site como quem usa de verdade e passe pelas páginas que importam. O terminal mostra o tempo e quantas requisições já foram gravadas. Quando terminar, feche a janela do navegador.",
-    dica: "Quanto mais páginas você visitar, mais bibliotecas o Rastro encontra. Também dá para parar com `Ctrl + C` no terminal.",
+    observacao: "Quanto mais páginas você visitar, mais bibliotecas o Rastro encontra. Também dá para parar com `Ctrl + C` no terminal.",
     ilustracao: "navegar-e-fechar",
   },
   VALIDAR_SEGURANCA_ATIVA,
   ABRIR_O_RELATORIO_GRAVADO,
 ];
 
-const PASSOS_COM_O_ROBO: PassoDoGuia[] = [
+const PASSOS_COM_O_ROBO: DescricaoDoPasso[] = [
   INSTALAR_O_RASTRO,
   INSTALAR_O_PLAYWRIGHT,
   {
@@ -229,7 +229,7 @@ const PASSOS_COM_O_ROBO: PassoDoGuia[] = [
       { sistema: "Linux", texto: "rastro gravar https://site.com.br --robo" },
       { sistema: "Windows", texto: "rastro gravar https://site.com.br --robo" },
     ],
-    dica: "Em produção, não use um usuário administrador ou com acesso a dados sensíveis: um link comum pode aprovar, arquivar ou enviar algo. Nesse caso, escolha \"O Rastro grava\" e navegue você mesmo.",
+    observacao: "Em produção, não use um usuário administrador ou com acesso a dados sensíveis: um link comum pode aprovar, arquivar ou enviar algo. Nesse caso, escolha \"O Rastro grava\" e navegue você mesmo.",
     ilustracao: "robo",
   },
   {
@@ -242,14 +242,14 @@ const PASSOS_COM_O_ROBO: PassoDoGuia[] = [
     titulo: "Espere o robô",
     texto:
       "O robô visita os links do site, até 20 páginas ou 3 minutos, e mostra cada página no terminal. Ele não clica em botões, não envia formulários e não sai do site.",
-    dica: "Quando ele parar, a janela continua aberta: visite outra página, se quiser, e feche a janela.",
+    observacao: "Quando ele parar, a janela continua aberta: visite outra página, se quiser, e feche a janela.",
     ilustracao: "robo-visita",
   },
   VALIDAR_SEGURANCA_ATIVA,
   ABRIR_O_RELATORIO_GRAVADO,
 ];
 
-export const PASSOS_POR_MODO: Record<ModoDeUso, PassoDoGuia[]> = {
+export const PASSOS_POR_MODO: Record<ModoDeUso, DescricaoDoPasso[]> = {
   devtools: PASSOS_PELO_DEVTOOLS,
   gravar: PASSOS_COM_O_RASTRO_GRAVANDO,
   robo: PASSOS_COM_O_ROBO,
@@ -300,7 +300,7 @@ export const PROBLEMAS: Problema[] = [
   },
 ];
 
-export const SEUS_DADOS: Item[] = [
+export const SEUS_DADOS: ItemDoGuia[] = [
   { texto: "O HAR e o relatório ficam na sua máquina, e o Rastro não acessa o site analisado.", modos: ["devtools"] },
   {
     texto: "A gravação e o relatório ficam na sua máquina. A gravação guarda a sessão do site (o login): não compartilhe o arquivo e apague quando não precisar mais. O relatório não traz a sessão.",

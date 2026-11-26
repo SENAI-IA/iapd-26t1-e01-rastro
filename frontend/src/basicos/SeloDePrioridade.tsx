@@ -11,7 +11,7 @@ interface Aparencia {
 const APARENCIA: Record<Prioridade, Aparencia> = {
   alta: { rotulo: "alta", tom: "critico", icone: "octogono" },
   media: { rotulo: "média", tom: "serio", icone: "triangulo" },
-  baixa: { rotulo: "baixa", tom: "neutro", icone: "info" },
+  baixa: { rotulo: "baixa", tom: "neutro", icone: "informacao" },
   "a avaliar": { rotulo: "a avaliar", tom: "neutro", icone: "interrogacao" },
 };
 

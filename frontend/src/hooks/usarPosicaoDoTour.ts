@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useState, type RefObject } from "react";
 import type { PassoDoTour } from "../conteudo/tour.ts";
-import { posicaoDoBalao, retanguloDoDestaque, rolagemParaMostrar, type Ponto, type Retangulo } from "../calculosDeTela/posicaoDoTour.ts";
+import { posicaoDoBalao, retanguloDoDestaque, rolagemParaMostrar, type PosicaoNaTela, type Retangulo } from "../calculosDeTela/posicaoDoTour.ts";
 import { prefereMenosMovimento } from "../calculosDeTela/movimento.ts";
 
 export interface PosicaoDoTour {
   destaque: Retangulo;
-  balao: Ponto;
+  balao: PosicaoNaTela;
 }
 
 function retanguloDe(elemento: Element): Retangulo {
@@ -13,21 +13,21 @@ function retanguloDe(elemento: Element): Retangulo {
   return { topo: caixa.top, esquerda: caixa.left, largura: caixa.width, altura: caixa.height };
 }
 
-function telaAtual() {
+function tamanhoDaTela() {
   return { largura: document.documentElement.clientWidth, altura: window.innerHeight };
 }
 
-function rolarAteOAlvo(seletor: string, alturaDoTopo: number) {
+function rolarAteOAlvo(seletor: string, alturaDoCabecalhoFixo: number) {
   const alvo = document.querySelector(seletor);
   if (alvo) {
-    const destino = rolagemParaMostrar(retanguloDe(alvo), window.scrollY, telaAtual(), alturaDoTopo);
+    const destino = rolagemParaMostrar(retanguloDe(alvo), window.scrollY, tamanhoDaTela(), alturaDoCabecalhoFixo);
     window.scrollTo({ top: destino, behavior: prefereMenosMovimento() ? "auto" : "smooth" });
   }
 }
 
 export function usarPosicaoDoTour(
   passo: PassoDoTour,
-  topo: HTMLElement | null,
+  cabecalhoFixo: HTMLElement | null,
   balao: RefObject<HTMLDivElement | null>,
 ): PosicaoDoTour | null {
   const [posicao, setPosicao] = useState<PosicaoDoTour | null>(null);
@@ -37,17 +37,17 @@ export function usarPosicaoDoTour(
     if (!alvo || !balao.current) {
       return;
     }
-    const tela = telaAtual();
-    const alturaDoTopo = topo?.offsetHeight ?? 0;
-    const destaque = retanguloDoDestaque(retanguloDe(alvo), tela, alturaDoTopo);
+    const tela = tamanhoDaTela();
+    const alturaDoCabecalhoFixo = cabecalhoFixo?.offsetHeight ?? 0;
+    const destaque = retanguloDoDestaque(retanguloDe(alvo), tela, alturaDoCabecalhoFixo);
     const tamanhoDoBalao = { largura: balao.current.offsetWidth, altura: balao.current.offsetHeight };
-    setPosicao({ destaque, balao: posicaoDoBalao(destaque, tamanhoDoBalao, tela, alturaDoTopo) });
-  }, [passo, topo, balao]);
+    setPosicao({ destaque, balao: posicaoDoBalao(destaque, tamanhoDoBalao, tela, alturaDoCabecalhoFixo) });
+  }, [passo, cabecalhoFixo, balao]);
 
   useLayoutEffect(() => {
-    rolarAteOAlvo(passo.seletor, topo?.offsetHeight ?? 0);
+    rolarAteOAlvo(passo.seletor, cabecalhoFixo?.offsetHeight ?? 0);
     medir();
-  }, [passo, topo, medir]);
+  }, [passo, cabecalhoFixo, medir]);
 
   useEffect(() => {
     window.addEventListener("scroll", medir, { passive: true });

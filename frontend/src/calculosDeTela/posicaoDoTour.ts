@@ -10,7 +10,7 @@ export interface Tamanho {
   altura: number;
 }
 
-export interface Ponto {
+export interface PosicaoNaTela {
   topo: number;
   esquerda: number;
 }
@@ -19,8 +19,8 @@ const FOLGA_DO_DESTAQUE = 6;
 const DISTANCIA_DO_BALAO = 14;
 const MARGEM_DA_TELA = 12;
 
-export function retanguloDoDestaque(alvo: Retangulo, tela: Tamanho, alturaDoTopo: number): Retangulo {
-  const topo = Math.max(alvo.topo - FOLGA_DO_DESTAQUE, alturaDoTopo);
+export function retanguloDoDestaque(alvo: Retangulo, tela: Tamanho, alturaDoCabecalhoFixo: number): Retangulo {
+  const topo = Math.max(alvo.topo - FOLGA_DO_DESTAQUE, alturaDoCabecalhoFixo);
   const fim = Math.min(alvo.topo + alvo.altura + FOLGA_DO_DESTAQUE, tela.altura);
   return {
     topo,
@@ -30,17 +30,17 @@ export function retanguloDoDestaque(alvo: Retangulo, tela: Tamanho, alturaDoTopo
   };
 }
 
-export function posicaoDoBalao(destaque: Retangulo, balao: Tamanho, tela: Tamanho, alturaDoTopo: number): Ponto {
-  const ponto = primeiroLugarQueCabe(destaque, balao, tela, alturaDoTopo);
+export function posicaoDoBalao(destaque: Retangulo, balao: Tamanho, tela: Tamanho, alturaDoCabecalhoFixo: number): PosicaoNaTela {
+  const lugar = primeiroLugarQueCabe(destaque, balao, tela, alturaDoCabecalhoFixo);
   const esquerdaMaxima = tela.largura - balao.largura - MARGEM_DA_TELA;
   return {
-    topo: ponto.topo,
-    esquerda: Math.max(MARGEM_DA_TELA, Math.min(ponto.esquerda, esquerdaMaxima)),
+    topo: lugar.topo,
+    esquerda: Math.max(MARGEM_DA_TELA, Math.min(lugar.esquerda, esquerdaMaxima)),
   };
 }
 
-function primeiroLugarQueCabe(destaque: Retangulo, balao: Tamanho, tela: Tamanho, alturaDoTopo: number): Ponto {
-  const topoMinimo = alturaDoTopo + MARGEM_DA_TELA;
+function primeiroLugarQueCabe(destaque: Retangulo, balao: Tamanho, tela: Tamanho, alturaDoCabecalhoFixo: number): PosicaoNaTela {
+  const topoMinimo = alturaDoCabecalhoFixo + MARGEM_DA_TELA;
   const baixo = destaque.topo + destaque.altura + DISTANCIA_DO_BALAO;
   if (baixo + balao.altura <= tela.altura - MARGEM_DA_TELA) {
     return { topo: baixo, esquerda: destaque.esquerda };
@@ -61,8 +61,8 @@ function primeiroLugarQueCabe(destaque: Retangulo, balao: Tamanho, tela: Tamanho
   return { topo: tela.altura - balao.altura - MARGEM_DA_TELA, esquerda: tela.largura - balao.largura };
 }
 
-export function rolagemParaMostrar(alvo: Retangulo, rolagemAtual: number, tela: Tamanho, alturaDoTopo: number): number {
-  const espacoLivre = tela.altura - alturaDoTopo;
+export function rolagemParaMostrar(alvo: Retangulo, rolagemAtual: number, tela: Tamanho, alturaDoCabecalhoFixo: number): number {
+  const espacoLivre = tela.altura - alturaDoCabecalhoFixo;
   const acimaDoAlvo = alvo.altura < espacoLivre ? (espacoLivre - alvo.altura) / 3 : MARGEM_DA_TELA * 2;
-  return Math.max(0, rolagemAtual + alvo.topo - alturaDoTopo - acimaDoAlvo);
+  return Math.max(0, rolagemAtual + alvo.topo - alturaDoCabecalhoFixo - acimaDoAlvo);
 }

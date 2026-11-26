@@ -50,8 +50,8 @@ export default function Janela({ tamanho, children }: Props) {
         x2={medidas.fimDaBarra}
         y2={medidas.alturaDaBarra}
       />
-      {medidas.botoes.map((x) => (
-        <circle key={x} className={traco} cx={x} cy={medidas.alturaDosBotoes} r={medidas.raioDosBotoes} />
+      {medidas.botoes.map((centroDoBotao) => (
+        <circle key={centroDoBotao} className={traco} cx={centroDoBotao} cy={medidas.alturaDosBotoes} r={medidas.raioDosBotoes} />
       ))}
       {children}
     </>

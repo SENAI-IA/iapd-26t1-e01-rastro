@@ -1,4 +1,4 @@
-import type { PassoDoGuia as DadosDoPasso } from "../conteudo/guia.ts";
+import type { DescricaoDoPasso } from "../conteudo/guia.ts";
 import ComandosDoPasso from "./ComandosDoPasso.tsx";
 import Icone from "../basicos/Icone.tsx";
 import IlustracaoDoGuia from "./IlustracaoDoGuia.tsx";
@@ -8,7 +8,7 @@ import "./PassoDoGuia.css";
 
 interface Props {
   numero: number;
-  passo: DadosDoPasso;
+  passo: DescricaoDoPasso;
   feito: boolean;
   aoMarcar: () => void;
 }
@@ -32,9 +32,9 @@ export default function PassoDoGuia({ numero, passo, feito, aoMarcar }: Props) {
           <TextoComMarcas texto={passo.texto} />
         </p>
         {passo.comandos && <ComandosDoPasso comandos={passo.comandos} />}
-        {passo.dica && (
-          <p className="passo-do-guia__dica">
-            <TextoComMarcas texto={passo.dica} />
+        {passo.observacao && (
+          <p className="passo-do-guia__observacao">
+            <TextoComMarcas texto={passo.observacao} />
           </p>
         )}
         <button type="button" className="passo-do-guia__marcar" aria-pressed={feito} onClick={aoMarcar}>

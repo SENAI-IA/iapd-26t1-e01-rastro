@@ -1,18 +1,18 @@
-import type { ChamadaIA } from "../../relatorio/tiposDoRelatorio.ts";
-import ChamadaDaIA from "./ChamadaDaIA.tsx";
+import type { ChamadaDaIA } from "../../relatorio/tiposDoRelatorio.ts";
+import ItemDaChamadaDaIA from "./ItemDaChamadaDaIA.tsx";
 
 interface Props {
-  chamadas: ChamadaIA[];
+  chamadas: ChamadaDaIA[];
 }
 
 export default function ListaDeChamadas({ chamadas }: Props) {
   if (chamadas.length === 0) {
-    return <p className="painel-ia__vazio">Nenhuma chamada à IA: não havia achado para explicar.</p>;
+    return <p className="painel-da-ia__vazio">Nenhuma chamada à IA: não havia achado para explicar.</p>;
   }
   return (
-    <ol className="painel-ia__lista">
+    <ol className="painel-da-ia__lista">
       {chamadas.map((chamada, indice) => (
-        <ChamadaDaIA key={indice} chamada={chamada} />
+        <ItemDaChamadaDaIA key={indice} chamada={chamada} />
       ))}
     </ol>
   );

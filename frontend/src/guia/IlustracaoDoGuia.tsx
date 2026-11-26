@@ -37,7 +37,7 @@ interface Props {
 
 export default function IlustracaoDoGuia({ ilustracao }: Props) {
   return (
-    <svg className="ilustracao" viewBox="0 0 320 190" aria-hidden="true">
+    <svg className="ilustracao-do-guia" viewBox="0 0 320 190" aria-hidden="true">
       {DESENHOS[ilustracao]}
     </svg>
   );

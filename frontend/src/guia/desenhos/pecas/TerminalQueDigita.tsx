@@ -8,19 +8,19 @@ import {
 import MolduraDeTerminal from "./MolduraDeTerminal.tsx";
 
 const CLASSES_DO_DESTAQUE: Record<DestaqueDaLinha, string[]> = {
-  comando: ["ilustracao__texto--forte"],
-  continuacao: ["ilustracao__texto--forte"],
+  comando: ["ilustracao-do-guia__texto--forte"],
+  continuacao: ["ilustracao-do-guia__texto--forte"],
   saida: [],
-  resultado: ["ilustracao__texto--destaque", "ilustracao__texto--forte"],
+  resultado: ["ilustracao-do-guia__texto--destaque", "ilustracao-do-guia__texto--forte"],
 };
 
 function classeDaLinha(linha: LinhaPosicionada): string {
   return [
-    "ilustracao__texto",
-    "ilustracao__texto--mono",
+    "ilustracao-do-guia__texto",
+    "ilustracao-do-guia__texto--mono",
     ...CLASSES_DO_DESTAQUE[linha.destaque],
-    "ilustracao__digita",
-    `ilustracao__digita--${linha.ordemDeAparecer}`,
+    "ilustracao-do-guia__digita",
+    `ilustracao-do-guia__digita--${linha.ordemDeAparecer}`,
   ].join(" ");
 }
 
@@ -38,7 +38,7 @@ export default function TerminalQueDigita({ linhas }: Props) {
           {linha.texto}
         </text>
       ))}
-      <rect className="ilustracao__cursor-texto" x="22" y={ultimaLinha + CURSOR_ABAIXO_DA_ULTIMA_LINHA} width="7" height="12" />
+      <rect className="ilustracao-do-guia__cursor-texto" x="22" y={ultimaLinha + CURSOR_ABAIXO_DA_ULTIMA_LINHA} width="7" height="12" />
     </MolduraDeTerminal>
   );
 }

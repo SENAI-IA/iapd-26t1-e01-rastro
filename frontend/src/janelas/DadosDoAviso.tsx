@@ -9,7 +9,7 @@ interface Props {
 
 export default function DadosDoAviso({ aviso }: Props) {
   return (
-    <dl className="painel-origem__dados">
+    <dl className="painel-origem-do-dado__dados">
       <dt>Aviso</dt>
       <dd>
         <a href={aviso.link} target="_blank" rel="noopener noreferrer">

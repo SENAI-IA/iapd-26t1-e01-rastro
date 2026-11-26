@@ -1,6 +1,6 @@
 import type { SituacaoDoPentest, ValidacaoDoPentest } from "../relatorio/tiposDoRelatorio.ts";
 import Icone, { type NomeDoIcone } from "../basicos/Icone.tsx";
-import { escreverStatus, plural } from "../formatacao/formato.ts";
+import { escreverStatus, comPlural } from "../formatacao/formato.ts";
 
 const ICONE_DA_SITUACAO: Record<SituacaoDoPentest, NomeDoIcone> = {
   falhou: "erro",
@@ -20,16 +20,16 @@ interface Props {
 
 export default function ListaDeEnderecos({ validacoes }: Props) {
   return (
-    <details className="item-pentest__enderecos">
-      <summary>Ver {plural(validacoes.length, "resultado", "resultados")} por endereço</summary>
+    <details className="item-da-seguranca-ativa__enderecos">
+      <summary>Ver {comPlural(validacoes.length, "resultado", "resultados")} por endereço</summary>
       <ul>
         {validacoes.map((validacao) => (
-          <li key={validacao.id} className={`item-pentest__endereco--${validacao.situacao}`}>
+          <li key={validacao.id} className={`item-da-seguranca-ativa__endereco--${validacao.situacao}`}>
             <span role="img" aria-label={NOME_DA_SITUACAO[validacao.situacao]} title={NOME_DA_SITUACAO[validacao.situacao]}>
               <Icone nome={ICONE_DA_SITUACAO[validacao.situacao]} tamanho={13} />
             </span>
             <code>{validacao.requisicao.url}</code>
-            <span className="item-pentest__meta">
+            <span className="item-da-seguranca-ativa__dados-da-requisicao">
               {validacao.requisicao.metodo} · {escreverStatus(validacao.requisicao.status)} · {validacao.id}
             </span>
           </li>

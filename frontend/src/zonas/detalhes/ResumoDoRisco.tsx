@@ -1,7 +1,7 @@
 import type { Achado, Biblioteca } from "../../relatorio/tiposDoRelatorio.ts";
 import Selo from "../../basicos/Selo.tsx";
 import SeloDePrioridade from "../../basicos/SeloDePrioridade.tsx";
-import { formatarNota, plural } from "../../formatacao/formato.ts";
+import { formatarNota, comPlural } from "../../formatacao/formato.ts";
 
 interface Props {
   biblioteca: Biblioteca;
@@ -25,8 +25,8 @@ export default function ResumoDoRisco({ biblioteca, achados }: Props) {
   }
   return (
     <>
-      <span>{plural(achados.length, "falha", "falhas")}</span>
-      <span className="linha-biblioteca__nota">
+      <span>{comPlural(achados.length, "falha", "falhas")}</span>
+      <span className="item-da-biblioteca__nota">
         {biblioteca.nota === null ? "Sem nota" : `Nota ${formatarNota(biblioteca.nota)}`}
       </span>
       <SeloDePrioridade prioridade={biblioteca.prioridade} />

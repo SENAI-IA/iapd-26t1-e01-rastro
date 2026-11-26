@@ -1,4 +1,4 @@
-.ilustracao {
+.ilustracao-do-guia {
   width: 100%;
   max-width: 320px;
   height: auto;
@@ -7,7 +7,7 @@
   background: var(--cor-fundo);
 }
 
-.ilustracao__traco {
+.ilustracao-do-guia__traco {
   fill: none;
   stroke: var(--cor-texto-fraco);
   stroke-width: 1.6;
@@ -15,136 +15,136 @@
   stroke-linejoin: round;
 }
 
-.ilustracao__traco--destaque {
+.ilustracao-do-guia__traco--destaque {
   stroke: var(--cor-destaque);
 }
 
-.ilustracao__traco--suave {
+.ilustracao-do-guia__traco--suave {
   stroke: var(--cor-linha);
   stroke-width: 5;
 }
 
-.ilustracao__traco--grosso {
+.ilustracao-do-guia__traco--grosso {
   stroke-width: 8;
 }
 
-.ilustracao__linha {
+.ilustracao-do-guia__linha {
   fill: none;
   stroke: var(--cor-linha);
   stroke-width: 5;
   stroke-linecap: round;
   stroke-dasharray: 1;
-  animation: ilustracao-linha 5s ease infinite backwards;
+  animation: ilustracao-do-guia-linha 5s ease infinite backwards;
 }
 
-.ilustracao__linha:nth-of-type(2n) {
+.ilustracao-do-guia__linha:nth-of-type(2n) {
   animation-delay: 0.5s;
 }
 
-.ilustracao__linha:nth-of-type(3n) {
+.ilustracao-do-guia__linha:nth-of-type(3n) {
   animation-delay: 1s;
 }
 
-.ilustracao__texto {
+.ilustracao-do-guia__texto {
   fill: var(--cor-texto-suave);
   font-family: var(--fonte-texto);
   font-size: 10.5px;
 }
 
-.ilustracao__texto--forte {
+.ilustracao-do-guia__texto--forte {
   fill: var(--cor-texto);
   font-weight: 600;
 }
 
-.ilustracao__texto--destaque {
+.ilustracao-do-guia__texto--destaque {
   fill: var(--cor-destaque);
 }
 
-.ilustracao__texto--mono {
+.ilustracao-do-guia__texto--mono {
   font-family: var(--fonte-mono);
 }
 
-.ilustracao__realce {
+.ilustracao-do-guia__realce {
   fill: var(--cor-destaque-suave);
 }
 
-.ilustracao__cursor-texto {
+.ilustracao-do-guia__cursor-texto {
   fill: var(--cor-destaque);
-  animation: ilustracao-pisca 1s steps(1) infinite;
+  animation: ilustracao-do-guia-pisca 1s steps(1) infinite;
 }
 
-.ilustracao__cursor {
+.ilustracao-do-guia__cursor {
   transform-box: fill-box;
-  animation: ilustracao-cursor 3.6s ease-in-out infinite;
+  animation: ilustracao-do-guia-cursor 3.6s ease-in-out infinite;
 }
 
-.ilustracao__tecla {
-  animation: ilustracao-aperta 2.4s ease infinite;
+.ilustracao-do-guia__tecla {
+  animation: ilustracao-do-guia-aperta 2.4s ease infinite;
 }
 
-.ilustracao__giro {
+.ilustracao-do-guia__giro {
   transform-box: fill-box;
   transform-origin: center;
-  animation: ilustracao-gira 2.8s ease infinite;
+  animation: ilustracao-do-guia-gira 2.8s ease infinite;
 }
 
-.ilustracao__passeio {
-  animation: ilustracao-passeia 5s ease-in-out infinite;
+.ilustracao-do-guia__passeio {
+  animation: ilustracao-do-guia-passeia 5s ease-in-out infinite;
 }
 
-.ilustracao__pulo {
-  animation: ilustracao-pula 1.6s ease-in-out infinite;
+.ilustracao-do-guia__pulo {
+  animation: ilustracao-do-guia-pula 1.6s ease-in-out infinite;
 }
 
-.ilustracao__pulsa {
-  animation: ilustracao-pulsa 2s ease-in-out infinite;
+.ilustracao-do-guia__pulsa {
+  animation: ilustracao-do-guia-pulsa 2s ease-in-out infinite;
 }
 
-.ilustracao__digita {
+.ilustracao-do-guia__digita {
   animation: 7s infinite;
 }
 
-.ilustracao__digita--1 {
-  animation-name: ilustracao-digita-1;
+.ilustracao-do-guia__digita--1 {
+  animation-name: ilustracao-do-guia-digita-1;
 }
 
-.ilustracao__digita--2 {
-  animation-name: ilustracao-digita-2;
+.ilustracao-do-guia__digita--2 {
+  animation-name: ilustracao-do-guia-digita-2;
 }
 
-.ilustracao__digita--3 {
-  animation-name: ilustracao-digita-3;
+.ilustracao-do-guia__digita--3 {
+  animation-name: ilustracao-do-guia-digita-3;
 }
 
-.ilustracao__digita--4 {
-  animation-name: ilustracao-digita-4;
+.ilustracao-do-guia__digita--4 {
+  animation-name: ilustracao-do-guia-digita-4;
 }
 
-.ilustracao__digita--5 {
-  animation-name: ilustracao-digita-5;
+.ilustracao-do-guia__digita--5 {
+  animation-name: ilustracao-do-guia-digita-5;
 }
 
-.ilustracao__cabeca {
+.ilustracao-do-guia__cabeca {
   fill: var(--cor-superficie);
 }
 
-.ilustracao__olho {
+.ilustracao-do-guia__olho {
   fill: var(--cor-destaque);
 }
 
-.ilustracao__robo {
-  animation: ilustracao-robo 7s ease-in-out infinite;
+.ilustracao-do-guia__robo {
+  animation: ilustracao-do-guia-robo 7s ease-in-out infinite;
 }
 
-.ilustracao__vai-fechar {
-  animation: ilustracao-vai-fechar 6s ease-in-out infinite;
+.ilustracao-do-guia__vai-fechar {
+  animation: ilustracao-do-guia-vai-fechar 6s ease-in-out infinite;
 }
 
-.ilustracao__pulsa-fechar {
-  animation: ilustracao-pulsa-fechar 6s ease infinite;
+.ilustracao-do-guia__pulsa-fechar {
+  animation: ilustracao-do-guia-pulsa-fechar 6s ease infinite;
 }
 
-@keyframes ilustracao-robo {
+@keyframes ilustracao-do-guia-robo {
   0%,
   16% {
     transform: translate(0, 0);
@@ -170,7 +170,7 @@
   }
 }
 
-@keyframes ilustracao-vai-fechar {
+@keyframes ilustracao-do-guia-vai-fechar {
   0%,
   10% {
     transform: translate(0, 0);
@@ -192,7 +192,7 @@
   }
 }
 
-@keyframes ilustracao-pulsa-fechar {
+@keyframes ilustracao-do-guia-pulsa-fechar {
   0%,
   66%,
   100% {
@@ -204,7 +204,7 @@
   }
 }
 
-@keyframes ilustracao-linha {
+@keyframes ilustracao-do-guia-linha {
   0% {
     stroke-dashoffset: 1;
     opacity: 1;
@@ -220,13 +220,13 @@
   }
 }
 
-@keyframes ilustracao-pisca {
+@keyframes ilustracao-do-guia-pisca {
   50% {
     opacity: 0;
   }
 }
 
-@keyframes ilustracao-cursor {
+@keyframes ilustracao-do-guia-cursor {
   0%,
   15% {
     transform: translate(0, 0);
@@ -243,7 +243,7 @@
   }
 }
 
-@keyframes ilustracao-aperta {
+@keyframes ilustracao-do-guia-aperta {
   0%,
   60%,
   100% {
@@ -254,7 +254,7 @@
   }
 }
 
-@keyframes ilustracao-gira {
+@keyframes ilustracao-do-guia-gira {
   0%,
   35% {
     transform: rotate(0);
@@ -265,7 +265,7 @@
   }
 }
 
-@keyframes ilustracao-passeia {
+@keyframes ilustracao-do-guia-passeia {
   0%,
   10% {
     transform: translate(0, 0);
@@ -284,7 +284,7 @@
   }
 }
 
-@keyframes ilustracao-pula {
+@keyframes ilustracao-do-guia-pula {
   0%,
   100% {
     transform: translateY(0);
@@ -294,7 +294,7 @@
   }
 }
 
-@keyframes ilustracao-pulsa {
+@keyframes ilustracao-do-guia-pulsa {
   0%,
   100% {
     stroke-width: 1.6;
@@ -304,7 +304,7 @@
   }
 }
 
-@keyframes ilustracao-digita-1 {
+@keyframes ilustracao-do-guia-digita-1 {
   0% {
     opacity: 0;
   }
@@ -317,7 +317,7 @@
   }
 }
 
-@keyframes ilustracao-digita-2 {
+@keyframes ilustracao-do-guia-digita-2 {
   0%,
   18% {
     opacity: 0;
@@ -331,7 +331,7 @@
   }
 }
 
-@keyframes ilustracao-digita-3 {
+@keyframes ilustracao-do-guia-digita-3 {
   0%,
   28% {
     opacity: 0;
@@ -345,7 +345,7 @@
   }
 }
 
-@keyframes ilustracao-digita-4 {
+@keyframes ilustracao-do-guia-digita-4 {
   0%,
   38% {
     opacity: 0;
@@ -359,7 +359,7 @@
   }
 }
 
-@keyframes ilustracao-digita-5 {
+@keyframes ilustracao-do-guia-digita-5 {
   0%,
   52% {
     opacity: 0;
@@ -374,7 +374,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ilustracao * {
+  .ilustracao-do-guia * {
     animation: none !important;
   }
 }

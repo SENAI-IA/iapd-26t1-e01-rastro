@@ -8,10 +8,10 @@ interface Props {
 export default function EtapaNoHar({ biblioteca }: Props) {
   return (
     <EtapaDaOrigem numero={1} titulo="No arquivo HAR">
-      <ul className="painel-origem__lista">
+      <ul className="painel-origem-do-dado__lista">
         {biblioteca.evidencias.map((evidencia) => (
           <li key={evidencia.indice_requisicao}>
-            <dl className="painel-origem__dados">
+            <dl className="painel-origem-do-dado__dados">
               <dt>Requisição</dt>
               <dd>
                 <code>log.entries[{evidencia.indice_requisicao}]</code>

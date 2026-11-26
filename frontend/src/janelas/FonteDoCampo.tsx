@@ -10,5 +10,5 @@ export default function FonteDoCampo({ aviso, campo }: Props) {
   if (fonte === undefined) {
     return null;
   }
-  return <span className="painel-origem__fonte"> · {fonte}</span>;
+  return <span className="painel-origem-do-dado__fonte"> · {fonte}</span>;
 }

@@ -1,13 +1,13 @@
-import type { Acao as DadosDaAcao } from "../../relatorio/tiposDoRelatorio.ts";
-import Acao from "./Acao.tsx";
+import type { Acao } from "../../relatorio/tiposDoRelatorio.ts";
+import ItemDoPlanoDeAcao from "./ItemDoPlanoDeAcao.tsx";
 import "./PlanoDeAcao.css";
 
 interface Props {
-  acoes: DadosDaAcao[];
-  aoAbrirTask: (acao: DadosDaAcao) => void;
+  acoes: Acao[];
+  aoAbrirTarefa: (acao: Acao) => void;
 }
 
-export default function PlanoDeAcao({ acoes, aoAbrirTask }: Props) {
+export default function PlanoDeAcao({ acoes, aoAbrirTarefa }: Props) {
   return (
     <section className="plano-de-acao" aria-labelledby="plano-de-acao-titulo">
       <div>
@@ -19,7 +19,7 @@ export default function PlanoDeAcao({ acoes, aoAbrirTask }: Props) {
       ) : (
         <ol className="plano-de-acao__lista">
           {acoes.map((acao, indice) => (
-            <Acao key={acao.id} acao={acao} posicao={indice + 1} aoAbrirTask={aoAbrirTask} />
+            <ItemDoPlanoDeAcao key={acao.id} acao={acao} posicao={indice + 1} aoAbrirTarefa={aoAbrirTarefa} />
           ))}
         </ol>
       )}

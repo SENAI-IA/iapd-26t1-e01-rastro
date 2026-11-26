@@ -74,7 +74,7 @@ export interface Aviso {
   versoes_afetadas: string;
   versao_corrigida: string | null;
   link: string;
-  origem_dos_campos: Partial<Record<CampoComOrigem, string>>;
+  origem_dos_campos: FonteDeCadaCampo;
 }
 
 export type CampoComOrigem =
@@ -85,6 +85,8 @@ export type CampoComOrigem =
   | "versoes_afetadas"
   | "versao_corrigida"
   | "link";
+
+export type FonteDeCadaCampo = Partial<Record<CampoComOrigem, string>>;
 
 export interface Nota {
   valor: number | null;
@@ -128,7 +130,7 @@ export interface TravaAcionada {
   motivo: string;
 }
 
-export interface ChamadaIA {
+export interface ChamadaDaIA {
   etapa: string;
   provedor: string;
   entrada: string;
@@ -149,7 +151,7 @@ export interface ComESemIA {
 }
 
 export interface DadosDaIA {
-  chamadas: ChamadaIA[];
+  chamadas: ChamadaDaIA[];
   travas_acionadas: TravaAcionada[];
   com_e_sem_ia: ComESemIA | null;
   tokens_total: number | null;
@@ -194,11 +196,11 @@ export type CategoriaDoPentest =
   | "csp_diretiva"
   | "execucao";
 export type SituacaoDoPentest = "falhou" | "passou" | "nao_verificada";
-export type MetodoSeguro = "GET" | "HEAD" | "OPTIONS";
+export type MetodoHttpSemEfeito = "GET" | "HEAD" | "OPTIONS";
 
 export interface RequisicaoDoPentest {
   indice_har: number;
-  metodo: MetodoSeguro;
+  metodo: MetodoHttpSemEfeito;
   status: number | null;
   url: string;
   erro: string | null;

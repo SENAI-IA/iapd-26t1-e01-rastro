@@ -18,7 +18,7 @@ function vereditoDe(validacoes: ValidacaoDoPentest[]): Veredito {
   return "sem_resposta";
 }
 
-export function agrupar(validacoes: ValidacaoDoPentest[]): ValidacaoAgrupada[] {
+export function agruparPorCategoria(validacoes: ValidacaoDoPentest[]): ValidacaoAgrupada[] {
   const porCategoria = new Map<CategoriaDoPentest, ValidacaoDoPentest[]>();
   for (const validacao of validacoes) {
     porCategoria.set(validacao.categoria, [...(porCategoria.get(validacao.categoria) ?? []), validacao]);
@@ -30,7 +30,7 @@ export function agrupar(validacoes: ValidacaoDoPentest[]): ValidacaoAgrupada[] {
   }));
 }
 
-export function doVeredito(agrupadas: ValidacaoAgrupada[], veredito: Veredito): ValidacaoAgrupada[] {
+export function gruposDoVeredito(agrupadas: ValidacaoAgrupada[], veredito: Veredito): ValidacaoAgrupada[] {
   return agrupadas.filter((item) => item.veredito === veredito);
 }
 

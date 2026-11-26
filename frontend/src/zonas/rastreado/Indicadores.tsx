@@ -3,7 +3,7 @@ import type { Acao, Resumo } from "../../relatorio/tiposDoRelatorio.ts";
 import Indicador from "./Indicador.tsx";
 import Selo from "../../basicos/Selo.tsx";
 import SeloDePrioridade from "../../basicos/SeloDePrioridade.tsx";
-import { formatarNota, plural } from "../../formatacao/formato.ts";
+import { formatarNota, comPlural } from "../../formatacao/formato.ts";
 import Termo from "../../basicos/Termo.tsx";
 import "./Indicadores.css";
 
@@ -60,9 +60,9 @@ function descreverRisco(resumo: Resumo): string {
 }
 
 function descreverBibliotecas(resumo: Resumo): string {
-  const partes = [plural(resumo.achados, "falha conhecida", "falhas conhecidas")];
+  const partes = [comPlural(resumo.achados, "falha conhecida", "falhas conhecidas")];
   if (resumo.bibliotecas_nao_consultadas > 0) {
-    partes.push(plural(resumo.bibliotecas_nao_consultadas, "não consultada", "não consultadas"));
+    partes.push(comPlural(resumo.bibliotecas_nao_consultadas, "não consultada", "não consultadas"));
   }
   if (resumo.bibliotecas_a_confirmar > 0) {
     partes.push(`${resumo.bibliotecas_a_confirmar} a confirmar`);

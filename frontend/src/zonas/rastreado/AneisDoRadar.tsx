@@ -8,7 +8,7 @@ const NOME_DA_CAMADA: Record<Camada, string> = {
   dados: "dados e APIs",
   midia: "imagens e fontes",
 };
-const CAMADAS = Object.keys(RAIO_DA_CAMADA) as Camada[];
+const CAMADAS: Camada[] = ["pagina", "script", "estilo", "dados", "midia"];
 const ALTURA_DO_NOME_NO_ANEL = 3.5;
 
 interface Props {

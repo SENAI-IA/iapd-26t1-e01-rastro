@@ -22,7 +22,7 @@ const MEDIDAS_DO_ROBO: Record<TamanhoDaPeca, MedidasDoRobo> = {
     raioDaPonta: 2,
     distanciaDosOlhos: 4,
     raioDoOlho: 2,
-    classeDoOlho: "ilustracao__olho",
+    classeDoOlho: "ilustracao-do-guia__olho",
   },
   pequeno: {
     largura: 12,
@@ -33,7 +33,7 @@ const MEDIDAS_DO_ROBO: Record<TamanhoDaPeca, MedidasDoRobo> = {
     raioDaPonta: 1.4,
     distanciaDosOlhos: 2.5,
     raioDoOlho: 1.2,
-    classeDoOlho: "modo-anim__ponto",
+    classeDoOlho: "animacao-do-modo__ponto",
   },
 };
 

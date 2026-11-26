@@ -13,7 +13,7 @@ export default function EtapaDaNota({ origem }: Props) {
     <EtapaDaOrigem numero={4} titulo="Cálculo da nota">
       <ContasDaNota origem={origem} />
       {achados.length > 1 && (
-        <p className="painel-origem__texto">
+        <p className="painel-origem-do-dado__texto">
           Nota da biblioteca:{" "}
           <b>{biblioteca.nota === null ? "sem nota" : formatarNota(biblioteca.nota)}</b>, a maior entre as
           falhas.

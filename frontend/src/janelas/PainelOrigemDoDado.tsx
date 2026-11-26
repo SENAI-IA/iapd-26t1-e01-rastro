@@ -22,22 +22,22 @@ export default function PainelOrigemDoDado({ origem, aoFechar }: Props) {
   return (
     <dialog
       ref={janela}
-      className="painel-origem"
-      aria-labelledby="painel-origem-titulo"
+      className="painel-origem-do-dado"
+      aria-labelledby="painel-origem-do-dado-titulo"
       onClose={aoFechar}
       onClick={fecharAoClicarFora}
     >
-      <div className="painel-origem__conteudo">
-        <header className="painel-origem__cabecalho">
+      <div className="painel-origem-do-dado__conteudo">
+        <header className="painel-origem-do-dado__cabecalho">
           <div>
-            <span className="painel-origem__rotulo">Origem do dado</span>
-            <h2 id="painel-origem-titulo">{tituloDaOrigem(origem)}</h2>
+            <span className="painel-origem-do-dado__rotulo">Origem do dado</span>
+            <h2 id="painel-origem-do-dado-titulo">{tituloDaOrigem(origem)}</h2>
           </div>
-          <button type="button" className="painel-origem__fechar" onClick={fechar} aria-label="Fechar a origem do dado">
+          <button type="button" className="painel-origem-do-dado__fechar" onClick={fechar} aria-label="Fechar a origem do dado">
             <Icone nome="fechar" tamanho={16} />
           </button>
         </header>
-        <div className="painel-origem__corpo">
+        <div className="painel-origem-do-dado__corpo">
           <EtapaNoHar biblioteca={origem.biblioteca} />
           <EtapaDaIdentificacao biblioteca={origem.biblioteca} />
           <EtapaDoAviso origem={origem} />

@@ -21,11 +21,11 @@ export default function MenuDeLinks({ tamanho }: Props) {
   const medidas = MEDIDAS_DO_MENU[tamanho];
   return (
     <>
-      {medidas.posicoes.map((x) => (
+      {medidas.posicoes.map((inicioDoLink) => (
         <rect
-          key={x}
+          key={inicioDoLink}
           className={`${PREFIXO_DA_CLASSE[tamanho]}__traco`}
-          x={x}
+          x={inicioDoLink}
           y={medidas.y}
           width={medidas.largura}
           height={medidas.altura}

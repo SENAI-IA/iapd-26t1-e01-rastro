@@ -7,12 +7,12 @@ interface Props {
 
 export default function ListaDeTravas({ travas }: Props) {
   if (travas.length === 0) {
-    return <p className="painel-ia__vazio">Nenhuma trava precisou barrar nada nesta análise.</p>;
+    return <p className="painel-da-ia__vazio">Nenhuma trava precisou barrar nada nesta análise.</p>;
   }
   return (
-    <ul className="painel-ia__lista">
+    <ul className="painel-da-ia__lista">
       {travas.map((trava, indice) => (
-        <li key={indice} className="painel-ia__trava">
+        <li key={indice} className="painel-da-ia__trava">
           <Selo tom="serio" icone="triangulo">
             Trava "{trava.trava}"
           </Selo>

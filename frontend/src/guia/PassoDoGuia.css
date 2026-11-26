@@ -63,7 +63,7 @@
   font-weight: 500;
 }
 
-.passo-do-guia__dica {
+.passo-do-guia__observacao {
   padding-left: 10px;
   border-left: 2px solid var(--cor-destaque);
   font-size: 13.5px;
@@ -138,7 +138,7 @@
     padding: 16px;
   }
 
-  .passo-do-guia .ilustracao {
+  .passo-do-guia .ilustracao-do-guia {
     grid-column: 1 / -1;
   }
 

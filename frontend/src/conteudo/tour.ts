@@ -9,7 +9,7 @@ export interface PassoDoTour {
 
 export const PASSOS_DO_TOUR: PassoDoTour[] = [
   {
-    seletor: ".cabecalho-analise",
+    seletor: ".cabecalho-da-analise",
     titulo: "Uma análise do Rastro",
     texto:
       "Você grava a navegação do site e o Rastro mostra o que está vulnerável nas bibliotecas que chegaram ao navegador. O Rastro não acessa o site: tudo sai do arquivo gravado.",
@@ -29,7 +29,7 @@ export const PASSOS_DO_TOUR: PassoDoTour[] = [
     termos: ["Bundle"],
   },
   {
-    seletor: ".painel-ia",
+    seletor: ".painel-da-ia",
     titulo: "Onde a IA entrou",
     texto:
       "A IA procura bibliotecas escondidas e explica os achados, mas não decide nada sozinha: travas fixas conferem o que ela sugere. Aqui ficam as chamadas, o tempo, os tokens e o que cada trava barrou.",
@@ -42,13 +42,13 @@ export const PASSOS_DO_TOUR: PassoDoTour[] = [
       "As correções em ordem de prioridade. Cada uma diz o porquê, o impacto, quem resolve e como conferir que deu certo.",
   },
   {
-    seletor: ".acao__abrir-task",
+    seletor: ".item-do-plano-de-acao__abrir-tarefa",
     titulo: "A task pronta para o time",
     texto:
       "Um clique abre o texto da task, com título, evidências, o que fazer e o critério de aceite. Copie e cole no Azure DevOps ou no GitLab.",
   },
   {
-    seletor: ".lista-bibliotecas__lista",
+    seletor: ".lista-de-bibliotecas__lista",
     titulo: "Cada biblioteca, com as falhas",
     texto:
       "Abra uma biblioteca para ver as falhas, a explicação e onde ela apareceu no arquivo. \"Ver a origem\" mostra de onde veio cada dado e a conta da nota.",
@@ -62,20 +62,20 @@ export const PASSOS_DO_TOUR: PassoDoTour[] = [
     termos: ["npm"],
   },
   {
-    seletor: ".lista-checagens",
+    seletor: ".lista-de-checagens",
     titulo: "A configuração do servidor",
     texto:
       "Do mesmo arquivo saem as checagens de cabeçalhos de segurança e de cookies, inclusive as que passaram. Com o HAR sanitized, as de cookie ficam como não verificadas.",
   },
   {
-    seletor: ".barra-superior__tela--pentest",
+    seletor: ".barra-superior__aba--seguranca-ativa",
     titulo: "Segurança ativa, opcional e separada",
     texto:
       "Quando você executa `pentest --autorizo`, esta aba mostra as proteções que o site devolveu, em a corrigir, em ordem e não conferido, e o escopo do teste. Fica fora da nota.",
     termos: ["Pentest", "WSTG"],
   },
   {
-    seletor: ".zona__focar",
+    seletor: ".zona-do-painel__focar",
     titulo: "Uma zona por vez",
     texto: "\"Focar\" mostra só aquela zona, usando a tela toda. Esc ou \"Sair do foco\" volta ao relatório completo.",
   },

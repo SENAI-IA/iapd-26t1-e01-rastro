@@ -26,9 +26,9 @@ export default function GuiaComoUsar({ aoIrParaOPainel, medirAlturaDoCabecalhoFi
   };
 
   return (
-    <section className="guia" aria-labelledby="guia-titulo">
-      <header className="guia__topo">
-        <h1 id="guia-titulo">Como usar o Rastro</h1>
+    <section className="guia-como-usar" aria-labelledby="guia-como-usar-titulo">
+      <header className="guia-como-usar__topo">
+        <h1 id="guia-como-usar-titulo">Como usar o Rastro</h1>
         <p>Do site ao relatório, em {passos.length} passos. Você só precisa do navegador e de um terminal.</p>
         <ProgressoDoGuia feitos={feitos.size} total={passos.length} />
       </header>
@@ -36,7 +36,7 @@ export default function GuiaComoUsar({ aoIrParaOPainel, medirAlturaDoCabecalhoFi
       <CaixaDoGuia titulo="Antes de começar">
         <ListaDoGuia itens={soDoModo(ANTES_DE_COMECAR, modo)} />
       </CaixaDoGuia>
-      <ol className="guia__passos">
+      <ol className="guia-como-usar__passos">
         {passos.map((passo, indice) => (
           <PassoDoGuia
             key={`${modo}-${passo.titulo}`}
@@ -48,11 +48,11 @@ export default function GuiaComoUsar({ aoIrParaOPainel, medirAlturaDoCabecalhoFi
         ))}
       </ol>
       {aoIrParaOPainel && (
-        <button type="button" id={ID_DO_FIM_DO_GUIA} className="guia__ir-para-o-painel" onClick={aoIrParaOPainel}>
+        <button type="button" id={ID_DO_FIM_DO_GUIA} className="guia-como-usar__ir-para-o-painel" onClick={aoIrParaOPainel}>
           Ver o relatório desta análise
         </button>
       )}
-      <div className="guia__grade">
+      <div className="guia-como-usar__grade">
         <CaixaDoGuia titulo="Se algo der errado">
           {soDoModo(PROBLEMAS, modo).map((problema) => (
             <ProblemaDoGuia key={problema.sintoma} problema={problema} />

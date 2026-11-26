@@ -7,7 +7,7 @@ interface Props {
 
 export default function DadosDaExecucao({ pentest }: Props) {
   return (
-    <dl className="painel-pentest__origem">
+    <dl className="painel-da-seguranca-ativa__origem">
       <div>
         <dt>Site testado</dt>
         <dd>{pentest.site}</dd>

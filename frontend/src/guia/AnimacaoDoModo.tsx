@@ -33,14 +33,14 @@ interface Props {
 export default function AnimacaoDoModo({ modo }: Props) {
   const { desenhos, legendas } = QUADROS[modo];
   return (
-    <svg className="modo-anim" viewBox="0 0 264 76" aria-hidden="true">
+    <svg className="animacao-do-modo" viewBox="0 0 264 76" aria-hidden="true">
       {desenhos.map((desenho, indice) => (
         <QuadroDoModo key={legendas[indice]} posicao={POSICOES[indice]} numero={indice + 1} legenda={legendas[indice]}>
           {desenho}
         </QuadroDoModo>
       ))}
-      <path className="modo-anim__traco modo-anim__traco--suave-seta" d="M76 30 h14 M86 26 l4 4 l-4 4" />
-      <path className="modo-anim__traco modo-anim__traco--suave-seta" d="M172 30 h14 M182 26 l4 4 l-4 4" />
+      <path className="animacao-do-modo__traco animacao-do-modo__traco--suave-seta" d="M76 30 h14 M86 26 l4 4 l-4 4" />
+      <path className="animacao-do-modo__traco animacao-do-modo__traco--suave-seta" d="M172 30 h14 M182 26 l4 4 l-4 4" />
     </svg>
   );
 }

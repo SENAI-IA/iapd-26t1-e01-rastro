@@ -1,10 +1,10 @@
-const NUMERO = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const UMA_CASA_DECIMAL = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const PERCENTIL = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 5 });
 const INTEIRO = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
 const DATA = new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" });
 
 export function formatarNota(nota: number): string {
-  return NUMERO.format(nota);
+  return UMA_CASA_DECIMAL.format(nota);
 }
 
 export function formatarPercentil(percentil: number): string {
@@ -12,7 +12,7 @@ export function formatarPercentil(percentil: number): string {
 }
 
 export function formatarDuracao(segundos: number): string {
-  return `${NUMERO.format(segundos)} s`;
+  return `${UMA_CASA_DECIMAL.format(segundos)} s`;
 }
 
 export function formatarData(dataIso: string): string {
@@ -20,7 +20,7 @@ export function formatarData(dataIso: string): string {
   return Number.isNaN(data.getTime()) ? dataIso : DATA.format(data);
 }
 
-export function plural(quantidade: number, singular: string, varios: string): string {
+export function comPlural(quantidade: number, singular: string, varios: string): string {
   return `${quantidade} ${quantidade === 1 ? singular : varios}`;
 }
 

@@ -1,23 +1,23 @@
 import type { ReactNode } from "react";
 import Icone, { type NomeDoIcone } from "../basicos/Icone.tsx";
-import type { Tela } from "../telas/tiposDaTela.ts";
+import type { Aba } from "../telas/tiposDaTela.ts";
 
 interface Props {
-  tela: Tela;
-  telaAberta: Tela;
+  aba: Aba;
+  abaAtual: Aba;
   icone: NomeDoIcone;
   classeExtra?: string;
-  aoTrocarTela: (tela: Tela) => void;
+  aoTrocarAba: (aba: Aba) => void;
   children: ReactNode;
 }
 
-export default function BotaoDaAba({ tela, telaAberta, icone, classeExtra, aoTrocarTela, children }: Props) {
+export default function BotaoDaAba({ aba, abaAtual, icone, classeExtra, aoTrocarAba, children }: Props) {
   return (
     <button
       type="button"
-      className={classeExtra ? `barra-superior__tela ${classeExtra}` : "barra-superior__tela"}
-      aria-current={tela === telaAberta ? "page" : undefined}
-      onClick={() => aoTrocarTela(tela)}
+      className={classeExtra ? `barra-superior__aba ${classeExtra}` : "barra-superior__aba"}
+      aria-current={aba === abaAtual ? "page" : undefined}
+      onClick={() => aoTrocarAba(aba)}
     >
       <Icone nome={icone} />
       {children}

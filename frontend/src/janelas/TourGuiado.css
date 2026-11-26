@@ -1,4 +1,4 @@
-.tour {
+.tour-guiado {
   position: fixed;
   inset: 0;
   width: 100%;
@@ -12,11 +12,11 @@
   overflow: hidden;
 }
 
-.tour::backdrop {
+.tour-guiado::backdrop {
   background: transparent;
 }
 
-.tour__destaque {
+.tour-guiado__destaque {
   position: fixed;
   border-radius: var(--raio);
   outline: 2px solid var(--cor-destaque);
@@ -25,7 +25,7 @@
   transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease;
 }
 
-.tour__balao {
+.tour-guiado__balao {
   position: fixed;
   display: grid;
   gap: 8px;
@@ -36,36 +36,36 @@
   background: var(--cor-superficie);
   box-shadow: var(--sombra);
   color: var(--cor-texto);
-  animation: tour-entra 0.25s ease;
+  animation: tour-guiado-entra 0.25s ease;
 }
 
-.tour__balao--medindo {
+.tour-guiado__balao--medindo {
   top: 0;
   left: 0;
   visibility: hidden;
 }
 
-.tour__passo {
+.tour-guiado__passo {
   color: var(--cor-texto-suave);
   font-family: var(--fonte-mono);
   font-size: 12px;
 }
 
-.tour__titulo {
+.tour-guiado__titulo {
   margin: 0;
   font-family: var(--fonte-titulo);
   font-size: 17px;
   font-weight: 600;
 }
 
-.tour__texto {
+.tour-guiado__texto {
   margin: 0;
   color: var(--cor-texto-suave);
   font-size: 14px;
   line-height: 1.5;
 }
 
-.tour__termos {
+.tour-guiado__termos {
   display: grid;
   gap: 6px;
   margin: 0;
@@ -74,7 +74,7 @@
   background: var(--cor-fundo);
 }
 
-.tour__rotulo {
+.tour-guiado__rotulo {
   color: var(--cor-texto-suave);
   font-size: 11px;
   font-weight: 600;
@@ -82,19 +82,19 @@
   text-transform: uppercase;
 }
 
-.tour__termos dt {
+.tour-guiado__termos dt {
   font-size: 13px;
   font-weight: 600;
 }
 
-.tour__termos dd {
+.tour-guiado__termos dd {
   margin: 0;
   color: var(--cor-texto-suave);
   font-size: 13px;
   line-height: 1.45;
 }
 
-.tour__acoes {
+.tour-guiado__acoes {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -102,12 +102,12 @@
   margin-top: 4px;
 }
 
-.tour__navegacao {
+.tour-guiado__navegacao {
   display: flex;
   gap: 6px;
 }
 
-.tour__pular {
+.tour-guiado__pular {
   padding: 6px 0;
   border: 0;
   background: none;
@@ -116,11 +116,11 @@
   cursor: pointer;
 }
 
-.tour__pular:hover {
+.tour-guiado__pular:hover {
   color: var(--cor-texto);
 }
 
-.tour__botao {
+.tour-guiado__botao {
   padding: 8px 12px;
   border: 1px solid var(--cor-destaque);
   border-radius: var(--raio-pequeno);
@@ -130,13 +130,13 @@
   cursor: pointer;
 }
 
-.tour__botao--secundario {
+.tour-guiado__botao--secundario {
   border-color: var(--cor-linha);
   background: var(--cor-superficie);
   color: var(--cor-texto);
 }
 
-@keyframes tour-entra {
+@keyframes tour-guiado-entra {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -144,8 +144,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tour__destaque,
-  .tour__balao {
+  .tour-guiado__destaque,
+  .tour-guiado__balao {
     animation: none;
     transition: none;
   }

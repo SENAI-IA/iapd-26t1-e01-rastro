@@ -1,5 +1,5 @@
 import type { PassoDaVisita } from "../../relatorio/tiposDoRelatorio.ts";
-import type { Chegada } from "../../calculosDeTela/chegadasDaVisita.ts";
+import type { ChegadaDeBiblioteca } from "../../calculosDeTela/chegadasDaVisita.ts";
 import { estadoDoRadar, type EstadoDoRadar } from "../../calculosDeTela/estadoDoRadar.ts";
 import { CENTRO, enquadramento, fatiaDoRastro } from "../../calculosDeTela/geometriaDoRadar.ts";
 import { caminhoDaUrl } from "../../formatacao/formato.ts";
@@ -13,8 +13,8 @@ const ABERTURA_DO_RASTRO = 40;
 
 interface Props {
   passos: PassoDaVisita[];
-  chegadas: Chegada[];
-  progresso: number;
+  chegadas: ChegadaDeBiblioteca[];
+  requisicoesTocadas: number;
   bibliotecaEmDestaque: string | null;
   aoEscolherBiblioteca: (id: string) => void;
   aoDestacarBiblioteca: (id: string | null) => void;
@@ -37,12 +37,12 @@ function classeDoRadar(estado: EstadoDoRadar): string {
 export default function RadarDaVisita({
   passos,
   chegadas,
-  progresso,
+  requisicoesTocadas,
   bibliotecaEmDestaque,
   aoEscolherBiblioteca,
   aoDestacarBiblioteca,
 }: Props) {
-  const estado = estadoDoRadar(passos, chegadas, progresso);
+  const estado = estadoDoRadar(passos, chegadas, requisicoesTocadas);
   return (
     <svg
       className={classeDoRadar(estado)}
@@ -59,7 +59,7 @@ export default function RadarDaVisita({
         </>
       )}
       {estado.recentes.map(({ ordem, ponto }) => (
-        <line key={`r${ordem}`} className="radar__recente" x1={CENTRO.x} y1={CENTRO.y} x2={ponto.x} y2={ponto.y} />
+        <line key={`recente-${ordem}`} className="radar__recente" x1={CENTRO.x} y1={CENTRO.y} x2={ponto.x} y2={ponto.y} />
       ))}
       {estado.chegaram.map(({ ordem, ponto }) => (
         <circle key={ordem} className="radar__requisicao" cx={ponto.x} cy={ponto.y} r={2.8}>
@@ -76,7 +76,7 @@ export default function RadarDaVisita({
         />
       ))}
       {estado.falhasRepetidas.map(({ ordem, ponto }) => (
-        <circle key={`f${ordem}`} className="radar__alvo radar__alvo--repetido" cx={ponto.x} cy={ponto.y} r={4.5} />
+        <circle key={`falha-repetida-${ordem}`} className="radar__alvo radar__alvo--repetido" cx={ponto.x} cy={ponto.y} r={4.5} />
       ))}
       <CentroDoRadar momento={estado.momento} />
     </svg>

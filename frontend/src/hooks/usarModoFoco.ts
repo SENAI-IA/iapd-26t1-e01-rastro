@@ -13,7 +13,7 @@ function rolarAteAZona(zona: NomeDaZona, cabecalhoFixo: HTMLElement | null) {
     return;
   }
   rolarAteOElemento(elemento, cabecalhoFixo?.offsetHeight ?? 0);
-  elemento.querySelector<HTMLButtonElement>(".zona__focar")?.focus({ preventScroll: true });
+  elemento.querySelector<HTMLButtonElement>(".zona-do-painel__focar")?.focus({ preventScroll: true });
 }
 
 export function usarModoFoco(cabecalhoFixo: RefObject<HTMLElement | null>) {

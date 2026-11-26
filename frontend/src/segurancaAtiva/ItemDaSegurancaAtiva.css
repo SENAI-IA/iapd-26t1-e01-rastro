@@ -1,0 +1,106 @@
+.item-da-seguranca-ativa + .item-da-seguranca-ativa {
+  border-top: 1px solid var(--cor-linha);
+}
+.item-da-seguranca-ativa__resumo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+.item-da-seguranca-ativa__resumo::-webkit-details-marker {
+  display: none;
+}
+.item-da-seguranca-ativa__resumo:hover {
+  background: var(--cor-superficie-2);
+}
+.item-da-seguranca-ativa__seta {
+  display: inline-flex;
+  color: var(--cor-texto-fraco);
+  transition: transform .2s ease;
+}
+details[open] > .item-da-seguranca-ativa__resumo .item-da-seguranca-ativa__seta {
+  transform: rotate(90deg);
+}
+.item-da-seguranca-ativa__titulo {
+  min-width: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.item-da-seguranca-ativa__contagem {
+  margin-left: auto;
+  color: var(--cor-texto-suave);
+  font-size: 12.5px;
+}
+.item-da-seguranca-ativa__corpo {
+  display: grid;
+  gap: 7px;
+  padding: 10px 16px 14px 42px;
+  border-top: 1px solid var(--cor-linha);
+  background: var(--cor-superficie-2);
+  font-size: 13.5px;
+}
+.item-da-seguranca-ativa__corpo p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.item-da-seguranca-ativa__porque {
+  color: var(--cor-texto);
+}
+.item-da-seguranca-ativa__corpo h3 {
+  margin: 4px 0 2px;
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+}
+.item-da-seguranca-ativa__detalhes {
+  margin: 0;
+  padding-left: 18px;
+}
+.item-da-seguranca-ativa__enderecos > summary {
+  width: fit-content;
+  color: var(--cor-destaque);
+  cursor: pointer;
+}
+.item-da-seguranca-ativa__enderecos ul {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.item-da-seguranca-ativa__enderecos li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.item-da-seguranca-ativa__enderecos code {
+  flex: 1 1 0;
+  min-width: 12ch;
+  overflow-wrap: anywhere;
+}
+.item-da-seguranca-ativa__endereco--falhou [role="img"] {
+  color: var(--cor-critico);
+}
+.item-da-seguranca-ativa__endereco--passou [role="img"] {
+  color: var(--cor-bom);
+}
+.item-da-seguranca-ativa__endereco--nao_verificada [role="img"] {
+  color: var(--cor-texto-fraco);
+}
+.item-da-seguranca-ativa__dados-da-requisicao,
+.item-da-seguranca-ativa__referencia {
+  color: var(--cor-texto-suave);
+  font-size: 12.5px;
+}
+@media (max-width: 460px) {
+  .item-da-seguranca-ativa__contagem {
+    margin-left: 0;
+  }
+  .item-da-seguranca-ativa__corpo {
+    padding-left: 16px;
+  }
+}

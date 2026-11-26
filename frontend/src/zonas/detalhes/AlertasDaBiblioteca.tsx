@@ -10,7 +10,7 @@ export default function AlertasDaBiblioteca({ biblioteca }: Props) {
   return (
     <>
       {biblioteca.motivo_nao_consultada !== null && (
-        <p className="linha-biblioteca__alerta">
+        <p className="item-da-biblioteca__alerta">
           <Icone nome="triangulo" />
           <span>
             Não consultada no GitHub Advisory: {biblioteca.motivo_nao_consultada}. As falhas desta
@@ -19,7 +19,7 @@ export default function AlertasDaBiblioteca({ biblioteca }: Props) {
         </p>
       )}
       {biblioteca.conferida_no_npm === null && (
-        <p className="linha-biblioteca__alerta">
+        <p className="item-da-biblioteca__alerta">
           <Icone nome="pacote" />
           <span>
             O registro do <Termo nome="npm" /> não respondeu, então não deu para conferir que{" "}

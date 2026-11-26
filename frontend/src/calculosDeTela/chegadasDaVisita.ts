@@ -1,17 +1,17 @@
 import type { Biblioteca, PassoDaVisita, Prioridade } from "../relatorio/tiposDoRelatorio.ts";
 
-export interface Chegada {
+export interface ChegadaDeBiblioteca {
   id: string;
   pacote: string;
   versao: string;
   prioridade: Prioridade;
   inicio_ms: number;
-  ordem: number;
+  ordemDaRequisicao: number;
 }
 
-export function listarChegadas(passos: PassoDaVisita[], bibliotecas: Biblioteca[]): Chegada[] {
-  const chegadas = new Map<string, Chegada>();
-  for (const [ordem, passo] of passos.entries()) {
+export function listarChegadas(passos: PassoDaVisita[], bibliotecas: Biblioteca[]): ChegadaDeBiblioteca[] {
+  const chegadas = new Map<string, ChegadaDeBiblioteca>();
+  for (const [ordemDaRequisicao, passo] of passos.entries()) {
     for (const id of passo.bibliotecas) {
       const biblioteca = bibliotecas.find((candidata) => candidata.id === id);
       if (!chegadas.has(id) && biblioteca?.prioridade) {
@@ -21,7 +21,7 @@ export function listarChegadas(passos: PassoDaVisita[], bibliotecas: Biblioteca[
           versao: biblioteca.versao,
           prioridade: biblioteca.prioridade,
           inicio_ms: passo.inicio_ms,
-          ordem,
+          ordemDaRequisicao,
         });
       }
     }

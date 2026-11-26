@@ -7,7 +7,7 @@ interface Props {
 
 export default function ProblemaDoGuia({ problema }: Props) {
   return (
-    <details className="guia__problema">
+    <details className="guia-como-usar__problema">
       <summary>{problema.sintoma}</summary>
       <p>
         <TextoComMarcas texto={problema.solucao} />

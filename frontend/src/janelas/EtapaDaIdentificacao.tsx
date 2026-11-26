@@ -17,7 +17,7 @@ function trechosSemRepeticao(biblioteca: Biblioteca): string[] {
 export default function EtapaDaIdentificacao({ biblioteca }: Props) {
   return (
     <EtapaDaOrigem numero={2} titulo="Identificação da biblioteca">
-      <dl className="painel-origem__dados">
+      <dl className="painel-origem-do-dado__dados">
         <dt>Método</dt>
         <dd>
           <SeloDoMetodo metodo={biblioteca.metodo} />
@@ -34,7 +34,7 @@ export default function EtapaDaIdentificacao({ biblioteca }: Props) {
         <dd>{textoDoNpm(biblioteca.conferida_no_npm)}</dd>
       </dl>
       {trechosSemRepeticao(biblioteca).map((trecho) => (
-        <pre key={trecho} className="painel-origem__trecho">
+        <pre key={trecho} className="painel-origem-do-dado__trecho">
           {trecho}
         </pre>
       ))}

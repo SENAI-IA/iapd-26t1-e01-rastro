@@ -4,7 +4,7 @@ import { listarChegadas } from "../../calculosDeTela/chegadasDaVisita.ts";
 import {
   duracaoDaVisita,
   duracaoDoReplay,
-  progressoDoReplay,
+  requisicoesTocadasNoTempo,
   requisicoesQueChegaram,
 } from "../../calculosDeTela/progressoDoReplay.ts";
 import ContagemDoReplay from "./ContagemDoReplay.tsx";
@@ -24,20 +24,20 @@ interface Props {
 }
 
 export default function ReplayDaVisita({ passos, bibliotecas, aoIrParaBiblioteca }: Props) {
-  const replay = duracaoDoReplay(passos.length);
-  const relogio = usarRelogioDoReplay(replay);
-  const progresso = progressoDoReplay(relogio.tempo, replay, passos.length);
+  const duracaoDoReplayEmMilissegundos = duracaoDoReplay(passos.length);
+  const relogio = usarRelogioDoReplay(duracaoDoReplayEmMilissegundos);
+  const requisicoesTocadas = requisicoesTocadasNoTempo(relogio.tempo, duracaoDoReplayEmMilissegundos, passos.length);
   const [bibliotecaEmDestaque, setBibliotecaEmDestaque] = useState<string | null>(null);
   const chegadas = listarChegadas(passos, bibliotecas);
-  const chegaram = requisicoesQueChegaram(progresso, passos.length);
-  const falhasQueChegaram = chegadas.filter((chegada) => chegada.ordem < progresso);
-  const terminou = relogio.tempo >= replay;
-  const painel = useRef<HTMLDivElement>(null);
-  const alturaDoPalco = usarAlturaAteADobra(painel);
+  const chegaram = requisicoesQueChegaram(requisicoesTocadas, passos.length);
+  const falhasQueChegaram = chegadas.filter((chegada) => chegada.ordemDaRequisicao < requisicoesTocadas);
+  const terminou = relogio.tempo >= duracaoDoReplayEmMilissegundos;
+  const blocoDoReplay = useRef<HTMLDivElement>(null);
+  const alturaDoPalco = usarAlturaAteADobra(blocoDoReplay);
 
   return (
     <section className="replay" aria-labelledby="replay-titulo">
-      <div className="replay__painel" ref={painel}>
+      <div className="replay__painel" ref={blocoDoReplay}>
         <div className="replay__lado">
           <div className="replay__cabecalho">
             <h2 id="replay-titulo">A visita, de novo</h2>
@@ -55,7 +55,7 @@ export default function ReplayDaVisita({ passos, bibliotecas, aoIrParaBiblioteca
             falhas={falhasQueChegaram.length}
             totalDeFalhas={chegadas.length}
           />
-          <ControlesDoReplay relogio={relogio} duracaoDoReplay={replay} duracaoDaVisita={duracaoDaVisita(passos)} />
+          <ControlesDoReplay relogio={relogio} duracaoDoReplay={duracaoDoReplayEmMilissegundos} duracaoDaVisita={duracaoDaVisita(passos)} />
           <LegendaDoReplay />
         </div>
         <div
@@ -65,7 +65,7 @@ export default function ReplayDaVisita({ passos, bibliotecas, aoIrParaBiblioteca
           <RadarDaVisita
             passos={passos}
             chegadas={chegadas}
-            progresso={progresso}
+            requisicoesTocadas={requisicoesTocadas}
             bibliotecaEmDestaque={bibliotecaEmDestaque}
             aoEscolherBiblioteca={aoIrParaBiblioteca}
             aoDestacarBiblioteca={setBibliotecaEmDestaque}

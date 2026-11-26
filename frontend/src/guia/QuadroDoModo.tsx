@@ -11,7 +11,7 @@ export default function QuadroDoModo({ posicao, numero, legenda, children }: Pro
   return (
     <g transform={`translate(${posicao} 2)`}>
       <rect
-        className={`modo-anim__traco modo-anim__quadro modo-anim__quadro--${numero}`}
+        className={`animacao-do-modo__traco animacao-do-modo__quadro animacao-do-modo__quadro--${numero}`}
         x="0"
         y="0"
         width="68"
@@ -19,7 +19,7 @@ export default function QuadroDoModo({ posicao, numero, legenda, children }: Pro
         rx="3"
       />
       {children}
-      <text className="modo-anim__legenda" x="34" y="70" textAnchor="middle">
+      <text className="animacao-do-modo__legenda" x="34" y="70" textAnchor="middle">
         {legenda}
       </text>
     </g>

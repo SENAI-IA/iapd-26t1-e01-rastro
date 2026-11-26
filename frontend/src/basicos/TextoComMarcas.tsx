@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 
-const MARCAS = /(\*\*[^*]+\*\*|`[^`]+`)/;
+const NEGRITO_OU_CODIGO = /(\*\*[^*]+\*\*|`[^`]+`)/;
 
 interface Props {
   texto: string;
 }
 
-function trecho(parte: string, indice: number): ReactNode {
+function desenharParte(parte: string, indice: number): ReactNode {
   if (parte.startsWith("**")) {
     return <strong key={indice}>{parte.slice(2, -2)}</strong>;
   }
@@ -17,5 +17,5 @@ function trecho(parte: string, indice: number): ReactNode {
 }
 
 export default function TextoComMarcas({ texto }: Props) {
-  return <>{texto.split(MARCAS).map(trecho)}</>;
+  return <>{texto.split(NEGRITO_OU_CODIGO).map(desenharParte)}</>;
 }

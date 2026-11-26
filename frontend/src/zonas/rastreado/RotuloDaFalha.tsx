@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from "react";
 import type { Prioridade } from "../../relatorio/tiposDoRelatorio.ts";
-import type { Chegada } from "../../calculosDeTela/chegadasDaVisita.ts";
+import type { ChegadaDeBiblioteca } from "../../calculosDeTela/chegadasDaVisita.ts";
 import { caminhoDoFio, CENTRO, type Rotulo } from "../../calculosDeTela/geometriaDoRadar.ts";
 
 const TOM_DA_PRIORIDADE: Record<Prioridade, string> = {
@@ -20,7 +20,7 @@ function acionarComTeclado(acao: () => void) {
 }
 
 interface Props {
-  rotulo: Rotulo<Chegada>;
+  rotulo: Rotulo<ChegadaDeBiblioteca>;
   emDestaque: boolean;
   aoEscolher: (id: string) => void;
   aoDestacar: (id: string | null) => void;

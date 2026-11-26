@@ -7,12 +7,12 @@ interface Props {
 
 export default function ComparacaoComESemIA({ comparacao }: Props) {
   return (
-    <div className="painel-ia__tabela">
+    <div className="painel-da-ia__tabela">
       <table>
         <thead>
           <tr>
             <th scope="col">
-              <span className="painel-ia__oculto">Medida</span>
+              <span className="painel-da-ia__oculto">Medida</span>
             </th>
             <th scope="col">
               Só por <Termo nome="Assinatura">assinatura</Termo>

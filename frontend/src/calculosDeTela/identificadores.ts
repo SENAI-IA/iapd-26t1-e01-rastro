@@ -4,7 +4,7 @@ export function idDaZona(zona: NomeDaZona): string {
   return `zona-${zona}`;
 }
 
-export function idDaLinhaDaBiblioteca(idDaBiblioteca: string): string {
+export function idDoItemDaBiblioteca(idDaBiblioteca: string): string {
   return `biblioteca-${idDaBiblioteca}`;
 }
 

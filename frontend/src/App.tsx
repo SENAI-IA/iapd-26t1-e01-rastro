@@ -1,18 +1,18 @@
 import { useRef, useState } from "react";
 import "./App.css";
 import type { Acao, Relatorio } from "./relatorio/tiposDoRelatorio.ts";
-import type { OrigemDoDado, Tela } from "./telas/tiposDaTela.ts";
-import AvisoSemIA from "./moldura/AvisoSemIA.tsx";
+import type { OrigemDoDado, Aba } from "./telas/tiposDaTela.ts";
+import AvisoDeLimitacoes from "./moldura/AvisoDeLimitacoes.tsx";
 import BarraDeFoco from "./moldura/BarraDeFoco.tsx";
 import BarraSuperior from "./moldura/BarraSuperior.tsx";
 import GuiaComoUsar from "./guia/GuiaComoUsar.tsx";
-import ModalTask from "./zonas/agir/ModalTask.tsx";
+import JanelaDaTarefa from "./zonas/agir/JanelaDaTarefa.tsx";
 import PainelOrigemDoDado from "./janelas/PainelOrigemDoDado.tsx";
-import PainelPentest from "./segurancaAtiva/PainelPentest.tsx";
+import PainelDaSegurancaAtiva from "./segurancaAtiva/PainelDaSegurancaAtiva.tsx";
 import TelaDoPainel from "./telas/TelaDoPainel.tsx";
 import TourGuiado from "./janelas/TourGuiado.tsx";
 import { PASSOS_DO_TOUR, type PassoDoTour } from "./conteudo/tour.ts";
-import { idDaLinhaDaBiblioteca } from "./calculosDeTela/identificadores.ts";
+import { idDoItemDaBiblioteca } from "./calculosDeTela/identificadores.ts";
 import { rolarAteOElemento } from "./calculosDeTela/rolagem.ts";
 import { depoisDeDesenhar } from "./calculosDeTela/desenho.ts";
 import { usarModoFoco } from "./hooks/usarModoFoco.ts";
@@ -27,35 +27,35 @@ function passosQueExistemNaTela(): PassoDoTour[] {
 }
 
 function abrirBiblioteca(id: string, cabecalhoFixo: HTMLElement | null) {
-  const linha = document.getElementById(idDaLinhaDaBiblioteca(id));
-  if (!linha) {
+  const itemDaBiblioteca = document.getElementById(idDoItemDaBiblioteca(id));
+  if (!itemDaBiblioteca) {
     return;
   }
-  linha.querySelector("details")?.setAttribute("open", "");
-  rolarAteOElemento(linha, cabecalhoFixo?.offsetHeight ?? 0, "smooth");
-  linha.querySelector<HTMLElement>("summary")?.focus({ preventScroll: true });
+  itemDaBiblioteca.querySelector("details")?.setAttribute("open", "");
+  rolarAteOElemento(itemDaBiblioteca, cabecalhoFixo?.offsetHeight ?? 0, "smooth");
+  itemDaBiblioteca.querySelector<HTMLElement>("summary")?.focus({ preventScroll: true });
 }
 
 export default function App({ relatorio }: Props) {
   const cabecalhoFixo = useRef<HTMLDivElement>(null);
   const { tema, trocarTema } = usarTema();
   const { zonaEmFoco, entrarNoFoco, sairDoFoco, sairDoFocoSemVoltarAZona } = usarModoFoco(cabecalhoFixo);
-  const [tela, setTela] = useState<Tela>(relatorio ? "painel" : "como-usar");
+  const [abaAtual, setAbaAtual] = useState<Aba>(relatorio ? "painel" : "como-usar");
   const [origemAberta, setOrigemAberta] = useState<OrigemDoDado | null>(null);
-  const [taskAberta, setTaskAberta] = useState<Acao | null>(null);
+  const [tarefaAberta, setTarefaAberta] = useState<Acao | null>(null);
   const [passosDoTour, setPassosDoTour] = useState<PassoDoTour[] | null>(null);
 
   const medirAlturaDoCabecalhoFixo = () => cabecalhoFixo.current?.offsetHeight ?? 0;
 
-  const trocarTela = (novaTela: Tela) => {
+  const trocarAba = (novaAba: Aba) => {
     sairDoFocoSemVoltarAZona();
-    setTela(novaTela);
+    setAbaAtual(novaAba);
     window.scrollTo({ top: 0 });
   };
 
   const abrirTour = () => {
     sairDoFocoSemVoltarAZona();
-    setTela("painel");
+    setAbaAtual("painel");
     depoisDeDesenhar(() => setPassosDoTour(passosQueExistemNaTela()));
   };
 
@@ -65,10 +65,10 @@ export default function App({ relatorio }: Props) {
   };
 
   const conteudoDaAba = () => {
-    if (tela === "como-usar") {
+    if (abaAtual === "como-usar") {
       return (
         <GuiaComoUsar
-          aoIrParaOPainel={relatorio ? () => trocarTela("painel") : null}
+          aoIrParaOPainel={relatorio ? () => trocarAba("painel") : null}
           medirAlturaDoCabecalhoFixo={medirAlturaDoCabecalhoFixo}
         />
       );
@@ -76,8 +76,8 @@ export default function App({ relatorio }: Props) {
     if (relatorio === null) {
       return <p>Este arquivo não traz os dados de uma análise. Gere o relatório com o Rastro: veja em "Como usar".</p>;
     }
-    if (tela === "pentest" && relatorio.pentest) {
-      return <PainelPentest pentest={relatorio.pentest} />;
+    if (abaAtual === "pentest" && relatorio.pentest) {
+      return <PainelDaSegurancaAtiva pentest={relatorio.pentest} />;
     }
     return (
       <TelaDoPainel
@@ -85,7 +85,7 @@ export default function App({ relatorio }: Props) {
         zonaEmFoco={zonaEmFoco}
         aoFocar={entrarNoFoco}
         aoIrParaBiblioteca={irParaBiblioteca}
-        aoAbrirTask={setTaskAberta}
+        aoAbrirTarefa={setTarefaAberta}
         aoVerOrigem={setOrigemAberta}
       />
     );
@@ -93,27 +93,27 @@ export default function App({ relatorio }: Props) {
 
   return (
     <>
-      <div className="app__topo" ref={cabecalhoFixo}>
+      <div className="app__cabecalho-fixo" ref={cabecalhoFixo}>
         <BarraSuperior
           tema={tema}
-          tela={tela}
+          abaAtual={abaAtual}
           aoTrocarTema={trocarTema}
-          aoTrocarTela={trocarTela}
+          aoTrocarAba={trocarAba}
           aoAbrirTour={relatorio ? abrirTour : null}
           temPentest={relatorio?.pentest != null}
         />
         {relatorio && zonaEmFoco && (
           <BarraDeFoco zonaEmFoco={zonaEmFoco} aoTrocarZona={entrarNoFoco} aoSair={sairDoFoco} />
         )}
-        {relatorio && tela === "painel" && relatorio.analise.limitacoes.length > 0 && (
-          <AvisoSemIA analise={relatorio.analise} recolhido={zonaEmFoco !== null || passosDoTour !== null} />
+        {relatorio && abaAtual === "painel" && relatorio.analise.limitacoes.length > 0 && (
+          <AvisoDeLimitacoes analise={relatorio.analise} recolhido={zonaEmFoco !== null || passosDoTour !== null} />
         )}
       </div>
       <main className={zonaEmFoco ? "app app--foco" : "app"}>{conteudoDaAba()}</main>
       {origemAberta && <PainelOrigemDoDado origem={origemAberta} aoFechar={() => setOrigemAberta(null)} />}
-      {taskAberta && <ModalTask acao={taskAberta} aoFechar={() => setTaskAberta(null)} />}
+      {tarefaAberta && <JanelaDaTarefa acao={tarefaAberta} aoFechar={() => setTarefaAberta(null)} />}
       {passosDoTour && passosDoTour.length > 0 && (
-        <TourGuiado passos={passosDoTour} topo={cabecalhoFixo.current} aoFechar={() => setPassosDoTour(null)} />
+        <TourGuiado passos={passosDoTour} cabecalhoFixo={cabecalhoFixo.current} aoFechar={() => setPassosDoTour(null)} />
       )}
     </>
   );

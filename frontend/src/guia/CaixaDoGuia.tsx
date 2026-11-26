@@ -7,7 +7,7 @@ interface Props {
 
 export default function CaixaDoGuia({ titulo, children }: Props) {
   return (
-    <div className="guia__caixa">
+    <div className="guia-como-usar__caixa">
       <h2>{titulo}</h2>
       {children}
     </div>

@@ -16,17 +16,17 @@ interface Props {
 
 export default function AcoesDaCopia({ estadoDaCopia, botaoCopiar, aoCopiar }: Props) {
   return (
-    <div className="modal-task__acoes">
+    <div className="janela-da-tarefa__acoes">
       <button
         type="button"
-        className={`modal-task__copiar modal-task__copiar--${estadoDaCopia}`}
+        className={`janela-da-tarefa__copiar janela-da-tarefa__copiar--${estadoDaCopia}`}
         ref={botaoCopiar}
         onClick={aoCopiar}
       >
         {estadoDaCopia === "copiada" && <Icone nome="certo" tamanho={14} />}
         {TEXTO_DO_BOTAO[estadoDaCopia]}
       </button>
-      <span className="modal-task__aviso" role="status">
+      <span className="janela-da-tarefa__aviso" role="status">
         {estadoDaCopia === "copiada" ? "Task copiada para a área de transferência." : ""}
       </span>
     </div>

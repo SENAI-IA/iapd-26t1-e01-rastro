@@ -1,6 +1,6 @@
 import { useId, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import { glossario, type NomeDoTermo } from "../conteudo/glossario.ts";
-import Dica from "./Dica.tsx";
+import DicaDoTermo from "./DicaDoTermo.tsx";
 import "./Termo.css";
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 
 export default function Termo({ nome, children }: Props) {
   const idDaDica = useId();
-  const [termo, setTermo] = useState<HTMLSpanElement | null>(null);
+  const [elementoDoTermo, setElementoDoTermo] = useState<HTMLSpanElement | null>(null);
   const [sobOPonteiro, setSobOPonteiro] = useState(false);
   const [comFoco, setComFoco] = useState(false);
 
@@ -32,7 +32,7 @@ export default function Termo({ nome, children }: Props) {
   return (
     <>
       <span
-        ref={setTermo}
+        ref={setElementoDoTermo}
         className="termo"
         tabIndex={0}
         aria-describedby={idDaDica}
@@ -45,7 +45,7 @@ export default function Termo({ nome, children }: Props) {
       >
         {children ?? nome}
       </span>
-      <Dica id={idDaDica} titulo={nome} definicao={glossario[nome]} ancora={termo} aberta={sobOPonteiro || comFoco} />
+      <DicaDoTermo id={idDaDica} titulo={nome} definicao={glossario[nome]} ancora={elementoDoTermo} aberta={sobOPonteiro || comFoco} />
     </>
   );
 }

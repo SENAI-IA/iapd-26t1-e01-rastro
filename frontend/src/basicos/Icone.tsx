@@ -1,6 +1,6 @@
 import "./Icone.css";
 
-const TRACOS = {
+const DESENHOS_DOS_ICONES = {
   logo: (
     <>
       <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -34,7 +34,7 @@ const TRACOS = {
       <path d="M12 9v4M12 16.5v.01" />
     </>
   ),
-  info: (
+  informacao: (
     <>
       <circle cx="12" cy="12" r="9" />
       <path d="M12 11v5M12 8v.01" />
@@ -134,7 +134,7 @@ const TRACOS = {
   ),
 };
 
-export type NomeDoIcone = keyof typeof TRACOS;
+export type NomeDoIcone = keyof typeof DESENHOS_DOS_ICONES;
 
 interface Props {
   nome: NomeDoIcone;
@@ -155,7 +155,7 @@ export default function Icone({ nome, tamanho = 14 }: Props) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      {TRACOS[nome]}
+      {DESENHOS_DOS_ICONES[nome]}
     </svg>
   );
 }

@@ -9,7 +9,10 @@ export default function ComandosDoPasso({ comandos }: Props) {
   const [copiado, setCopiado] = useState<string | null>(null);
 
   const copiar = (comando: Comando) => {
-    navigator.clipboard?.writeText(comando.texto).then(
+    if (!navigator.clipboard) {
+      return;
+    }
+    navigator.clipboard.writeText(comando.texto).then(
       () => setCopiado(comando.sistema),
       () => setCopiado(null),
     );

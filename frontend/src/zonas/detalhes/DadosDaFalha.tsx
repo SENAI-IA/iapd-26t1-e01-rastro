@@ -8,7 +8,7 @@ interface Props {
 
 export default function DadosDaFalha({ aviso }: Props) {
   return (
-    <dl className="item-falha__dados">
+    <dl className="item-da-falha__dados">
       <div>
         <dt>
           <Termo nome="CVSS" />

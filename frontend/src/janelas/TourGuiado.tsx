@@ -7,7 +7,7 @@ import "./TourGuiado.css";
 
 interface Props {
   passos: PassoDoTour[];
-  topo: HTMLElement | null;
+  cabecalhoFixo: HTMLElement | null;
   aoFechar: () => void;
 }
 
@@ -23,11 +23,11 @@ function andarPelasSetas(avancar: () => void, voltar: () => void) {
   };
 }
 
-export default function TourGuiado({ passos, topo, aoFechar }: Props) {
+export default function TourGuiado({ passos, cabecalhoFixo, aoFechar }: Props) {
   const { janela, fechar, fecharAoClicarFora } = usarJanelaModal();
   const balao = useRef<HTMLDivElement>(null);
   const [indice, setIndice] = useState(0);
-  const posicao = usarPosicaoDoTour(passos[indice], topo, balao);
+  const posicao = usarPosicaoDoTour(passos[indice], cabecalhoFixo, balao);
 
   const avancar = () => {
     if (indice === passos.length - 1) {
@@ -46,15 +46,15 @@ export default function TourGuiado({ passos, topo, aoFechar }: Props) {
   return (
     <dialog
       ref={janela}
-      className="tour"
-      aria-labelledby="tour-titulo"
+      className="tour-guiado"
+      aria-labelledby="tour-guiado-titulo"
       onClose={aoFechar}
       onClick={fecharAoClicarFora}
       onKeyDown={andarPelasSetas(avancar, voltar)}
     >
       {posicao && (
         <div
-          className="tour__destaque"
+          className="tour-guiado__destaque"
           style={{
             top: posicao.destaque.topo,
             left: posicao.destaque.esquerda,
