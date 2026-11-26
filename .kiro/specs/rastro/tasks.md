@@ -706,10 +706,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @geison.santos
 
-- [ ] **T77 Quebrar as validações ativas em uma função por validação**
+- [x] **T77 Quebrar as validações ativas em uma função por validação**
   - Entrega: `validar_resposta` vira uma função por proteção; constantes, resumo e `ler_pentest` deixam de existir em dobro.
   - Aceite: nenhuma função do pentest passa de ~25 linhas; o `pentest.json` sai igual; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/pentest/`, `tests/pentest/`
+  - Arquivos: `rastro/pentest/`, `rastro/comandos/comando_pentest.py`, `tests/pentest/`, `.kiro/steering/structure.md`
   - Teste: os testes atuais do pentest.
   - Requisito: R19.4
   - Revisão: @ali.santos

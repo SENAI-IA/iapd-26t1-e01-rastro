@@ -45,8 +45,11 @@ rastro/
                            painel_da_ia.py, visita_no_relatorio.py, pagina_do_relatorio.py, gravacao_do_relatorio.py,
                            modelo.html (build do frontend, versionado)
   captura/                 sessao.py (interface), navegador_playwright.py (único import do Playwright), pasta.py, robo.py
-  pentest/                 modelos.py, erros.py, privacidade.py, sonda.py, validacoes.py, conferencia_do_resultado.py,
-                           leitura_do_resultado.py, gravacao_do_resultado.py, execucao_do_pentest.py (pentest --autorizo, isolado da análise)
+  pentest/                 pentest --autorizo, isolado da análise: modelos.py (com as constantes do formato), erros.py,
+                           privacidade.py, sonda.py, alvos_da_sonda.py (quais requisições do HAR são sondadas),
+                           regras_dos_cabecalhos.py (leitura pura dos cabeçalhos), validacoes.py (uma função por validação),
+                           resumo_do_pentest.py, conferencia_do_resultado.py, leitura_do_resultado.py,
+                           gravacao_do_resultado.py, execucao_do_pentest.py
 tests/                     mesma estrutura de rastro/
 frontend/                  React (ver frontend-react.md)
 docs/
@@ -67,6 +70,6 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 - **Assinatura nova:** em `identificacao/assinaturas.py`.
 - **Trava nova:** um arquivo em `travas/`, chamado por `conferencia_das_bibliotecas.py` (trava sobre biblioteca) ou direto pelo fluxo (trava sobre aviso ou explicação), com teste em que a IA (dublê) inventa algo e a trava barra.
 
-- **Regra nova no pentest:** uma função em `pentest/validacoes.py` ou `pentest/execucao_do_pentest.py`, com teste que prova o limite de segurança. O fluxo da análise não muda.
+- **Regra nova no pentest:** uma função `validar_*` em `pentest/validacoes.py` (chamada por `validar_cabecalhos`), com a leitura do cabeçalho em `pentest/regras_dos_cabecalhos.py`, ou uma regra de escolha de alvo em `pentest/alvos_da_sonda.py`, com teste que prova o limite de segurança. O fluxo da análise não muda.
 
 A skill `rastro-nova-regra` (`.kiro/skills/rastro-nova-regra/SKILL.md`) descreve o passo a passo.
