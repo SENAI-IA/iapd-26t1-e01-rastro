@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 VERSAO_DO_PLAYWRIGHT = "1.65.1"
 CANAIS_DO_NAVEGADOR = ("chrome", "msedge")
-TEMPO_LIMITE_DA_PAGINA_EM_MS = 15_000
-TEMPO_DE_ESPERA_DA_REDE_PARADA_EM_MS = 5_000
+TEMPO_LIMITE_DA_PAGINA_EM_MILISSEGUNDOS = 15_000
+TEMPO_DE_ESPERA_DA_REDE_PARADA_EM_MILISSEGUNDOS = 5_000
 TEXTO_DE_NAVEGADOR_NAO_ENCONTRADO = "is not found at"
 LER_OS_LINKS = "elementos => elementos.map(elemento => elemento.href)"
 
@@ -67,26 +67,30 @@ class SessaoPlaywright:
         if "javascript" in (resposta.headers.get("content-type") or ""):
             self.scripts += 1
 
-    def ir(self, url: str) -> None:
+    def abrir_pagina(self, url: str) -> None:
         from playwright.sync_api import Error
 
         try:
-            self._pagina.goto(url, wait_until="load", timeout=TEMPO_LIMITE_DA_PAGINA_EM_MS)
+            self._pagina.goto(
+                url, wait_until="load", timeout=TEMPO_LIMITE_DA_PAGINA_EM_MILISSEGUNDOS
+            )
         except Error as erro:
             raise FalhaAoNavegar(primeira_linha(erro)) from erro
         with suppress(Error):
             self._pagina.wait_for_load_state(
-                "networkidle", timeout=TEMPO_DE_ESPERA_DA_REDE_PARADA_EM_MS
+                "networkidle", timeout=TEMPO_DE_ESPERA_DA_REDE_PARADA_EM_MILISSEGUNDOS
             )
 
     def links(self) -> list[str]:
         from playwright.sync_api import Error
 
         try:
-            hrefs: list[str] = self._pagina.eval_on_selector_all("a[href]", LER_OS_LINKS)
+            enderecos_dos_links: list[str] = self._pagina.eval_on_selector_all(
+                "a[href]", LER_OS_LINKS
+            )
         except Error:
             return []
-        return hrefs
+        return enderecos_dos_links
 
     def endereco(self) -> str:
         return self._pagina.url

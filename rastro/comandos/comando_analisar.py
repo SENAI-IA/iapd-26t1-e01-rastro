@@ -42,7 +42,7 @@ from rastro.terminal.linha_ao_vivo import LinhaAoVivo
 
 SUGESTAO_SEM_IA = f"Use --sem-ia ({AJUDA_SEM_IA})."
 AVISO_COM_IA = (
-    "Análise com a IA {ia}. Cada chamada à IA pode levar até 2 minutos; "
+    "Análise com a IA {nome_da_ia}. Cada chamada à IA pode levar até 2 minutos; "
     "o que ela sugere passa pelas travas antes do relatório."
 )
 PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
@@ -54,19 +54,21 @@ PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
 
 def analisar_com_ia(
     caminho_har: Path,
-    saida: Path | None,
+    pasta_de_saida: Path | None,
     opcao_da_ia: str | None,
-    abrir: bool,
+    abrir_no_navegador: bool,
     caminho_pentest: Path | None,
 ) -> int:
     try:
-        ia = montar_cliente_de_ia(opcao_da_ia)
+        cliente_de_ia = montar_cliente_de_ia(opcao_da_ia)
     except IAInvalida as erro:
         return encerrar_com_erro(str(erro))
     except CLIDaIAAusente as erro:
         return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
-    avisar_analise_com_ia(ia)
-    return analisar_e_gravar(caminho_har, saida, ia, abrir, caminho_pentest)
+    avisar_analise_com_ia(cliente_de_ia)
+    return analisar_e_gravar(
+        caminho_har, pasta_de_saida, cliente_de_ia, abrir_no_navegador, caminho_pentest
+    )
 
 
 def montar_cliente_de_ia(opcao_da_ia: str | None) -> ClienteDeIA:
@@ -76,17 +78,20 @@ def montar_cliente_de_ia(opcao_da_ia: str | None) -> ClienteDeIA:
 
 
 def analisar_sem_ia(
-    caminho_har: Path, saida: Path | None, abrir: bool, caminho_pentest: Path | None
+    caminho_har: Path,
+    pasta_de_saida: Path | None,
+    abrir_no_navegador: bool,
+    caminho_pentest: Path | None,
 ) -> int:
     avisar_analise_sem_ia()
-    return analisar_e_gravar(caminho_har, saida, None, abrir, caminho_pentest)
+    return analisar_e_gravar(caminho_har, pasta_de_saida, None, abrir_no_navegador, caminho_pentest)
 
 
 def analisar_e_gravar(
     caminho_har: Path,
-    saida: Path | None,
-    ia: ClienteDeIA | None,
-    abrir: bool,
+    pasta_de_saida: Path | None,
+    cliente_de_ia: ClienteDeIA | None,
+    abrir_no_navegador: bool,
     caminho_pentest: Path | None = None,
     gravado_pelo_rastro: bool = False,
 ) -> int:
@@ -100,7 +105,7 @@ def analisar_e_gravar(
                 caminho_har,
                 GitHubAdvisory(),
                 RegistroNpm(),
-                ia,
+                cliente_de_ia,
                 Osv(),
                 Nvd(),
                 gravado_pelo_rastro=gravado_pelo_rastro,
@@ -111,17 +116,17 @@ def analisar_e_gravar(
         return encerrar_com_erro(str(erro))
     relatorio = montar_relatorio(analise, pentest)
     aplicacao = nome_da_aplicacao(analise.site, caminho_har)
-    pasta = caminho_do_relatorio(saida or pasta_padrao(), aplicacao, analise.inicio)
+    pasta = caminho_do_relatorio(pasta_de_saida or pasta_padrao(), aplicacao, analise.inicio)
     try:
-        gravado = gravar_relatorio(pasta, relatorio)
+        arquivos_gravados = gravar_relatorio(pasta, relatorio)
     except RelatorioJaExiste as erro:
         return encerrar_com_erro(str(erro))
-    mostrar_resultado(pasta, gravado, relatorio, abrir)
+    mostrar_resultado(pasta, arquivos_gravados, relatorio, abrir_no_navegador)
     return 0
 
 
-def avisar_analise_com_ia(ia: ClienteDeIA) -> None:
-    print(AVISO_COM_IA.format(ia=ia.provedor.nome))
+def avisar_analise_com_ia(cliente_de_ia: ClienteDeIA) -> None:
+    print(AVISO_COM_IA.format(nome_da_ia=cliente_de_ia.provedor.nome))
     print()
 
 

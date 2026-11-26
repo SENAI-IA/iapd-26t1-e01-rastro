@@ -3,7 +3,7 @@ from typing import Any
 from urllib.request import Request
 
 from rastro.fontes.faixas_do_osv import FaixaSemver, faixas_dos_eventos_semver
-from rastro.fontes.filtro_do_pacote_npm import e_o_pacote_npm
+from rastro.fontes.filtro_do_pacote_npm import pacote_e_o_npm_procurado
 from rastro.fontes.modelos import Aviso, marcar_origem
 from rastro.fontes.requisicao_http import baixar_json, ler_resposta
 
@@ -53,7 +53,7 @@ def aviso_retirado(aviso_da_fonte: Any) -> bool:
 def faixas_do_pacote(aviso_da_fonte: Any, pacote: str) -> list[FaixaSemver]:
     faixas = []
     for afetado in aviso_da_fonte.get("affected") or []:
-        if e_o_pacote_npm(afetado["package"], pacote):
+        if pacote_e_o_npm_procurado(afetado["package"], pacote):
             faixas.extend(faixas_semver(afetado) or [FAIXA_SEM_SEMVER])
     return faixas
 

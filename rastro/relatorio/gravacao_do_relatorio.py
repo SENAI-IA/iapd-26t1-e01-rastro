@@ -39,18 +39,20 @@ def nome_da_aplicacao(site: str | None, caminho_har: Path) -> str:
     return caminho_har.stem
 
 
-def caminho_do_relatorio(raiz: Path, aplicacao: str, momento: datetime) -> Path:
-    return caminho_da_pasta_com_data(raiz, aplicacao, momento)
+def caminho_do_relatorio(pasta_dos_relatorios: Path, aplicacao: str, momento: datetime) -> Path:
+    return caminho_da_pasta_com_data(pasta_dos_relatorios, aplicacao, momento)
 
 
 def gravar_relatorio(pasta_da_analise: Path, relatorio: dict[str, Any]) -> RelatorioGravado:
     texto_do_json = json.dumps(relatorio, ensure_ascii=False, indent=2) + "\n"
     texto_do_html = montar_html(ler_modelo(), relatorio)
     criar_pasta_da_analise(pasta_da_analise)
-    gravado = RelatorioGravado(pasta_da_analise / NOME_DO_JSON, pasta_da_analise / NOME_DO_HTML)
-    gravar_arquivo_novo(gravado.json, texto_do_json)
-    gravar_arquivo_novo(gravado.html, texto_do_html)
-    return gravado
+    arquivos_gravados = RelatorioGravado(
+        pasta_da_analise / NOME_DO_JSON, pasta_da_analise / NOME_DO_HTML
+    )
+    gravar_arquivo_novo(arquivos_gravados.json, texto_do_json)
+    gravar_arquivo_novo(arquivos_gravados.html, texto_do_html)
+    return arquivos_gravados
 
 
 def criar_pasta_da_analise(pasta_da_analise: Path) -> None:

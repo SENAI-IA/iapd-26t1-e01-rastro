@@ -202,9 +202,9 @@ def test_r03_1_com_ia_procura_bibliotecas_em_bundles(
 
     [relatorio_json] = tmp_path.rglob("relatorio.json")
     relatorio = ler_relatorio(relatorio_json)
-    assert [(b["pacote"], b["metodo"]) for b in relatorio["bibliotecas"]] == [
-        ("@angular/core", "ia")
-    ]
+    assert [
+        (biblioteca["pacote"], biblioteca["metodo"]) for biblioteca in relatorio["bibliotecas"]
+    ] == [("@angular/core", "ia")]
     assert relatorio["resumo"]["encontradas_so_pela_ia"] == 1
     assert [chamada["sucesso"] for chamada in relatorio["ia"]["chamadas"]] == [True, False]
 
@@ -321,7 +321,7 @@ def test_r17_1_grava_so_o_relatorio_e_nao_altera_o_har(tmp_path: Path) -> None:
 
     analisar_loja(tmp_path)
 
-    arquivos = sorted(p for p in tmp_path.rglob("*") if p.is_file())
+    arquivos = sorted(caminho for caminho in tmp_path.rglob("*") if caminho.is_file())
     assert arquivos == [
         tmp_path / PASTA_DA_LOJA / "relatorio.html",
         tmp_path / PASTA_DA_LOJA / "relatorio.json",

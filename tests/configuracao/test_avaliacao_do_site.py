@@ -1,11 +1,11 @@
 from rastro.configuracao.avaliacao_do_site import (
     checar_cookies_do_site,
     checar_paginas_do_site,
-    e_do_site,
     montar_checagem,
     nao_verificada,
     nomes_dos_cookies,
     paginas_html_do_site,
+    requisicao_e_do_site,
     respostas_do_site_com_cookies,
     usa_https,
 )
@@ -57,8 +57,8 @@ def test_r06_7_respostas_do_site_com_cookies_ignora_resposta_sem_cookie() -> Non
 
 
 def test_r06_1_sem_site_analisado_nada_e_do_site() -> None:
-    assert e_do_site(resposta(0), None) is False
-    assert e_do_site(resposta(0), SITE) is True
+    assert requisicao_e_do_site(resposta(0), None) is False
+    assert requisicao_e_do_site(resposta(0), SITE) is True
 
 
 def test_r06_2_usa_https_olha_o_esquema_da_url() -> None:

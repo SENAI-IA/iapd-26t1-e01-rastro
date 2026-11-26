@@ -31,17 +31,17 @@ class ClienteDeIA:
                 etapa=etapa,
                 entrada=entrada,
                 resposta=falha.motivo,
-                duracao_s=segundos_desde(inicio),
+                duracao_em_segundos=segundos_desde(inicio),
                 tokens=None,
                 sucesso=False,
             )
             return None
-        duracao_s = segundos_desde(inicio)
+        duracao_em_segundos = segundos_desde(inicio)
         self.registrar(
             etapa=etapa,
             entrada=entrada,
             resposta=sanitizar(resposta.texto),
-            duracao_s=duracao_s,
+            duracao_em_segundos=duracao_em_segundos,
             tokens=resposta.tokens,
             sucesso=True,
         )
@@ -52,12 +52,12 @@ class ClienteDeIA:
         etapa: str,
         entrada: str,
         resposta: str,
-        duracao_s: float,
+        duracao_em_segundos: float,
         tokens: int | None,
         sucesso: bool,
     ) -> None:
         chamada = ChamadaDaIA(
-            etapa, self.provedor.nome, entrada, resposta, duracao_s, tokens, sucesso
+            etapa, self.provedor.nome, entrada, resposta, duracao_em_segundos, tokens, sucesso
         )
         self.chamadas.append(chamada)
 

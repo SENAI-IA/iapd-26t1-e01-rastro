@@ -10,7 +10,7 @@ TEXTO_NADA_A_REMOVER = "O comando rastro não está instalado."
 TEXTO_PARA_LIMPAR_TUDO = "Para limpar tudo, apague também:"
 
 
-def desinstalar_comando() -> int:
+def executar_comando_desinstalar() -> int:
     try:
         desinstalacao = instalador.desinstalar()
     except AtalhoDeOutro as erro:

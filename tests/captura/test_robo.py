@@ -5,9 +5,7 @@ from rastro.captura.sessao import FalhaAoNavegar
 INICIO = "https://loja.exemplo.com/"
 
 
-class SiteFalso:
-    """Uma SessaoDeGravacao sobre um site em memória: URL -> links da página."""
-
+class SessaoComSiteEmMemoria:
     def __init__(
         self,
         paginas: dict[str, list[str]],
@@ -24,7 +22,7 @@ class SiteFalso:
         self.fechada = False
         self.ao_visitar: list[object] = []
 
-    def ir(self, url: str) -> None:
+    def abrir_pagina(self, url: str) -> None:
         if url in self.quebradas:
             raise FalhaAoNavegar("net::ERR_CONNECTION_REFUSED")
         self.visitadas.append(url)
@@ -56,7 +54,7 @@ class RelogioFalso:
 
 
 def navegar(
-    site: SiteFalso,
+    site: SessaoComSiteEmMemoria,
     limites: Limites | None = None,
     parada: PedidoDeParada | None = None,
     relogio: RelogioFalso | None = None,
@@ -73,7 +71,7 @@ def navegar(
 
 
 def test_r24_11_nunca_visita_a_mesma_pagina_duas_vezes() -> None:
-    site = SiteFalso(
+    site = SessaoComSiteEmMemoria(
         {
             INICIO: ["/a", "/b?pagina=1"],
             f"{INICIO}a": ["/", "/b?pagina=2", "/a#topo"],
@@ -88,7 +86,7 @@ def test_r24_11_nunca_visita_a_mesma_pagina_duas_vezes() -> None:
 
 
 def test_r24_10_visita_os_links_em_ordem_alfabetica() -> None:
-    site = SiteFalso({INICIO: ["/c", "/a", "/b"]})
+    site = SessaoComSiteEmMemoria({INICIO: ["/c", "/a", "/b"]})
 
     navegar(site)
 
@@ -96,7 +94,7 @@ def test_r24_10_visita_os_links_em_ordem_alfabetica() -> None:
 
 
 def test_r24_12_links_barrados_nao_sao_visitados_e_sao_contados() -> None:
-    site = SiteFalso({INICIO: ["/sair", "https://outro.exemplo.com/", "/produtos"]})
+    site = SessaoComSiteEmMemoria({INICIO: ["/sair", "https://outro.exemplo.com/", "/produtos"]})
 
     resultado, _ = navegar(site)
 
@@ -105,7 +103,7 @@ def test_r24_12_links_barrados_nao_sao_visitados_e_sao_contados() -> None:
 
 
 def test_r24_13_para_no_limite_de_paginas() -> None:
-    site = SiteFalso({INICIO: [f"/p{numero}" for numero in range(10)]})
+    site = SessaoComSiteEmMemoria({INICIO: [f"/p{numero}" for numero in range(10)]})
 
     resultado, _ = navegar(site, Limites(paginas=3, por_familia=99))
 
@@ -114,7 +112,7 @@ def test_r24_13_para_no_limite_de_paginas() -> None:
 
 
 def test_r24_13_para_no_limite_de_tempo() -> None:
-    site = SiteFalso({INICIO: [f"/p{numero}" for numero in range(10)]})
+    site = SessaoComSiteEmMemoria({INICIO: [f"/p{numero}" for numero in range(10)]})
 
     resultado, _ = navegar(
         site, Limites(segundos=180, por_familia=99), relogio=RelogioFalso(passo=50)
@@ -125,7 +123,7 @@ def test_r24_13_para_no_limite_de_tempo() -> None:
 
 
 def test_r24_13_nao_passa_de_dois_cliques_da_pagina_inicial() -> None:
-    site = SiteFalso(
+    site = SessaoComSiteEmMemoria(
         {
             INICIO: ["/um"],
             f"{INICIO}um": ["/um/dois"],
@@ -141,7 +139,7 @@ def test_r24_13_nao_passa_de_dois_cliques_da_pagina_inicial() -> None:
 
 def test_r24_13_no_maximo_duas_paginas_por_familia() -> None:
     blocos = [f"/admin/blocos/{nome}" for nome in ("a", "b", "c", "d")]
-    site = SiteFalso({INICIO: [*blocos, "/node/add"]})
+    site = SessaoComSiteEmMemoria({INICIO: [*blocos, "/node/add"]})
 
     resultado, _ = navegar(site)
 
@@ -157,7 +155,7 @@ def test_r24_13_no_maximo_duas_paginas_por_familia() -> None:
 def test_r24_13_pagina_que_falhou_nao_gasta_a_vaga_da_familia() -> None:
     licoes = [f"#lesson/{nome}.lesson" for nome in ("a", "b", "c")]
     quebradas = frozenset({f"{INICIO}#lesson/a.lesson"})
-    site = SiteFalso({INICIO: licoes}, quebradas=quebradas)
+    site = SessaoComSiteEmMemoria({INICIO: licoes}, quebradas=quebradas)
 
     _, passos = navegar(site)
 
@@ -167,7 +165,7 @@ def test_r24_13_pagina_que_falhou_nao_gasta_a_vaga_da_familia() -> None:
 
 def test_r24_15_ctrl_c_para_o_robo_na_proxima_pagina() -> None:
     parada = PedidoDeParada()
-    site = SiteFalso({INICIO: ["/a", "/b"]})
+    site = SessaoComSiteEmMemoria({INICIO: ["/a", "/b"]})
     passos: list[PassoDoRobo] = []
 
     def ctrl_c_depois_da_primeira(passo: PassoDoRobo) -> None:
@@ -181,7 +179,7 @@ def test_r24_15_ctrl_c_para_o_robo_na_proxima_pagina() -> None:
 
 
 def test_r24_15_janela_fechada_para_o_robo() -> None:
-    site = SiteFalso({INICIO: ["/a", "/b"]})
+    site = SessaoComSiteEmMemoria({INICIO: ["/a", "/b"]})
 
     def fechar_a_janela(passo: PassoDoRobo) -> None:
         site.fechada = True
@@ -193,7 +191,7 @@ def test_r24_15_janela_fechada_para_o_robo() -> None:
 
 
 def test_r24_14_cada_pagina_traz_o_progresso() -> None:
-    site = SiteFalso({INICIO: ["/a"]})
+    site = SessaoComSiteEmMemoria({INICIO: ["/a"]})
 
     _, passos = navegar(site)
 
@@ -209,7 +207,7 @@ def test_r24_14_cada_pagina_traz_o_progresso() -> None:
 
 
 def test_r24_13_paginas_da_raiz_nao_dividem_familia() -> None:
-    site = SiteFalso({INICIO: ["/contato", "/produtos", "/sobre"]})
+    site = SessaoComSiteEmMemoria({INICIO: ["/contato", "/produtos", "/sobre"]})
 
     resultado, _ = navegar(site)
 
@@ -218,7 +216,7 @@ def test_r24_13_paginas_da_raiz_nao_dividem_familia() -> None:
 
 
 def test_r24_10_redirecionado_para_fora_nao_conta_nem_tem_links_seguidos() -> None:
-    site = SiteFalso(
+    site = SessaoComSiteEmMemoria(
         {INICIO: ["/github", "/sobre"], "https://github.com/loja": ["/explore"]},
         redirecionamentos={f"{INICIO}github": "https://github.com/loja"},
     )
@@ -232,7 +230,7 @@ def test_r24_10_redirecionado_para_fora_nao_conta_nem_tem_links_seguidos() -> No
 
 def test_r24_10_pagina_inicial_que_vai_para_o_www_continua_no_site() -> None:
     www = "https://www.loja.exemplo.com/"
-    site = SiteFalso({www: ["/sobre"]}, redirecionamentos={INICIO: www})
+    site = SessaoComSiteEmMemoria({www: ["/sobre"]}, redirecionamentos={INICIO: www})
 
     resultado, passos = navegar(site)
 
@@ -242,7 +240,7 @@ def test_r24_10_pagina_inicial_que_vai_para_o_www_continua_no_site() -> None:
 
 
 def test_r24_10_porta_padrao_escrita_na_url_inicial_nao_tira_do_site() -> None:
-    site = SiteFalso({"https://loja.exemplo.com/": ["/sobre"]})
+    site = SessaoComSiteEmMemoria({"https://loja.exemplo.com/": ["/sobre"]})
     robo = Robo(site, PedidoDeParada(), RelogioFalso(), lambda _passo: None)
 
     resultado = robo.navegar("https://loja.exemplo.com:443/")

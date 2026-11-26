@@ -4,7 +4,7 @@ from urllib.parse import urlsplit
 from rastro.configuracao.modelos import Checagem, RegraDeChecagem, SituacaoDaChecagem
 from rastro.configuracao.regras_das_checagens import MOTIVO_SEM_COOKIES, MOTIVO_SEM_PAGINAS_HTML
 from rastro.har.modelos import Cookie, Requisicao
-from rastro.har.site import e_pagina_html, host_com_porta, url_sem_query_string
+from rastro.har.site import host_com_porta, requisicao_e_pagina_html, url_sem_query_string
 from rastro.identificacao.modelos import Evidencia
 
 TesteDeFalha = Callable[[Requisicao], bool]
@@ -15,7 +15,7 @@ TesteDeCookie = Callable[[Cookie], bool]
 def paginas_html_do_site(requisicoes: list[Requisicao], site: str | None) -> list[Requisicao]:
     paginas = []
     for requisicao in requisicoes:
-        if e_pagina_html(requisicao) and e_do_site(requisicao, site):
+        if requisicao_e_pagina_html(requisicao) and requisicao_e_do_site(requisicao, site):
             paginas.append(requisicao)
     return paginas
 
@@ -25,12 +25,12 @@ def respostas_do_site_com_cookies(
 ) -> list[Requisicao]:
     respostas = []
     for requisicao in requisicoes:
-        if requisicao.cookies_resposta and e_do_site(requisicao, site):
+        if requisicao.cookies_resposta and requisicao_e_do_site(requisicao, site):
             respostas.append(requisicao)
     return respostas
 
 
-def e_do_site(requisicao: Requisicao, site: str | None) -> bool:
+def requisicao_e_do_site(requisicao: Requisicao, site: str | None) -> bool:
     return site is not None and host_com_porta(requisicao.url) == site
 
 

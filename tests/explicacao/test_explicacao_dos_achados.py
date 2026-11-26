@@ -51,7 +51,7 @@ def achado(
     return Achado(da_biblioteca, aviso, calcular_nota(cvss, 0.97))
 
 
-def ia_que_responde(*textos: str) -> tuple[ClienteDeIA, ProvedorFalso]:
+def cliente_de_ia_que_responde(*textos: str) -> tuple[ClienteDeIA, ProvedorFalso]:
     provedor = ProvedorFalso([RespostaDoProvedor(texto, tokens=None) for texto in textos])
     return ClienteDeIA(provedor), provedor
 
@@ -63,9 +63,9 @@ def entrada_enviada(prompt: str) -> dict[str, object]:
 
 
 def test_r07_1_resposta_valida_vira_explicacao_marcada_como_ia() -> None:
-    ia, _ = ia_que_responde(json.dumps(RESPOSTA_VALIDA, ensure_ascii=False))
+    cliente_de_ia, _ = cliente_de_ia_que_responde(json.dumps(RESPOSTA_VALIDA, ensure_ascii=False))
 
-    resultado = explicar_achados([achado(biblioteca())], ia)
+    resultado = explicar_achados([achado(biblioteca())], cliente_de_ia)
 
     assert resultado.explicacoes == {
         "jquery@3.4.1": Explicacao(**RESPOSTA_VALIDA, gerada_por_ia=True)
@@ -75,9 +75,9 @@ def test_r07_1_resposta_valida_vira_explicacao_marcada_como_ia() -> None:
 
 def test_r07_1_aceita_a_resposta_dentro_de_um_bloco_de_codigo() -> None:
     cercada = "```json\n" + json.dumps(RESPOSTA_VALIDA, ensure_ascii=False) + "\n```"
-    ia, _ = ia_que_responde(cercada)
+    cliente_de_ia, _ = cliente_de_ia_que_responde(cercada)
 
-    resultado = explicar_achados([achado(biblioteca())], ia)
+    resultado = explicar_achados([achado(biblioteca())], cliente_de_ia)
 
     assert resultado.explicacoes["jquery@3.4.1"].gerada_por_ia is True
 
@@ -86,7 +86,7 @@ def test_r07_1_pede_uma_explicacao_por_biblioteca_com_achados() -> None:
     jquery = biblioteca()
     lodash = biblioteca("lodash", "4.17.4", url="https://cdn.exemplo.net/lodash.js")
     resposta = json.dumps(RESPOSTA_VALIDA, ensure_ascii=False)
-    ia, provedor = ia_que_responde(resposta, resposta)
+    cliente_de_ia, provedor = cliente_de_ia_que_responde(resposta, resposta)
 
     achados = [
         achado(jquery),
@@ -94,26 +94,26 @@ def test_r07_1_pede_uma_explicacao_por_biblioteca_com_achados() -> None:
         achado(jquery, "GHSA-jpcq-cgw6-v4j6"),
     ]
 
-    resultado = explicar_achados(achados, ia)
+    resultado = explicar_achados(achados, cliente_de_ia)
 
     assert list(resultado.explicacoes) == ["jquery@3.4.1", "lodash@4.17.4"]
     assert len(provedor.prompts) == 2
-    assert [chamada.etapa for chamada in ia.chamadas] == [ETAPA, ETAPA]
+    assert [chamada.etapa for chamada in cliente_de_ia.chamadas] == [ETAPA, ETAPA]
 
 
 def test_r07_1_biblioteca_a_confirmar_nao_e_explicada() -> None:
-    ia, provedor = ia_que_responde()
+    cliente_de_ia, provedor = cliente_de_ia_que_responde()
 
-    resultado = explicar_achados([achado(biblioteca(situacao="a_confirmar"))], ia)
+    resultado = explicar_achados([achado(biblioteca(situacao="a_confirmar"))], cliente_de_ia)
 
     assert resultado.explicacoes == {}
     assert provedor.prompts == []
 
 
 def test_r07_1_prompt_pede_so_json_e_proibe_fato_fora_da_entrada() -> None:
-    ia, provedor = ia_que_responde(json.dumps(RESPOSTA_VALIDA))
+    cliente_de_ia, provedor = cliente_de_ia_que_responde(json.dumps(RESPOSTA_VALIDA))
 
-    explicar_achados([achado(biblioteca())], ia)
+    explicar_achados([achado(biblioteca())], cliente_de_ia)
 
     prompt = provedor.prompts[0]
     assert "Responda **só** com um objeto JSON" in prompt
@@ -122,9 +122,9 @@ def test_r07_1_prompt_pede_so_json_e_proibe_fato_fora_da_entrada() -> None:
 
 
 def test_r07_2_envia_so_pacote_versao_avisos_e_url_sem_query_string() -> None:
-    ia, provedor = ia_que_responde(json.dumps(RESPOSTA_VALIDA))
+    cliente_de_ia, provedor = cliente_de_ia_que_responde(json.dumps(RESPOSTA_VALIDA))
 
-    explicar_achados([achado(biblioteca())], ia)
+    explicar_achados([achado(biblioteca())], cliente_de_ia)
 
     assert entrada_enviada(provedor.prompts[0]) == {
         "pacote": "jquery",
@@ -142,17 +142,17 @@ def test_r07_2_envia_so_pacote_versao_avisos_e_url_sem_query_string() -> None:
 
 
 def test_r07_2_biblioteca_sem_evidencia_vai_sem_url() -> None:
-    ia, provedor = ia_que_responde(json.dumps(RESPOSTA_VALIDA))
+    cliente_de_ia, provedor = cliente_de_ia_que_responde(json.dumps(RESPOSTA_VALIDA))
 
-    explicar_achados([achado(biblioteca(url=None))], ia)
+    explicar_achados([achado(biblioteca(url=None))], cliente_de_ia)
 
     assert entrada_enviada(provedor.prompts[0])["url_do_script"] is None
 
 
 def test_r07_3_falha_da_ia_usa_o_resumo_do_aviso_sem_explicacao_da_ia() -> None:
-    ia = ClienteDeIA(ProvedorFalso([FalhaDoProvedor("tempo limite")]))
+    cliente_de_ia = ClienteDeIA(ProvedorFalso([FalhaDoProvedor("tempo limite")]))
 
-    resultado = explicar_achados([achado(biblioteca())], ia)
+    resultado = explicar_achados([achado(biblioteca())], cliente_de_ia)
 
     explicacao = resultado.explicacoes["jquery@3.4.1"]
     assert explicacao.gerada_por_ia is False
@@ -164,14 +164,14 @@ def test_r07_3_falha_da_ia_usa_o_resumo_do_aviso_sem_explicacao_da_ia() -> None:
 
 def test_r07_3_sem_explicacao_usa_o_resumo_do_aviso_de_maior_nota() -> None:
     jquery = biblioteca()
-    ia, _ = ia_que_responde("não sei")
+    cliente_de_ia, _ = cliente_de_ia_que_responde("não sei")
 
     resultado = explicar_achados(
         [
             achado(jquery, "GHSA-gxr4-xjj5-5px2", cvss=4.0, resumo="Menor"),
             achado(jquery, "GHSA-jpcq-cgw6-v4j6", cvss=9.0, resumo="Maior"),
         ],
-        ia,
+        cliente_de_ia,
     )
 
     assert resultado.explicacoes["jquery@3.4.1"].o_que_e == "Maior"
@@ -198,9 +198,9 @@ def test_r07_3_sem_explicacao_usa_o_resumo_do_aviso_de_maior_nota() -> None:
     ],
 )
 def test_r07_3_resposta_fora_do_formato_usa_o_resumo_do_aviso(resposta: str, motivo: str) -> None:
-    ia, _ = ia_que_responde(resposta)
+    cliente_de_ia, _ = cliente_de_ia_que_responde(resposta)
 
-    resultado = explicar_achados([achado(biblioteca())], ia)
+    resultado = explicar_achados([achado(biblioteca())], cliente_de_ia)
 
     assert resultado.explicacoes["jquery@3.4.1"].gerada_por_ia is False
     [trava] = resultado.travas_acionadas
@@ -212,9 +212,9 @@ def test_r07_3_resposta_fora_do_formato_usa_o_resumo_do_aviso(resposta: str, mot
 
 def test_r07_3_resposta_real_do_kiro_sem_todos_os_campos_e_descartada() -> None:
     resposta_gravada = (DADOS / "kiro-resposta.txt").read_text(encoding="utf-8")
-    ia, _ = ia_que_responde(resposta_gravada)
+    cliente_de_ia, _ = cliente_de_ia_que_responde(resposta_gravada)
 
-    resultado = explicar_achados([achado(biblioteca())], ia)
+    resultado = explicar_achados([achado(biblioteca())], cliente_de_ia)
 
     assert resultado.explicacoes["jquery@3.4.1"].gerada_por_ia is False
     assert "campo faltando na explicação" in resultado.travas_acionadas[0].motivo
@@ -222,9 +222,9 @@ def test_r07_3_resposta_real_do_kiro_sem_todos_os_campos_e_descartada() -> None:
 
 def test_r07_3_explicacao_com_fato_novo_usa_o_resumo_do_aviso() -> None:
     inventada = {**RESPOSTA_VALIDA, "impacto": "Explorada em 95% dos casos (CVE-2020-11023)."}
-    ia, _ = ia_que_responde(json.dumps(inventada, ensure_ascii=False))
+    cliente_de_ia, _ = cliente_de_ia_que_responde(json.dumps(inventada, ensure_ascii=False))
 
-    resultado = explicar_achados([achado(biblioteca())], ia)
+    resultado = explicar_achados([achado(biblioteca())], cliente_de_ia)
 
     assert resultado.explicacoes["jquery@3.4.1"].gerada_por_ia is False
     [trava] = resultado.travas_acionadas
@@ -235,9 +235,9 @@ def test_r07_3_explicacao_com_fato_novo_usa_o_resumo_do_aviso() -> None:
 
 def test_r07_3_fato_do_exemplo_do_prompt_nao_conta_como_entrada() -> None:
     copiada = {**RESPOSTA_VALIDA, "como_corrigir": "Atualizar para a versão 1.3.0."}
-    ia, _ = ia_que_responde(json.dumps(copiada, ensure_ascii=False))
+    cliente_de_ia, _ = cliente_de_ia_que_responde(json.dumps(copiada, ensure_ascii=False))
 
-    resultado = explicar_achados([achado(biblioteca())], ia)
+    resultado = explicar_achados([achado(biblioteca())], cliente_de_ia)
 
     assert resultado.explicacoes["jquery@3.4.1"].gerada_por_ia is False
     assert "`1.3.0` (como_corrigir)" in resultado.travas_acionadas[0].motivo

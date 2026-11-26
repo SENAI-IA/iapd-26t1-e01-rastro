@@ -1,4 +1,4 @@
-from rastro.comandos.navegador import abrir_no_navegador
+from rastro.comandos.navegador import abrir_arquivo_no_navegador
 from rastro.relatorio.pagina_do_relatorio import caminho_do_modelo
 
 TEXTO_COMO_USAR_ABERTO = 'Guia "Como usar" aberto no navegador: {caminho}'
@@ -10,7 +10,7 @@ TEXTO_COMO_USAR_SEM_NAVEGADOR = (
 
 def abrir_como_usar() -> int:
     caminho = caminho_do_modelo()
-    if abrir_no_navegador(caminho):
+    if abrir_arquivo_no_navegador(caminho):
         print(TEXTO_COMO_USAR_ABERTO.format(caminho=caminho))
     else:
         print(TEXTO_COMO_USAR_SEM_NAVEGADOR.format(caminho=caminho))

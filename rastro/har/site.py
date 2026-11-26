@@ -10,16 +10,16 @@ def descobrir_site_analisado(requisicoes: list[Requisicao]) -> str | None:
         if requisicao.url_da_pagina:
             return host_com_porta(requisicao.url_da_pagina)
     for requisicao in requisicoes:
-        if e_pagina_html(requisicao):
+        if requisicao_e_pagina_html(requisicao):
             return host_com_porta(requisicao.url)
     return None
 
 
-def e_pagina_html(requisicao: Requisicao) -> bool:
-    return requisicao.tipo_conteudo == "text/html" and not e_redirecionamento(requisicao)
+def requisicao_e_pagina_html(requisicao: Requisicao) -> bool:
+    return requisicao.tipo_conteudo == "text/html" and not requisicao_e_redirecionamento(requisicao)
 
 
-def e_redirecionamento(requisicao: Requisicao) -> bool:
+def requisicao_e_redirecionamento(requisicao: Requisicao) -> bool:
     return 300 <= requisicao.status < 400
 
 

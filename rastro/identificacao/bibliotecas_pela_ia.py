@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from rastro.andamento import SEM_ANDAMENTO, Andamento
+from rastro.andamento import ANDAMENTO_SILENCIOSO, Andamento
 from rastro.har.modelos import Requisicao
 from rastro.ia.cliente import ClienteDeIA
 from rastro.ia.montagem_do_prompt import montar_prompt
@@ -24,26 +24,28 @@ class BibliotecasDaIA:
 
 def identificar_em_bundles(
     requisicoes: list[Requisicao],
-    por_assinatura: list[Biblioteca],
-    ia: ClienteDeIA | None,
-    andamento: Andamento = SEM_ANDAMENTO,
+    bibliotecas_por_assinatura: list[Biblioteca],
+    cliente_de_ia: ClienteDeIA | None,
+    andamento: Andamento = ANDAMENTO_SILENCIOSO,
 ) -> BibliotecasDaIA:
-    if ia is None:
+    if cliente_de_ia is None:
         return BibliotecasDaIA([], [])
-    ja_identificadas = {nome_com_versao(biblioteca) for biblioteca in por_assinatura}
-    da_ia: dict[str, Biblioteca] = {}
+    ja_identificadas = {nome_com_versao(biblioteca) for biblioteca in bibliotecas_por_assinatura}
+    bibliotecas_da_ia: dict[str, Biblioteca] = {}
     travas_acionadas: list[TravaAcionada] = []
-    bundles = escolher_bundles(requisicoes, por_assinatura)
-    andamento.itens(len(bundles))
+    bundles = escolher_bundles(requisicoes, bibliotecas_por_assinatura)
+    andamento.definir_total_de_itens(len(bundles))
     for bundle in bundles:
-        do_bundle, barrados = identificar_no_bundle(bundle, ia)
-        andamento.avancar()
-        travas_acionadas.extend(barrados)
-        for biblioteca in do_bundle:
+        bibliotecas_do_bundle, travas_do_bundle = identificar_no_bundle(bundle, cliente_de_ia)
+        andamento.avancar_item()
+        travas_acionadas.extend(travas_do_bundle)
+        for biblioteca in bibliotecas_do_bundle:
             if nome_com_versao(biblioteca) not in ja_identificadas:
-                anterior = da_ia.get(nome_com_versao(biblioteca))
-                da_ia[nome_com_versao(biblioteca)] = preferir_confirmada(anterior, biblioteca)
-    return BibliotecasDaIA(list(da_ia.values()), travas_acionadas)
+                anterior = bibliotecas_da_ia.get(nome_com_versao(biblioteca))
+                bibliotecas_da_ia[nome_com_versao(biblioteca)] = preferir_confirmada(
+                    anterior, biblioteca
+                )
+    return BibliotecasDaIA(list(bibliotecas_da_ia.values()), travas_acionadas)
 
 
 def preferir_confirmada(atual: Biblioteca | None, nova: Biblioteca) -> Biblioteca:
@@ -53,22 +55,22 @@ def preferir_confirmada(atual: Biblioteca | None, nova: Biblioteca) -> Bibliotec
 
 
 def identificar_no_bundle(
-    bundle: Bundle, ia: ClienteDeIA
+    bundle: Bundle, cliente_de_ia: ClienteDeIA
 ) -> tuple[list[Biblioteca], list[TravaAcionada]]:
     if not bundle.trechos:
         return [], []
     trechos_enviados = [sanitizar(trecho) for trecho in bundle.trechos]
     prompt = montar_prompt(ARQUIVO_DO_PROMPT, montar_entrada(trechos_enviados))
-    resposta = ia.perguntar(ETAPA, prompt)
+    resposta = cliente_de_ia.perguntar(ETAPA, prompt)
     if resposta is None:
         return [], []
     sugeridas, travas_acionadas = conferir_formato(tirar_cerca_de_codigo(resposta))
     bibliotecas = []
     for sugerida in sugeridas:
         biblioteca = biblioteca_sugerida(sugerida, bundle.requisicao)
-        ancorada, barrados = conferir_ancoragem(biblioteca, trechos_enviados)
+        ancorada, travas_da_ancoragem = conferir_ancoragem(biblioteca, trechos_enviados)
         bibliotecas.append(ancorada)
-        travas_acionadas.extend(barrados)
+        travas_acionadas.extend(travas_da_ancoragem)
     return bibliotecas, travas_acionadas
 
 

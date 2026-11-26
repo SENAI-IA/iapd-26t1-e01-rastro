@@ -142,9 +142,14 @@ def test_r03_1_no_juice_shop_o_trecho_do_angular_vai_para_a_ia() -> None:
 
     bundles = escolher_bundles(requisicoes, identificar_por_assinatura(requisicoes))
 
-    trechos_por_script = {nome_do_arquivo(b.requisicao.url): b.trechos for b in bundles}
+    trechos_por_script = {
+        nome_do_arquivo(bundle.requisicao.url): bundle.trechos for bundle in bundles
+    }
     assert sorted(trechos_por_script) == [
-        "chunk-1qQQGal7.js", "chunk-Cv2YgWUq.js", "main.js", "polyfills.js",
+        "chunk-1qQQGal7.js",
+        "chunk-Cv2YgWUq.js",
+        "main.js",
+        "polyfills.js",
     ]
     assert TRECHO_DO_ANGULAR in trechos_por_script["chunk-Cv2YgWUq.js"][0]
     assert 'U$1=`FA "5.15.4"`' in trechos_por_script["main.js"][0]

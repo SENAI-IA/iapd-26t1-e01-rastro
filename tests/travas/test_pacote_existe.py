@@ -53,12 +53,14 @@ def test_r21_4_versao_inventada_pela_ia_e_barrada() -> None:
 def test_r21_9_sem_resposta_so_a_biblioteca_da_ia_e_barrada() -> None:
     registro = RegistroFalso("sem rede")
 
-    por_assinatura, sem_trava = conferir_pacote_no_npm(biblioteca(metodo="assinatura"), registro)
-    da_ia, trava_acionada = conferir_pacote_no_npm(biblioteca(), registro)
+    biblioteca_por_assinatura, sem_trava = conferir_pacote_no_npm(
+        biblioteca(metodo="assinatura"), registro
+    )
+    biblioteca_da_ia, trava_acionada = conferir_pacote_no_npm(biblioteca(), registro)
 
-    assert por_assinatura.situacao == "confirmada"
-    assert por_assinatura.conferida_no_npm is None
+    assert biblioteca_por_assinatura.situacao == "confirmada"
+    assert biblioteca_por_assinatura.conferida_no_npm is None
     assert sem_trava is None
-    assert da_ia.situacao == "a_confirmar"
+    assert biblioteca_da_ia.situacao == "a_confirmar"
     assert trava_acionada is not None
     assert trava_acionada.motivo == "não foi possível conferir no npm: sem rede"

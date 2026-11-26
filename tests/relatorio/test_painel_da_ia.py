@@ -20,29 +20,29 @@ def chamada(tokens: int | None) -> ChamadaDaIA:
 
 
 def test_r21_10_travas_acionadas_vao_para_o_painel_da_ia() -> None:
-    ia = relatorio_da_loja()["ia"]
+    painel_da_ia = relatorio_da_loja()["ia"]
 
-    assert ia["travas_acionadas"] == [
+    assert painel_da_ia["travas_acionadas"] == [
         {
             "trava": "faixa conferida",
             "alvo": "GHSA-rmxg-73gg-4p98 em jquery@3.4.1",
             "motivo": "a versão 3.4.1 está fora da faixa afetada `< 1.9.0`",
         }
     ]
-    assert ia["chamadas"] == []
-    assert ia["com_e_sem_ia"] is None
-    assert ia["tokens_total"] is None
+    assert painel_da_ia["chamadas"] == []
+    assert painel_da_ia["com_e_sem_ia"] is None
+    assert painel_da_ia["tokens_total"] is None
 
 
 def test_r21_10_travas_barradas_com_ia_vao_para_o_painel_com_o_motivo() -> None:
     fora_do_formato = RespostaDoProvedor("Claro! Segue a explicação.", None)
-    ia = montar_relatorio(analise_da_loja_com_ia(fora_do_formato))["ia"]
+    painel_da_ia = montar_relatorio(analise_da_loja_com_ia(fora_do_formato))["ia"]
 
-    assert [trava["trava"] for trava in ia["travas_acionadas"]] == [
+    assert [trava["trava"] for trava in painel_da_ia["travas_acionadas"]] == [
         "faixa conferida",
         "formato fechado",
     ]
-    barrada = ia["travas_acionadas"][1]
+    barrada = painel_da_ia["travas_acionadas"][1]
     assert barrada["alvo"] == "explicação de jquery@3.4.1"
     assert barrada["motivo"].startswith("explicação descartada:")
 

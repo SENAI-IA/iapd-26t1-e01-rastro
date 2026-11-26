@@ -81,10 +81,10 @@ LODASH = biblioteca("lodash", "4.17.15")
 
 
 def test_r08_1_uma_acao_por_biblioteca_com_os_avisos_reais_do_jquery() -> None:
-    plano = montar_plano_de_acao(achados_reais_do_jquery(), {}, [])
+    plano_de_acao = montar_plano_de_acao(achados_reais_do_jquery(), {}, [])
 
-    assert len(plano) == 1
-    acao = plano[0]
+    assert len(plano_de_acao) == 1
+    acao = plano_de_acao[0]
     assert acao.id == "jquery@3.4.1"
     assert acao.o_que_fazer == "Atualizar jquery de 3.4.1 para 3.5.0"
     assert acao.refs == ["GHSA-jpcq-cgw6-v4j6", "GHSA-gxr4-xjj5-5px2"]
@@ -129,17 +129,21 @@ def test_r08_1_cada_biblioteca_e_cada_versao_tem_a_sua_acao() -> None:
         achado(JQUERY, "GHSA-d", "3.5.0"),
     ]
 
-    plano = montar_plano_de_acao(achados, {}, [])
+    plano_de_acao = montar_plano_de_acao(achados, {}, [])
 
-    assert sorted(acao.id for acao in plano) == ["jquery@1.12.4", "jquery@3.4.1", "lodash@4.17.15"]
+    assert sorted(acao.id for acao in plano_de_acao) == [
+        "jquery@1.12.4",
+        "jquery@3.4.1",
+        "lodash@4.17.15",
+    ]
 
 
 def test_r08_1_biblioteca_a_confirmar_fica_fora_do_plano() -> None:
     a_confirmar = biblioteca("moment", "2.18.1", situacao="a_confirmar")
 
-    plano = montar_plano_de_acao([achado(a_confirmar, "GHSA-a", "2.29.4")], {}, [])
+    plano_de_acao = montar_plano_de_acao([achado(a_confirmar, "GHSA-a", "2.29.4")], {}, [])
 
-    assert plano == []
+    assert plano_de_acao == []
 
 
 def test_r08_2_uma_acao_por_checagem_com_falha() -> None:
@@ -150,10 +154,10 @@ def test_r08_2_uma_acao_por_checagem_com_falha() -> None:
         checagem(regras.SERVIDOR_EXPOE_VERSAO),
     ]
 
-    plano = montar_plano_de_acao([], {}, checagens)
+    plano_de_acao = montar_plano_de_acao([], {}, checagens)
 
-    assert [acao.id for acao in plano] == ["C01", "C05"]
-    assert plano[0].refs == ["C01"]
+    assert [acao.id for acao in plano_de_acao] == ["C01", "C05"]
+    assert plano_de_acao[0].refs == ["C01"]
 
 
 @pytest.mark.parametrize(
@@ -257,9 +261,9 @@ def test_r08_5_ordena_por_prioridade_e_dentro_dela_por_nota_decrescente() -> Non
     ]
     checagens = [checagem(regras.NOSNIFF_AUSENTE), checagem(regras.CSP_AUSENTE)]
 
-    plano = montar_plano_de_acao(achados, {}, checagens)
+    plano_de_acao = montar_plano_de_acao(achados, {}, checagens)
 
-    assert [acao.id for acao in plano] == [
+    assert [acao.id for acao in plano_de_acao] == [
         "angular@1.5.0",
         "jquery@3.4.1",
         "C01",

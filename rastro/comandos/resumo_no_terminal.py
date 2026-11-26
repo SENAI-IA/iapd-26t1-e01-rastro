@@ -17,17 +17,20 @@ TEXTO_PENTEST_NO_RELATORIO = (
 
 
 def mostrar_resultado(
-    pasta: Path, gravado: RelatorioGravado, relatorio: dict[str, Any], abrir: bool
+    pasta: Path,
+    arquivos_gravados: RelatorioGravado,
+    relatorio: dict[str, Any],
+    abrir_no_navegador: bool,
 ) -> None:
     print(f"Relatório gravado em: {pasta}")
-    print(f"HTML: {gravado.html}")
-    print(f"JSON: {gravado.json}")
+    print(f"HTML: {arquivos_gravados.html}")
+    print(f"JSON: {arquivos_gravados.json}")
     print(f"Resumo: {resumo_de_uma_linha(relatorio)}")
     if relatorio["pentest"] is not None:
         resumo = texto_do_resumo_do_pentest(relatorio["pentest"]["resumo"])
         print(TEXTO_PENTEST_NO_RELATORIO.format(resumo=resumo))
-    if abrir:
-        abrir_relatorio(gravado.html)
+    if abrir_no_navegador:
+        abrir_relatorio(arquivos_gravados.html)
     if relatorio["analise"]["ia"] is None:
         print(AVISO_SEM_IA)
     for texto in falhas_da_ia(relatorio):
@@ -60,4 +63,6 @@ def escrever_nota_maxima(nota: float | None) -> str:
 
 def escrever_acoes_por_prioridade(resumo: dict[str, Any]) -> str:
     contagem = resumo["acoes_por_prioridade"]
-    return ", ".join(f"{contagem[p]} {ROTULO_DA_PRIORIDADE[p]}" for p in PRIORIDADES)
+    return ", ".join(
+        f"{contagem[prioridade]} {ROTULO_DA_PRIORIDADE[prioridade]}" for prioridade in PRIORIDADES
+    )

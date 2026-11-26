@@ -11,12 +11,12 @@ class ProvedorKiro:
         self.executavel = executavel
 
     def executar(self, prompt: str) -> RespostaDoProvedor:
-        saida = executar_cli_da_ia(self.executavel, OPCOES_SEM_FERRAMENTAS, prompt, "Kiro")
-        return ler_resposta(saida)
+        saida_da_cli = executar_cli_da_ia(self.executavel, OPCOES_SEM_FERRAMENTAS, prompt, "Kiro")
+        return ler_resposta(saida_da_cli)
 
 
-def ler_resposta(saida: str) -> RespostaDoProvedor:
-    texto = saida.strip()
+def ler_resposta(saida_da_cli: str) -> RespostaDoProvedor:
+    texto = saida_da_cli.strip()
     if not texto:
         raise FalhaDoProvedor("a CLI do Kiro respondeu sem texto")
     return RespostaDoProvedor(texto, tokens=None)

@@ -21,7 +21,7 @@ rastro/
                            comando_pentest.py, comando_como_usar.py, comando_instalar.py, comando_desinstalar.py;
                            e as peças que eles dividem: argumentos.py, resumo_no_terminal.py, navegador.py, saida_de_erro.py
   instalacao/              instalar e desinstalar o comando rastro na pasta do usuário: instalador.py (instalar e desinstalar
-                           no Unix e no Windows), atalho.py (cria e remove o arquivo do atalho, com a MARCA),
+                           no Unix e no Windows), atalho.py (cria e remove o arquivo do atalho, com a MARCA_DO_ATALHO),
                            path_no_unix.py (bloco do PATH no arquivo do shell), path_no_windows.py (PATH do usuário
                            no registro e aviso ao sistema), sobras.py (o que fica depois de desinstalar)
   fluxo_da_analise.py      orquestra as etapas, sem regra própria

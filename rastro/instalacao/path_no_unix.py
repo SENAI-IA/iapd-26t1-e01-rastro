@@ -26,8 +26,8 @@ def acrescentar_bloco_do_path(arquivo: Path) -> bool:
         return False
     quebra_que_falta = "" if texto == "" or texto.endswith("\n") else "\n"
     bloco = f"{quebra_que_falta}\n{INICIO_DO_BLOCO}\n{LINHA_DO_PATH}\n{FIM_DO_BLOCO}\n"
-    with arquivo.open("a", encoding="utf-8") as saida:
-        saida.write(bloco)
+    with arquivo.open("a", encoding="utf-8") as arquivo_aberto:
+        arquivo_aberto.write(bloco)
     return True
 
 
@@ -47,4 +47,4 @@ def remover_bloco_do_path(arquivo: Path) -> bool:
 
 def posicao_da_linha(linhas: list[str], procurada: str, a_partir_de: int) -> int | None:
     posicoes = range(a_partir_de, len(linhas))
-    return next((i for i in posicoes if linhas[i].strip() == procurada), None)
+    return next((posicao for posicao in posicoes if linhas[posicao].strip() == procurada), None)

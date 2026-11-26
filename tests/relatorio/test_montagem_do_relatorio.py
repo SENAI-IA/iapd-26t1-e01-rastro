@@ -3,7 +3,7 @@ from dataclasses import replace
 
 from rastro.fluxo_da_analise import analisar
 from rastro.pentest.modelos import ResultadoDoPentest, ResumoDoPentest
-from rastro.relatorio.montagem_do_relatorio import VERSAO_FORMATO, montar_relatorio
+from rastro.relatorio.montagem_do_relatorio import VERSAO_DO_FORMATO, montar_relatorio
 from tests.dubles import (
     HAR_DA_LOJA,
     ConectorFalso,
@@ -39,7 +39,7 @@ def test_r24_11_pentest_fica_separado_e_nao_muda_o_resumo() -> None:
 
     relatorio = relatorio_da_loja()
 
-    assert relatorio["versao_formato"] == VERSAO_FORMATO == 1
+    assert relatorio["versao_formato"] == VERSAO_DO_FORMATO == 1
     assert list(relatorio) == [
         "versao_formato",
         "analise",
@@ -101,7 +101,7 @@ def test_r16_4_evidencias_saem_sem_os_valores_da_query_string() -> None:
     analise = analise_da_loja()
     jquery = analise.bibliotecas[0]
     com_token = replace(jquery.evidencias[0], url="https://loja.exemplo.com/a.js?token=segredo#x")
-    checagem = next(c for c in analise.checagens if c.evidencia is not None)
+    checagem = next(checagem for checagem in analise.checagens if checagem.evidencia is not None)
     na_pagina = replace(checagem.evidencia, url="https://loja.exemplo.com/?code=segredo")
     analise = replace(
         analise,
@@ -139,9 +139,9 @@ def test_r03_4_biblioteca_a_confirmar_fica_em_lista_propria() -> None:
     analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(frozenset({"lodash"})))
     relatorio = montar_relatorio(analise)
 
-    assert [b["id"] for b in relatorio["a_confirmar"]] == ["lodash@4.17.21"]
+    assert [biblioteca["id"] for biblioteca in relatorio["a_confirmar"]] == ["lodash@4.17.21"]
     assert relatorio["a_confirmar"][0]["travas_que_falharam"] == ["pacote existe"]
-    assert [b["id"] for b in relatorio["bibliotecas"]] == ["jquery@3.4.1"]
+    assert [biblioteca["id"] for biblioteca in relatorio["bibliotecas"]] == ["jquery@3.4.1"]
 
 
 def test_r14_5_sem_ia_bibliotecas_sem_explicacao() -> None:
@@ -171,11 +171,13 @@ def test_r16_4_relatorio_nao_traz_valor_de_cookie_nem_token_do_har() -> None:
 
 
 def test_r08_5_plano_de_acao_vai_inteiro_na_ordem_com_o_texto_da_task() -> None:
-    plano = relatorio_da_loja()["plano_de_acao"]
+    plano_de_acao = relatorio_da_loja()["plano_de_acao"]
 
-    assert plano[0]["id"] == "jquery@3.4.1"
-    assert plano[0]["texto_task"].startswith("## [Rastro] Atualizar jquery de 3.4.1 para 3.5.0")
-    assert [acao["id"] for acao in plano[1:]] == ["C01", "C02", "C06", "C04", "C05", "C08"]
+    assert plano_de_acao[0]["id"] == "jquery@3.4.1"
+    assert plano_de_acao[0]["texto_task"].startswith(
+        "## [Rastro] Atualizar jquery de 3.4.1 para 3.5.0"
+    )
+    assert [acao["id"] for acao in plano_de_acao[1:]] == ["C01", "C02", "C06", "C04", "C05", "C08"]
 
 
 def test_r04a_5_achado_leva_as_fontes_e_a_origem_de_cada_campo_para_o_json() -> None:

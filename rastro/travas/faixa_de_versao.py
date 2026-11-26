@@ -12,11 +12,11 @@ def conferir_faixas(
     travas_acionadas: list[TravaAcionada] = []
     for avisos_da_biblioteca in avisos:
         biblioteca = avisos_da_biblioteca.biblioteca
-        na_faixa, barrados = descartar_fora_da_faixa(
+        na_faixa, travas_da_faixa = descartar_fora_da_faixa(
             biblioteca.pacote, biblioteca.versao, avisos_da_biblioteca.avisos
         )
         mantidos.append(AvisosDaBiblioteca(biblioteca, na_faixa))
-        travas_acionadas.extend(barrados)
+        travas_acionadas.extend(travas_da_faixa)
     return mantidos, travas_acionadas
 
 

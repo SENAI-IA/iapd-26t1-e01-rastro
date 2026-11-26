@@ -3,7 +3,7 @@ import shlex
 import sys
 from pathlib import Path
 
-MARCA = "Criado por `rastro instalar`. Para remover: rastro desinstalar"
+MARCA_DO_ATALHO = "Criado por `rastro instalar`. Para remover: rastro desinstalar"
 TEXTO_PROJETO_NAO_ENCONTRADO = (
     "rode o instalar de dentro da pasta do projeto: python3 -m rastro instalar "
     "(Windows: py -m rastro instalar)"
@@ -27,10 +27,10 @@ def pasta_do_projeto() -> Path:
 
 
 def raiz_do_projeto() -> Path:
-    raiz = pasta_do_projeto()
-    if not (raiz / "pyproject.toml").is_file():
+    pasta = pasta_do_projeto()
+    if not (pasta / "pyproject.toml").is_file():
         raise ProjetoNaoEncontrado(TEXTO_PROJETO_NAO_ENCONTRADO)
-    return raiz
+    return pasta
 
 
 def python_do_sistema() -> Path:
@@ -49,7 +49,7 @@ def python_da_instalacao(base: Path) -> Path:
 def texto_do_atalho_unix(python: Path, projeto: Path) -> str:
     return (
         "#!/bin/sh\n"
-        f"# {MARCA}\n"
+        f"# {MARCA_DO_ATALHO}\n"
         f'PYTHONPATH={shlex.quote(str(projeto))}"${{PYTHONPATH:+:$PYTHONPATH}}" '
         f'exec {shlex.quote(str(python))} -m rastro "$@"\n'
     )
@@ -58,7 +58,7 @@ def texto_do_atalho_unix(python: Path, projeto: Path) -> str:
 def texto_do_atalho_windows(python: Path, projeto: Path) -> str:
     return (
         "@echo off\r\n"
-        f"rem {MARCA}\r\n"
+        f"rem {MARCA_DO_ATALHO}\r\n"
         "setlocal\r\n"
         f'set "PYTHONPATH={projeto};%PYTHONPATH%"\r\n'
         f'"{python}" -m rastro %* & exit /b\r\n'
@@ -91,6 +91,6 @@ def atalho_foi_criado_pelo_rastro(caminho: Path) -> bool:
     if caminho.is_symlink() or not caminho.is_file():
         return False
     try:
-        return MARCA in caminho.read_text(encoding="utf-8", errors="replace")
+        return MARCA_DO_ATALHO in caminho.read_text(encoding="utf-8", errors="replace")
     except OSError:
         return False

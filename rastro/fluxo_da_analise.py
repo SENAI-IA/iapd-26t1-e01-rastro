@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 from rastro.acao.plano_de_acao import montar_plano_de_acao
-from rastro.andamento import SEM_ANDAMENTO, Andamento
+from rastro.andamento import ANDAMENTO_SILENCIOSO, Andamento
 from rastro.configuracao.checagens import checar_configuracao
 from rastro.explicacao.explicacao_dos_achados import explicar_achados
 from rastro.fontes.completar_cvss import BuscaDeCvss
@@ -36,72 +36,76 @@ def analisar(
     caminho_har: Path,
     fonte: ConectorDeAvisos,
     registro: RegistroDePacotes,
-    ia: ClienteDeIA | None = None,
+    cliente_de_ia: ClienteDeIA | None = None,
     conector_osv: ConectorDeAvisos | None = None,
     busca_de_cvss: BuscaDeCvss | None = None,
     gravado_pelo_rastro: bool = False,
-    andamento: Andamento = SEM_ANDAMENTO,
+    andamento: Andamento = ANDAMENTO_SILENCIOSO,
 ) -> Analise:
     inicio = datetime.now()
-    cronometro = time.perf_counter()
-    andamento.comecar(ETAPAS_SEM_IA if ia is None else ETAPAS_COM_IA)
+    inicio_do_cronometro = time.perf_counter()
+    andamento.comecar_analise(ETAPAS_SEM_IA if cliente_de_ia is None else ETAPAS_COM_IA)
 
-    andamento.etapa(ETAPA_LER_O_HAR)
+    andamento.iniciar_etapa(ETAPA_LER_O_HAR)
     requisicoes = ler_har(caminho_har)
     site = descobrir_site_analisado(requisicoes)
-    andamento.etapa(ETAPA_RECONHECER)
-    por_assinatura = identificar_por_assinatura(requisicoes)
-    if ia is not None:
-        andamento.etapa(ETAPA_BUNDLES)
-    em_bundles = identificar_em_bundles(requisicoes, por_assinatura, ia, andamento)
-    andamento.etapa(ETAPA_CONFERIR)
-    bibliotecas = conferir_bibliotecas(por_assinatura + em_bundles.bibliotecas, registro, andamento)
-    andamento.etapa(ETAPA_CONSULTAR)
-    consultados = consultar_avisos(
+    andamento.iniciar_etapa(ETAPA_RECONHECER)
+    bibliotecas_por_assinatura = identificar_por_assinatura(requisicoes)
+    if cliente_de_ia is not None:
+        andamento.iniciar_etapa(ETAPA_BUNDLES)
+    resultado_dos_bundles = identificar_em_bundles(
+        requisicoes, bibliotecas_por_assinatura, cliente_de_ia, andamento
+    )
+    andamento.iniciar_etapa(ETAPA_CONFERIR)
+    bibliotecas = conferir_bibliotecas(
+        bibliotecas_por_assinatura + resultado_dos_bundles.bibliotecas, registro, andamento
+    )
+    andamento.iniciar_etapa(ETAPA_CONSULTAR)
+    consulta_de_avisos = consultar_avisos(
         bibliotecas.confirmadas, fonte, conector_osv, busca_de_cvss, andamento
     )
-    avisos_na_faixa, travas_da_faixa = conferir_faixas(consultados.avisos)
+    avisos_na_faixa, travas_da_faixa = conferir_faixas(consulta_de_avisos.avisos)
     achados = calcular_risco(avisos_na_faixa)
-    if ia is not None:
-        andamento.etapa(ETAPA_EXPLICAR)
-    explicados = explicar_achados(achados, ia, andamento)
-    andamento.etapa(ETAPA_PLANO)
+    if cliente_de_ia is not None:
+        andamento.iniciar_etapa(ETAPA_EXPLICAR)
+    resultado_das_explicacoes = explicar_achados(achados, cliente_de_ia, andamento)
+    andamento.iniciar_etapa(ETAPA_PLANO)
     checagens = checar_configuracao(requisicoes, site, gravado_pelo_rastro)
-    plano = montar_plano_de_acao(achados, explicados.explicacoes, checagens)
+    plano_de_acao = montar_plano_de_acao(achados, resultado_das_explicacoes.explicacoes, checagens)
 
     return Analise(
         har=caminho_har.name,
         site=site,
         inicio=inicio,
-        duracao_s=round(time.perf_counter() - cronometro, 1),
-        provedor_de_ia=nome_do_provedor(ia),
+        duracao_s=round(time.perf_counter() - inicio_do_cronometro, 1),
+        provedor_de_ia=nome_do_provedor(cliente_de_ia),
         tem_javascript=algum_script_com_conteudo(requisicoes),
         bibliotecas=bibliotecas.confirmadas,
         a_confirmar=bibliotecas.a_confirmar,
-        nao_consultadas=consultados.nao_consultadas,
-        fontes_sem_resposta=consultados.fontes_sem_resposta,
+        nao_consultadas=consulta_de_avisos.nao_consultadas,
+        fontes_sem_resposta=consulta_de_avisos.fontes_sem_resposta,
         achados=achados,
-        explicacoes=explicados.explicacoes,
+        explicacoes=resultado_das_explicacoes.explicacoes,
         checagens=checagens,
-        plano_de_acao=plano,
+        plano_de_acao=plano_de_acao,
         travas_acionadas=(
-            em_bundles.travas_acionadas
+            resultado_dos_bundles.travas_acionadas
             + bibliotecas.travas_acionadas
             + travas_da_faixa
-            + explicados.travas_acionadas
+            + resultado_das_explicacoes.travas_acionadas
         ),
-        chamadas_de_ia=chamadas_feitas(ia),
+        chamadas_de_ia=chamadas_feitas(cliente_de_ia),
         visita=montar_visita(requisicoes),
     )
 
 
-def nome_do_provedor(ia: ClienteDeIA | None) -> str | None:
-    if ia is None:
+def nome_do_provedor(cliente_de_ia: ClienteDeIA | None) -> str | None:
+    if cliente_de_ia is None:
         return None
-    return ia.provedor.nome
+    return cliente_de_ia.provedor.nome
 
 
-def chamadas_feitas(ia: ClienteDeIA | None) -> list[ChamadaDaIA]:
-    if ia is None:
+def chamadas_feitas(cliente_de_ia: ClienteDeIA | None) -> list[ChamadaDaIA]:
+    if cliente_de_ia is None:
         return []
-    return list(ia.chamadas)
+    return list(cliente_de_ia.chamadas)

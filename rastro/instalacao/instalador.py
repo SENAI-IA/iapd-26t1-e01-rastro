@@ -59,19 +59,19 @@ def instalar_no_unix(pasta_do_usuario: Path, ambiente: Mapping[str, str]) -> Ins
     pasta = pasta_do_usuario / ".local" / "bin"
     atalho = pasta / "rastro"
     gravar_atalho(atalho, texto_do_atalho_unix(python_do_sistema(), projeto), "utf-8")
-    alterado_em = None
+    arquivo_alterado = None
     if not pasta_no_path(pasta, ambiente.get("PATH", "")):
         arquivo = arquivo_do_shell(pasta_do_usuario, ambiente.get("SHELL", ""))
         if acrescentar_bloco_do_path(arquivo):
-            alterado_em = str(arquivo)
-    return Instalacao(atalho, projeto, alterado_em)
+            arquivo_alterado = str(arquivo)
+    return Instalacao(atalho, projeto, arquivo_alterado)
 
 
 def desinstalar_no_unix(pasta_do_usuario: Path) -> Desinstalacao:
     removido = remover_atalho(pasta_do_usuario / ".local" / "bin" / "rastro")
     arquivos = [pasta_do_usuario / nome for nome in ARQUIVOS_DO_SHELL]
-    alterados = [str(arquivo) for arquivo in arquivos if remover_bloco_do_path(arquivo)]
-    return Desinstalacao(removido, alterados)
+    arquivos_alterados = [str(arquivo) for arquivo in arquivos if remover_bloco_do_path(arquivo)]
+    return Desinstalacao(removido, arquivos_alterados)
 
 
 def instalar_no_windows(pasta_do_usuario: Path, ambiente: Mapping[str, str]) -> Instalacao:
@@ -80,12 +80,12 @@ def instalar_no_windows(pasta_do_usuario: Path, ambiente: Mapping[str, str]) -> 
     atalho = pasta / "rastro.cmd"
     texto = texto_do_atalho_windows(python_do_sistema(), projeto)
     gravar_atalho(atalho, texto, CODIFICACAO_DO_CMD)
-    alterado = acrescentar_ao_path_do_windows(pasta)
-    return Instalacao(atalho, projeto, PATH_DO_USUARIO_NO_WINDOWS if alterado else None)
+    path_foi_alterado = acrescentar_ao_path_do_windows(pasta)
+    return Instalacao(atalho, projeto, PATH_DO_USUARIO_NO_WINDOWS if path_foi_alterado else None)
 
 
 def desinstalar_no_windows(pasta_do_usuario: Path, ambiente: Mapping[str, str]) -> Desinstalacao:
     pasta = pasta_do_windows(pasta_do_usuario, ambiente)
     removido = remover_atalho(pasta / "rastro.cmd")
-    alterado = remover_do_path_do_windows(pasta)
-    return Desinstalacao(removido, [PATH_DO_USUARIO_NO_WINDOWS] if alterado else [])
+    path_foi_alterado = remover_do_path_do_windows(pasta)
+    return Desinstalacao(removido, [PATH_DO_USUARIO_NO_WINDOWS] if path_foi_alterado else [])

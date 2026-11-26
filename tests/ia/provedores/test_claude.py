@@ -161,9 +161,9 @@ def test_r14_4_cliente_registra_o_nome_e_os_tokens_do_claude(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     trocar_subprocess(monkeypatch, SubprocessFalso())
-    ia = ClienteDeIA(ProvedorClaude(EXECUTAVEL))
+    cliente_de_ia = ClienteDeIA(ProvedorClaude(EXECUTAVEL))
 
-    assert ia.perguntar("explicar_achado", "prompt") == TEXTO_DA_RESPOSTA
-    assert ia.chamadas[0].provedor == "claude"
-    assert ia.chamadas[0].tokens == 27982
-    assert ia.chamadas[0].sucesso is True
+    assert cliente_de_ia.perguntar("explicar_achado", "prompt") == TEXTO_DA_RESPOSTA
+    assert cliente_de_ia.chamadas[0].provedor == "claude"
+    assert cliente_de_ia.chamadas[0].tokens == 27982
+    assert cliente_de_ia.chamadas[0].sucesso is True

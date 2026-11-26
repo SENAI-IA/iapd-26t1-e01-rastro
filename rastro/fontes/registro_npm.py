@@ -6,7 +6,7 @@ from urllib.request import Request, urlopen
 
 from rastro.fontes.conector import ConsultaNaoRealizada
 from rastro.fontes.pacote_npm import (
-    LIMITE_DO_PACOTE_EM_MB,
+    LIMITE_DO_PACOTE_EM_MEGABYTES,
     MEGABYTE,
     NOME_DO_REGISTRO,
     conferir_integridade,
@@ -20,7 +20,7 @@ from rastro.fontes.requisicao_http import (
 )
 
 ENDERECO_DO_REGISTRO = "https://registry.npmjs.org"
-HTTP_PUBLICADO = 200
+STATUS_HTTP_PUBLICADO = 200
 HTTP_NAO_PUBLICADO = 404
 
 
@@ -55,10 +55,10 @@ def montar_requisicao(pacote: str, versao: str) -> Request:
 
 
 def baixar(requisicao: Request) -> bytes:
-    limite = LIMITE_DO_PACOTE_EM_MB * MEGABYTE
+    limite = LIMITE_DO_PACOTE_EM_MEGABYTES * MEGABYTE
     try:
         with urlopen(requisicao, timeout=TEMPO_LIMITE_EM_SEGUNDOS) as resposta:
-            if resposta.status != HTTP_PUBLICADO:
+            if resposta.status != STATUS_HTTP_PUBLICADO:
                 raise ConsultaNaoRealizada(motivo_do_erro_do_registro(resposta.status))
             dados: bytes = resposta.read(limite + 1)
     except HTTPError as erro:
@@ -66,7 +66,7 @@ def baixar(requisicao: Request) -> bytes:
     except ERROS_DE_CONEXAO as erro:
         raise ConsultaNaoRealizada(motivo_da_falha_de_conexao(NOME_DO_REGISTRO, erro)) from erro
     if len(dados) > limite:
-        raise ConsultaNaoRealizada(f"pacote acima de {LIMITE_DO_PACOTE_EM_MB} MB")
+        raise ConsultaNaoRealizada(f"pacote acima de {LIMITE_DO_PACOTE_EM_MEGABYTES} MB")
     return dados
 
 
@@ -84,7 +84,7 @@ def ler_endereco_e_integridade(metadados: bytes) -> tuple[str, str]:
 
 
 def publicado_pelo_codigo(codigo: int) -> bool:
-    if codigo == HTTP_PUBLICADO:
+    if codigo == STATUS_HTTP_PUBLICADO:
         return True
     if codigo == HTTP_NAO_PUBLICADO:
         return False

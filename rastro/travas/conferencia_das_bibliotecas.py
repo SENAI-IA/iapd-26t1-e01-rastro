@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from rastro.andamento import SEM_ANDAMENTO, Andamento
+from rastro.andamento import ANDAMENTO_SILENCIOSO, Andamento
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.identificacao.modelos import Biblioteca
 from rastro.travas.codigo_publicado import conferir_codigo_publicado
@@ -18,20 +18,20 @@ class BibliotecasConferidas:
 def conferir_bibliotecas(
     bibliotecas: list[Biblioteca],
     registro: RegistroDePacotes,
-    andamento: Andamento = SEM_ANDAMENTO,
+    andamento: Andamento = ANDAMENTO_SILENCIOSO,
 ) -> BibliotecasConferidas:
     confirmadas = []
     a_confirmar = []
     travas_acionadas = []
-    andamento.itens(len(bibliotecas))
+    andamento.definir_total_de_itens(len(bibliotecas))
     for biblioteca in bibliotecas:
-        conferida, barrados = conferir_biblioteca(biblioteca, registro)
-        andamento.avancar()
+        conferida, travas_da_biblioteca = conferir_biblioteca(biblioteca, registro)
+        andamento.avancar_item()
         if conferida.situacao == "confirmada":
             confirmadas.append(conferida)
         else:
             a_confirmar.append(conferida)
-        travas_acionadas.extend(barrados)
+        travas_acionadas.extend(travas_da_biblioteca)
     return BibliotecasConferidas(confirmadas, a_confirmar, travas_acionadas)
 
 

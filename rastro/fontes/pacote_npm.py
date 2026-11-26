@@ -7,8 +7,8 @@ from rastro.fontes.conector import ConsultaNaoRealizada
 
 NOME_DO_REGISTRO = "registro do npm"
 MEGABYTE = 1024 * 1024
-LIMITE_DO_PACOTE_EM_MB = 10
-LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MB = 50
+LIMITE_DO_PACOTE_EM_MEGABYTES = 10
+LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MEGABYTES = 50
 LIMITE_DE_ARQUIVOS_NO_PACOTE = 20_000
 EXTENSOES_DE_CODIGO = (".js", ".mjs", ".cjs")
 PREFIXO_DO_SHA512 = "sha512-"
@@ -44,20 +44,21 @@ def membros_de_codigo(pacote: tarfile.TarFile) -> list[tarfile.TarInfo]:
             raise ConsultaNaoRealizada(
                 f"pacote com mais de {LIMITE_DE_ARQUIVOS_NO_PACOTE} arquivos"
             )
-        if e_arquivo_de_codigo(membro):
+        if membro_e_arquivo_de_codigo(membro):
             membros.append(membro)
     return membros
 
 
-def e_arquivo_de_codigo(membro: tarfile.TarInfo) -> bool:
+def membro_e_arquivo_de_codigo(membro: tarfile.TarInfo) -> bool:
     return membro.isfile() and membro.name.endswith(EXTENSOES_DE_CODIGO)
 
 
 def conferir_tamanho_desempacotado(membros: list[tarfile.TarInfo]) -> None:
-    limite = LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MB * MEGABYTE
+    limite = LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MEGABYTES * MEGABYTE
     if sum(membro.size for membro in membros) > limite:
         raise ConsultaNaoRealizada(
-            f"código do pacote acima de {LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MB} MB desempacotado"
+            f"código do pacote acima de {LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MEGABYTES} MB "
+            "desempacotado"
         )
 
 

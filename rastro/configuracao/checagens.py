@@ -26,7 +26,7 @@ from rastro.configuracao.regras_das_checagens import (
     CSP_AUSENTE,
     FRAME_SEM_PROTECAO,
     HSTS_AUSENTE,
-    IDS_DAS_CHECAGENS_DE_COOKIE,
+    IDENTIFICADORES_DAS_CHECAGENS_DE_COOKIE,
     MOTIVO_SEM_COOKIES_NA_GRAVACAO,
     NOSNIFF_AUSENTE,
     SERVIDOR_EXPOE_VERSAO,
@@ -143,6 +143,6 @@ def gravacao_sem_cookies(
 
 
 def explicar_falta_de_cookie_na_gravacao(checagem: Checagem) -> Checagem:
-    if checagem.id not in IDS_DAS_CHECAGENS_DE_COOKIE:
+    if checagem.id not in IDENTIFICADORES_DAS_CHECAGENS_DE_COOKIE:
         return checagem
     return replace(checagem, detalhe=MOTIVO_SEM_COOKIES_NA_GRAVACAO)

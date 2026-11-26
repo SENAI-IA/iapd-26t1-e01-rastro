@@ -21,7 +21,6 @@ def sobras() -> list[Sobra]:
 
 
 def sobras_da_instalacao(pasta_do_usuario: Path, projeto: Path) -> list[Sobra]:
-    """O que o `desinstalar` deixa para trás: a pessoa apaga se quiser (R17.2)."""
     encontradas = []
     if instalado_pelo_install_sh(projeto):
         encontradas.append(Sobra(DESCRICAO_DOS_ARQUIVOS, projeto))

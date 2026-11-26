@@ -98,15 +98,15 @@ TEXTO_HAR_PERDIDO = "o navegador fechou antes de gravar o HAR. Nenhum relatório
 
 def gravar_e_analisar(
     url: str,
-    saida: Path | None,
+    pasta_de_saida: Path | None,
     opcao_da_ia: str | None,
     sem_ia: bool,
-    abrir: bool,
-    robo: bool = False,
+    abrir_no_navegador: bool,
+    usar_robo: bool = False,
 ) -> int:
     try:
         host = host_da_url(url)
-        ia = None if sem_ia else montar_cliente_de_ia(opcao_da_ia)
+        cliente_de_ia = None if sem_ia else montar_cliente_de_ia(opcao_da_ia)
         conferir_playwright()
         pasta = caminho_da_gravacao(pasta_padrao_das_gravacoes(), host, datetime.now())
         har = criar_pasta_da_gravacao(pasta)
@@ -115,7 +115,7 @@ def gravar_e_analisar(
     except (UrlInvalida, IAInvalida, PlaywrightAusente, GravacaoJaExiste) as erro:
         return encerrar_com_erro(str(erro))
     try:
-        requisicoes = gravar_visita(url, host, har, robo)
+        requisicoes = gravar_visita(url, host, har, usar_robo)
     except (NavegadorAusente, NavegadorNaoAbriu) as erro:
         apagar_pasta_da_gravacao(pasta)
         return encerrar_com_erro(str(erro))
@@ -126,30 +126,32 @@ def gravar_e_analisar(
     print(TEXTO_HAR_GRAVADO.format(har=har))
     print(AVISO_SESSAO_NO_HAR)
     print()
-    if ia is None:
+    if cliente_de_ia is None:
         avisar_analise_sem_ia()
     else:
-        avisar_analise_com_ia(ia)
-    return analisar_e_gravar(har, saida, ia, abrir, gravado_pelo_rastro=True)
+        avisar_analise_com_ia(cliente_de_ia)
+    return analisar_e_gravar(
+        har, pasta_de_saida, cliente_de_ia, abrir_no_navegador, gravado_pelo_rastro=True
+    )
 
 
-def gravar_visita(url: str, host: str, har: Path, robo: bool) -> int:
+def gravar_visita(url: str, host: str, har: Path, usar_robo: bool) -> int:
     parada = PedidoDeParada()
     with LinhaAoVivo() as linha:
-        linha.acompanhar(cronometrado(TEXTO_ABRINDO_O_NAVEGADOR))
-        with ctrl_c_pede_parada(parada), abrir_gravacao(har) as sessao:
-            if robo:
+        linha.acompanhar(texto_com_tempo_decorrido(TEXTO_ABRINDO_O_NAVEGADOR))
+        with parar_ao_apertar_ctrl_c(parada), abrir_gravacao(har) as sessao:
+            if usar_robo:
                 navegar_com_o_robo(sessao, parada, url, host, linha)
             else:
                 linha.pedir(TEXTO_GRAVANDO.format(host=host))
                 abrir_primeira_pagina(sessao, url, linha)
                 esperar_gravando(sessao, parada, linha)
             requisicoes = sessao.requisicoes
-            linha.acompanhar(cronometrado(TEXTO_SALVANDO_A_GRAVACAO))
+            linha.acompanhar(texto_com_tempo_decorrido(TEXTO_SALVANDO_A_GRAVACAO))
     return requisicoes
 
 
-def cronometrado(texto: str) -> Callable[[], str]:
+def texto_com_tempo_decorrido(texto: str) -> Callable[[], str]:
     inicio = time.monotonic()
     return lambda: f"{texto} · {escrever_tempo(time.monotonic() - inicio)}"
 
@@ -177,7 +179,7 @@ def navegar_com_o_robo(
     linha.soltar()
     linha.imprimir(AVISO_ANTES_DO_ROBO)
     linha.pedir(PEDIDO_ANTES_DO_ROBO)
-    if not esperar_o_enter(sessao, parada, ler_enter):
+    if not esperar_o_enter(sessao, parada, esperar_linha_digitada):
         return
     limites = LIMITES_PADRAO
     linha.imprimir(
@@ -207,7 +209,7 @@ def navegar_com_o_robo(
     esperar_gravando(sessao, parada, linha)
 
 
-def ler_enter() -> str:
+def esperar_linha_digitada() -> str:
     return input()
 
 
@@ -243,16 +245,16 @@ def mostrar_fim_do_robo(resultado: ResultadoDoRobo, linha: LinhaAoVivo) -> None:
 
 
 def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str, linha: LinhaAoVivo) -> None:
-    sem_senha = url_sem_usuario_e_senha(url)
-    linha.acompanhar(cronometrado(TEXTO_ABRINDO_A_PAGINA.format(url=sem_senha)))
+    url_para_exibir = url_sem_usuario_e_senha(url)
+    linha.acompanhar(texto_com_tempo_decorrido(TEXTO_ABRINDO_A_PAGINA.format(url=url_para_exibir)))
     try:
-        sessao.ir(url)
+        sessao.abrir_pagina(url)
     except FalhaAoNavegar as erro:
-        linha.pedir(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=sem_senha, motivo=erro))
+        linha.pedir(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=url_para_exibir, motivo=erro))
 
 
 @contextmanager
-def ctrl_c_pede_parada(parada: PedidoDeParada) -> Iterator[None]:
+def parar_ao_apertar_ctrl_c(parada: PedidoDeParada) -> Iterator[None]:
     original = signal.signal(signal.SIGINT, lambda *_: parada.pedir("Ctrl+C"))
     try:
         yield

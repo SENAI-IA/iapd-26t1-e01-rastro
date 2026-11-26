@@ -19,8 +19,8 @@ def pasta_padrao_das_gravacoes() -> Path:
     return Path.home() / "Rastro" / "gravacoes"
 
 
-def caminho_da_gravacao(raiz: Path, host: str, momento: datetime) -> Path:
-    return caminho_da_pasta_com_data(raiz, host, momento)
+def caminho_da_gravacao(pasta_das_gravacoes: Path, host: str, momento: datetime) -> Path:
+    return caminho_da_pasta_com_data(pasta_das_gravacoes, host, momento)
 
 
 def criar_pasta_da_gravacao(pasta: Path) -> Path:

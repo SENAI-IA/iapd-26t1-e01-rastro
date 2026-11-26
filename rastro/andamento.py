@@ -2,27 +2,27 @@ from typing import Protocol
 
 
 class Andamento(Protocol):
-    def comecar(self, etapas: int) -> None: ...
+    def comecar_analise(self, etapas: int) -> None: ...
 
-    def etapa(self, nome: str) -> None: ...
+    def iniciar_etapa(self, nome: str) -> None: ...
 
-    def itens(self, total: int) -> None: ...
+    def definir_total_de_itens(self, total: int) -> None: ...
 
-    def avancar(self) -> None: ...
+    def avancar_item(self) -> None: ...
 
 
-class SemAndamento:
-    def comecar(self, etapas: int) -> None:
+class AndamentoSilencioso:
+    def comecar_analise(self, etapas: int) -> None:
         return None
 
-    def etapa(self, nome: str) -> None:
+    def iniciar_etapa(self, nome: str) -> None:
         return None
 
-    def itens(self, total: int) -> None:
+    def definir_total_de_itens(self, total: int) -> None:
         return None
 
-    def avancar(self) -> None:
+    def avancar_item(self) -> None:
         return None
 
 
-SEM_ANDAMENTO = SemAndamento()
+ANDAMENTO_SILENCIOSO = AndamentoSilencioso()

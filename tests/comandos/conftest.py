@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from rastro.andamento import SEM_ANDAMENTO, Andamento
+from rastro.andamento import ANDAMENTO_SILENCIOSO, Andamento
 from rastro.comandos import comando_analisar
 from rastro.fluxo_da_analise import analisar
 from rastro.fontes.completar_cvss import BuscaDeCvss
@@ -22,17 +22,17 @@ def analisar_no_momento_fixo(
     caminho_har: Path,
     fonte: ConectorDeAvisos,
     registro: RegistroDePacotes,
-    ia: ClienteDeIA | None = None,
+    cliente_de_ia: ClienteDeIA | None = None,
     conector_osv: ConectorDeAvisos | None = None,
     busca_de_cvss: BuscaDeCvss | None = None,
     gravado_pelo_rastro: bool = False,
-    andamento: Andamento = SEM_ANDAMENTO,
+    andamento: Andamento = ANDAMENTO_SILENCIOSO,
 ) -> Analise:
     analise = analisar(
         caminho_har,
         fonte,
         registro,
-        ia,
+        cliente_de_ia,
         conector_osv,
         busca_de_cvss,
         gravado_pelo_rastro=gravado_pelo_rastro,

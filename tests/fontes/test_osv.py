@@ -167,13 +167,13 @@ def test_r04a_1_aviso_sem_faixa_semver_sai_com_faixa_vazia_e_a_trava_6_descarta(
 ) -> None:
     sem_faixa = avisos_de_exemplo(monkeypatch)[3]
 
-    mantidos, barrados = descartar_fora_da_faixa("pacote-exemplo", "1.0.0", [sem_faixa])
+    mantidos, travas_acionadas = descartar_fora_da_faixa("pacote-exemplo", "1.0.0", [sem_faixa])
 
     assert sem_faixa.ghsa == "OSV-2099-0003"
     assert sem_faixa.versoes_afetadas == ""
     assert mantidos == []
-    assert barrados[0].alvo == "OSV-2099-0003 em pacote-exemplo@1.0.0"
-    assert "não foi possível conferir a faixa" in barrados[0].motivo
+    assert travas_acionadas[0].alvo == "OSV-2099-0003 em pacote-exemplo@1.0.0"
+    assert "não foi possível conferir a faixa" in travas_acionadas[0].motivo
 
 
 def test_r04a_1_descarta_aviso_retirado(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -189,11 +189,11 @@ def test_r04a_1_a_trava_6_vale_igual_para_as_faixas_do_osv(
     urlopen_falso = UrlopenFalso(resposta_gravada("osv-jquery-3.4.1.json"))
     avisos = consultar(monkeypatch, urlopen_falso)
 
-    mantidos, barrados = descartar_fora_da_faixa("jquery", "3.4.1", avisos)
+    mantidos, travas_acionadas = descartar_fora_da_faixa("jquery", "3.4.1", avisos)
     _, fora = descartar_fora_da_faixa("jquery", "3.5.0", avisos)
 
     assert mantidos == avisos
-    assert barrados == []
+    assert travas_acionadas == []
     assert len(fora) == 2
 
 
@@ -250,10 +250,10 @@ def test_r04a_6_falha_do_osv_segue_so_com_o_github_e_registra_a_fonte(
 ) -> None:
     monkeypatch.setattr(requisicao_http, "urlopen", UrlopenFalso(erro=URLError("sem rede")))
 
-    consultados = consultar_avisos([JQUERY], ConectorFalso(), conector_osv=Osv())
+    consulta_de_avisos = consultar_avisos([JQUERY], ConectorFalso(), conector_osv=Osv())
 
-    assert consultados.avisos[0].avisos != []
-    assert consultados.nao_consultadas == {}
-    assert consultados.fontes_sem_resposta == [
+    assert consulta_de_avisos.avisos[0].avisos != []
+    assert consulta_de_avisos.nao_consultadas == {}
+    assert consulta_de_avisos.fontes_sem_resposta == [
         FonteSemResposta("OSV", "jquery@3.4.1", "sem resposta do OSV: sem rede")
     ]

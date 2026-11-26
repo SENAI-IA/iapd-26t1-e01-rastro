@@ -2,10 +2,10 @@ import re
 from dataclasses import dataclass
 
 from rastro.har.modelos import Requisicao
-from rastro.identificacao.assinaturas import e_script
+from rastro.identificacao.assinaturas import requisicao_e_script
 from rastro.identificacao.modelos import Biblioteca
 
-TAMANHO_MINIMO_DO_BUNDLE_EM_KB = 30
+TAMANHO_MINIMO_DO_BUNDLE_EM_KILOBYTES = 30
 TAMANHO_DA_JANELA = 300
 MAXIMO_DE_TRECHOS_POR_BUNDLE = 5
 COMENTARIO_DE_LICENCA = re.compile(r"/\*!(.*?)\*/", re.DOTALL)
@@ -19,13 +19,13 @@ class Bundle:
 
 
 def escolher_bundles(
-    requisicoes: list[Requisicao], por_assinatura: list[Biblioteca]
+    requisicoes: list[Requisicao], bibliotecas_por_assinatura: list[Biblioteca]
 ) -> list[Bundle]:
-    com_assinatura = indices_com_assinatura(por_assinatura)
+    com_assinatura = indices_com_assinatura(bibliotecas_por_assinatura)
     bundles: list[Bundle] = []
     conteudos_vistos: set[str] = set()
     for requisicao in requisicoes:
-        if requisicao.indice in com_assinatura or not e_bundle(requisicao):
+        if requisicao.indice in com_assinatura or not requisicao_e_bundle(requisicao):
             continue
         conteudo = requisicao.conteudo or ""
         if conteudo in conteudos_vistos:
@@ -43,11 +43,11 @@ def indices_com_assinatura(bibliotecas: list[Biblioteca]) -> set[int]:
     }
 
 
-def e_bundle(requisicao: Requisicao) -> bool:
-    if not e_script(requisicao) or requisicao.conteudo is None:
+def requisicao_e_bundle(requisicao: Requisicao) -> bool:
+    if not requisicao_e_script(requisicao) or requisicao.conteudo is None:
         return False
     tamanho_em_bytes = len(requisicao.conteudo.encode("utf-8"))
-    return tamanho_em_bytes > TAMANHO_MINIMO_DO_BUNDLE_EM_KB * 1024
+    return tamanho_em_bytes > TAMANHO_MINIMO_DO_BUNDLE_EM_KILOBYTES * 1024
 
 
 def extrair_trechos(conteudo: str) -> list[str]:

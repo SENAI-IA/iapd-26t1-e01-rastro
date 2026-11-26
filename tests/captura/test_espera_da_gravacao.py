@@ -14,7 +14,7 @@ class SessaoQueFechaSozinha:
         self.fatias_ate_fechar = fatias_ate_fechar
         self.fatias_esperadas = 0
 
-    def ir(self, url: str) -> None:
+    def abrir_pagina(self, url: str) -> None:
         return None
 
     def links(self) -> list[str]:

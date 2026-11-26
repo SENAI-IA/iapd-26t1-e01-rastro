@@ -32,7 +32,7 @@ class SessaoFalsa:
         self.esperas = 0
         self.urls_antes_de_fechar = 1
 
-    def ir(self, url: str) -> None:
+    def abrir_pagina(self, url: str) -> None:
         self.urls.append(url)
         if self.falha_ao_ir is not None:
             raise FalhaAoNavegar(self.falha_ao_ir)
@@ -87,8 +87,8 @@ def gravar_loja(saida: Path, *opcoes: str) -> int:
     return executar(["gravar", "https://loja.exemplo.com/", "--saida", str(saida), *opcoes])
 
 
-def pastas_das_gravacoes(raiz: Path) -> list[Path]:
-    return sorted((raiz / "Rastro" / "gravacoes").glob("*/*"))
+def pastas_das_gravacoes(pasta_de_saida: Path) -> list[Path]:
+    return sorted((pasta_de_saida / "Rastro" / "gravacoes").glob("*/*"))
 
 
 def test_r24_7_grava_a_visita_e_analisa_o_har_gravado(
@@ -254,10 +254,10 @@ def test_r24_9_sem_cookies_na_gravacao_nao_pede_o_har_completo(
 
     [json_do_relatorio] = saida.glob("*/*/relatorio.json")
     checagens = ler_relatorio(json_do_relatorio)["checagens"]
-    de_cookie = [c for c in checagens if c["id"] in ("C06", "C07", "C08")]
-    assert [c["situacao"] for c in de_cookie] == ["nao_verificada"] * 3
-    assert all("não criou nenhum cookie" in c["detalhe"] for c in de_cookie)
-    assert not any("HAR completo" in c["detalhe"] for c in de_cookie)
+    de_cookie = [checagem for checagem in checagens if checagem["id"] in ("C06", "C07", "C08")]
+    assert [checagem["situacao"] for checagem in de_cookie] == ["nao_verificada"] * 3
+    assert all("não criou nenhum cookie" in checagem["detalhe"] for checagem in de_cookie)
+    assert not any("HAR completo" in checagem["detalhe"] for checagem in de_cookie)
 
 
 def test_r24_18_no_terminal_mostra_ao_vivo_o_tempo_e_as_requisicoes_gravadas(
@@ -290,7 +290,7 @@ def enter(monkeypatch: pytest.MonkeyPatch) -> list[str]:
         lidos.append("")
         return ""
 
-    monkeypatch.setattr(comando_gravar, "ler_enter", apertar_enter)
+    monkeypatch.setattr(comando_gravar, "esperar_linha_digitada", apertar_enter)
     return lidos
 
 
@@ -375,7 +375,7 @@ def test_r24_10_ctrl_c_antes_do_enter_nao_roda_o_robo_e_analisa(
         sem_enter.wait(5)
         return ""
 
-    monkeypatch.setattr(comando_gravar, "ler_enter", nunca_aperta)
+    monkeypatch.setattr(comando_gravar, "esperar_linha_digitada", nunca_aperta)
     gravacao.sessao = SessaoFalsa(ctrl_c=True)
     saida = tmp_path / "relatorios"
 

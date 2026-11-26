@@ -144,7 +144,7 @@ ARQUIVOS_DO_PACOTE = {
 }
 
 
-def montar_tgz(arquivos: dict[str, str]) -> bytes:
+def montar_pacote_compactado(arquivos: dict[str, str]) -> bytes:
     memoria = io.BytesIO()
     with tarfile.open(fileobj=memoria, mode="w:gz") as pacote:
         pasta = tarfile.TarInfo("package/pasta.js")
@@ -186,13 +186,15 @@ class UrlopenDoPacote:
         return RespostaFalsa(200, resposta)
 
 
-def registro_com_pacote(tgz: bytes, metadados_do_pacote: bytes | None = None) -> UrlopenDoPacote:
+def registro_com_pacote(
+    pacote_compactado: bytes, metadados_do_pacote: bytes | None = None
+) -> UrlopenDoPacote:
     return UrlopenDoPacote(
         {
             "https://registry.npmjs.org/@angular%2Fcore/22.2.2": (
-                metadados_do_pacote or metadados(integridade=integridade_de(tgz))
+                metadados_do_pacote or metadados(integridade=integridade_de(pacote_compactado))
             ),
-            ENDERECO_DO_PACOTE: tgz,
+            ENDERECO_DO_PACOTE: pacote_compactado,
         }
     )
 
@@ -203,7 +205,9 @@ def ler_codigo(monkeypatch: pytest.MonkeyPatch, urlopen_falso: UrlopenDoPacote) 
 
 
 def test_r21_5_le_so_os_arquivos_de_codigo_do_pacote(monkeypatch: pytest.MonkeyPatch) -> None:
-    codigos = ler_codigo(monkeypatch, registro_com_pacote(montar_tgz(ARQUIVOS_DO_PACOTE)))
+    codigos = ler_codigo(
+        monkeypatch, registro_com_pacote(montar_pacote_compactado(ARQUIVOS_DO_PACOTE))
+    )
 
     assert codigos == [CODIGO_DO_ANGULAR, "module.exports = 'index';", "exports.x = 'cjs';"]
 
@@ -211,7 +215,7 @@ def test_r21_5_le_so_os_arquivos_de_codigo_do_pacote(monkeypatch: pytest.MonkeyP
 def test_r21_5_baixa_os_metadados_e_o_pacote_so_com_leitura(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    urlopen_falso = registro_com_pacote(montar_tgz(ARQUIVOS_DO_PACOTE))
+    urlopen_falso = registro_com_pacote(montar_pacote_compactado(ARQUIVOS_DO_PACOTE))
 
     ler_codigo(monkeypatch, urlopen_falso)
 
@@ -233,16 +237,20 @@ def test_r21_5_nada_e_extraido_em_disco_nem_executado(
     monkeypatch.setattr(tarfile.TarFile, "extract", recusar)
     monkeypatch.setattr(tarfile.TarFile, "extractall", recusar)
 
-    codigos = ler_codigo(monkeypatch, registro_com_pacote(montar_tgz(ARQUIVOS_DO_PACOTE)))
+    codigos = ler_codigo(
+        monkeypatch, registro_com_pacote(montar_pacote_compactado(ARQUIVOS_DO_PACOTE))
+    )
 
     assert CODIGO_DO_ANGULAR in codigos
     assert list(tmp_path.iterdir()) == []
 
 
 def test_r21_5_integridade_diferente_nao_le_o_pacote(monkeypatch: pytest.MonkeyPatch) -> None:
-    tgz = montar_tgz(ARQUIVOS_DO_PACOTE)
-    adulterado = montar_tgz({"package/index.js": "'inventado'"})
-    urlopen_falso = registro_com_pacote(adulterado, metadados(integridade=integridade_de(tgz)))
+    pacote_compactado = montar_pacote_compactado(ARQUIVOS_DO_PACOTE)
+    adulterado = montar_pacote_compactado({"package/index.js": "'inventado'"})
+    urlopen_falso = registro_com_pacote(
+        adulterado, metadados(integridade=integridade_de(pacote_compactado))
+    )
 
     with pytest.raises(ConsultaNaoRealizada) as falha:
         ler_codigo(monkeypatch, urlopen_falso)
@@ -260,8 +268,8 @@ def test_r21_5_integridade_diferente_nao_le_o_pacote(monkeypatch: pytest.MonkeyP
 def test_r21_5_pacote_sem_sha512_nao_e_lido(
     monkeypatch: pytest.MonkeyPatch, integridade: str | None, motivo: str
 ) -> None:
-    tgz = montar_tgz(ARQUIVOS_DO_PACOTE)
-    urlopen_falso = registro_com_pacote(tgz, metadados(integridade=integridade))
+    pacote_compactado = montar_pacote_compactado(ARQUIVOS_DO_PACOTE)
+    urlopen_falso = registro_com_pacote(pacote_compactado, metadados(integridade=integridade))
 
     with pytest.raises(ConsultaNaoRealizada) as falha:
         ler_codigo(monkeypatch, urlopen_falso)
@@ -270,10 +278,12 @@ def test_r21_5_pacote_sem_sha512_nao_e_lido(
 
 
 def test_r21_5_aceita_integridade_com_mais_de_um_hash(monkeypatch: pytest.MonkeyPatch) -> None:
-    tgz = montar_tgz(ARQUIVOS_DO_PACOTE)
-    integridade = f"sha1-abc {integridade_de(tgz)}"
+    pacote_compactado = montar_pacote_compactado(ARQUIVOS_DO_PACOTE)
+    integridade = f"sha1-abc {integridade_de(pacote_compactado)}"
 
-    codigos = ler_codigo(monkeypatch, registro_com_pacote(tgz, metadados(integridade=integridade)))
+    codigos = ler_codigo(
+        monkeypatch, registro_com_pacote(pacote_compactado, metadados(integridade=integridade))
+    )
 
     assert CODIGO_DO_ANGULAR in codigos
 
@@ -290,10 +300,10 @@ def test_r21_5_pacote_acima_de_10_mb_nao_e_lido(monkeypatch: pytest.MonkeyPatch)
 def test_r21_5_codigo_desempacotado_acima_do_limite_nao_e_lido(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(pacote_npm, "LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MB", 0)
+    monkeypatch.setattr(pacote_npm, "LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MEGABYTES", 0)
 
     with pytest.raises(ConsultaNaoRealizada) as falha:
-        ler_codigo(monkeypatch, registro_com_pacote(montar_tgz(ARQUIVOS_DO_PACOTE)))
+        ler_codigo(monkeypatch, registro_com_pacote(montar_pacote_compactado(ARQUIVOS_DO_PACOTE)))
 
     assert falha.value.motivo == "código do pacote acima de 0 MB desempacotado"
 
@@ -302,7 +312,7 @@ def test_r21_5_pacote_com_arquivos_demais_nao_e_lido(monkeypatch: pytest.MonkeyP
     monkeypatch.setattr(pacote_npm, "LIMITE_DE_ARQUIVOS_NO_PACOTE", 2)
 
     with pytest.raises(ConsultaNaoRealizada) as falha:
-        ler_codigo(monkeypatch, registro_com_pacote(montar_tgz(ARQUIVOS_DO_PACOTE)))
+        ler_codigo(monkeypatch, registro_com_pacote(montar_pacote_compactado(ARQUIVOS_DO_PACOTE)))
 
     assert falha.value.motivo == "pacote com mais de 2 arquivos"
 
@@ -351,8 +361,8 @@ def test_r21_5_metadados_fora_do_formato_viram_consulta_nao_realizada(
 def test_r21_9_falha_ao_baixar_o_pacote_vira_consulta_nao_realizada(
     monkeypatch: pytest.MonkeyPatch, erro: Exception, motivo: str
 ) -> None:
-    tgz = montar_tgz(ARQUIVOS_DO_PACOTE)
-    urlopen_falso = registro_com_pacote(tgz)
+    pacote_compactado = montar_pacote_compactado(ARQUIVOS_DO_PACOTE)
+    urlopen_falso = registro_com_pacote(pacote_compactado)
     urlopen_falso.respostas[ENDERECO_DO_PACOTE] = erro
 
     with pytest.raises(ConsultaNaoRealizada) as falha:

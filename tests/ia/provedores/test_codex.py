@@ -217,9 +217,9 @@ def test_r14_4_cliente_registra_o_nome_e_os_tokens_do_codex(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     trocar_subprocess(monkeypatch, SubprocessFalso())
-    ia = ClienteDeIA(ProvedorCodex(EXECUTAVEL))
+    cliente_de_ia = ClienteDeIA(ProvedorCodex(EXECUTAVEL))
 
-    assert ia.perguntar("explicar_achado", "prompt") == TEXTO_DA_RESPOSTA
-    assert ia.chamadas[0].provedor == "codex"
-    assert ia.chamadas[0].tokens == 12844
-    assert ia.chamadas[0].sucesso is True
+    assert cliente_de_ia.perguntar("explicar_achado", "prompt") == TEXTO_DA_RESPOSTA
+    assert cliente_de_ia.chamadas[0].provedor == "codex"
+    assert cliente_de_ia.chamadas[0].tokens == 12844
+    assert cliente_de_ia.chamadas[0].sucesso is True

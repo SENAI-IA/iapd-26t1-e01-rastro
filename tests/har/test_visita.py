@@ -7,8 +7,14 @@ INICIO = datetime(2026, 11, 6, 12, 0, tzinfo=timezone.utc)
 
 
 def requisicao(
-    indice: int, tipo: str | None, depois_ms: float | None, duracao_ms: float | None = 5.0
+    indice: int,
+    tipo: str | None,
+    depois_em_milissegundos: float | None,
+    duracao_em_milissegundos: float | None = 5.0,
 ) -> Requisicao:
+    inicio: datetime | None = None
+    if depois_em_milissegundos is not None:
+        inicio = INICIO + timedelta(milliseconds=depois_em_milissegundos)
     return Requisicao(
         indice=indice,
         url=f"https://loja.exemplo.com/{indice}",
@@ -18,19 +24,25 @@ def requisicao(
         cabecalhos_resposta={},
         cookies_resposta=[],
         conteudo=None,
-        inicio=None if depois_ms is None else INICIO + timedelta(milliseconds=depois_ms),
-        duracao_ms=duracao_ms,
+        inicio=inicio,
+        duracao_ms=duracao_em_milissegundos,
     )
 
 
 def test_r22_2_visita_conta_o_tempo_desde_a_primeira_requisicao_e_ordena() -> None:
-    visita = montar_visita([
-        requisicao(0, "text/html", 100),
-        requisicao(1, "application/javascript", 350),
-        requisicao(2, "text/css", 250),
-    ])
+    visita = montar_visita(
+        [
+            requisicao(0, "text/html", 100),
+            requisicao(1, "application/javascript", 350),
+            requisicao(2, "text/css", 250),
+        ]
+    )
 
-    assert [(p.indice_requisicao, p.inicio_ms) for p in visita] == [(0, 0), (2, 150), (1, 250)]
+    assert [(passo.indice_requisicao, passo.inicio_ms) for passo in visita] == [
+        (0, 0),
+        (2, 150),
+        (1, 250),
+    ]
 
 
 def test_r22_2_visita_ignora_requisicao_sem_horario() -> None:

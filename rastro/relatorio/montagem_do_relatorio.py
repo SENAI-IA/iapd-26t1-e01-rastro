@@ -14,16 +14,20 @@ from rastro.risco.achados import achados_da_biblioteca
 from rastro.risco.modelos import Achado
 from rastro.risco.prioridade import classificar_prioridade, nota_da_biblioteca
 
-VERSAO_FORMATO = 1
+VERSAO_DO_FORMATO = 1
 
 
 def montar_relatorio(analise: Analise, pentest: ResultadoDoPentest | None = None) -> dict[str, Any]:
     return {
-        "versao_formato": VERSAO_FORMATO,
+        "versao_formato": VERSAO_DO_FORMATO,
         "analise": dados_da_analise(analise),
         "resumo": montar_resumo(analise),
-        "bibliotecas": [biblioteca_no_relatorio(b, analise) for b in analise.bibliotecas],
-        "a_confirmar": [biblioteca_no_relatorio(b, analise) for b in analise.a_confirmar],
+        "bibliotecas": [
+            biblioteca_no_relatorio(biblioteca, analise) for biblioteca in analise.bibliotecas
+        ],
+        "a_confirmar": [
+            biblioteca_no_relatorio(biblioteca, analise) for biblioteca in analise.a_confirmar
+        ],
         "achados": [achado_no_relatorio(achado) for achado in analise.achados],
         "checagens": [checagem_no_relatorio(checagem) for checagem in analise.checagens],
         "plano_de_acao": [asdict(acao) for acao in analise.plano_de_acao],

@@ -63,7 +63,7 @@ class Robo:
         self.relogio = relogio
         self.mostrar = mostrar
         self.limites = limites
-        self.vistas: set[str] = set()
+        self.urls_ja_vistas: set[str] = set()
         self.por_familia: dict[str, int] = {}
         self.paginas = 0
         self.barrados = 0
@@ -72,7 +72,7 @@ class Robo:
     def navegar(self, url_inicial: str) -> ResultadoDoRobo:
         host = host_do_site(url_inicial)
         fila: deque[LinkNaFila] = deque([LinkNaFila(url_inicial, 0)])
-        self.vistas.add(url_para_comparar(url_inicial))
+        self.urls_ja_vistas.add(url_para_comparar(url_inicial))
         inicio = self.relogio()
         while fila:
             self.registrar_janela_fechada()
@@ -119,7 +119,7 @@ class Robo:
 
     def descobrir_falha_da_visita(self, url: str, host: str) -> str | None:
         try:
-            self.sessao.ir(url)
+            self.sessao.abrir_pagina(url)
         except FalhaAoNavegar as erro:
             return str(erro)
         return saida_do_site(self.sessao.endereco(), host)
@@ -147,9 +147,9 @@ class Robo:
         for href in sorted(set(self.sessao.links())):
             absoluto = urljoin(url_da_pagina, href)
             chave = url_para_comparar(absoluto)
-            if chave in self.vistas:
+            if chave in self.urls_ja_vistas:
                 continue
-            self.vistas.add(chave)
+            self.urls_ja_vistas.add(chave)
             if link_permitido(absoluto, host):
                 novos.append(absoluto)
             else:

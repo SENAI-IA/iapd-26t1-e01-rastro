@@ -154,7 +154,7 @@ def test_r24_10_pagina_que_carregou_conta_mesmo_sem_a_rede_parar() -> None:
     pagina = PaginaFalsa()
     sessao = SessaoPlaywright(ContextoFalso(pagina))  # type: ignore[arg-type]
 
-    sessao.ir("https://loja.exemplo.com/")
+    sessao.abrir_pagina("https://loja.exemplo.com/")
 
     assert sessao.endereco() == "https://loja.exemplo.com/"
     assert pagina.esperas == [("load", 15_000), ("networkidle", 5_000)]
@@ -165,4 +165,4 @@ def test_r24_10_pagina_que_nao_carregou_e_falha_ao_navegar() -> None:
     sessao = SessaoPlaywright(ContextoFalso(pagina))  # type: ignore[arg-type]
 
     with pytest.raises(FalhaAoNavegar, match="^net::ERR_CONNECTION_REFUSED at https://x/$"):
-        sessao.ir("https://x/")
+        sessao.abrir_pagina("https://x/")

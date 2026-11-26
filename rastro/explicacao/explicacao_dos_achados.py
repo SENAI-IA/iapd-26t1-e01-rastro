@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 
-from rastro.andamento import SEM_ANDAMENTO, Andamento
+from rastro.andamento import ANDAMENTO_SILENCIOSO, Andamento
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.modelos import Aviso
 from rastro.har.site import url_sem_query_string
@@ -27,40 +27,44 @@ class ExplicacoesDosAchados:
 
 
 def explicar_achados(
-    achados: list[Achado], ia: ClienteDeIA | None, andamento: Andamento = SEM_ANDAMENTO
+    achados: list[Achado],
+    cliente_de_ia: ClienteDeIA | None,
+    andamento: Andamento = ANDAMENTO_SILENCIOSO,
 ) -> ExplicacoesDosAchados:
-    if ia is None:
+    if cliente_de_ia is None:
         return ExplicacoesDosAchados({}, [])
     explicacoes: dict[str, Explicacao] = {}
     travas_acionadas: list[TravaAcionada] = []
     por_biblioteca = agrupar_por_biblioteca(achados)
-    andamento.itens(len(por_biblioteca))
+    andamento.definir_total_de_itens(len(por_biblioteca))
     for chave, achados_da_biblioteca in por_biblioteca.items():
-        explicacao, barrados = explicar_biblioteca(achados_da_biblioteca, ia)
-        andamento.avancar()
+        explicacao, travas_da_biblioteca = explicar_biblioteca(achados_da_biblioteca, cliente_de_ia)
+        andamento.avancar_item()
         explicacoes[chave] = explicacao
-        travas_acionadas.extend(barrados)
+        travas_acionadas.extend(travas_da_biblioteca)
     return ExplicacoesDosAchados(explicacoes, travas_acionadas)
 
 
 def explicar_biblioteca(
-    achados: list[Achado], ia: ClienteDeIA
+    achados: list[Achado], cliente_de_ia: ClienteDeIA
 ) -> tuple[Explicacao, list[TravaAcionada]]:
     em_ordem = ordenar_achados(achados)
     biblioteca = em_ordem[0].biblioteca
     avisos = [achado.aviso for achado in em_ordem]
     sem_ia = explicacao_pelo_resumo(avisos[0])
     entrada = sanitizar(montar_entrada(biblioteca, avisos))
-    resposta = ia.perguntar(ETAPA, montar_prompt(ARQUIVO_DO_PROMPT, entrada))
+    resposta = cliente_de_ia.perguntar(ETAPA, montar_prompt(ARQUIVO_DO_PROMPT, entrada))
     if resposta is None:
         return sem_ia, []
     alvo = f"explicação de {biblioteca.pacote}@{biblioteca.versao}"
-    campos, barrados = conferir_formato_da_explicacao(resposta, alvo)
+    campos, travas_do_formato = conferir_formato_da_explicacao(resposta, alvo)
     if campos is None:
-        return sem_ia, barrados
-    conferida, barrados = conferir_explicacao(biblioteca.pacote, biblioteca.versao, campos, entrada)
+        return sem_ia, travas_do_formato
+    conferida, travas_do_conteudo = conferir_explicacao(
+        biblioteca.pacote, biblioteca.versao, campos, entrada
+    )
     if conferida is None:
-        return sem_ia, barrados
+        return sem_ia, travas_do_conteudo
     return Explicacao(**conferida, gerada_por_ia=True), []
 
 

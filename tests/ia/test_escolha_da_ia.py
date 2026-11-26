@@ -36,10 +36,10 @@ def test_r14_2_ia_invalida_lista_as_opcoes_validas(
 
 
 @pytest.mark.parametrize(
-    ("ia", "executavel"), [("kiro", "kiro-cli"), ("claude", "claude"), ("codex", "codex")]
+    ("nome_da_ia", "executavel"), [("kiro", "kiro-cli"), ("claude", "claude"), ("codex", "codex")]
 )
 def test_r14_3_procura_o_executavel_de_cada_ia(
-    monkeypatch: pytest.MonkeyPatch, ia: str, executavel: str
+    monkeypatch: pytest.MonkeyPatch, nome_da_ia: str, executavel: str
 ) -> None:
     procurados: list[str] = []
 
@@ -49,7 +49,7 @@ def test_r14_3_procura_o_executavel_de_cada_ia(
 
     monkeypatch.setattr(escolha_da_ia.shutil, "which", which_falso)
 
-    assert localizar_cli(ia) == f"/usr/local/bin/{executavel}"
+    assert localizar_cli(nome_da_ia) == f"/usr/local/bin/{executavel}"
     assert procurados == [executavel]
 
 

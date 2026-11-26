@@ -82,8 +82,13 @@ def test_r21_4_separa_confirmadas_e_a_confirmar_na_ordem_recebida() -> None:
 
     conferidas = conferir_bibliotecas(bibliotecas, RegistroFalso())
 
-    assert [b.pacote for b in conferidas.confirmadas] == ["@angular/core", "jquery"]
-    assert [(b.pacote, b.versao) for b in conferidas.a_confirmar] == [("jquery", "9.9.9")]
+    assert [biblioteca.pacote for biblioteca in conferidas.confirmadas] == [
+        "@angular/core",
+        "jquery",
+    ]
+    assert [(biblioteca.pacote, biblioteca.versao) for biblioteca in conferidas.a_confirmar] == [
+        ("jquery", "9.9.9")
+    ]
 
 
 def test_r21_9_sem_resposta_assinatura_segue_nao_conferida_no_npm() -> None:

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from rastro.andamento import SEM_ANDAMENTO, Andamento
+from rastro.andamento import ANDAMENTO_SILENCIOSO, Andamento
 from rastro.fontes import nvd, osv
 from rastro.fontes.completar_cvss import BuscaDeCvss, completar_cvss
 from rastro.fontes.conector import ConectorDeAvisos, ConsultaNaoRealizada
@@ -27,22 +27,22 @@ def consultar_avisos(
     fonte: ConectorDeAvisos,
     conector_osv: ConectorDeAvisos | None = None,
     busca_de_cvss: BuscaDeCvss | None = None,
-    andamento: Andamento = SEM_ANDAMENTO,
+    andamento: Andamento = ANDAMENTO_SILENCIOSO,
 ) -> AvisosConsultados:
     avisos: list[AvisosDaBiblioteca] = []
     nao_consultadas: dict[str, str] = {}
     fontes_sem_resposta: list[FonteSemResposta] = []
-    andamento.itens(len(bibliotecas))
+    andamento.definir_total_de_itens(len(bibliotecas))
     for biblioteca in bibliotecas:
         try:
             consultada = consultar_uma_biblioteca(biblioteca, fonte, conector_osv, busca_de_cvss)
         except ConsultaNaoRealizada as erro:
             nao_consultadas[nome_com_versao(biblioteca)] = erro.motivo
-            andamento.avancar()
+            andamento.avancar_item()
             continue
         avisos.append(AvisosDaBiblioteca(biblioteca, consultada.avisos))
         fontes_sem_resposta.extend(consultada.sem_resposta)
-        andamento.avancar()
+        andamento.avancar_item()
     return AvisosConsultados(avisos, nao_consultadas, fontes_sem_resposta)
 
 

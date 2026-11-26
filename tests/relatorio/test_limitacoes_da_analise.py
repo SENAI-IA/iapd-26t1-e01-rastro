@@ -10,7 +10,7 @@ from rastro.relatorio.montagem_do_relatorio import montar_relatorio
 from tests.dubles import analise_da_loja, relatorio_da_loja
 
 
-def ids_das_limitacoes(relatorio: dict[str, Any]) -> list[str]:
+def identificadores_das_limitacoes(relatorio: dict[str, Any]) -> list[str]:
     return [limitacao["id"] for limitacao in relatorio["analise"]["limitacoes"]]
 
 
@@ -18,7 +18,7 @@ def test_r14_5_sem_ia_o_relatorio_marca_a_analise_como_incompleta() -> None:
     dados = relatorio_da_loja()["analise"]
 
     assert dados["ia"] is None
-    assert ids_das_limitacoes(relatorio_da_loja()) == [
+    assert identificadores_das_limitacoes(relatorio_da_loja()) == [
         "bundles_nao_procurados",
         "achados_sem_explicacao",
     ]
@@ -29,7 +29,7 @@ def test_r14_5_sem_ia_o_relatorio_marca_a_analise_como_incompleta() -> None:
 def test_r01_6_har_sem_javascript_avisa_no_relatorio() -> None:
     analise = replace(analise_da_loja(), tem_javascript=False)
 
-    assert ids_das_limitacoes(montar_relatorio(analise))[-1] == "sem_javascript"
+    assert identificadores_das_limitacoes(montar_relatorio(analise))[-1] == "sem_javascript"
 
 
 def test_r04a_6_fonte_sem_resposta_vira_limitacao_com_o_alvo_e_o_motivo() -> None:

@@ -49,10 +49,10 @@ class LeitorDeTags(HTMLParser):
 
 
 def ler_tags(html: str) -> LeitorDeTags:
-    leitor = LeitorDeTags()
-    leitor.feed(html)
-    leitor.close()
-    return leitor
+    leitor_de_tags = LeitorDeTags()
+    leitor_de_tags.feed(html)
+    leitor_de_tags.close()
+    return leitor_de_tags
 
 
 def test_r13_5_dados_entram_na_tag_dos_dados() -> None:
@@ -103,7 +103,9 @@ def test_r13_5_modelo_do_pacote_nao_busca_nada_na_rede() -> None:
 
     enderecos_de_css = re.findall(r"url\(\s*['\"]?([^)'\"]*)", estilos_do_modelo(modelo))
     assert tags.enderecos
-    assert all(e.startswith(ENDERECO_EMBUTIDO) for e in tags.enderecos + enderecos_de_css)
+    assert all(
+        endereco.startswith(ENDERECO_EMBUTIDO) for endereco in tags.enderecos + enderecos_de_css
+    )
     assert all("src" not in script for script in tags.scripts)
     assert "@import" not in estilos_do_modelo(modelo)
 

@@ -45,7 +45,7 @@ def test_r01_1_analisar_segue_as_etapas_do_har_ao_plano() -> None:
 
     assert analise.har == "loja.har"
     assert analise.site == "loja.exemplo.com"
-    assert [(b.pacote, b.versao) for b in analise.bibliotecas] == [
+    assert [(biblioteca.pacote, biblioteca.versao) for biblioteca in analise.bibliotecas] == [
         ("jquery", "3.4.1"),
         ("lodash", "4.17.21"),
     ]
@@ -54,7 +54,14 @@ def test_r01_1_analisar_segue_as_etapas_do_har_ao_plano() -> None:
         "GHSA-gxr4-xjj5-5px2",
     ]
     assert [checagem.id for checagem in analise.checagens] == [
-        "C01", "C02", "C03", "C04", "C05", "C06", "C07", "C08",
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "C08",
     ]
     assert analise.plano_de_acao[0].o_que_fazer == "Atualizar jquery de 3.4.1 para 3.5.0"
     assert analise.plano_de_acao[0].texto_task.startswith("## [Rastro] Atualizar jquery")
@@ -73,16 +80,16 @@ class AndamentoGravado:
         self.etapas = 0
         self.eventos: list[str] = []
 
-    def comecar(self, etapas: int) -> None:
+    def comecar_analise(self, etapas: int) -> None:
         self.etapas = etapas
 
-    def etapa(self, nome: str) -> None:
+    def iniciar_etapa(self, nome: str) -> None:
         self.eventos.append(nome)
 
-    def itens(self, total: int) -> None:
+    def definir_total_de_itens(self, total: int) -> None:
         self.eventos.append(f"itens {total}")
 
-    def avancar(self) -> None:
+    def avancar_item(self) -> None:
         self.eventos.append("+1")
 
 
@@ -109,9 +116,9 @@ def test_r13_10_sem_ia_a_analise_avisa_as_5_etapas_e_os_itens() -> None:
 
 def test_r13_10_com_ia_a_analise_avisa_as_7_etapas() -> None:
     andamento = AndamentoGravado()
-    ia = ClienteDeIA(ProvedorFalso([FalhaDoProvedor("sem resposta")] * 5))
+    cliente_de_ia = ClienteDeIA(ProvedorFalso([FalhaDoProvedor("sem resposta")] * 5))
 
-    analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia, andamento=andamento)
+    analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), cliente_de_ia, andamento=andamento)
 
     etapas = [evento for evento in andamento.eventos if evento[0].isupper()]
     assert andamento.etapas == 7
@@ -129,9 +136,9 @@ def test_r13_10_com_ia_a_analise_avisa_as_7_etapas() -> None:
 
 
 def test_r14_8_com_ia_o_relatorio_informa_o_provedor_usado() -> None:
-    ia = ClienteDeIA(ProvedorFalso([FalhaDoProvedor("sem resposta")], nome="claude"))
+    cliente_de_ia = ClienteDeIA(ProvedorFalso([FalhaDoProvedor("sem resposta")], nome="claude"))
 
-    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), cliente_de_ia)
 
     assert analise.provedor_de_ia == "claude"
     assert montar_relatorio(analise)["analise"]["ia"] == "claude"
@@ -147,22 +154,22 @@ EXPLICACAO_DO_JQUERY = {
 
 def test_r07_1_com_ia_o_achado_e_explicado_e_o_teste_vai_para_a_task() -> None:
     resposta = RespostaDoProvedor(json.dumps(EXPLICACAO_DO_JQUERY, ensure_ascii=False), None)
-    ia = ClienteDeIA(ProvedorFalso([resposta]))
+    cliente_de_ia = ClienteDeIA(ProvedorFalso([resposta]))
 
-    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), cliente_de_ia)
 
     explicacao = analise.explicacoes["jquery@3.4.1"]
     assert explicacao.gerada_por_ia is True
     assert analise.plano_de_acao[0].impacto == EXPLICACAO_DO_JQUERY["impacto"]
     assert "sugerido pela IA: confira antes de usar" in analise.plano_de_acao[0].texto_task
-    assert [chamada.etapa for chamada in ia.chamadas] == ["explicar_achado"]
+    assert [chamada.etapa for chamada in cliente_de_ia.chamadas] == ["explicar_achado"]
 
 
 def test_r07_1_resposta_real_do_kiro_vira_explicacao_da_ia() -> None:
     gravada = (DADOS / "kiro-explicacao-jquery.txt").read_text(encoding="utf-8")
-    ia = ClienteDeIA(ProvedorFalso([RespostaDoProvedor(gravada, None)], nome="kiro"))
+    cliente_de_ia = ClienteDeIA(ProvedorFalso([RespostaDoProvedor(gravada, None)], nome="kiro"))
 
-    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), cliente_de_ia)
 
     assert analise.explicacoes["jquery@3.4.1"].gerada_por_ia is True
     assert analise.explicacoes["jquery@3.4.1"].como_corrigir.startswith("Atualizar o jQuery")
@@ -172,9 +179,9 @@ def test_r07_1_resposta_real_do_kiro_vira_explicacao_da_ia() -> None:
 def test_r07_3_explicacao_barrada_entra_nas_travas_acionadas() -> None:
     inventada = {**EXPLICACAO_DO_JQUERY, "impacto": "Nota 9,8 no CVSS."}
     resposta = RespostaDoProvedor(json.dumps(inventada, ensure_ascii=False), None)
-    ia = ClienteDeIA(ProvedorFalso([resposta]))
+    cliente_de_ia = ClienteDeIA(ProvedorFalso([resposta]))
 
-    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
+    analise = analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), cliente_de_ia)
 
     assert analise.explicacoes["jquery@3.4.1"].gerada_por_ia is False
     assert analise.plano_de_acao[0].teste_verificacao is None
@@ -198,13 +205,17 @@ def respostas_do_juice_shop() -> list[RespostaDoProvedor]:
 
 
 def test_r03_3_biblioteca_da_ia_passa_pelas_travas_antes_do_relatorio() -> None:
-    ia = ClienteDeIA(ProvedorFalso(respostas_do_juice_shop()))
+    cliente_de_ia = ClienteDeIA(ProvedorFalso(respostas_do_juice_shop()))
     conector = ConectorFalso()
 
-    analise = analisar(HAR_DO_JUICE_SHOP, conector, RegistroFalso(), ia)
+    analise = analisar(HAR_DO_JUICE_SHOP, conector, RegistroFalso(), cliente_de_ia)
 
-    assert [(b.pacote, b.metodo) for b in analise.bibliotecas] == [("@angular/core", "ia")]
-    assert [b.pacote for b in analise.a_confirmar] == ["@fortawesome/fontawesome-free"]
+    assert [(biblioteca.pacote, biblioteca.metodo) for biblioteca in analise.bibliotecas] == [
+        ("@angular/core", "ia")
+    ]
+    assert [biblioteca.pacote for biblioteca in analise.a_confirmar] == [
+        "@fortawesome/fontawesome-free"
+    ]
     assert conector.consultas == [("@angular/core", "22.2.2")]
     assert "código confere" in [trava.trava for trava in analise.travas_acionadas]
     assert [chamada.etapa for chamada in analise.chamadas_de_ia] == [
@@ -232,7 +243,7 @@ def test_r21_4_pacote_nao_publicado_vai_para_a_confirmar_e_nao_e_consultado() ->
     fonte = ConectorFalso()
     analise = analisar(HAR_DA_LOJA, fonte, RegistroFalso(nao_publicados=frozenset({"jquery"})))
 
-    assert [b.pacote for b in analise.a_confirmar] == ["jquery"]
+    assert [biblioteca.pacote for biblioteca in analise.a_confirmar] == ["jquery"]
     assert fonte.consultas == [("lodash", "4.17.21")]
     assert analise.achados == []
     assert analise.travas_acionadas[0].trava == "pacote existe"

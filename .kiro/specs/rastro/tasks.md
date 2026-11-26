@@ -754,10 +754,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @ali.santos
 
-- [ ] **T83 Trocar abreviações por nomes completos no Python**
+- [x] **T83 Trocar abreviações por nomes completos no Python**
   - Entrega: sem `e_`/`eh_`, `_s`, `_ms`, `_mb`, `ia` como variável, `b`, `p`, `r`, `i`, `casa`; nomes internos completos.
   - Aceite: as chaves do JSON do relatório e do `pentest.json` não mudam; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/`, `tests/`
+  - Arquivos: `rastro/`, `tests/`, `.kiro/steering/structure.md`, `.kiro/skills/rastro-nova-regra/SKILL.md`
   - Teste: os testes atuais.
   - Requisito: R19.4
   - Revisão: @luiz.pagliari

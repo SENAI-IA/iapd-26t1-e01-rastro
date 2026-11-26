@@ -94,12 +94,12 @@ def ler_urls_das_paginas(log: dict[str, Any]) -> dict[str, str]:
             continue
         identificador = pagina.get("id")
         titulo = pagina.get("title")
-        if isinstance(identificador, str) and isinstance(titulo, str) and e_url_web(titulo):
+        if isinstance(identificador, str) and isinstance(titulo, str) and texto_e_url_web(titulo):
             urls[identificador] = titulo
     return urls
 
 
-def e_url_web(texto: str) -> bool:
+def texto_e_url_web(texto: str) -> bool:
     partes = urlsplit(texto.strip())
     return partes.scheme in ("http", "https") and bool(partes.netloc)
 
@@ -121,7 +121,7 @@ def converter_entrada(
         cookies_resposta=ler_cookies(resposta),
         conteudo=ler_conteudo(conteudo_da_resposta),
         inicio=ler_inicio(entrada),
-        duracao_ms=ler_duracao_ms(entrada),
+        duracao_ms=ler_duracao_em_milissegundos(entrada),
         url_da_pagina=urls_das_paginas.get(str(entrada.get("pageref"))),
     )
 
@@ -136,7 +136,7 @@ def ler_inicio(entrada: dict[str, Any]) -> datetime | None:
         return None
 
 
-def ler_duracao_ms(entrada: dict[str, Any]) -> float | None:
+def ler_duracao_em_milissegundos(entrada: dict[str, Any]) -> float | None:
     duracao = entrada.get("time")
     if isinstance(duracao, bool) or not isinstance(duracao, (int, float)) or duracao < 0:
         return None

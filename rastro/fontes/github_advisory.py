@@ -3,7 +3,7 @@ from typing import Any
 from urllib.parse import urlencode
 from urllib.request import Request
 
-from rastro.fontes.filtro_do_pacote_npm import e_o_pacote_npm
+from rastro.fontes.filtro_do_pacote_npm import pacote_e_o_npm_procurado
 from rastro.fontes.modelos import Aviso, marcar_origem
 from rastro.fontes.requisicao_http import baixar_json, ler_resposta
 
@@ -56,7 +56,7 @@ def aviso_retirado(aviso_da_fonte: Any) -> bool:
 def faixas_do_pacote(aviso_da_fonte: Any, pacote: str) -> list[Any]:
     faixas = []
     for vulnerabilidade in aviso_da_fonte.get("vulnerabilities") or []:
-        if e_o_pacote_npm(vulnerabilidade["package"], pacote):
+        if pacote_e_o_npm_procurado(vulnerabilidade["package"], pacote):
             faixas.append(vulnerabilidade)
     return faixas
 

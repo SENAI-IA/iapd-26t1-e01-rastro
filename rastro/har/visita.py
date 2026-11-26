@@ -19,7 +19,11 @@ class PassoDaVisita:
 
 
 def montar_visita(requisicoes: list[Requisicao]) -> list[PassoDaVisita]:
-    inicios = {r.indice: r.inicio for r in requisicoes if r.inicio is not None}
+    inicios = {
+        requisicao.indice: requisicao.inicio
+        for requisicao in requisicoes
+        if requisicao.inicio is not None
+    }
     if not inicios:
         return []
     primeiro_inicio = min(inicios.values())

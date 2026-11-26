@@ -7,7 +7,7 @@ TEXTO_TESTE_NO_MESMO_TERMINAL = "Teste com: rastro --help"
 TEXTO_TESTE_NUM_TERMINAL_NOVO = "Abra um terminal novo e teste com: rastro --help"
 
 
-def instalar_comando() -> int:
+def executar_comando_instalar() -> int:
     try:
         instalacao = instalador.instalar()
     except (ProjetoNaoEncontrado, AtalhoDeOutro) as erro:

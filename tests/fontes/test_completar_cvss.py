@@ -36,7 +36,7 @@ def test_r04a_2_so_consulta_aviso_com_cve_e_sem_cvss() -> None:
 
     completado = completar_cvss([com_cvss, sem_cve, sem_cvss], nvd_falso)
 
-    assert nvd_falso.consultados == ["CVE-2099-0003"]
+    assert nvd_falso.cves_consultados == ["CVE-2099-0003"]
     assert completado.avisos[:2] == [com_cvss, sem_cve]
     assert completado.avisos[2].cvss == 5.0
 
@@ -48,7 +48,7 @@ def test_r04a_2_faz_uma_consulta_por_cve() -> None:
 
     completado = completar_cvss([do_github, do_osv, do_github], nvd_falso)
 
-    assert nvd_falso.consultados == ["CVE-2020-11022"]
+    assert nvd_falso.cves_consultados == ["CVE-2020-11022"]
     assert [completo.cvss for completo in completado.avisos] == [6.1, 6.1, 6.1]
     assert completado.avisos[1].fontes == ["OSV", "NVD"]
 

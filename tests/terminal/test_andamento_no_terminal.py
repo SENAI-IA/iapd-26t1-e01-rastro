@@ -17,11 +17,11 @@ def test_r13_10_fora_do_terminal_mostra_so_o_nome_de_cada_etapa() -> None:
     saida = io.StringIO()
     andamento = AndamentoNoTerminal(LinhaAoVivo(saida, ao_vivo=False))
 
-    andamento.comecar(5)
-    andamento.etapa("Lendo o HAR")
-    andamento.etapa("Consultando falhas conhecidas")
-    andamento.itens(3)
-    andamento.avancar()
+    andamento.comecar_analise(5)
+    andamento.iniciar_etapa("Lendo o HAR")
+    andamento.iniciar_etapa("Consultando falhas conhecidas")
+    andamento.definir_total_de_itens(3)
+    andamento.avancar_item()
     andamento.terminar()
 
     assert saida.getvalue().splitlines() == [
@@ -36,11 +36,11 @@ def test_r13_10_no_terminal_mostra_etapa_itens_e_tempo_ao_vivo() -> None:
     linha = LinhaAoVivo(saida, ao_vivo=True, largura=lambda: 80)
     andamento = AndamentoNoTerminal(linha, relogio)
 
-    andamento.comecar(7)
-    andamento.etapa("Procurando bibliotecas nos bundles com a IA")
-    andamento.itens(5)
-    andamento.avancar()
-    andamento.avancar()
+    andamento.comecar_analise(7)
+    andamento.iniciar_etapa("Procurando bibliotecas nos bundles com a IA")
+    andamento.definir_total_de_itens(5)
+    andamento.avancar_item()
+    andamento.avancar_item()
     relogio.agora = 42
     linha.acompanhar(andamento.texto)
 
@@ -54,10 +54,10 @@ def test_r13_10_etapa_concluida_fica_no_terminal_com_ok() -> None:
     relogio = RelogioFalso()
     andamento = AndamentoNoTerminal(LinhaAoVivo(saida, ao_vivo=True), relogio)
 
-    andamento.comecar(5)
-    andamento.etapa("Lendo o HAR")
+    andamento.comecar_analise(5)
+    andamento.iniciar_etapa("Lendo o HAR")
     relogio.agora = 3
-    andamento.etapa("Reconhecendo as bibliotecas pelos arquivos")
+    andamento.iniciar_etapa("Reconhecendo as bibliotecas pelos arquivos")
     andamento.terminar()
 
     linhas = [trecho.strip() for trecho in saida.getvalue().split("\r")]

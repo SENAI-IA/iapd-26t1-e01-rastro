@@ -69,13 +69,13 @@ def resposta(
     )
 
 
-def sem(nome: str) -> dict[str, str]:
+def sem_o_cabecalho(nome: str) -> dict[str, str]:
     cabecalhos = dict(CABECALHOS_SEGUROS)
     del cabecalhos[nome]
     return cabecalhos
 
 
-def com(nome: str, valor: str) -> dict[str, str]:
+def com_o_cabecalho(nome: str, valor: str) -> dict[str, str]:
     return {**CABECALHOS_SEGUROS, nome: valor}
 
 
@@ -107,7 +107,7 @@ def test_r06_1_a_5_resposta_de_outro_host_nao_conta(checar: Checar) -> None:
 
 
 def test_r06_1_csp_ausente_falha() -> None:
-    checagem = checar_csp([resposta(0, sem("content-security-policy"))], SITE)
+    checagem = checar_csp([resposta(0, sem_o_cabecalho("content-security-policy"))], SITE)
 
     assert checagem.situacao == "falhou"
     assert checagem.titulo == "CSP ausente"
@@ -116,14 +116,14 @@ def test_r06_1_csp_ausente_falha() -> None:
 def test_r16_4_detalhe_da_falha_traz_a_pagina_sem_a_query_string() -> None:
     url = f"https://{SITE}/redefinir?token=segredo-ficticio#topo"
 
-    checagem = checar_csp([resposta(0, sem("content-security-policy"), url=url)], SITE)
+    checagem = checar_csp([resposta(0, sem_o_cabecalho("content-security-policy"), url=url)], SITE)
 
     assert checagem.detalhe.endswith(f"https://{SITE}/redefinir")
     assert "segredo-ficticio" not in checagem.detalhe
 
 
 def test_r06_1_csp_so_report_only_falha() -> None:
-    cabecalhos = sem("content-security-policy")
+    cabecalhos = sem_o_cabecalho("content-security-policy")
     cabecalhos["content-security-policy-report-only"] = "default-src 'self'"
 
     checagem = checar_csp([resposta(0, cabecalhos)], SITE)
@@ -134,8 +134,8 @@ def test_r06_1_csp_so_report_only_falha() -> None:
 def test_r06_1_falha_se_alguma_pagina_falha_e_evidencia_e_a_primeira() -> None:
     requisicoes = [
         resposta(0, CABECALHOS_SEGUROS),
-        resposta(1, sem("content-security-policy"), url=f"https://{SITE}/conta"),
-        resposta(2, sem("content-security-policy"), url=f"https://{SITE}/sobre"),
+        resposta(1, sem_o_cabecalho("content-security-policy"), url=f"https://{SITE}/conta"),
+        resposta(2, sem_o_cabecalho("content-security-policy"), url=f"https://{SITE}/sobre"),
     ]
 
     checagem = checar_csp(requisicoes, SITE)
@@ -159,14 +159,14 @@ def test_r06_1_redirecionamento_e_script_sem_csp_nao_contam() -> None:
 
 
 def test_r06_2_hsts_ausente_em_https_falha() -> None:
-    checagem = checar_hsts([resposta(0, sem("strict-transport-security"))], SITE)
+    checagem = checar_hsts([resposta(0, sem_o_cabecalho("strict-transport-security"))], SITE)
 
     assert checagem.situacao == "falhou"
     assert checagem.titulo == "HSTS ausente"
 
 
 def test_r06_2_site_so_em_http_nao_verificada() -> None:
-    pagina = resposta(0, sem("strict-transport-security"), url=f"http://{SITE}/")
+    pagina = resposta(0, sem_o_cabecalho("strict-transport-security"), url=f"http://{SITE}/")
 
     checagem = checar_hsts([pagina], SITE)
 
@@ -176,7 +176,7 @@ def test_r06_2_site_so_em_http_nao_verificada() -> None:
 
 def test_r06_2_pagina_em_http_nao_conta_quando_o_site_usa_https() -> None:
     requisicoes = [
-        resposta(0, sem("strict-transport-security"), url=f"http://{SITE}/"),
+        resposta(0, sem_o_cabecalho("strict-transport-security"), url=f"http://{SITE}/"),
         resposta(1, CABECALHOS_SEGUROS),
     ]
 
@@ -186,13 +186,13 @@ def test_r06_2_pagina_em_http_nao_conta_quando_o_site_usa_https() -> None:
 
 
 def test_r06_3_nosniff_ausente_falha() -> None:
-    checagem = checar_nosniff([resposta(0, sem("x-content-type-options"))], SITE)
+    checagem = checar_nosniff([resposta(0, sem_o_cabecalho("x-content-type-options"))], SITE)
 
     assert checagem.situacao == "falhou"
 
 
 def test_r06_3_valor_diferente_de_nosniff_falha() -> None:
-    pagina = resposta(0, com("x-content-type-options", "sniff"))
+    pagina = resposta(0, com_o_cabecalho("x-content-type-options", "sniff"))
 
     checagem = checar_nosniff([pagina], SITE)
 
@@ -200,7 +200,7 @@ def test_r06_3_valor_diferente_de_nosniff_falha() -> None:
 
 
 def test_r06_3_nosniff_em_maiusculas_passa() -> None:
-    pagina = resposta(0, com("x-content-type-options", " NoSniff "))
+    pagina = resposta(0, com_o_cabecalho("x-content-type-options", " NoSniff "))
 
     checagem = checar_nosniff([pagina], SITE)
 
@@ -208,7 +208,7 @@ def test_r06_3_nosniff_em_maiusculas_passa() -> None:
 
 
 def test_r06_4_sem_x_frame_options_e_sem_frame_ancestors_falha() -> None:
-    checagem = checar_protecao_contra_frame([resposta(0, sem("x-frame-options"))], SITE)
+    checagem = checar_protecao_contra_frame([resposta(0, sem_o_cabecalho("x-frame-options"))], SITE)
 
     assert checagem.situacao == "falhou"
     assert checagem.titulo == "proteção contra frame ausente"
@@ -223,7 +223,7 @@ def test_r06_4_sem_x_frame_options_e_sem_frame_ancestors_falha() -> None:
     ],
 )
 def test_r06_4_frame_ancestors_na_csp_passa(politica: str) -> None:
-    cabecalhos = sem("x-frame-options")
+    cabecalhos = sem_o_cabecalho("x-frame-options")
     cabecalhos["content-security-policy"] = politica
 
     checagem = checar_protecao_contra_frame([resposta(0, cabecalhos)], SITE)
@@ -232,7 +232,7 @@ def test_r06_4_frame_ancestors_na_csp_passa(politica: str) -> None:
 
 
 def test_r06_4_frame_ancestors_so_no_valor_de_outra_diretiva_falha() -> None:
-    cabecalhos = sem("x-frame-options")
+    cabecalhos = sem_o_cabecalho("x-frame-options")
     cabecalhos["content-security-policy"] = "default-src https://frame-ancestors.exemplo"
 
     checagem = checar_protecao_contra_frame([resposta(0, cabecalhos)], SITE)
@@ -250,7 +250,7 @@ def test_r06_4_frame_ancestors_so_no_valor_de_outra_diretiva_falha() -> None:
     ],
 )
 def test_r06_5_servidor_com_versao_falha(nome: str, valor: str) -> None:
-    checagem = checar_versao_do_servidor([resposta(0, com(nome, valor))], SITE)
+    checagem = checar_versao_do_servidor([resposta(0, com_o_cabecalho(nome, valor))], SITE)
 
     assert checagem.situacao == "falhou"
     assert checagem.evidencia is not None
@@ -262,7 +262,7 @@ def test_r06_5_servidor_com_versao_falha(nome: str, valor: str) -> None:
     [("server", "nginx"), ("server", "cloudflare"), ("x-powered-by", "Express")],
 )
 def test_r06_5_servidor_sem_versao_passa(nome: str, valor: str) -> None:
-    checagem = checar_versao_do_servidor([resposta(0, com(nome, valor))], SITE)
+    checagem = checar_versao_do_servidor([resposta(0, com_o_cabecalho(nome, valor))], SITE)
 
     assert checagem.situacao == "passou"
 
@@ -466,9 +466,9 @@ def test_r24_9_gravado_pelo_rastro_sem_cookies_diz_que_o_site_nao_criou_cookie()
 
     checagens = checagens_de_cookie(checar_configuracao(requisicoes, SITE, True))
 
-    assert [c.situacao for c in checagens] == ["nao_verificada"] * 3
-    assert all("não criou nenhum cookie" in c.detalhe for c in checagens)
-    assert not any("HAR completo" in c.detalhe for c in checagens)
+    assert [checagem.situacao for checagem in checagens] == ["nao_verificada"] * 3
+    assert all("não criou nenhum cookie" in checagem.detalhe for checagem in checagens)
+    assert not any("HAR completo" in checagem.detalhe for checagem in checagens)
 
 
 def test_r24_9_fora_da_gravacao_continua_sugerindo_o_har_completo() -> None:
@@ -476,7 +476,7 @@ def test_r24_9_fora_da_gravacao_continua_sugerindo_o_har_completo() -> None:
 
     checagens = checagens_de_cookie(checar_configuracao(requisicoes, SITE))
 
-    assert all("HAR completo" in c.detalhe for c in checagens)
+    assert all("HAR completo" in checagem.detalhe for checagem in checagens)
 
 
 def test_r24_9_gravado_pelo_rastro_com_cookies_confere_normalmente() -> None:

@@ -17,13 +17,13 @@ def relogio_de_2_5_segundos(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.mark.usefixtures("relogio_de_2_5_segundos")
 def test_r11_1_chamada_com_sucesso_fica_registrada_com_tempo_e_tokens() -> None:
     provedor = ProvedorFalso([RespostaDoProvedor('{"o_que_e": "XSS"}', tokens=12_890)])
-    ia = ClienteDeIA(provedor)
+    cliente_de_ia = ClienteDeIA(provedor)
 
-    resposta = ia.perguntar("explicar_achado", "Explique o GHSA-gxr4-xjj5-5px2")
+    resposta = cliente_de_ia.perguntar("explicar_achado", "Explique o GHSA-gxr4-xjj5-5px2")
 
     assert resposta == '{"o_que_e": "XSS"}'
     assert provedor.prompts == ["Explique o GHSA-gxr4-xjj5-5px2"]
-    assert ia.chamadas == [
+    assert cliente_de_ia.chamadas == [
         ChamadaDaIA(
             etapa="explicar_achado",
             provedor="falso",
@@ -39,11 +39,11 @@ def test_r11_1_chamada_com_sucesso_fica_registrada_com_tempo_e_tokens() -> None:
 @pytest.mark.usefixtures("relogio_de_2_5_segundos")
 def test_r11_1_falha_do_provedor_fica_registrada_e_devolve_none() -> None:
     provedor = ProvedorFalso([FalhaDoProvedor("código de saída 1")])
-    ia = ClienteDeIA(provedor)
+    cliente_de_ia = ClienteDeIA(provedor)
 
-    assert ia.perguntar("identificar_bibliotecas", "trechos") is None
+    assert cliente_de_ia.perguntar("identificar_bibliotecas", "trechos") is None
 
-    assert ia.chamadas == [
+    assert cliente_de_ia.chamadas == [
         ChamadaDaIA(
             etapa="identificar_bibliotecas",
             provedor="falso",
@@ -64,12 +64,16 @@ def test_r11_1_cada_chamada_fica_registrada_na_ordem() -> None:
             RespostaDoProvedor("terceira", tokens=30),
         ]
     )
-    ia = ClienteDeIA(provedor)
+    cliente_de_ia = ClienteDeIA(provedor)
 
-    respostas = [ia.perguntar("explicar_achado", f"prompt {n}") for n in range(3)]
+    respostas = [
+        cliente_de_ia.perguntar("explicar_achado", f"prompt {numero}") for numero in range(3)
+    ]
 
     assert respostas == ["primeira", None, "terceira"]
-    assert [(c.entrada, c.sucesso, c.tokens) for c in ia.chamadas] == [
+    assert [
+        (chamada.entrada, chamada.sucesso, chamada.tokens) for chamada in cliente_de_ia.chamadas
+    ] == [
         ("prompt 0", True, 10),
         ("prompt 1", False, None),
         ("prompt 2", True, 30),
@@ -78,31 +82,35 @@ def test_r11_1_cada_chamada_fica_registrada_na_ordem() -> None:
 
 def test_r16_3_prompt_sai_sanitizado_e_a_chamada_registra_o_que_foi_enviado() -> None:
     provedor = ProvedorFalso([RespostaDoProvedor("ok", tokens=1)])
-    ia = ClienteDeIA(provedor)
+    cliente_de_ia = ClienteDeIA(provedor)
 
-    ia.perguntar("identificar_bibliotecas", "trecho de https://loja.exemplo/a.js?sessao=x1")
+    cliente_de_ia.perguntar(
+        "identificar_bibliotecas", "trecho de https://loja.exemplo/a.js?sessao=x1"
+    )
 
     enviado = "trecho de https://loja.exemplo/a.js?[removido]"
     assert provedor.prompts == [enviado]
-    assert ia.chamadas[0].entrada == enviado
+    assert cliente_de_ia.chamadas[0].entrada == enviado
 
 
 def test_r16_4_resposta_da_ia_fica_registrada_sem_dado_que_parece_segredo() -> None:
     jwt = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.assinatura"
     provedor = ProvedorFalso([RespostaDoProvedor(f"token lido: {jwt}", tokens=1)])
-    ia = ClienteDeIA(provedor)
+    cliente_de_ia = ClienteDeIA(provedor)
 
-    resposta = ia.perguntar("identificar_bibliotecas", "trecho")
+    resposta = cliente_de_ia.perguntar("identificar_bibliotecas", "trecho")
 
     assert resposta == f"token lido: {jwt}"
-    assert ia.chamadas[0].resposta == "token lido: [removido]"
+    assert cliente_de_ia.chamadas[0].resposta == "token lido: [removido]"
 
 
 def test_r11_2_provedor_sem_tokens_registra_none_e_nunca_estima() -> None:
     resposta_longa = "texto " * 500
-    ia = ClienteDeIA(ProvedorFalso([RespostaDoProvedor(resposta_longa, tokens=None)], "kiro"))
+    cliente_de_ia = ClienteDeIA(
+        ProvedorFalso([RespostaDoProvedor(resposta_longa, tokens=None)], "kiro")
+    )
 
-    ia.perguntar("explicar_achado", "prompt")
+    cliente_de_ia.perguntar("explicar_achado", "prompt")
 
-    assert ia.chamadas[0].tokens is None
-    assert ia.chamadas[0].provedor == "kiro"
+    assert cliente_de_ia.chamadas[0].tokens is None
+    assert cliente_de_ia.chamadas[0].provedor == "kiro"

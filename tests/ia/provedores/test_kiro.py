@@ -131,9 +131,9 @@ def test_r14_4_cliente_registra_o_nome_do_kiro_e_tokens_none(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     trocar_subprocess(monkeypatch, SubprocessFalso())
-    ia = ClienteDeIA(ProvedorKiro(EXECUTAVEL))
+    cliente_de_ia = ClienteDeIA(ProvedorKiro(EXECUTAVEL))
 
-    assert ia.perguntar("explicar_achado", "prompt") == RESPOSTA_GRAVADA.strip()
-    assert ia.chamadas[0].provedor == "kiro"
-    assert ia.chamadas[0].tokens is None
-    assert ia.chamadas[0].sucesso is True
+    assert cliente_de_ia.perguntar("explicar_achado", "prompt") == RESPOSTA_GRAVADA.strip()
+    assert cliente_de_ia.chamadas[0].provedor == "kiro"
+    assert cliente_de_ia.chamadas[0].tokens is None
+    assert cliente_de_ia.chamadas[0].sucesso is True

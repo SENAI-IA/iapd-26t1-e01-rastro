@@ -28,21 +28,21 @@ class ProvedorCodex:
         self.executavel = executavel
 
     def executar(self, prompt: str) -> RespostaDoProvedor:
-        saida = executar_cli_da_ia(self.executavel, OPCOES_SEM_GRAVACAO, prompt, "Codex")
-        return ler_resposta(saida)
+        saida_da_cli = executar_cli_da_ia(self.executavel, OPCOES_SEM_GRAVACAO, prompt, "Codex")
+        return ler_resposta(saida_da_cli)
 
 
-def ler_resposta(saida: str) -> RespostaDoProvedor:
-    eventos = ler_eventos(saida)
+def ler_resposta(saida_da_cli: str) -> RespostaDoProvedor:
+    eventos = ler_eventos(saida_da_cli)
     texto = ultima_mensagem_do_agente(eventos)
     if texto is None:
         raise FalhaDoProvedor("a CLI do Codex respondeu sem agent_message")
     return RespostaDoProvedor(texto, somar_tokens(uso_do_turno(eventos), CAMPOS_DE_TOKENS))
 
 
-def ler_eventos(saida: str) -> list[dict[str, Any]]:
+def ler_eventos(saida_da_cli: str) -> list[dict[str, Any]]:
     eventos = []
-    for linha in saida.splitlines():
+    for linha in saida_da_cli.splitlines():
         evento = ler_linha(linha)
         if evento is not None:
             eventos.append(evento)
@@ -67,13 +67,13 @@ def ultima_mensagem_do_agente(eventos: list[dict[str, Any]]) -> str | None:
 
 
 def texto_do_agente(evento: dict[str, Any]) -> str | None:
-    if not e_mensagem_do_agente(evento):
+    if not evento_e_mensagem_do_agente(evento):
         return None
     texto = evento["item"].get("text")
     return texto if isinstance(texto, str) and texto.strip() else None
 
 
-def e_mensagem_do_agente(evento: dict[str, Any]) -> bool:
+def evento_e_mensagem_do_agente(evento: dict[str, Any]) -> bool:
     item = evento.get("item")
     return (
         evento.get("type") == "item.completed"

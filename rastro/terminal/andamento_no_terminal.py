@@ -20,10 +20,10 @@ class AndamentoNoTerminal:
         self.total_de_itens = 0
         self.itens_feitos = 0
 
-    def comecar(self, etapas: int) -> None:
+    def comecar_analise(self, etapas: int) -> None:
         self.total_de_etapas = etapas
 
-    def etapa(self, nome: str) -> None:
+    def iniciar_etapa(self, nome: str) -> None:
         self.terminar()
         self.numero_da_etapa += 1
         self.nome_da_etapa = nome
@@ -35,10 +35,10 @@ class AndamentoNoTerminal:
         else:
             self.linha.imprimir(self.titulo())
 
-    def itens(self, total: int) -> None:
+    def definir_total_de_itens(self, total: int) -> None:
         self.total_de_itens = total
 
-    def avancar(self) -> None:
+    def avancar_item(self) -> None:
         self.itens_feitos += 1
 
     def terminar(self) -> None:

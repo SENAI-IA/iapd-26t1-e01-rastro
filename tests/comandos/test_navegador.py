@@ -14,8 +14,8 @@ def test_r13_9_analisar_abre_o_relatorio_html_no_navegador(
 ) -> None:
     assert analisar_loja(tmp_path) == 0
 
-    html = tmp_path / PASTA_DA_LOJA / "relatorio.html"
-    assert navegador.enderecos == [html.resolve().as_uri()]
+    caminho_do_html = tmp_path / PASTA_DA_LOJA / "relatorio.html"
+    assert navegador.enderecos == [caminho_do_html.resolve().as_uri()]
     assert "Relatório aberto no navegador." in capsys.readouterr().out
 
 

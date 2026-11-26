@@ -85,10 +85,10 @@ class NvdFalso:
     ) -> None:
         self.cvss = cvss or {}
         self.falhas = falhas or {}
-        self.consultados: list[str] = []
+        self.cves_consultados: list[str] = []
 
     def buscar_cvss(self, cve: str) -> float | None:
-        self.consultados.append(cve)
+        self.cves_consultados.append(cve)
         if cve in self.falhas:
             raise ConsultaNaoRealizada(self.falhas[cve])
         return self.cvss.get(cve)
@@ -168,5 +168,5 @@ def relatorio_da_loja() -> dict[str, Any]:
 
 
 def analise_da_loja_com_ia(*respostas: RespostaDoProvedor | FalhaDoProvedor) -> Analise:
-    ia = ClienteDeIA(ProvedorFalso(list(respostas), nome="kiro"))
-    return analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), ia)
+    cliente_de_ia = ClienteDeIA(ProvedorFalso(list(respostas), nome="kiro"))
+    return analisar(HAR_DA_LOJA, ConectorFalso(), RegistroFalso(), cliente_de_ia)

@@ -26,12 +26,12 @@ def esperar_o_enter(
 ) -> bool:
     apertou = threading.Event()
 
-    def ler() -> None:
+    def ler_linha_e_marcar_que_apertou() -> None:
         with contextlib.suppress(EOFError):
             ler_linha()
         apertou.set()
 
-    threading.Thread(target=ler, daemon=True).start()
+    threading.Thread(target=ler_linha_e_marcar_que_apertou, daemon=True).start()
     while not apertou.is_set():
         if parada.motivo is not None or not sessao.aberta():
             return False

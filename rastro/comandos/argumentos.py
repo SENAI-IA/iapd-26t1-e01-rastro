@@ -35,15 +35,15 @@ ListaDeComandos: TypeAlias = "argparse._SubParsersAction[argparse.ArgumentParser
 
 
 def criar_leitor_de_argumentos() -> argparse.ArgumentParser:
-    leitor = argparse.ArgumentParser(prog="rastro", description=DESCRICAO)
-    comandos = leitor.add_subparsers(dest="comando", metavar="comando")
+    leitor_de_argumentos = argparse.ArgumentParser(prog="rastro", description=DESCRICAO)
+    comandos = leitor_de_argumentos.add_subparsers(dest="comando", metavar="comando")
     adicionar_comando_analisar(comandos)
     adicionar_comando_gravar(comandos)
     adicionar_comando_pentest(comandos)
     adicionar_comando_como_usar(comandos)
     adicionar_comando_instalar(comandos)
     adicionar_comando_desinstalar(comandos)
-    return leitor
+    return leitor_de_argumentos
 
 
 def adicionar_comando_analisar(comandos: ListaDeComandos) -> None:

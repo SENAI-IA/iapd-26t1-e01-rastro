@@ -34,7 +34,7 @@ ASSINATURAS: tuple[Assinatura, ...] = (
 def identificar_por_assinatura(requisicoes: list[Requisicao]) -> list[Biblioteca]:
     bibliotecas: list[Biblioteca] = []
     for requisicao in requisicoes:
-        if e_script(requisicao):
+        if requisicao_e_script(requisicao):
             bibliotecas.extend(bibliotecas_na_requisicao(requisicao))
     return agrupar_repetidas(bibliotecas)
 
@@ -121,14 +121,14 @@ def requisicao_ja_esta_nas_evidencias(evidencia: Evidencia, evidencias: list[Evi
 
 
 def algum_script_com_conteudo(requisicoes: list[Requisicao]) -> bool:
-    return any(e_script_com_conteudo(requisicao) for requisicao in requisicoes)
+    return any(requisicao_e_script_com_conteudo(requisicao) for requisicao in requisicoes)
 
 
-def e_script_com_conteudo(requisicao: Requisicao) -> bool:
-    return e_script(requisicao) and bool(requisicao.conteudo)
+def requisicao_e_script_com_conteudo(requisicao: Requisicao) -> bool:
+    return requisicao_e_script(requisicao) and bool(requisicao.conteudo)
 
 
-def e_script(requisicao: Requisicao) -> bool:
+def requisicao_e_script(requisicao: Requisicao) -> bool:
     tipo_conteudo = requisicao.tipo_conteudo or ""
     caminho = urlsplit(requisicao.url).path.lower()
     return tipo_conteudo.endswith("javascript") or caminho.endswith(".js")

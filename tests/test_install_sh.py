@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from rastro.instalacao.atalho import MARCA
+from rastro.instalacao.atalho import MARCA_DO_ATALHO
 from rastro.instalacao.sobras import MARCA_DO_INSTALADOR
 
 RAIZ_DO_PROJETO = Path(__file__).resolve().parent.parent
@@ -20,8 +20,7 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.fixture
-def pacote(tmp_path: Path) -> Path:
-    """Um .tar.gz igual ao do GitHub: tudo dentro de uma pasta com o nome do repositório."""
+def pacote_igual_ao_do_github(tmp_path: Path) -> Path:
     caminho = tmp_path / "rastro-main.tar.gz"
     sem_cache = shutil.ignore_patterns("__pycache__")
     copia = tmp_path / "montagem" / "iapd-26t1-e01-rastro-main"
@@ -32,10 +31,10 @@ def pacote(tmp_path: Path) -> Path:
     return caminho
 
 
-def rodar_instalador(casa: Path, origem: str) -> subprocess.CompletedProcess[str]:
+def rodar_instalador(pasta_do_usuario: Path, origem: str) -> subprocess.CompletedProcess[str]:
     pasta_do_python = str(Path(sys.executable).parent)
     ambiente = {
-        "HOME": str(casa),
+        "HOME": str(pasta_do_usuario),
         "SHELL": "/bin/bash",
         "PATH": f"{pasta_do_python}{os.pathsep}/usr/bin{os.pathsep}/bin",
         "RASTRO_ORIGEM": origem,
@@ -43,7 +42,7 @@ def rodar_instalador(casa: Path, origem: str) -> subprocess.CompletedProcess[str
     return subprocess.run(
         ["sh", str(INSTALADOR)],
         env=ambiente,
-        cwd=casa,
+        cwd=pasta_do_usuario,
         capture_output=True,
         encoding="utf-8",
         timeout=120,
@@ -51,25 +50,27 @@ def rodar_instalador(casa: Path, origem: str) -> subprocess.CompletedProcess[str
     )
 
 
-def pasta_instalada(casa: Path) -> Path:
-    return casa / ".local" / "share" / "rastro"
+def pasta_instalada(pasta_do_usuario: Path) -> Path:
+    return pasta_do_usuario / ".local" / "share" / "rastro"
 
 
-def test_r17_4_instalador_baixa_o_rastro_e_cria_o_comando(tmp_path: Path, pacote: Path) -> None:
-    resultado = rodar_instalador(tmp_path, pacote.as_uri())
+def test_r17_4_instalador_baixa_o_rastro_e_cria_o_comando(
+    tmp_path: Path, pacote_igual_ao_do_github: Path
+) -> None:
+    resultado = rodar_instalador(tmp_path, pacote_igual_ao_do_github.as_uri())
 
     assert resultado.returncode == 0, resultado.stderr
     pasta = pasta_instalada(tmp_path)
     assert (pasta / "rastro" / "__main__.py").is_file()
     assert (pasta / MARCA_DO_INSTALADOR).is_file()
     comando = tmp_path / ".local" / "bin" / "rastro"
-    assert MARCA in comando.read_text(encoding="utf-8")
+    assert MARCA_DO_ATALHO in comando.read_text(encoding="utf-8")
     assert str(pasta) in comando.read_text(encoding="utf-8")
     assert "Pronto! Comando rastro instalado." in resultado.stdout
 
 
-def test_r17_4_comando_instalado_funciona(tmp_path: Path, pacote: Path) -> None:
-    rodar_instalador(tmp_path, pacote.as_uri())
+def test_r17_4_comando_instalado_funciona(tmp_path: Path, pacote_igual_ao_do_github: Path) -> None:
+    rodar_instalador(tmp_path, pacote_igual_ao_do_github.as_uri())
 
     ajuda = subprocess.run(
         [str(tmp_path / ".local" / "bin" / "rastro"), "--help"],
@@ -83,12 +84,14 @@ def test_r17_4_comando_instalado_funciona(tmp_path: Path, pacote: Path) -> None:
     assert "usage: rastro" in ajuda.stdout
 
 
-def test_r17_4_rodar_de_novo_atualiza_sem_sobras(tmp_path: Path, pacote: Path) -> None:
-    rodar_instalador(tmp_path, pacote.as_uri())
+def test_r17_4_rodar_de_novo_atualiza_sem_sobras(
+    tmp_path: Path, pacote_igual_ao_do_github: Path
+) -> None:
+    rodar_instalador(tmp_path, pacote_igual_ao_do_github.as_uri())
     velho = pasta_instalada(tmp_path) / "arquivo-da-versao-velha.txt"
     velho.write_text("velho", encoding="utf-8")
 
-    resultado = rodar_instalador(tmp_path, pacote.as_uri())
+    resultado = rodar_instalador(tmp_path, pacote_igual_ao_do_github.as_uri())
 
     assert resultado.returncode == 0, resultado.stderr
     assert not velho.exists()
@@ -96,12 +99,14 @@ def test_r17_4_rodar_de_novo_atualiza_sem_sobras(tmp_path: Path, pacote: Path) -
     assert irmas == ["rastro"]
 
 
-def test_r17_4_nao_mexe_numa_pasta_que_nao_criou(tmp_path: Path, pacote: Path) -> None:
+def test_r17_4_nao_mexe_numa_pasta_que_nao_criou(
+    tmp_path: Path, pacote_igual_ao_do_github: Path
+) -> None:
     alheia = pasta_instalada(tmp_path)
     alheia.mkdir(parents=True)
     (alheia / "meu.txt").write_text("meu", encoding="utf-8")
 
-    resultado = rodar_instalador(tmp_path, pacote.as_uri())
+    resultado = rodar_instalador(tmp_path, pacote_igual_ao_do_github.as_uri())
 
     assert resultado.returncode == 1
     assert "não foi criada por este instalador" in resultado.stderr

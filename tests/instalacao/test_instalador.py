@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from rastro.instalacao.atalho import MARCA, AtalhoDeOutro
+from rastro.instalacao.atalho import MARCA_DO_ATALHO, AtalhoDeOutro
 from rastro.instalacao.instalador import desinstalar_no_unix, instalar_no_unix
 from rastro.instalacao.path_no_unix import INICIO_DO_BLOCO
 from tests.instalacao.apoio import PATH_SEM_A_PASTA, ambiente, atalho_unix, somente_unix
@@ -18,7 +18,7 @@ def test_r17_3_instalar_cria_o_atalho_marcado_na_pasta_do_usuario(tmp_path: Path
     assert instalacao.atalho == atalho_unix(tmp_path)
     assert instalacao.projeto == RAIZ_DO_PROJETO
     texto = instalacao.atalho.read_text(encoding="utf-8")
-    assert MARCA in texto
+    assert MARCA_DO_ATALHO in texto
     assert str(RAIZ_DO_PROJETO) in texto
     assert os.access(instalacao.atalho, os.X_OK)
 
