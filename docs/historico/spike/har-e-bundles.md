@@ -1,5 +1,7 @@
 # Spike: HAR real e bundle do Juice Shop (T03)
 
+> **Registro histórico** de 06/11/2026, mantido como foi escrito. Nomes de arquivo e de função podem ter mudado depois: a estrutura atual está em `.kiro/steering/structure.md`.
+
 Exploração de 06/11/2026 para responder as perguntas da seção 17 do design sobre o HAR, os bundles e a trava 5. Afeta as seções 5, 6 e 8 do design e os critérios R01.1, R03.1, R06.7 e R21.5.
 
 **O HAR foi gravado pelo Playwright, não exportado à mão no Chrome.** A comparação entre o HAR sanitized e o completo do DevTools fica para a T04, que já exporta os HARs das aplicações-alvo. A seção "A conferir no Chrome" lista o que olhar.

@@ -818,10 +818,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @halan.bacca
 
-- [ ] **T92 Separar o histórico e versionar a decisão 11**
+- [x] **T92 Separar o histórico e versionar a decisão 11**
   - Entrega: `docs/historico/` com os registros de uma etapa (spikes, análise inicial do pentest, `dependencias.md`, pitch inicial), cada um com uma linha no topo dizendo a data e que nomes de arquivo podem ter mudado; a decisão 11 entra no repositório.
   - Aceite: nenhum link aponta para o lugar antigo; a decisão 11 deixa de estar no `.git/info/exclude` e cita os caminhos atuais.
-  - Arquivos: `docs/historico/`, `docs/decisoes/11-comando-rastro-de-qualquer-pasta.md`, documentos que linkam os movidos
+  - Arquivos: `docs/historico/`, `docs/decisoes/`, `.kiro/steering/structure.md`, `.kiro/specs/rastro/design.md`, `README.md`, `README-TECNICO.md`, `avaliacao/`
   - Teste: não se aplica (documentação); conferência de links quebrados.
   - Requisito: R19.4
   - Revisão: @cristiano.albino

@@ -79,8 +79,10 @@ tests/                     mesma estrutura de rastro/
 frontend/                  React (ver frontend-react.md)
 docs/
   decisoes/                um arquivo por decisão importante
+  arquitetura/             diagrama interativo das camadas (arquitetura.html)
   cobertura/               resultado da verificação (linux.md, windows.md) e html/ (relatório do pytest-cov)
   prints/                  telas do relatório usadas no README
+  historico/               registros de uma etapa, mantidos como foram escritos: spike/, análise inicial do pentest, dependências das tasks, pitch inicial
 .kiro/                     specs (com tasks e kanban), steering, skills
 ```
 

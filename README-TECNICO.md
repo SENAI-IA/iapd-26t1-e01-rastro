@@ -254,10 +254,10 @@ Os critérios marcados *(verificação manual)* na spec só se conferem olhando 
 
 ## A conferir no Windows (T42)
 
-- O `rastro gravar` (extensão R24): se o Playwright acha o Chrome ou o Edge pelo `channel`, se fechar a janela grava o HAR, se o Ctrl+C no PowerShell e no `cmd` grava o HAR e se o `pip install --user playwright` funciona sem administrador. Ver `docs/spike/gravacao-com-playwright.md`, "A conferir no Windows".
+- O `rastro gravar` (extensão R24): se o Playwright acha o Chrome ou o Edge pelo `channel`, se fechar a janela grava o HAR, se o Ctrl+C no PowerShell e no `cmd` grava o HAR e se o `pip install --user playwright` funciona sem administrador. Ver `docs/historico/spike/gravacao-com-playwright.md`, "A conferir no Windows".
 
 - Os comandos marcados "a conferir" nas tabelas: `py`, `$env:RASTRO_IA`, `Invoke-Item` e a ativação do `.venv`.
-- Se o `kiro-cli` existe para Windows e se `claude` e `codex` são achados (`.exe` ou `.cmd`). A lista completa está em `docs/spike/clis-de-ia.md`, "A conferir no Windows".
+- Se o `kiro-cli` existe para Windows e se `claude` e `codex` são achados (`.exe` ou `.cmd`). A lista completa está em `docs/historico/spike/clis-de-ia.md`, "A conferir no Windows".
 - Se os acentos chegam certos no terminal e no relatório.
 - Se o `py -m rastro instalar` põe o comando `rastro` no PATH do usuário, se ele roda de outra pasta, num terminal novo, e se o `rastro desinstalar` apaga o próprio `rastro.cmd` sem erro do cmd (passo 18 do roteiro). Pasta do projeto com acento no caminho também.
 - A pasta padrão `C:\Users\<nome>\Rastro\relatorios` e o nome da pasta do site com `_` no lugar de `:` (ex.: `127.0.0.1_8080`).
@@ -344,7 +344,7 @@ E no próprio produto a IA tem papel real, mas não decide sozinha: ela sugere b
 
 ## Links
 
-- Pitch: [`docs/pitch-inicial.pdf`](docs/pitch-inicial.pdf)
+- Pitch: [`docs/historico/pitch-inicial.pdf`](docs/historico/pitch-inicial.pdf)
 - Telas do relatório: [`docs/prints/`](docs/prints/)
 
 ## Créditos

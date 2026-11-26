@@ -1,5 +1,7 @@
 # Spike: CLIs de IA sem interação (T02)
 
+> **Registro histórico** de 06/11/2026 (Windows completado em 09/11/2026), mantido como foi escrito. Nomes de arquivo e de função podem ter mudado depois: a estrutura atual está em `.kiro/steering/structure.md`.
+
 Exploração de 06/11/2026 para preencher a tabela de provedores da seção 11 do design. Afeta R14.4 e R18.1.
 
 **Só o Linux foi conferido.** O Windows fica para a T42 (instalação do zero), com um colega que use Windows. A seção "A conferir no Windows" lista o que olhar.

@@ -11,7 +11,7 @@ Quem usa o Rastro já tem, na própria máquina, a CLI de uma IA instalada e aut
 - O Rastro chama a CLI com `subprocess.run`, com o caminho que `shutil.which` achou. Não usa SDK nem chave, e não instala nem autentica nenhuma CLI (R20.3).
 - **Três provedores, um arquivo cada**, em `rastro/ia/provedores/`. A escolha é feita por `--ia`, senão por `RASTRO_IA`, senão o Kiro (R14.1).
 - **O prompt vai pela entrada padrão, nunca como argumento** (R14.4). Assim ele não aparece na lista de processos e não esbarra no limite de tamanho da linha de comando do Windows.
-- **As opções desligam ferramentas e gravação:** a IA só responde, sem ler, rodar ou gravar nada na máquina (`docs/spike/clis-de-ia.md`).
+- **As opções desligam ferramentas e gravação:** a IA só responde, sem ler, rodar ou gravar nada na máquina (`docs/historico/spike/clis-de-ia.md`).
 - **Toda falha** (código de saída, tempo limite de 120 s, resposta com erro ou vazia) vira `FalhaDoProvedor`. A análise segue sem aquele dado, e a falha aparece no painel da IA.
 - **Tokens só quando a CLI informa.** O Kiro não informa, e o relatório mostra "não informado", sem estimar (R11.2).
 - O texto passa pela sanitização dentro do cliente, antes de chegar ao provedor (R16.3).

@@ -106,6 +106,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T88** Padronizar os nomes do frontend · rodada de legibilidade · revisão @halan.bacca · 26/11
 - [ ] **T90** Achatar ifs encadeados e laços no Python · rodada de legibilidade · revisão @ali.santos · 26/11
 - [ ] **T91** Achatar ifs encadeados e laços no frontend · rodada de legibilidade · revisão @halan.bacca · 26/11
+- [ ] **T92** Separar o histórico e versionar a decisão 11 · rodada de legibilidade · revisão @cristiano.albino · 26/11
 
 ## A fazer
 
@@ -145,7 +146,6 @@ _(vazio)_
 
 ### Rodada de legibilidade (até 08/12)
 
-- [ ] **T92** Separar o histórico e versionar a decisão 11 · rodada de legibilidade · revisão @cristiano.albino
 - [ ] **T93** Numerar as travas como a decisão 06 · rodada de legibilidade · revisão @cristiano.albino
 - [ ] **T94** Reescrever o README no ritmo do Como usar · rodada de legibilidade · revisão @halan.bacca
 - [ ] **T95** Deixar o README técnico só para desenvolvimento · rodada de legibilidade · revisão @luiz.pagliari

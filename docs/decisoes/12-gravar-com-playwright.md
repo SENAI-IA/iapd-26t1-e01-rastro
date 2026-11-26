@@ -1,6 +1,6 @@
 # Decisão 12: gravar a visita com o Playwright, opcional
 
-Requisitos: R24, R16.1, R17.1 e R20.2. Código: `rastro/captura/` e `rastro/cli.py`. Base: `docs/spike/gravacao-com-playwright.md` (T58).
+Requisitos: R24, R16.1, R17.1 e R20.2. Código: `rastro/captura/` e `rastro/cli.py`. Base: `docs/historico/spike/gravacao-com-playwright.md` (T58).
 
 ## Contexto
 

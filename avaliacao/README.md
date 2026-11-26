@@ -68,7 +68,7 @@ Na IA: no Juice Shop, a única prova possível é o `@angular/core` (spike T03).
 
 ## Pendente: exportação manual no Chrome
 
-Os HARs daqui foram gravados pelo Playwright. Falta exportar à mão, do DevTools do Chrome, numa mesma navegação de um dos alvos com sessão (Drupal logado, por exemplo), o HAR **sanitized** e o **completo** (*with sensitive data*), e conferir a lista "A conferir no Chrome" de `docs/spike/har-e-bundles.md`:
+Os HARs daqui foram gravados pelo Playwright. Falta exportar à mão, do DevTools do Chrome, numa mesma navegação de um dos alvos com sessão (Drupal logado, por exemplo), o HAR **sanitized** e o **completo** (*with sensitive data*), e conferir a lista "A conferir no Chrome" de `docs/historico/spike/har-e-bundles.md`:
 
 - se o conteúdo dos scripts vem em `text` nos dois, e se algum vem em base64;
 - o que o sanitized remove além de `Cookie`, `Set-Cookie` e `Authorization` (`cookies[]`, query string, corpo, outros cabeçalhos);

@@ -6,7 +6,7 @@ Requisito: R21. Código: `rastro/travas/` e `rastro/fontes/registro_npm.py`.
 
 A IA pode inventar uma versão, citar um pacote vizinho ou um CVE que não existe. No relatório, esse erro vira uma task errada para o dev e tira a confiança no resto. O auditor precisa mostrar, para cada dado, de onde ele veio e quem o conferiu.
 
-No spike T03, a IA leu o trecho `` `FA "5.15.4"` `` do Juice Shop e sugeriu `@fortawesome/fontawesome-free@5.15.4`. O pacote existe, a versão existe e está no trecho, mas o bundle traz outro pacote da família (`docs/spike/har-e-bundles.md`). Conferir só o nome e a versão não basta.
+No spike T03, a IA leu o trecho `` `FA "5.15.4"` `` do Juice Shop e sugeriu `@fortawesome/fontawesome-free@5.15.4`. O pacote existe, a versão existe e está no trecho, mas o bundle traz outro pacote da família (`docs/historico/spike/har-e-bundles.md`). Conferir só o nome e a versão não basta.
 
 ## Decisão
 

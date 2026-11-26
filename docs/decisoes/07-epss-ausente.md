@@ -4,7 +4,7 @@ Requisitos: R05.3 e R05.4. Código: `rastro/risco/nota.py`.
 
 ## Contexto
 
-A fórmula da nota ([decisão 01](01-formula-da-nota.md)) usa CVSS e EPSS. O EPSS só existe para falha com CVE. No spike T01, 12 de 136 avisos (8,8%) vieram sem EPSS, e **todos eram avisos sem CVE**, só com GHSA. Seis deles tinham CVSS; os outros seis não tinham nem CVSS (`docs/spike/github-advisory.md`).
+A fórmula da nota ([decisão 01](01-formula-da-nota.md)) usa CVSS e EPSS. O EPSS só existe para falha com CVE. No spike T01, 12 de 136 avisos (8,8%) vieram sem EPSS, e **todos eram avisos sem CVE**, só com GHSA. Seis deles tinham CVSS; os outros seis não tinham nem CVSS (`docs/historico/spike/github-advisory.md`).
 
 ## Decisão
 

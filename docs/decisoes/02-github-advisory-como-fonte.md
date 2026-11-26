@@ -10,7 +10,7 @@ Para cada biblioteca (`pacote@versão`), o Rastro precisa dos avisos de falha co
 
 **O MVP foi desenhado com uma fonte só: o GitHub Advisory.**
 
-- Consulta direta por pacote npm e versão (`affects=<pacote>@<versão>`). No spike T01, 20 pacotes trouxeram 136 avisos, e a versão consultada estava na faixa de todos eles (`docs/spike/github-advisory.md`).
+- Consulta direta por pacote npm e versão (`affects=<pacote>@<versão>`). No spike T01, 20 pacotes trouxeram 136 avisos, e a versão consultada estava na faixa de todos eles (`docs/historico/spike/github-advisory.md`).
 - Traz tudo o que a nota precisa: CVSS v3 ou v4 e o **EPSS já embutido**, sem uma segunda consulta.
 - Traz a faixa afetada e a primeira versão corrigida, que viram o plano de ação.
 - Não exige chave: 60 consultas por hora sem token, uma por biblioteca, e uma análise cabe nesse limite. Com `GITHUB_TOKEN`, 5.000 por hora.

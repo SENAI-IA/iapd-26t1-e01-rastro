@@ -202,7 +202,7 @@ A aba **Segurança ativa** mostra as proteções em três grupos (a corrigir, em
 
 O escopo é a configuração de segurança das respostas do site. Ficam fora do escopo: login e sessão, permissões entre usuários, injeção de código e regras de negócio.
 
-Detalhes e comparação com motores externos estão em [`docs/analise-opcoes-pentest.md`](docs/analise-opcoes-pentest.md).
+Detalhes e comparação com motores externos estão em [`docs/historico/analise-validacoes-pentest.md`](docs/historico/analise-validacoes-pentest.md).
 
 ## Fazer uma análise
 

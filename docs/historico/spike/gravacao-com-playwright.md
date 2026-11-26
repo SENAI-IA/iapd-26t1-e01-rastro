@@ -1,5 +1,7 @@
 # Spike: gravar a visita com Playwright (T58)
 
+> **Registro histórico** de 13/11/2026, mantido como foi escrito. Nomes de arquivo e de função podem ter mudado depois: a estrutura atual está em `.kiro/steering/structure.md`.
+
 Exploração de 13/11/2026 para decidir se o Rastro pode gravar o HAR sozinho, sem o DevTools, e se um robô com travas acha as mesmas bibliotecas que uma pessoa. Base do R24.
 
 **Só o Linux foi conferido.** O Windows fica para a T42 (ver "A conferir no Windows").

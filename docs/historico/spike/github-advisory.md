@@ -1,5 +1,7 @@
 # Spike: GitHub Advisory e EPSS (T01)
 
+> **Registro histórico** de 06/11/2026, mantido como foi escrito. Nomes de arquivo e de função podem ter mudado depois: a estrutura atual está em `.kiro/steering/structure.md`.
+
 Exploração de 06/11/2026, sem token, para responder as perguntas da seção 17 do design sobre a fonte. Afeta a seção 7 e a 9 do design e os critérios R04.4 e R05.3.
 
 ## Como foi feito

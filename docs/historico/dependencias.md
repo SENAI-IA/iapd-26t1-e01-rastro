@@ -1,5 +1,7 @@
 # Dependências entre tasks: Rastro
 
+> **Registro histórico** de 10/11/2026 (última atualização em 25/11/2026), mantido como foi escrito. Nomes de arquivo e de função podem ter mudado depois: a estrutura atual está em `.kiro/steering/structure.md`.
+
 **Quando cada task pode começar.** O que cada task faz está no `tasks.md`; em que pé ela está, no `kanban.md`. Aqui fica o que precisa estar pronto antes.
 
 ## Regras

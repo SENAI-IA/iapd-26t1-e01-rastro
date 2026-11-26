@@ -18,7 +18,7 @@ nota = 10 × (0,5 × CVSS/10 + 0,5 × percentil EPSS)
 ```
 
 - **Pesos iguais.** O grupo não tem dado próprio de exploração para calibrar os pesos. Sem esse dado, dar mais peso a um dos lados seria um palpite. Metade e metade se explica numa frase: gravidade e chance de ataque valem o mesmo.
-- **Percentil, não probabilidade.** A probabilidade fica quase sempre perto de zero e apagaria o EPSS da soma. No spike T01, o mesmo aviso trouxe probabilidade 0,00049 e percentil 0,21662 (`docs/spike/github-advisory.md`).
+- **Percentil, não probabilidade.** A probabilidade fica quase sempre perto de zero e apagaria o EPSS da soma. No spike T01, o mesmo aviso trouxe probabilidade 0,00049 e percentil 0,21662 (`docs/historico/spike/github-advisory.md`).
 - **Escala de 0 a 10**, a mesma do CVSS, para comparar a nota com o CVSS e com a nota sem EPSS ([decisão 07](07-epss-ausente.md)).
 - **Uma casa decimal, meio para cima**, com `Decimal`: CVSS 6,1 e percentil 0 dão 3,1, como na conta feita à mão. Com `float` daria 3,0.
 - **Faixas:** alta ≥ 7,5; média ≥ 6,5; baixa no resto (R05.2). A nota da biblioteca é a maior nota dos seus achados.

@@ -176,7 +176,7 @@ A `situacao` sai só das travas; a IA não tem campo de confiança que decida al
 ## 5. Ler o HAR (R01)
 
 - `json.loads` do arquivo aberto com `encoding="utf-8"`. Valida `log.entries` como lista.
-- O conteúdo dos scripts vem em `response.content.text`, em texto puro (spike T03, `docs/spike/har-e-bundles.md`). Entrada sem `text` (ex.: WebSocket) fica sem conteúdo. Chaves com `_` (`_resourceType`, `_initiator`…) são ignoradas.
+- O conteúdo dos scripts vem em `response.content.text`, em texto puro (spike T03, `docs/historico/spike/har-e-bundles.md`). Entrada sem `text` (ex.: WebSocket) fica sem conteúdo. Chaves com `_` (`_resourceType`, `_initiator`…) são ignoradas.
 - `response.content.encoding == "base64"` → `base64.b64decode` e depois decodifica em UTF-8 com `errors="replace"`. No spike, só imagens e fontes vieram assim.
 - Cookies: usa `response.cookies` do HAR. Se vier vazio, interpreta os `Set-Cookie` dos cabeçalhos, guardando só o nome e os atributos. Cookie criado por JavaScript não tem `Set-Cookie` e fica de fora das checagens.
 - Cabeçalhos: nome em minúsculas; nome repetido junta os valores com `, `. O `Set-Cookie` não entra em `cabecalhos_resposta`: o cookie fica só em `cookies_resposta`, sem o valor.
@@ -234,7 +234,7 @@ Accept: application/vnd.github+json
 Authorization: Bearer $GITHUB_TOKEN      (só se a variável existir)
 ```
 
-Formato conferido no spike T01 (`docs/spike/github-advisory.md`).
+Formato conferido no spike T01 (`docs/historico/spike/github-advisory.md`).
 
 | Campo do aviso | Vem de |
 |---|---|
@@ -310,7 +310,7 @@ GET <dist.tarball>                                     → pacote .tgz, só para
 
 ### Como a trava 5 compara
 
-Conferido no spike T03 (`docs/spike/har-e-bundles.md`). O minificador renomeia variáveis e troca as aspas (`"FA \"5.15.4\""` vira `` `FA "5.15.4"` ``), mas mantém o valor das strings. Por isso a trava compara **o valor das strings**:
+Conferido no spike T03 (`docs/historico/spike/har-e-bundles.md`). O minificador renomeia variáveis e troca as aspas (`"FA \"5.15.4\""` vira `` `FA "5.15.4"` ``), mas mantém o valor das strings. Por isso a trava compara **o valor das strings**:
 
 1. Tira do trecho todas as strings (entre `"`, `'` ou `` ` ``) e resolve os escapes.
 2. Exige que uma delas contenha a versão e que alguma tenha 3 ou mais caracteres além da versão. Só a versão não prova o pacote.
@@ -433,7 +433,7 @@ Decidido na T33:
 
 ### Provedores
 
-Conferido no Linux no spike T02 (`docs/spike/clis-de-ia.md`). O Windows é conferido na T42.
+Conferido no Linux no spike T02 (`docs/historico/spike/clis-de-ia.md`). O Windows é conferido na T42.
 
 | Provedor | Comando (prompt pela entrada padrão) | Texto da resposta | Tokens | Linux | Windows |
 |---|---|---|---|---|---|
@@ -714,17 +714,17 @@ Decisão nova ganha o próximo número (`14-<tema>.md`), com as mesmas três se�
 
 | Pergunta | Afeta | Situação |
 |---|---|---|
-| Limite do GitHub Advisory sem token; formato de `epss` e `cvss_severities` | seção 7, R04.4 | respondida na T01 (`docs/spike/github-advisory.md`) |
-| Com que frequência o EPSS vem vazio | seção 9, R05.3 | respondida na T01 (`docs/spike/github-advisory.md`) |
-| O HAR do Chrome traz o conteúdo dos scripts? O sanitized remove só cookies e cabeçalhos de autenticação, ou mais? | R01, R06.7, R16.5 | conteúdo respondido na T03 com HAR do Playwright (`docs/spike/har-e-bundles.md`); sanitized × completo do Chrome pendente, por exportação manual (`avaliacao/README.md`) |
+| Limite do GitHub Advisory sem token; formato de `epss` e `cvss_severities` | seção 7, R04.4 | respondida na T01 (`docs/historico/spike/github-advisory.md`) |
+| Com que frequência o EPSS vem vazio | seção 9, R05.3 | respondida na T01 (`docs/historico/spike/github-advisory.md`) |
+| O HAR do Chrome traz o conteúdo dos scripts? O sanitized remove só cookies e cabeçalhos de autenticação, ou mais? | R01, R06.7, R16.5 | conteúdo respondido na T03 com HAR do Playwright (`docs/historico/spike/har-e-bundles.md`); sanitized × completo do Chrome pendente, por exportação manual (`avaliacao/README.md`) |
 | Lista de assinaturas de R02.4 | seção 6, R02.4 | respondida na T04 (`avaliacao/README.md`) |
-| Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 | respondida na T03 (`docs/spike/har-e-bundles.md`) |
-| Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 | Linux respondido na T02 (`docs/spike/clis-de-ia.md`); Windows na T42 |
-| Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 | respondida na T03 (`docs/spike/har-e-bundles.md`) |
+| Tamanho mínimo de bundle e seleção de trechos no Juice Shop | seção 6, R03.1 | respondida na T03 (`docs/historico/spike/har-e-bundles.md`) |
+| Comando sem interação e tokens de Kiro, Claude e Codex, no Windows e no Linux | seção 11 | Linux respondido na T02 (`docs/historico/spike/clis-de-ia.md`); Windows na T42 |
+| Critério da trava 5 (trecho × código publicado) no Juice Shop, e tamanho dos pacotes | seção 8, R21.5 | respondida na T03 (`docs/historico/spike/har-e-bundles.md`) |
 
 ## 18. Gravar a visita (R24)
 
-Extensão na branch `feat/gravar`. Base: `docs/spike/gravacao-com-playwright.md` (T58) e decisão 12.
+Extensão na branch `feat/gravar`. Base: `docs/historico/spike/gravacao-com-playwright.md` (T58) e decisão 12.
 
 ### Comando
 
@@ -798,5 +798,5 @@ A sonda gera validações de CSP, HSTS, nosniff, frame, Referrer-Policy, Permiss
 
 O `pentest.json` leva o SHA-256 do HAR. `analisar --pentest` recusa resultado de outro HAR e nunca faz requisições novas. O JSON do relatório mantém o resultado na chave `pentest`; nota, bibliotecas, achados, checagens e plano permanecem independentes.
 
-Cada validação leva em `referencia` o teste do OWASP WSTG que cobre (`REFERENCIA_DA_CATEGORIA` em `rastro/pentest/modelos.py`; `null` para falha de execução), e o leitor recusa referência que não bate com a categoria. Por isso o `pentest.json` está na versão 2. O relatório mostra a aba **Segurança ativa** somente quando há um resultado e agrupa os resultados por proteção: "A corrigir" quando falhou em algum endereço, "Em ordem" e "Não conferido". Os textos simples de cada proteção e a lista do que fica fora do escopo ficam em `frontend/src/dados/segurancaAtiva.ts`. Um motor externo futuro, como OWASP ZAP, deve implementar o mesmo contrato, informar motor, versão, perfil, escopo e limites, e continuar fora da nota. As opções estão comparadas em `docs/analise-opcoes-pentest.md`.
+Cada validação leva em `referencia` o teste do OWASP WSTG que cobre (`REFERENCIA_DA_CATEGORIA` em `rastro/pentest/modelos.py`; `null` para falha de execução), e o leitor recusa referência que não bate com a categoria. Por isso o `pentest.json` está na versão 2. O relatório mostra a aba **Segurança ativa** somente quando há um resultado e agrupa os resultados por proteção: "A corrigir" quando falhou em algum endereço, "Em ordem" e "Não conferido". Os textos simples de cada proteção e a lista do que fica fora do escopo ficam em `frontend/src/dados/segurancaAtiva.ts`. Um motor externo futuro, como OWASP ZAP, deve implementar o mesmo contrato, informar motor, versão, perfil, escopo e limites, e continuar fora da nota. As opções estão comparadas em `docs/historico/analise-validacoes-pentest.md`.
 
