@@ -13,6 +13,8 @@ from rastro.captura.regras_dos_links import (
 )
 from rastro.captura.sessao import FalhaAoNavegar, SessaoDeGravacao
 
+SEGUNDOS_POR_MINUTO = 60
+
 
 @dataclass(frozen=True)
 class Limites:
@@ -102,7 +104,7 @@ class Robo:
         if self.paginas >= self.limites.paginas:
             return f"limite de {self.limites.paginas} páginas"
         if self.relogio() - inicio >= self.limites.segundos:
-            return f"limite de {self.limites.segundos / 60:g} minutos"
+            return f"limite de {self.limites.segundos / SEGUNDOS_POR_MINUTO:g} minutos"
         return None
 
     def familia_cheia(self, link: LinkNaFila) -> bool:

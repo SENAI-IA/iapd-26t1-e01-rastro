@@ -14,8 +14,24 @@ ALVO = "resposta da IA"
 CAMPOS_DA_RESPOSTA = {"bibliotecas"}
 CAMPOS_DA_BIBLIOTECA = {"pacote", "versao", "trecho"}
 TAMANHO_MAXIMO_DO_PACOTE = 214
-PADRAO_DO_PACOTE = re.compile(r"^(?:@[a-z0-9~-][a-z0-9._~-]*/)?[a-z0-9~-][a-z0-9._~-]*$")
-PADRAO_DA_VERSAO = re.compile(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")
+PADRAO_DO_PACOTE = re.compile(
+    r"""
+    ^
+    (?: @ [a-z0-9~-] [a-z0-9._~-]* / )?
+    [a-z0-9~-] [a-z0-9._~-]*
+    $
+    """,
+    re.VERBOSE,
+)
+PADRAO_DA_VERSAO = re.compile(
+    r"""
+    ^
+    \d+ \. \d+ \. \d+
+    (?: - [0-9A-Za-z.-]+ )?
+    $
+    """,
+    re.VERBOSE,
+)
 
 
 @dataclass(frozen=True)

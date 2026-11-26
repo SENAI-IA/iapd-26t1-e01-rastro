@@ -3,7 +3,14 @@ import re
 from typing import Any
 
 TRAVA_FORMATO_FECHADO = "formato fechado"
-CERCA_DE_CODIGO = re.compile(r"^```[a-z]*\n(.*)\n```$", re.DOTALL)
+CERCA_DE_CODIGO = re.compile(
+    r"""
+    ^ ``` [a-z]* \n
+    (?P<conteudo> .* )
+    \n ``` $
+    """,
+    re.VERBOSE | re.DOTALL,
+)
 
 
 class ForaDoFormato(Exception):
@@ -64,4 +71,4 @@ def tirar_cerca_de_codigo(resposta: str) -> str:
     cercado = CERCA_DE_CODIGO.match(texto)
     if cercado is None:
         return texto
-    return cercado.group(1)
+    return cercado.group("conteudo")

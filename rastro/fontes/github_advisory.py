@@ -10,6 +10,7 @@ from rastro.fontes.requisicao_http import baixar_json, ler_resposta
 NOME_DA_FONTE = "GitHub Advisory"
 ENDERECO_DA_API = "https://api.github.com/advisories"
 AVISOS_POR_PAGINA = 100
+VERSOES_DO_CVSS_NA_ORDEM = ("cvss_v3", "cvss_v4")
 
 
 class GitHubAdvisory:
@@ -18,7 +19,11 @@ class GitHubAdvisory:
 
     def consultar(self, pacote: str, versao: str) -> list[Aviso]:
         resposta = self.baixar_avisos(pacote, versao)
-        return ler_resposta(lambda: converter_resposta(resposta, pacote), NOME_DA_FONTE)
+
+        def converter_os_avisos() -> list[Aviso]:
+            return converter_resposta(resposta, pacote)
+
+        return ler_resposta(converter_os_avisos, NOME_DA_FONTE)
 
     def baixar_avisos(self, pacote: str, versao: str) -> Any:
         return baixar_json(montar_requisicao(pacote, versao, self.token), NOME_DA_FONTE)
@@ -87,10 +92,12 @@ def ler_apelidos(aviso_da_fonte: Any, ghsa: str) -> list[str]:
 
 
 def ler_cvss(aviso_da_fonte: Any) -> float | None:
-    severidades = aviso_da_fonte.get("cvss_severities") or {}
-    for versao_do_cvss in ("cvss_v3", "cvss_v4"):
-        cvss = severidades.get(versao_do_cvss) or {}
-        if cvss.get("vector_string"):
+    severidades = aviso_da_fonte.get("cvss_severities")
+    if not severidades:
+        return None
+    for versao_do_cvss in VERSOES_DO_CVSS_NA_ORDEM:
+        cvss = severidades.get(versao_do_cvss)
+        if cvss and cvss.get("vector_string"):
             return float(cvss["score"])
     return None
 

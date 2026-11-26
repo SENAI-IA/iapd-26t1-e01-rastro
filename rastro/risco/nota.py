@@ -6,6 +6,8 @@ from rastro.risco.prioridade import classificar_prioridade
 PESO_DO_CVSS = Decimal("0.5")
 PESO_DO_EPSS = Decimal("0.5")
 UMA_CASA_DECIMAL = Decimal("0.1")
+CVSS_MAXIMO = 10
+NOTA_MAXIMA = 10
 
 
 def calcular_nota(cvss: float | None, percentil_epss: float | None) -> Nota:
@@ -33,9 +35,9 @@ def calcular_nota(cvss: float | None, percentil_epss: float | None) -> Nota:
 
 
 def calcular_nota_de_risco(cvss: float, percentil_epss: float) -> float:
-    parte_do_cvss = PESO_DO_CVSS * Decimal(str(cvss)) / 10
+    parte_do_cvss = PESO_DO_CVSS * Decimal(str(cvss)) / CVSS_MAXIMO
     parte_do_epss = PESO_DO_EPSS * Decimal(str(percentil_epss))
-    nota = 10 * (parte_do_cvss + parte_do_epss)
+    nota = NOTA_MAXIMA * (parte_do_cvss + parte_do_epss)
     return float(nota.quantize(UMA_CASA_DECIMAL, rounding=ROUND_HALF_UP))
 
 

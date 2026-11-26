@@ -3,6 +3,8 @@ from urllib.parse import urlsplit, urlunsplit
 from rastro.har.modelos import Requisicao
 
 MARCADOR_DA_QUERY_REMOVIDA = "[removido]"
+PRIMEIRO_STATUS_DE_REDIRECIONAMENTO = 300
+PRIMEIRO_STATUS_DE_ERRO = 400
 
 
 def descobrir_site_analisado(requisicoes: list[Requisicao]) -> str | None:
@@ -20,7 +22,7 @@ def requisicao_e_pagina_html(requisicao: Requisicao) -> bool:
 
 
 def requisicao_e_redirecionamento(requisicao: Requisicao) -> bool:
-    return 300 <= requisicao.status < 400
+    return PRIMEIRO_STATUS_DE_REDIRECIONAMENTO <= requisicao.status < PRIMEIRO_STATUS_DE_ERRO
 
 
 def host_com_porta(url: str) -> str | None:

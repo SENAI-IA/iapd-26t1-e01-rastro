@@ -2,6 +2,7 @@ from dataclasses import asdict, replace
 from typing import Any
 
 from rastro.configuracao.modelos import Checagem
+from rastro.explicacao.modelos import Explicacao
 from rastro.har.site import url_sem_valores_da_query
 from rastro.identificacao.modelos import Biblioteca, Evidencia, nome_com_versao
 from rastro.modelos_da_analise import Analise
@@ -11,7 +12,7 @@ from rastro.relatorio.painel_da_ia import montar_painel_da_ia
 from rastro.relatorio.resumo_do_relatorio import montar_resumo
 from rastro.relatorio.visita_no_relatorio import montar_visita_no_relatorio
 from rastro.risco.achados import achados_da_biblioteca
-from rastro.risco.modelos import Achado
+from rastro.risco.modelos import Achado, Prioridade
 from rastro.risco.prioridade import classificar_prioridade, nota_da_biblioteca
 
 VERSAO_DO_FORMATO = 1
@@ -60,15 +61,29 @@ def biblioteca_no_relatorio(biblioteca: Biblioteca, analise: Analise) -> dict[st
     achados = achados_da_biblioteca(chave, analise.achados)
     explicacao = analise.explicacoes.get(chave)
     nota = nota_da_biblioteca(achados)
-    return {
-        "id": chave,
-        **asdict(replace(biblioteca, evidencias=evidencias_sem_valores(biblioteca.evidencias))),
-        "nota": nota,
-        "prioridade": classificar_prioridade(nota) if achados else None,
-        "achados": [achado.aviso.ghsa for achado in achados],
-        "motivo_nao_consultada": analise.nao_consultadas.get(chave),
-        "explicacao": asdict(explicacao) if explicacao is not None else None,
-    }
+    biblioteca_sem_valores = replace(
+        biblioteca, evidencias=evidencias_sem_valores(biblioteca.evidencias)
+    )
+    no_relatorio: dict[str, Any] = {"id": chave}
+    no_relatorio.update(asdict(biblioteca_sem_valores))
+    no_relatorio["nota"] = nota
+    no_relatorio["prioridade"] = prioridade_se_houver_achados(nota, achados)
+    no_relatorio["achados"] = [achado.aviso.ghsa for achado in achados]
+    no_relatorio["motivo_nao_consultada"] = analise.nao_consultadas.get(chave)
+    no_relatorio["explicacao"] = explicacao_no_relatorio(explicacao)
+    return no_relatorio
+
+
+def prioridade_se_houver_achados(nota: float | None, achados: list[Achado]) -> Prioridade | None:
+    if not achados:
+        return None
+    return classificar_prioridade(nota)
+
+
+def explicacao_no_relatorio(explicacao: Explicacao | None) -> dict[str, Any] | None:
+    if explicacao is None:
+        return None
+    return asdict(explicacao)
 
 
 def evidencias_sem_valores(evidencias: list[Evidencia]) -> list[Evidencia]:

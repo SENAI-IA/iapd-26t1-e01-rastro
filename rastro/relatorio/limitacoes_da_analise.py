@@ -1,4 +1,6 @@
 from rastro.fontes.modelos import FonteSemResposta
+from rastro.ia.cliente import ChamadaDaIA
+from rastro.listas import sem_repeticao
 from rastro.modelos_da_analise import Analise
 
 TEXTO_BUNDLES_NAO_PROCURADOS = (
@@ -54,8 +56,8 @@ def listar_limitacoes(analise: Analise) -> list[dict[str, str]]:
 def limitacoes_da_ia_que_falhou(analise: Analise) -> list[dict[str, str]]:
     limitacoes = []
     for etapa, (identificador, consequencia) in CONSEQUENCIA_DA_IA_QUE_FALHOU.items():
-        chamadas = [chamada for chamada in analise.chamadas_de_ia if chamada.etapa == etapa]
-        falhas = [chamada for chamada in chamadas if not chamada.sucesso]
+        chamadas = chamadas_da_etapa(analise.chamadas_de_ia, etapa)
+        falhas = chamadas_que_falharam(chamadas)
         if falhas:
             texto = (
                 f"A IA ({analise.provedor_de_ia}) falhou em {len(falhas)} de {len(chamadas)} "
@@ -65,13 +67,29 @@ def limitacoes_da_ia_que_falhou(analise: Analise) -> list[dict[str, str]]:
     return limitacoes
 
 
+def chamadas_da_etapa(chamadas: list[ChamadaDaIA], etapa: str) -> list[ChamadaDaIA]:
+    return [chamada for chamada in chamadas if chamada.etapa == etapa]
+
+
+def chamadas_que_falharam(chamadas: list[ChamadaDaIA]) -> list[ChamadaDaIA]:
+    return [chamada for chamada in chamadas if not chamada.sucesso]
+
+
 def fontes_que_nao_responderam(sem_resposta: list[FonteSemResposta]) -> list[str]:
-    return list(dict.fromkeys(item.fonte for item in sem_resposta))
+    return sem_repeticao([item.fonte for item in sem_resposta])
 
 
 def texto_da_fonte_sem_resposta(fonte: str, sem_resposta: list[FonteSemResposta]) -> str:
-    alvos = "; ".join(f"{item.alvo}: {item.motivo}" for item in sem_resposta if item.fonte == fonte)
+    alvos = "; ".join(alvos_da_fonte(fonte, sem_resposta))
     return f"O {fonte} não respondeu ({alvos}). {CONSEQUENCIA_DA_FONTE_SEM_RESPOSTA[fonte]}"
+
+
+def alvos_da_fonte(fonte: str, sem_resposta: list[FonteSemResposta]) -> list[str]:
+    alvos = []
+    for item in sem_resposta:
+        if item.fonte == fonte:
+            alvos.append(f"{item.alvo}: {item.motivo}")
+    return alvos
 
 
 def limitacao(identificador: str, texto: str) -> dict[str, str]:

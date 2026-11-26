@@ -18,6 +18,7 @@ from rastro.travas.modelos import TravaAcionada
 
 ETAPA = "explicar_achado"
 ARQUIVO_DO_PROMPT = "explicar_achado.md"
+ESPACOS_DE_RECUO_DO_JSON = 2
 
 
 @dataclass(frozen=True)
@@ -85,7 +86,7 @@ def montar_entrada(biblioteca: Biblioteca, avisos: list[Aviso]) -> str:
         "url_do_script": url_do_script(biblioteca),
         "avisos": [aviso_na_entrada(aviso) for aviso in avisos],
     }
-    return json.dumps(entrada, ensure_ascii=False, indent=2)
+    return json.dumps(entrada, ensure_ascii=False, indent=ESPACOS_DE_RECUO_DO_JSON)
 
 
 def url_do_script(biblioteca: Biblioteca) -> str | None:
@@ -96,8 +97,15 @@ def url_do_script(biblioteca: Biblioteca) -> str | None:
 
 def aviso_na_entrada(aviso: Aviso) -> dict[str, object]:
     return {
-        "ids": [aviso.ghsa] + ([aviso.cve] if aviso.cve else []),
+        "ids": identificadores_do_aviso(aviso),
         "resumo": aviso.resumo,
         "versoes_afetadas": aviso.versoes_afetadas,
         "versao_corrigida": aviso.versao_corrigida,
     }
+
+
+def identificadores_do_aviso(aviso: Aviso) -> list[str]:
+    identificadores = [aviso.ghsa]
+    if aviso.cve:
+        identificadores.append(aviso.cve)
+    return identificadores

@@ -2,6 +2,7 @@ from rastro.acao.modelos import Acao
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.modelos import Aviso
 from rastro.identificacao.modelos import Biblioteca
+from rastro.listas import sem_repeticao
 from rastro.risco.achados import agrupar_por_biblioteca
 from rastro.risco.modelos import Achado, Prioridade
 from rastro.risco.nota import escrever_nota
@@ -73,7 +74,7 @@ def avisos_sem_correcao(avisos: list[Aviso]) -> list[Aviso]:
 
 
 def identificadores_dos_avisos(avisos: list[Aviso]) -> list[str]:
-    return list(dict.fromkeys(aviso.ghsa for aviso in avisos))
+    return sem_repeticao([aviso.ghsa for aviso in avisos])
 
 
 def porque_da_biblioteca(avisos: list[Aviso], nota: float | None, prioridade: Prioridade) -> str:

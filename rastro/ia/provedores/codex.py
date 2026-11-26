@@ -54,7 +54,9 @@ def ler_linha(linha: str) -> dict[str, Any] | None:
         evento = json.loads(linha)
     except json.JSONDecodeError:
         return None
-    return evento if isinstance(evento, dict) else None
+    if not isinstance(evento, dict):
+        return None
+    return evento
 
 
 def ultima_mensagem_do_agente(eventos: list[dict[str, Any]]) -> str | None:
@@ -70,7 +72,11 @@ def texto_do_agente(evento: dict[str, Any]) -> str | None:
     if not evento_e_mensagem_do_agente(evento):
         return None
     texto = evento["item"].get("text")
-    return texto if isinstance(texto, str) and texto.strip() else None
+    if not isinstance(texto, str):
+        return None
+    if not texto.strip():
+        return None
+    return texto
 
 
 def evento_e_mensagem_do_agente(evento: dict[str, Any]) -> bool:
@@ -84,4 +90,7 @@ def evento_e_mensagem_do_agente(evento: dict[str, Any]) -> bool:
 
 def uso_do_turno(eventos: list[dict[str, Any]]) -> Any:
     turnos = [evento for evento in eventos if evento.get("type") == "turn.completed"]
-    return turnos[-1].get("usage") if turnos else None
+    if not turnos:
+        return None
+    ultimo_turno = turnos[-1]
+    return ultimo_turno.get("usage")

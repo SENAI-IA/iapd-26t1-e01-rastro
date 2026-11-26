@@ -10,4 +10,6 @@ def sem_secure(cookie: Cookie) -> bool:
 
 
 def sem_samesite(cookie: Cookie) -> bool:
-    return not (cookie.same_site or "").strip()
+    if cookie.same_site is None:
+        return True
+    return not cookie.same_site.strip()

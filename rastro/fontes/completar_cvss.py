@@ -4,6 +4,7 @@ from typing import Protocol
 from rastro.fontes.conector import ConsultaNaoRealizada
 from rastro.fontes.modelos import Aviso
 from rastro.fontes.nvd import NOME_DA_FONTE
+from rastro.listas import sem_repeticao
 
 
 class BuscaDeCvss(Protocol):
@@ -29,8 +30,11 @@ def completar_cvss(avisos: list[Aviso], busca_de_cvss: BuscaDeCvss) -> CvssCompl
 
 
 def cves_sem_cvss(avisos: list[Aviso]) -> list[str]:
-    cves = [aviso.cve for aviso in avisos if aviso.cve is not None and aviso.cvss is None]
-    return list(dict.fromkeys(cves))
+    cves = []
+    for aviso in avisos:
+        if aviso.cve is not None and aviso.cvss is None:
+            cves.append(aviso.cve)
+    return sem_repeticao(cves)
 
 
 def aplicar_cvss(aviso: Aviso, cvss_por_cve: dict[str, float | None]) -> Aviso:
@@ -42,6 +46,12 @@ def aplicar_cvss(aviso: Aviso, cvss_por_cve: dict[str, float | None]) -> Aviso:
     return replace(
         aviso,
         cvss=cvss,
-        fontes=[*aviso.fontes, NOME_DA_FONTE],
-        origem_dos_campos={**aviso.origem_dos_campos, "cvss": NOME_DA_FONTE},
+        fontes=aviso.fontes + [NOME_DA_FONTE],
+        origem_dos_campos=origem_com_o_cvss_do_nvd(aviso.origem_dos_campos),
     )
+
+
+def origem_com_o_cvss_do_nvd(origem_dos_campos: dict[str, str]) -> dict[str, str]:
+    origem = dict(origem_dos_campos)
+    origem["cvss"] = NOME_DA_FONTE
+    return origem

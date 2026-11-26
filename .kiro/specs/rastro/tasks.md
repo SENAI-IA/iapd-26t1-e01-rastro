@@ -762,10 +762,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @luiz.pagliari
 
-- [ ] **T84 Trocar código esperto por laço e função com nome**
+- [x] **T84 Trocar código esperto por laço e função com nome**
   - Entrega: walrus, lambdas, compreensões aninhadas, ternários encadeados e regex sem nome viram passos com nome.
   - Aceite: quem não domina Python lê cada função de cima para baixo; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/`
+  - Arquivos: `rastro/`, `tests/`, `.kiro/steering/structure.md`, `.kiro/steering/codigo-python.md`
   - Teste: os testes atuais.
   - Requisito: R19.4
   - Revisão: @cristiano.albino

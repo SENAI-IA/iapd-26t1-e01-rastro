@@ -12,6 +12,7 @@ from rastro.gravacao_segura import (
 )
 from rastro.relatorio.pagina_do_relatorio import NOME_DO_HTML, ler_modelo, montar_html
 
+ESPACOS_DE_RECUO_DO_JSON = 2
 NOME_DO_JSON = "relatorio.json"
 
 
@@ -44,7 +45,9 @@ def caminho_do_relatorio(pasta_dos_relatorios: Path, aplicacao: str, momento: da
 
 
 def gravar_relatorio(pasta_da_analise: Path, relatorio: dict[str, Any]) -> RelatorioGravado:
-    texto_do_json = json.dumps(relatorio, ensure_ascii=False, indent=2) + "\n"
+    texto_do_json = (
+        json.dumps(relatorio, ensure_ascii=False, indent=ESPACOS_DE_RECUO_DO_JSON) + "\n"
+    )
     texto_do_html = montar_html(ler_modelo(), relatorio)
     criar_pasta_da_analise(pasta_da_analise)
     arquivos_gravados = RelatorioGravado(

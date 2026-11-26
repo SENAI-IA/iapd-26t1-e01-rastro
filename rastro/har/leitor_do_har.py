@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from rastro.data_e_hora import ler_data_iso
 from rastro.har.modelos import Cookie, Requisicao
 
 MENSAGEM_HAR_INVALIDO = "o arquivo não é um HAR válido"
@@ -72,16 +73,33 @@ def pedido_e_valido(pedido: dict[str, Any]) -> bool:
 
 
 def resposta_e_valida(resposta: dict[str, Any]) -> bool:
-    return (
-        isinstance(resposta.get("status"), int)
-        and isinstance(resposta.get("content") or {}, dict)
-        and lista_de_objetos(resposta.get("headers") or [])
-        and lista_de_objetos(resposta.get("cookies") or [])
-    )
+    if not isinstance(resposta.get("status"), int):
+        return False
+    if not isinstance(campo_ou_objeto_vazio(resposta, "content"), dict):
+        return False
+    if not lista_de_objetos(campo_ou_lista_vazia(resposta, "headers")):
+        return False
+    return lista_de_objetos(campo_ou_lista_vazia(resposta, "cookies"))
+
+
+def campo_ou_objeto_vazio(objeto: dict[str, Any], campo: str) -> Any:
+    valor = objeto.get(campo)
+    if not valor:
+        return {}
+    return valor
+
+
+def campo_ou_lista_vazia(objeto: dict[str, Any], campo: str) -> Any:
+    valor = objeto.get(campo)
+    if not valor:
+        return []
+    return valor
 
 
 def lista_de_objetos(valor: Any) -> bool:
-    return isinstance(valor, list) and all(isinstance(item, dict) for item in valor)
+    if not isinstance(valor, list):
+        return False
+    return all(isinstance(item, dict) for item in valor)
 
 
 def ler_urls_das_paginas(log: dict[str, Any]) -> dict[str, str]:
@@ -110,7 +128,7 @@ def converter_entrada(
     pedido = entrada["request"]
     resposta = entrada["response"]
     cabecalhos = ler_cabecalhos(resposta)
-    conteudo_da_resposta = resposta.get("content") or {}
+    conteudo_da_resposta = campo_ou_objeto_vazio(resposta, "content")
     return Requisicao(
         indice=indice,
         url=pedido["url"],
@@ -131,7 +149,7 @@ def ler_inicio(entrada: dict[str, Any]) -> datetime | None:
     if not isinstance(inicio, str):
         return None
     try:
-        return datetime.fromisoformat(inicio.replace("Z", "+00:00"))
+        return ler_data_iso(inicio)
     except ValueError:
         return None
 
@@ -157,7 +175,7 @@ def ler_cabecalhos(resposta: dict[str, Any]) -> dict[str, str]:
 
 def pares_de_cabecalho(resposta: dict[str, Any]) -> list[tuple[str, str]]:
     pares = []
-    for cabecalho in resposta.get("headers") or []:
+    for cabecalho in campo_ou_lista_vazia(resposta, "headers"):
         nome = str(cabecalho.get("name", "")).strip().lower()
         valor = str(cabecalho.get("value", ""))
         pares.append((nome, valor))
@@ -167,9 +185,21 @@ def pares_de_cabecalho(resposta: dict[str, Any]) -> list[tuple[str, str]]:
 def ler_tipo_de_conteudo(
     conteudo_da_resposta: dict[str, Any], cabecalhos: dict[str, str]
 ) -> str | None:
-    tipo = conteudo_da_resposta.get("mimeType") or cabecalhos.get("content-type") or ""
+    tipo = tipo_informado(conteudo_da_resposta, cabecalhos)
     tipo_sem_parametros = str(tipo).split(";")[0].strip().lower()
-    return tipo_sem_parametros or None
+    if not tipo_sem_parametros:
+        return None
+    return tipo_sem_parametros
+
+
+def tipo_informado(conteudo_da_resposta: dict[str, Any], cabecalhos: dict[str, str]) -> Any:
+    tipo_no_conteudo = conteudo_da_resposta.get("mimeType")
+    if tipo_no_conteudo:
+        return tipo_no_conteudo
+    tipo_no_cabecalho = cabecalhos.get("content-type")
+    if tipo_no_cabecalho:
+        return tipo_no_cabecalho
+    return ""
 
 
 def ler_conteudo(conteudo_da_resposta: dict[str, Any]) -> str | None:
@@ -190,7 +220,7 @@ def decodificar_base64(texto: str) -> str | None:
 
 
 def ler_cookies(resposta: dict[str, Any]) -> list[Cookie]:
-    cookies_do_har = resposta.get("cookies") or []
+    cookies_do_har = campo_ou_lista_vazia(resposta, "cookies")
     if cookies_do_har:
         return [converter_cookie_do_har(cookie) for cookie in cookies_do_har]
     cookies = []
@@ -207,8 +237,14 @@ def converter_cookie_do_har(cookie: dict[str, Any]) -> Cookie:
         nome=str(cookie.get("name", "")),
         http_only=bool(cookie.get("httpOnly", False)),
         secure=bool(cookie.get("secure", False)),
-        same_site=same_site if isinstance(same_site, str) and same_site else None,
+        same_site=texto_ou_nada(same_site),
     )
+
+
+def texto_ou_nada(valor: Any) -> str | None:
+    if isinstance(valor, str) and valor:
+        return valor
+    return None
 
 
 def linhas_de_set_cookie(resposta: dict[str, Any]) -> list[str]:
@@ -220,7 +256,9 @@ def linhas_de_set_cookie(resposta: dict[str, Any]) -> list[str]:
 
 
 def interpretar_set_cookie(linha: str) -> Cookie | None:
-    nome_e_valor, *atributos = linha.split(";")
+    partes = linha.split(";")
+    nome_e_valor = partes[0]
+    atributos = partes[1:]
     nome = nome_e_valor.split("=", 1)[0].strip()
     if not nome:
         return None

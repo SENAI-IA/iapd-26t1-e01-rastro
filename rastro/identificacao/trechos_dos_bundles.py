@@ -6,10 +6,27 @@ from rastro.identificacao.assinaturas import requisicao_e_script
 from rastro.identificacao.modelos import Biblioteca
 
 TAMANHO_MINIMO_DO_BUNDLE_EM_KILOBYTES = 30
+BYTES_POR_KILOBYTE = 1024
 TAMANHO_DA_JANELA = 300
 MAXIMO_DE_TRECHOS_POR_BUNDLE = 5
-COMENTARIO_DE_LICENCA = re.compile(r"/\*!(.*?)\*/", re.DOTALL)
-VERSAO_ENTRE_ASPAS = re.compile(r"""["'`]v?\d+\.\d+\.\d+(?:-[\w.]+)?["'`]""")
+COMENTARIO_DE_LICENCA = re.compile(
+    r"""
+    /\*!
+    (?P<texto> .*? )
+    \*/
+    """,
+    re.VERBOSE | re.DOTALL,
+)
+VERSAO_ENTRE_ASPAS = re.compile(
+    r"""
+    ["'`]
+    v?
+    \d+ \. \d+ \. \d+
+    (?: - [\w.]+ )?
+    ["'`]
+    """,
+    re.VERBOSE,
+)
 
 
 @dataclass(frozen=True)
@@ -25,9 +42,9 @@ def escolher_bundles(
     bundles: list[Bundle] = []
     conteudos_vistos: set[str] = set()
     for requisicao in requisicoes:
-        if requisicao.indice in com_assinatura or not requisicao_e_bundle(requisicao):
+        if not bundle_sem_assinatura(requisicao, com_assinatura):
             continue
-        conteudo = requisicao.conteudo or ""
+        conteudo = conteudo_da_requisicao(requisicao)
         if conteudo in conteudos_vistos:
             continue
         conteudos_vistos.add(conteudo)
@@ -36,18 +53,30 @@ def escolher_bundles(
 
 
 def indices_com_assinatura(bibliotecas: list[Biblioteca]) -> set[int]:
-    return {
-        evidencia.indice_requisicao
-        for biblioteca in bibliotecas
-        for evidencia in biblioteca.evidencias
-    }
+    indices = set()
+    for biblioteca in bibliotecas:
+        for evidencia in biblioteca.evidencias:
+            indices.add(evidencia.indice_requisicao)
+    return indices
+
+
+def bundle_sem_assinatura(requisicao: Requisicao, indices_com_assinatura: set[int]) -> bool:
+    if requisicao.indice in indices_com_assinatura:
+        return False
+    return requisicao_e_bundle(requisicao)
+
+
+def conteudo_da_requisicao(requisicao: Requisicao) -> str:
+    if requisicao.conteudo is None:
+        return ""
+    return requisicao.conteudo
 
 
 def requisicao_e_bundle(requisicao: Requisicao) -> bool:
     if not requisicao_e_script(requisicao) or requisicao.conteudo is None:
         return False
     tamanho_em_bytes = len(requisicao.conteudo.encode("utf-8"))
-    return tamanho_em_bytes > TAMANHO_MINIMO_DO_BUNDLE_EM_KILOBYTES * 1024
+    return tamanho_em_bytes > TAMANHO_MINIMO_DO_BUNDLE_EM_KILOBYTES * BYTES_POR_KILOBYTE
 
 
 def extrair_trechos(conteudo: str) -> list[str]:
@@ -61,8 +90,8 @@ def extrair_trechos(conteudo: str) -> list[str]:
 def comentarios_de_licenca(conteudo: str) -> list[str]:
     comentarios = []
     for encontrado in COMENTARIO_DE_LICENCA.finditer(conteudo):
-        if encontrado.group(1).strip():
-            comentarios.append(encontrado.group(0)[:TAMANHO_DA_JANELA])
+        if encontrado.group("texto").strip():
+            comentarios.append(encontrado.group()[:TAMANHO_DA_JANELA])
     return comentarios
 
 

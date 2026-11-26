@@ -3,6 +3,7 @@ import shlex
 import sys
 from pathlib import Path
 
+PERMISSAO_DE_LER_E_EXECUTAR = 0o755
 MARCA_DO_ATALHO = "Criado por `rastro instalar`. Para remover: rastro desinstalar"
 TEXTO_PROJETO_NAO_ENCONTRADO = (
     "rode o instalar de dentro da pasta do projeto: python3 -m rastro instalar "
@@ -71,7 +72,7 @@ def gravar_atalho(caminho: Path, texto: str, codificacao: str) -> None:
     caminho.parent.mkdir(parents=True, exist_ok=True)
     with caminho.open("w", encoding=codificacao, newline="") as arquivo:
         arquivo.write(texto)
-    caminho.chmod(0o755)
+    caminho.chmod(PERMISSAO_DE_LER_E_EXECUTAR)
 
 
 def remover_atalho(caminho: Path) -> Path | None:

@@ -28,6 +28,8 @@ rastro/
   modelos_da_analise.py    a Analise: o resultado completo que o fluxo entrega ao relatório
   versao_semver.py         lê e compara versões e faixas semver (usado por travas/, fontes/ e acao/)
   gravacao_segura.py       grava sem sobrescrever: pasta nova, arquivo novo e nome de pasta seguro no Windows
+  listas.py                sem_repeticao: tira os repetidos de uma lista mantendo a ordem
+  data_e_hora.py           ler_data_iso: lê data e hora ISO 8601 (usado pelo HAR e pelo pentest)
   andamento.py             interface que o fluxo usa para avisar a etapa e os itens
   terminal/                cores.py (liga as cores do terminal), formatacao.py (tempo, corte e destaque do texto),
                            linha_ao_vivo.py (a linha que se redesenha com o giro), andamento_no_terminal.py (etapas da análise)
@@ -86,7 +88,7 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 
 ## Onde colocar algo novo
 
-- **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` e `achados_da_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade e `valor_para_ordem_decrescente` em `risco/prioridade.py`).
+- **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `listas.py`, `data_e_hora.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` e `achados_da_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade e `valor_para_ordem_decrescente` em `risco/prioridade.py`).
 - **Checagem nova:** a `RegraDeChecagem` em `configuracao/regras_das_checagens.py`; o teste que diz se uma resposta ou um cookie falha em `configuracao/falhas_nos_cabecalhos.py` ou `configuracao/falhas_nos_cookies.py`; uma função `checar_*` em `configuracao/checagens.py` (e na tupla `CHECAGENS`), que usa o mecanismo de `configuracao/avaliacao_do_site.py`; os testes de cada uma; e o que fazer e o impacto dela em `acao/correcoes_das_checagens.py`.
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
 - **IA nova:** um arquivo em `ia/provedores/` (que roda a CLI com `execucao_da_cli.py`) e o nome em `EXECUTAVEIS_DAS_IAS` (`ia/escolha_da_ia.py`).

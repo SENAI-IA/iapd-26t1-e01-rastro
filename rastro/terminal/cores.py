@@ -25,6 +25,11 @@ def ativar_sequencias_no_console_do_windows() -> bool:
         modo = ctypes.c_uint32()
         if not kernel32.GetConsoleMode(console, ctypes.byref(modo)):
             return False
-        return bool(kernel32.SetConsoleMode(console, modo.value | PROCESSAR_SEQUENCIAS_DO_TERMINAL))
+        novo_modo = modo_com_sequencias_do_terminal(modo.value)
+        return bool(kernel32.SetConsoleMode(console, novo_modo))
     except (AttributeError, OSError):
         return False
+
+
+def modo_com_sequencias_do_terminal(modo_atual: int) -> int:
+    return modo_atual | PROCESSAR_SEQUENCIAS_DO_TERMINAL

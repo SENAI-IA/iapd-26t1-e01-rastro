@@ -8,9 +8,10 @@ TEMPO_LIMITE_EM_SEGUNDOS = 120
 def executar_cli_da_ia(
     executavel: str, argumentos: list[str], prompt: str, nome_exibido: str
 ) -> str:
+    comando = [executavel] + argumentos
     try:
         processo = subprocess.run(
-            [executavel, *argumentos],
+            comando,
             input=prompt,
             capture_output=True,
             encoding="utf-8",

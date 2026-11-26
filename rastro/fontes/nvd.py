@@ -16,7 +16,11 @@ class Nvd:
 
     def buscar_cvss(self, cve: str) -> float | None:
         resposta = self.baixar_cve(cve)
-        return ler_resposta(lambda: ler_cvss(resposta), NOME_DA_FONTE)
+
+        def ler_o_cvss() -> float | None:
+            return ler_cvss(resposta)
+
+        return ler_resposta(ler_o_cvss, NOME_DA_FONTE)
 
     def baixar_cve(self, cve: str) -> Any:
         return baixar_json(montar_requisicao(cve, self.chave), NOME_DA_FONTE)
@@ -34,9 +38,11 @@ def ler_cvss(resposta: Any) -> float | None:
     vulnerabilidades = resposta["vulnerabilities"]
     if not vulnerabilidades:
         return None
-    metricas = vulnerabilidades[0]["cve"].get("metrics") or {}
+    metricas = vulnerabilidades[0]["cve"].get("metrics")
+    if not metricas:
+        return None
     for versao_do_cvss in METRICAS_NA_ORDEM:
-        medicoes = metricas.get(versao_do_cvss) or []
+        medicoes = metricas.get(versao_do_cvss)
         if medicoes:
             return float(medicao_principal(medicoes)["cvssData"]["baseScore"])
     return None

@@ -15,11 +15,10 @@ PREFIXO_DO_SHA512 = "sha512-"
 
 
 def conferir_integridade(dados: bytes, integridade: str) -> None:
-    esperados = [
-        parte.removeprefix(PREFIXO_DO_SHA512)
-        for parte in integridade.split()
-        if parte.startswith(PREFIXO_DO_SHA512)
-    ]
+    esperados = []
+    for parte in integridade.split():
+        if parte.startswith(PREFIXO_DO_SHA512):
+            esperados.append(parte.removeprefix(PREFIXO_DO_SHA512))
     if not esperados:
         raise ConsultaNaoRealizada(f"pacote sem integridade sha512 no {NOME_DO_REGISTRO}")
     calculado = base64.b64encode(hashlib.sha512(dados).digest()).decode("ascii")
@@ -53,9 +52,16 @@ def membro_e_arquivo_de_codigo(membro: tarfile.TarInfo) -> bool:
     return membro.isfile() and membro.name.endswith(EXTENSOES_DE_CODIGO)
 
 
+def tamanho_somado(membros: list[tarfile.TarInfo]) -> int:
+    total = 0
+    for membro in membros:
+        total += membro.size
+    return total
+
+
 def conferir_tamanho_desempacotado(membros: list[tarfile.TarInfo]) -> None:
     limite = LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MEGABYTES * MEGABYTE
-    if sum(membro.size for membro in membros) > limite:
+    if tamanho_somado(membros) > limite:
         raise ConsultaNaoRealizada(
             f"código do pacote acima de {LIMITE_DO_CODIGO_DESEMPACOTADO_EM_MEGABYTES} MB "
             "desempacotado"

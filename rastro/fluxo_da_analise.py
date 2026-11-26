@@ -44,15 +44,14 @@ def analisar(
 ) -> Analise:
     inicio = datetime.now()
     inicio_do_cronometro = time.perf_counter()
-    andamento.comecar_analise(ETAPAS_SEM_IA if cliente_de_ia is None else ETAPAS_COM_IA)
+    andamento.comecar_analise(numero_de_etapas(cliente_de_ia))
 
     andamento.iniciar_etapa(ETAPA_LER_O_HAR)
     requisicoes = ler_har(caminho_har)
     site = descobrir_site_analisado(requisicoes)
     andamento.iniciar_etapa(ETAPA_RECONHECER)
     bibliotecas_por_assinatura = identificar_por_assinatura(requisicoes)
-    if cliente_de_ia is not None:
-        andamento.iniciar_etapa(ETAPA_BUNDLES)
+    iniciar_etapa_da_ia(andamento, cliente_de_ia, ETAPA_BUNDLES)
     resultado_dos_bundles = identificar_em_bundles(
         requisicoes, bibliotecas_por_assinatura, cliente_de_ia, andamento
     )
@@ -66,8 +65,7 @@ def analisar(
     )
     avisos_na_faixa, travas_da_faixa = conferir_faixas(consulta_de_avisos.avisos)
     achados = calcular_risco(avisos_na_faixa)
-    if cliente_de_ia is not None:
-        andamento.iniciar_etapa(ETAPA_EXPLICAR)
+    iniciar_etapa_da_ia(andamento, cliente_de_ia, ETAPA_EXPLICAR)
     resultado_das_explicacoes = explicar_achados(achados, cliente_de_ia, andamento)
     andamento.iniciar_etapa(ETAPA_PLANO)
     checagens = checar_configuracao(requisicoes, site, gravado_pelo_rastro)
@@ -97,6 +95,19 @@ def analisar(
         chamadas_de_ia=chamadas_feitas(cliente_de_ia),
         visita=montar_visita(requisicoes),
     )
+
+
+def numero_de_etapas(cliente_de_ia: ClienteDeIA | None) -> int:
+    if cliente_de_ia is None:
+        return ETAPAS_SEM_IA
+    return ETAPAS_COM_IA
+
+
+def iniciar_etapa_da_ia(
+    andamento: Andamento, cliente_de_ia: ClienteDeIA | None, etapa: str
+) -> None:
+    if cliente_de_ia is not None:
+        andamento.iniciar_etapa(etapa)
 
 
 def nome_do_provedor(cliente_de_ia: ClienteDeIA | None) -> str | None:

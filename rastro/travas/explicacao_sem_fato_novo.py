@@ -3,17 +3,53 @@ import re
 from rastro.travas.modelos import TravaAcionada
 
 NOME_DA_TRAVA = "explicação sem fato novo"
-PADRAO_DO_CVE = re.compile(r"\bCVE-\d{4}-\d{4,}\b", re.IGNORECASE)
-PADRAO_DO_GHSA = re.compile(r"\bGHSA(?:-[0-9a-z]{4}){3}\b", re.IGNORECASE)
-PADRAO_DA_PORCENTAGEM = re.compile(r"(?<![\d.,])\d+(?:[.,]\d+)?\s?%")
-SEM_PORCENTAGEM_DEPOIS = r"(?!\d|\s?%)"
+PADRAO_DO_CVE = re.compile(
+    r"""
+    \b CVE
+    - \d{4}
+    - \d{4,}
+    \b
+    """,
+    re.VERBOSE | re.IGNORECASE,
+)
+PADRAO_DO_GHSA = re.compile(
+    r"""
+    \b GHSA
+    (?: - [0-9a-z]{4} ){3}
+    \b
+    """,
+    re.VERBOSE | re.IGNORECASE,
+)
+PADRAO_DA_PORCENTAGEM = re.compile(
+    r"""
+    (?<! [\d.,] )
+    \d+
+    (?: [.,] \d+ )?
+    \s? %
+    """,
+    re.VERBOSE,
+)
+SEM_PORCENTAGEM_DEPOIS = r"(?! \d | \s? % )"
 PADRAO_DA_VERSAO = re.compile(
-    r"(?<![\d.])\d+(?:\.\d+)+(?:-[A-Za-z][0-9A-Za-z]*(?:\.[0-9A-Za-z]+)*)?"
-    + SEM_PORCENTAGEM_DEPOIS
+    r"""
+    (?<! [\d.] )
+    \d+
+    (?: \. \d+ )+
+    (?: - [A-Za-z] [0-9A-Za-z]* (?: \. [0-9A-Za-z]+ )* )?
+    """
+    + SEM_PORCENTAGEM_DEPOIS,
+    re.VERBOSE,
 )
 PADRAO_DO_DECIMAL_COM_VIRGULA = re.compile(
-    r"(?<![\d.,])\d+,\d+(?!,\d)" + SEM_PORCENTAGEM_DEPOIS
+    r"""
+    (?<! [\d.,] )
+    \d+ , \d+
+    (?! , \d )
+    """
+    + SEM_PORCENTAGEM_DEPOIS,
+    re.VERBOSE,
 )
+ESPACO = re.compile(r"\s")
 PADROES_DE_FATO = (
     PADRAO_DO_CVE,
     PADRAO_DO_GHSA,
@@ -49,9 +85,15 @@ def extrair_fatos(texto: str) -> list[str]:
     encontrados: list[re.Match[str]] = []
     for padrao in PADROES_DE_FATO:
         encontrados.extend(padrao.finditer(texto))
-    encontrados.sort(key=lambda encontrado: encontrado.start())
+    encontrados.sort(key=posicao_no_texto)
     return [encontrado.group() for encontrado in encontrados]
 
 
+def posicao_no_texto(encontrado: re.Match[str]) -> int:
+    return encontrado.start()
+
+
 def normalizar(fato: str) -> str:
-    return re.sub(r"\s", "", fato).replace(",", ".").upper()
+    sem_espacos = ESPACO.sub("", fato)
+    com_ponto_decimal = sem_espacos.replace(",", ".")
+    return com_ponto_decimal.upper()

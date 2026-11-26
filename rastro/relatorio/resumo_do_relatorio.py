@@ -36,10 +36,18 @@ def chaves_das_bibliotecas_com_achados(achados: list[Achado]) -> set[str]:
 
 
 def contar_checagens(analise: Analise, situacao: SituacaoDaChecagem) -> int:
-    return sum(1 for checagem in analise.checagens if checagem.situacao == situacao)
+    quantidade = 0
+    for checagem in analise.checagens:
+        if checagem.situacao == situacao:
+            quantidade += 1
+    return quantidade
 
 
 def encontradas_so_pela_ia(analise: Analise) -> int | None:
     if analise.provedor_de_ia is None:
         return None
-    return sum(1 for biblioteca in analise.bibliotecas if biblioteca.metodo == "ia")
+    quantidade = 0
+    for biblioteca in analise.bibliotecas:
+        if biblioteca.metodo == "ia":
+            quantidade += 1
+    return quantidade

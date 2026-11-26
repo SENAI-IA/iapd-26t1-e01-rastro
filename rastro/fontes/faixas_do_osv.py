@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 EventoSemver = dict[str, str]
 INICIO_DE_TODAS_AS_VERSOES = "0"
+CONDICAO_DE_TODAS_AS_VERSOES = ">= 0"
 
 
 @dataclass(frozen=True)
@@ -20,7 +21,7 @@ def faixas_dos_eventos_semver(eventos: list[EventoSemver]) -> list[FaixaSemver]:
             faixas.append(faixa_fechada(inicio, evento))
             inicio = None
     if inicio is not None:
-        faixas.append(FaixaSemver(condicao_de_inicio(inicio) or ">= 0", None))
+        faixas.append(FaixaSemver(faixa_aberta(inicio), None))
     return faixas
 
 
@@ -30,11 +31,24 @@ def fecha_a_faixa(evento: EventoSemver) -> bool:
 
 def faixa_fechada(inicio: str, evento: EventoSemver) -> FaixaSemver:
     if "fixed" in evento:
-        fim, versao_corrigida = f"< {evento['fixed']}", evento["fixed"]
+        fim = f"< {evento['fixed']}"
+        versao_corrigida: str | None = evento["fixed"]
     else:
-        fim, versao_corrigida = f"<= {evento['last_affected']}", None
-    condicoes = [condicao for condicao in (condicao_de_inicio(inicio), fim) if condicao]
+        fim = f"<= {evento['last_affected']}"
+        versao_corrigida = None
+    condicoes = []
+    inicio_da_faixa = condicao_de_inicio(inicio)
+    if inicio_da_faixa:
+        condicoes.append(inicio_da_faixa)
+    condicoes.append(fim)
     return FaixaSemver(", ".join(condicoes), versao_corrigida)
+
+
+def faixa_aberta(inicio: str) -> str:
+    inicio_da_faixa = condicao_de_inicio(inicio)
+    if not inicio_da_faixa:
+        return CONDICAO_DE_TODAS_AS_VERSOES
+    return inicio_da_faixa
 
 
 def condicao_de_inicio(inicio: str) -> str:

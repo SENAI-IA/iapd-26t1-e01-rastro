@@ -18,11 +18,9 @@ def conferir_codigo_publicado(
     except ConsultaNaoRealizada as erro:
         motivo = f"não foi possível ler o código publicado no npm: {erro.motivo}"
         return barrar_codigo_que_nao_confere(biblioteca, [motivo])
-    motivos = [
-        motivo
-        for evidencia in biblioteca.evidencias
-        for motivo in conferir_evidencia_no_codigo_publicado(biblioteca, evidencia, codigos)
-    ]
+    motivos = []
+    for evidencia in biblioteca.evidencias:
+        motivos.extend(conferir_evidencia_no_codigo_publicado(biblioteca, evidencia, codigos))
     if not biblioteca.evidencias:
         motivos.append("a IA não citou trecho")
     if not motivos:
@@ -39,12 +37,14 @@ def conferir_evidencia_no_codigo_publicado(
             f"o trecho de {evidencia.url} não tem a versão {biblioteca.versao} "
             "e outra string que identifique o pacote"
         ]
-    return [
-        f"a string `{valor}` do trecho de {evidencia.url} não aparece no código publicado "
-        f"de {nome_com_versao(biblioteca)}"
-        for valor in strings
-        if not string_esta_no_codigo(valor, codigos)
-    ]
+    motivos = []
+    for valor in strings:
+        if not string_esta_no_codigo(valor, codigos):
+            motivos.append(
+                f"a string `{valor}` do trecho de {evidencia.url} não aparece no código "
+                f"publicado de {nome_com_versao(biblioteca)}"
+            )
+    return motivos
 
 
 def trecho_prova_o_pacote(strings: list[str], versao: str) -> bool:
@@ -54,13 +54,18 @@ def trecho_prova_o_pacote(strings: list[str], versao: str) -> bool:
 
 
 def tem_texto_alem_da_versao(valor: str, versao: str) -> bool:
-    letras_e_numeros = [caractere for caractere in valor.replace(versao, "") if caractere.isalnum()]
+    sem_a_versao = valor.replace(versao, "")
+    letras_e_numeros = [caractere for caractere in sem_a_versao if caractere.isalnum()]
     return len(letras_e_numeros) >= MINIMO_DE_CARACTERES_ALEM_DA_VERSAO
 
 
 def string_esta_no_codigo(valor: str, codigos: list[str]) -> bool:
     formas = formas_escritas(valor)
-    return any(forma in codigo for codigo in codigos for forma in formas)
+    return any(alguma_forma_no_codigo(formas, codigo) for codigo in codigos)
+
+
+def alguma_forma_no_codigo(formas: list[str], codigo: str) -> bool:
+    return any(forma in codigo for forma in formas)
 
 
 def barrar_codigo_que_nao_confere(

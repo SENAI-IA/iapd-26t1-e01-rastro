@@ -23,8 +23,10 @@ from rastro.ia.provedor import ProvedorDeIA
 from rastro.ia.provedores.claude import ProvedorClaude
 from rastro.ia.provedores.codex import ProvedorCodex
 from rastro.ia.provedores.kiro import ProvedorKiro
+from rastro.modelos_da_analise import Analise
 from rastro.pentest.erros import ErroNoPentest
 from rastro.pentest.execucao_do_pentest import carregar_resultado_do_pentest
+from rastro.pentest.modelos import ResultadoDoPentest
 from rastro.relatorio.gravacao_do_relatorio import (
     RelatorioJaExiste,
     caminho_do_relatorio,
@@ -96,33 +98,52 @@ def analisar_e_gravar(
     gravado_pelo_rastro: bool = False,
 ) -> int:
     try:
-        pentest = (
-            carregar_resultado_do_pentest(caminho_pentest, caminho_har) if caminho_pentest else None
-        )
-        with LinhaAoVivo() as linha:
-            andamento = AndamentoNoTerminal(linha)
-            analise = analisar(
-                caminho_har,
-                GitHubAdvisory(),
-                RegistroNpm(),
-                cliente_de_ia,
-                Osv(),
-                Nvd(),
-                gravado_pelo_rastro=gravado_pelo_rastro,
-                andamento=andamento,
-            )
-            andamento.terminar()
+        pentest = carregar_pentest_pedido(caminho_pentest, caminho_har)
+        analise = analisar_mostrando_o_andamento(caminho_har, cliente_de_ia, gravado_pelo_rastro)
     except (ErroAoLerHar, ErroNoPentest) as erro:
         return encerrar_com_erro(str(erro))
     relatorio = montar_relatorio(analise, pentest)
     aplicacao = nome_da_aplicacao(analise.site, caminho_har)
-    pasta = caminho_do_relatorio(pasta_de_saida or pasta_padrao(), aplicacao, analise.inicio)
+    pasta = caminho_do_relatorio(pasta_escolhida(pasta_de_saida), aplicacao, analise.inicio)
     try:
         arquivos_gravados = gravar_relatorio(pasta, relatorio)
     except RelatorioJaExiste as erro:
         return encerrar_com_erro(str(erro))
     mostrar_resultado(pasta, arquivos_gravados, relatorio, abrir_no_navegador)
     return 0
+
+
+def carregar_pentest_pedido(
+    caminho_pentest: Path | None, caminho_har: Path
+) -> ResultadoDoPentest | None:
+    if not caminho_pentest:
+        return None
+    return carregar_resultado_do_pentest(caminho_pentest, caminho_har)
+
+
+def analisar_mostrando_o_andamento(
+    caminho_har: Path, cliente_de_ia: ClienteDeIA | None, gravado_pelo_rastro: bool
+) -> Analise:
+    with LinhaAoVivo() as linha:
+        andamento = AndamentoNoTerminal(linha)
+        analise = analisar(
+            caminho_har,
+            GitHubAdvisory(),
+            RegistroNpm(),
+            cliente_de_ia,
+            Osv(),
+            Nvd(),
+            gravado_pelo_rastro=gravado_pelo_rastro,
+            andamento=andamento,
+        )
+        andamento.terminar()
+    return analise
+
+
+def pasta_escolhida(pasta_de_saida: Path | None) -> Path:
+    if pasta_de_saida is None:
+        return pasta_padrao()
+    return pasta_de_saida
 
 
 def avisar_analise_com_ia(cliente_de_ia: ClienteDeIA) -> None:

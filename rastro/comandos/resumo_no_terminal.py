@@ -7,6 +7,7 @@ from rastro.relatorio.gravacao_do_relatorio import RelatorioGravado
 from rastro.risco.nota import escrever_nota
 from rastro.risco.prioridade import PRIORIDADES, ROTULO_DA_PRIORIDADE
 
+PREFIXO_DA_FALHA_DA_IA = "ia_falhou_"
 AVISO_SEM_IA = (
     "Atenção: análise sem IA. Bibliotecas em bundles não foram procuradas; "
     "podem existir falhas que não aparecem aqui."
@@ -39,7 +40,11 @@ def mostrar_resultado(
 
 def falhas_da_ia(relatorio: dict[str, Any]) -> list[str]:
     limitacoes = relatorio["analise"]["limitacoes"]
-    return [item["texto"] for item in limitacoes if item["id"].startswith("ia_falhou_")]
+    return [item["texto"] for item in limitacoes if limitacao_de_falha_da_ia(item)]
+
+
+def limitacao_de_falha_da_ia(limitacao: dict[str, str]) -> bool:
+    return limitacao["id"].startswith(PREFIXO_DA_FALHA_DA_IA)
 
 
 def resumo_de_uma_linha(relatorio: dict[str, Any]) -> str:

@@ -1,10 +1,13 @@
 import threading
+import time
 
 from rastro.captura.espera_da_gravacao import (
     PedidoDeParada,
     esperar_a_janela_fechar,
     esperar_o_enter,
 )
+
+ESPERA_REAL_DE_CADA_FATIA_EM_SEGUNDOS = 0.001
 
 
 class SessaoQueFechaSozinha:
@@ -28,6 +31,12 @@ class SessaoQueFechaSozinha:
 
     def esperar(self, segundos: float) -> None:
         self.fatias_esperadas += 1
+
+
+class SessaoQueEsperaUmPoucoDeVerdade(SessaoQueFechaSozinha):
+    def esperar(self, segundos: float) -> None:
+        super().esperar(segundos)
+        time.sleep(ESPERA_REAL_DE_CADA_FATIA_EM_SEGUNDOS)
 
 
 def test_r24_7_espera_ate_a_janela_fechar() -> None:
@@ -58,7 +67,7 @@ def test_r24_7_pedido_de_parada_guarda_o_primeiro_motivo() -> None:
 
 
 def test_r24_10_enter_libera_o_robo() -> None:
-    sessao = SessaoQueFechaSozinha(fatias_ate_fechar=10_000)
+    sessao = SessaoQueEsperaUmPoucoDeVerdade(fatias_ate_fechar=10_000)
 
     assert esperar_o_enter(sessao, PedidoDeParada(), lambda: "")
 
@@ -67,7 +76,7 @@ def test_r24_10_sem_terminal_conta_como_enter() -> None:
     def fim_da_entrada() -> str:
         raise EOFError
 
-    sessao = SessaoQueFechaSozinha(fatias_ate_fechar=10_000)
+    sessao = SessaoQueEsperaUmPoucoDeVerdade(fatias_ate_fechar=10_000)
 
     assert esperar_o_enter(sessao, PedidoDeParada(), fim_da_entrada)
 

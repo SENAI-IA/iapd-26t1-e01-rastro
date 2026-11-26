@@ -17,7 +17,11 @@ FAIXA_SEM_SEMVER = FaixaSemver("", None)
 class Osv:
     def consultar(self, pacote: str, versao: str) -> list[Aviso]:
         resposta = self.baixar_avisos(pacote, versao)
-        return ler_resposta(lambda: converter_resposta(resposta, pacote), NOME_DA_FONTE)
+
+        def converter_os_avisos() -> list[Aviso]:
+            return converter_resposta(resposta, pacote)
+
+        return ler_resposta(converter_os_avisos, NOME_DA_FONTE)
 
     def baixar_avisos(self, pacote: str, versao: str) -> Any:
         requisicao = montar_requisicao(pacote, versao)
@@ -54,7 +58,14 @@ def faixas_do_pacote(aviso_da_fonte: Any, pacote: str) -> list[FaixaSemver]:
     faixas = []
     for afetado in aviso_da_fonte.get("affected") or []:
         if pacote_e_o_npm_procurado(afetado["package"], pacote):
-            faixas.extend(faixas_semver(afetado) or [FAIXA_SEM_SEMVER])
+            faixas.extend(faixas_semver_ou_sem_faixa(afetado))
+    return faixas
+
+
+def faixas_semver_ou_sem_faixa(afetado: Any) -> list[FaixaSemver]:
+    faixas = faixas_semver(afetado)
+    if not faixas:
+        return [FAIXA_SEM_SEMVER]
     return faixas
 
 
@@ -67,14 +78,14 @@ def faixas_semver(afetado: Any) -> list[FaixaSemver]:
 
 
 def converter_aviso(aviso_da_fonte: Any, faixa: FaixaSemver) -> Aviso:
-    identificadores = [aviso_da_fonte["id"], *(aviso_da_fonte.get("aliases") or [])]
+    identificadores = identificadores_do_aviso(aviso_da_fonte)
     principal = identificador_principal(identificadores)
     aviso = Aviso(
         fontes=[NOME_DA_FONTE],
-        apelidos=[identificador for identificador in identificadores if identificador != principal],
+        apelidos=identificadores_menos(identificadores, principal),
         ghsa=principal,
         cve=primeiro_com_prefixo(identificadores, "CVE-"),
-        resumo=aviso_da_fonte.get("summary") or aviso_da_fonte["details"],
+        resumo=resumo_do_aviso(aviso_da_fonte),
         cvss=None,
         percentil_epss=None,
         versoes_afetadas=faixa.faixa,
@@ -82,6 +93,25 @@ def converter_aviso(aviso_da_fonte: Any, faixa: FaixaSemver) -> Aviso:
         link=f"{ENDERECO_DO_AVISO}{aviso_da_fonte['id']}",
     )
     return marcar_origem(aviso, NOME_DA_FONTE)
+
+
+def identificadores_do_aviso(aviso_da_fonte: Any) -> list[str]:
+    identificadores = [aviso_da_fonte["id"]]
+    apelidos = aviso_da_fonte.get("aliases")
+    if apelidos:
+        identificadores.extend(apelidos)
+    return identificadores
+
+
+def identificadores_menos(identificadores: list[str], retirado: str) -> list[str]:
+    return [identificador for identificador in identificadores if identificador != retirado]
+
+
+def resumo_do_aviso(aviso_da_fonte: Any) -> Any:
+    resumo = aviso_da_fonte.get("summary")
+    if resumo:
+        return resumo
+    return aviso_da_fonte["details"]
 
 
 def identificador_principal(identificadores: list[str]) -> str:

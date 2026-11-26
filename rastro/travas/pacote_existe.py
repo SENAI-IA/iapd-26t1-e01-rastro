@@ -36,6 +36,6 @@ def barrar_pacote_inexistente(
     barrada = replace(
         biblioteca,
         situacao="a_confirmar",
-        travas_que_falharam=[*biblioteca.travas_que_falharam, TRAVA_PACOTE_EXISTE],
+        travas_que_falharam=biblioteca.travas_que_falharam + [TRAVA_PACOTE_EXISTE],
     )
     return barrada, TravaAcionada(TRAVA_PACOTE_EXISTE, nome_com_versao(biblioteca), motivo)

@@ -32,11 +32,11 @@ def descartar_fora_da_faixa(
         else:
             motivos_por_aviso.setdefault(aviso.ghsa, []).append(motivo)
     avisos_mantidos = {aviso.ghsa for aviso in mantidos}
-    travas_acionadas = [
-        TravaAcionada(NOME_DA_TRAVA, f"{ghsa} em {pacote}@{versao}", "; ".join(motivos))
-        for ghsa, motivos in motivos_por_aviso.items()
-        if ghsa not in avisos_mantidos
-    ]
+    travas_acionadas = []
+    for ghsa, motivos in motivos_por_aviso.items():
+        if ghsa not in avisos_mantidos:
+            alvo = f"{ghsa} em {pacote}@{versao}"
+            travas_acionadas.append(TravaAcionada(NOME_DA_TRAVA, alvo, "; ".join(motivos)))
     return mantidos, travas_acionadas
 
 

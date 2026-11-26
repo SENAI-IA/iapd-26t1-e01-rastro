@@ -8,6 +8,7 @@ from urllib.request import Request, urlopen
 from rastro.fontes.conector import ConsultaNaoRealizada
 
 TEMPO_LIMITE_EM_SEGUNDOS = 15
+PRIMEIRO_CODIGO_DE_ERRO_DO_SERVIDOR = 500
 CODIGOS_DE_LIMITE_DE_CONSULTAS = (403, 429)
 ERROS_DE_FORMATO = (KeyError, TypeError, ValueError, AttributeError)
 ERROS_DE_CONEXAO = (URLError, TimeoutError, HTTPException, OSError)
@@ -63,7 +64,7 @@ def motivo_do_erro_http(
 ) -> str:
     if codigo in codigos_de_limite:
         return f"limite de consultas do {nome_da_fonte} atingido (HTTP {codigo})"
-    if codigo >= 500:
+    if codigo >= PRIMEIRO_CODIGO_DE_ERRO_DO_SERVIDOR:
         return f"erro no servidor do {nome_da_fonte} (HTTP {codigo})"
     recusa = motivo_da_recusa or f"o {nome_da_fonte} recusou a consulta"
     return f"{recusa} (HTTP {codigo})"

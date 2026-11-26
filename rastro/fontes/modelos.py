@@ -42,5 +42,15 @@ class AvisosDaBiblioteca:
 
 
 def marcar_origem(aviso: Aviso, fonte: str) -> Aviso:
-    preenchidos = [campo for campo in CAMPOS_COM_ORIGEM if getattr(aviso, campo) is not None]
-    return replace(aviso, origem_dos_campos={campo: fonte for campo in preenchidos})
+    origem_dos_campos = {}
+    for campo in campos_preenchidos(aviso):
+        origem_dos_campos[campo] = fonte
+    return replace(aviso, origem_dos_campos=origem_dos_campos)
+
+
+def campos_preenchidos(aviso: Aviso) -> list[str]:
+    preenchidos = []
+    for campo in CAMPOS_COM_ORIGEM:
+        if getattr(aviso, campo) is not None:
+            preenchidos.append(campo)
+    return preenchidos

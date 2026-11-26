@@ -13,6 +13,15 @@ O código será defendido na banca. Qualquer pessoa deve entender um arquivo sem
 - **Funções curtas, um nível de abstração cada.**
 - **Evitar comentários.** Lógica complexa vira função com nome que se explica. Condição composta vira função: `biblioteca_esta_vulneravel(...)` em vez de um `if` com três condições.
 - **Sem código esperto:** `if` claro em vez de expressão encadeada; laço legível em vez de compreensão aninhada.
+  - Compreensão só com um `for` e, se tiver filtro, filtro curto; dois `for` ou filtro longo viram laço ou função com nome.
+  - Sem `lambda`: o que vai para `sorted(key=...)`, `re.sub`, `signal.signal` ou callback é uma função com nome (função interna quando precisa de uma variável local, como `pedir_parada_pelo_ctrl_c`).
+  - `any`/`all` com um `for` e uma condição com nome (`any(tem_identificador_em_comum(aviso, outro) for outro in grupo)`); contagem é um laço que soma, não `sum(1 for ...)`.
+  - Ternário só em uma linha e sem encadear; `x or []`, `x or {}` e `a or b or ""` no meio de expressões longas viram função com `if`.
+  - Sem desempacotar com estrela (`[*lista, x]`, `a, *resto = ...`, `**asdict(...)`): passos com nome (`lista + [x]`, `partes[0]` e `partes[1:]`, `dicionario.update(...)`).
+  - Números com significado viram constante com nome (`SEGUNDOS_POR_MINUTO`, `ORDEM_DA_PARTE_NUMERICA`, `ESPACOS_DE_RECUO_DO_JSON`).
+  - Truque de baixo nível necessário (`os.dup2`, `ExitStack.callback`, `object_pairs_hook`, OU de bits) fica dentro de função cujo nome diz o que ele faz.
+- **Regex:** toda regex é uma constante com nome que diz o que ela encontra. A longa usa `re.VERBOSE`, com uma parte por linha; a que junta pedaços é montada de constantes com nome e sem f-string. Grupo usado no código é nomeado (`(?P<versao>...)` e `group("versao")`), nunca por índice.
+- **Funções comuns sem camada:** `sem_repeticao(itens)` (`rastro/listas.py`) tira repetidos mantendo a ordem (no lugar de `dict.fromkeys`); `ler_data_iso(texto)` (`rastro/data_e_hora.py`) lê data ISO 8601 aceitando o `Z` do UTC.
 - **Tipos em tudo:** type hints em funções; `dataclass` para modelos (`Biblioteca`, `Achado`, `Requisicao`, `Checagem`).
 - `ruff` e `mypy` sem erros.
 

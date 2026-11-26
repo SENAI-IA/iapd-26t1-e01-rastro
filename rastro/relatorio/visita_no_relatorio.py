@@ -23,20 +23,24 @@ def montar_visita_no_relatorio(analise: Analise) -> list[dict[str, Any]]:
 def agrupar_bibliotecas_por_requisicao(bibliotecas: list[Biblioteca]) -> dict[int, list[str]]:
     agrupadas: dict[int, list[str]] = {}
     for biblioteca in bibliotecas:
-        for indice in {evidencia.indice_requisicao for evidencia in biblioteca.evidencias}:
+        for indice in indices_das_evidencias(biblioteca):
             agrupadas.setdefault(indice, []).append(nome_com_versao(biblioteca))
     return agrupadas
+
+
+def indices_das_evidencias(biblioteca: Biblioteca) -> set[int]:
+    return {evidencia.indice_requisicao for evidencia in biblioteca.evidencias}
 
 
 def passo_no_relatorio(
     passo: PassoDaVisita, chaves: list[str], achados: list[Achado]
 ) -> dict[str, Any]:
     prioridades = [prioridade_da_biblioteca(chave, achados) for chave in chaves]
-    return {
-        **asdict(replace(passo, url=url_sem_valores_da_query(passo.url))),
-        "bibliotecas": chaves,
-        "prioridade": prioridade_mais_alta(prioridades),
-    }
+    passo_sem_valores = replace(passo, url=url_sem_valores_da_query(passo.url))
+    no_relatorio = asdict(passo_sem_valores)
+    no_relatorio["bibliotecas"] = chaves
+    no_relatorio["prioridade"] = prioridade_mais_alta(prioridades)
+    return no_relatorio
 
 
 def prioridade_da_biblioteca(chave: str, achados: list[Achado]) -> Prioridade | None:

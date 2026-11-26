@@ -10,23 +10,34 @@ ESPERA_DO_AVISO_EM_MILISSEGUNDOS = 5000
 
 
 def pasta_do_windows(pasta_do_usuario: Path, ambiente: Mapping[str, str]) -> Path:
+    return pasta_local_do_windows(pasta_do_usuario, ambiente) / "Rastro" / "bin"
+
+
+def pasta_local_do_windows(pasta_do_usuario: Path, ambiente: Mapping[str, str]) -> Path:
     local = ambiente.get("LOCALAPPDATA")
-    base = Path(local) if local else pasta_do_usuario / "AppData" / "Local"
-    return base / "Rastro" / "bin"
+    if local:
+        return Path(local)
+    return pasta_do_usuario / "AppData" / "Local"
 
 
 def acrescentar_ao_path_do_windows(pasta: Path) -> bool:
-    return trocar_path_do_windows(lambda partes: acrescentar_pasta(partes, pasta))
+    def acrescentar_a_pasta(partes: list[str]) -> list[str]:
+        return acrescentar_pasta(partes, pasta)
+
+    return trocar_path_do_windows(acrescentar_a_pasta)
 
 
 def remover_do_path_do_windows(pasta: Path) -> bool:
-    return trocar_path_do_windows(lambda partes: tirar_pasta(partes, pasta))
+    def tirar_a_pasta(partes: list[str]) -> list[str]:
+        return tirar_pasta(partes, pasta)
+
+    return trocar_path_do_windows(tirar_a_pasta)
 
 
 def acrescentar_pasta(partes: list[str], pasta: Path) -> list[str]:
     if any(mesma_pasta_no_windows(parte, pasta) for parte in partes):
         return partes
-    return [*partes, str(pasta)]
+    return partes + [str(pasta)]
 
 
 def tirar_pasta(partes: list[str], pasta: Path) -> list[str]:
@@ -42,19 +53,23 @@ def trocar_path_do_windows(trocar: Callable[[list[str]], list[str]]) -> bool:
         raise OSError("o PATH do usuário no registro só existe no Windows")
     import winreg
 
-    acesso = winreg.KEY_READ | winreg.KEY_WRITE
-    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, CHAVE_DO_AMBIENTE, 0, acesso) as chave:
+    ler_e_gravar = winreg.KEY_READ | winreg.KEY_WRITE
+    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, CHAVE_DO_AMBIENTE, 0, ler_e_gravar) as chave:
         try:
             valor, tipo = winreg.QueryValueEx(chave, "Path")
         except FileNotFoundError:
             valor, tipo = "", winreg.REG_EXPAND_SZ
-        partes = [parte for parte in str(valor).split(";") if parte]
+        partes = partes_do_path(str(valor))
         novas = trocar(partes)
         if novas == partes:
             return False
         winreg.SetValueEx(chave, "Path", 0, tipo, ";".join(novas))
     avisar_terminais_novos_do_windows()
     return True
+
+
+def partes_do_path(valor: str) -> list[str]:
+    return [parte for parte in valor.split(";") if parte]
 
 
 def avisar_terminais_novos_do_windows() -> None:

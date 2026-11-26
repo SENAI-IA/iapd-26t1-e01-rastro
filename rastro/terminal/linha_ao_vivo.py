@@ -11,10 +11,25 @@ from rastro.terminal.formatacao import cortar_no_limite, destacar
 SIMBOLOS_DO_GIRO = "|/-\\"
 INTERVALO_DO_GIRO_EM_SEGUNDOS = 0.12
 LARGURA_MINIMA = 20
+ESPACO_DO_SIMBOLO_DO_GIRO = 2
 
 
 def largura_do_terminal() -> int:
     return shutil.get_terminal_size().columns
+
+
+def decidir_se_e_ao_vivo(saida: TextIO, ao_vivo: bool | None) -> bool:
+    if ao_vivo is not None:
+        return ao_vivo
+    return saida.isatty()
+
+
+def decidir_se_usa_cores(ao_vivo: bool, cores: bool | None) -> bool:
+    if cores is not None:
+        return cores
+    if not ao_vivo:
+        return False
+    return ativar_cores_no_terminal()
 
 
 class LinhaAoVivo:
@@ -26,8 +41,8 @@ class LinhaAoVivo:
         cores: bool | None = None,
     ) -> None:
         self.saida = saida or sys.stdout
-        self.ao_vivo = self.saida.isatty() if ao_vivo is None else ao_vivo
-        self.cores = (self.ao_vivo and ativar_cores_no_terminal()) if cores is None else cores
+        self.ao_vivo = decidir_se_e_ao_vivo(self.saida, ao_vivo)
+        self.cores = decidir_se_usa_cores(self.ao_vivo, cores)
         self.largura = largura
         self._texto: Callable[[], str] | None = None
         self._quadro_do_giro = 0
@@ -83,7 +98,7 @@ class LinhaAoVivo:
             return
         largura = max(self.largura(), LARGURA_MINIMA) - 1
         simbolo = SIMBOLOS_DO_GIRO[self._quadro_do_giro % len(SIMBOLOS_DO_GIRO)]
-        linha = f"{cortar_no_limite(self._texto(), largura - 2)} {simbolo}"
+        linha = f"{cortar_no_limite(self._texto(), largura - ESPACO_DO_SIMBOLO_DO_GIRO)} {simbolo}"
         self.saida.write("\r" + linha.ljust(self._largura_ocupada))
         self.saida.flush()
         self._largura_ocupada = len(linha)

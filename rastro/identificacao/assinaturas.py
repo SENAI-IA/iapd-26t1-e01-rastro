@@ -5,10 +5,26 @@ from urllib.parse import urlsplit
 from rastro.har.modelos import Requisicao
 from rastro.identificacao.modelos import Biblioteca, Evidencia
 
-VERSAO = r"(\d+\.\d+\.\d+)"
+
+def uma_das_alternativas(padroes: tuple[str, ...]) -> str:
+    return "(?:" + "|".join(padroes) + ")"
+
+
+VERSAO = r"(?P<versao>\d+\.\d+\.\d+)"
 INICIO_DO_NOME = r"(?<![\w-])"
-SEPARADOR_DA_VERSAO = r"(?:[-.@/]?|(?:\.min)?\.js\?v(?:er)?=)"
-INICIO_DO_COMENTARIO = r"(?:/\*[*!]?\s*|//!?[ \t]*|^[ \t]*\*[ \t]*)"
+SEPARADOR_OPCIONAL = r"[-.@/]?"
+PARAMETRO_DE_VERSAO_NA_URL = r"(?:\.min)?\.js\?v(?:er)?="
+SEPARADOR_DA_VERSAO = uma_das_alternativas((SEPARADOR_OPCIONAL, PARAMETRO_DE_VERSAO_NA_URL))
+ABERTURA_DO_COMENTARIO_EM_BLOCO = r"/\*[*!]?\s*"
+ABERTURA_DO_COMENTARIO_DE_LINHA = r"//!?[ \t]*"
+LINHA_DE_DENTRO_DO_COMENTARIO_EM_BLOCO = r"^[ \t]*\*[ \t]*"
+INICIO_DO_COMENTARIO = uma_das_alternativas(
+    (
+        ABERTURA_DO_COMENTARIO_EM_BLOCO,
+        ABERTURA_DO_COMENTARIO_DE_LINHA,
+        LINHA_DE_DENTRO_DO_COMENTARIO_EM_BLOCO,
+    )
+)
 
 
 @dataclass(frozen=True)
@@ -56,8 +72,8 @@ def bibliotecas_no_comentario(assinatura: Assinatura, requisicao: Requisicao) ->
     padrao = INICIO_DO_COMENTARIO + assinatura.comentario_de_versao
     bibliotecas: list[Biblioteca] = []
     for encontrado in re.finditer(padrao, requisicao.conteudo, re.MULTILINE):
-        versao = encontrado.group(1)
-        trecho = encontrado.group(0).strip()
+        versao = encontrado.group("versao")
+        trecho = encontrado.group().strip()
         bibliotecas.append(biblioteca_por_assinatura(assinatura.pacote, versao, requisicao, trecho))
     return bibliotecas
 
@@ -76,7 +92,7 @@ def versao_no_nome_do_arquivo(assinatura: Assinatura, nome_do_arquivo: str) -> s
     encontrado = re.search(padrao, nome_do_arquivo, re.IGNORECASE)
     if encontrado is None:
         return None
-    return encontrado.group(1)
+    return encontrado.group("versao")
 
 
 def biblioteca_por_assinatura(
@@ -129,9 +145,14 @@ def requisicao_e_script_com_conteudo(requisicao: Requisicao) -> bool:
 
 
 def requisicao_e_script(requisicao: Requisicao) -> bool:
-    tipo_conteudo = requisicao.tipo_conteudo or ""
     caminho = urlsplit(requisicao.url).path.lower()
-    return tipo_conteudo.endswith("javascript") or caminho.endswith(".js")
+    return tipo_de_conteudo_javascript(requisicao.tipo_conteudo) or caminho.endswith(".js")
+
+
+def tipo_de_conteudo_javascript(tipo_conteudo: str | None) -> bool:
+    if tipo_conteudo is None:
+        return False
+    return tipo_conteudo.endswith("javascript")
 
 
 def caminho_com_parametros(url: str) -> str:

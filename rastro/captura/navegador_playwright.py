@@ -14,6 +14,7 @@ CANAIS_DO_NAVEGADOR = ("chrome", "msedge")
 TEMPO_LIMITE_DA_PAGINA_EM_MILISSEGUNDOS = 15_000
 TEMPO_DE_ESPERA_DA_REDE_PARADA_EM_MILISSEGUNDOS = 5_000
 TEXTO_DE_NAVEGADOR_NAO_ENCONTRADO = "is not found at"
+MILISSEGUNDOS_POR_SEGUNDO = 1000
 LER_OS_LINKS = "elementos => elementos.map(elemento => elemento.href)"
 
 
@@ -47,6 +48,13 @@ def primeira_linha(erro: "Error") -> str:
     return linhas[0]
 
 
+def resposta_e_script(resposta: "Response") -> bool:
+    tipo_de_conteudo = resposta.headers.get("content-type")
+    if tipo_de_conteudo is None:
+        return False
+    return "javascript" in tipo_de_conteudo
+
+
 def conferir_playwright() -> None:
     try:
         import playwright.sync_api  # noqa: F401
@@ -64,7 +72,7 @@ class SessaoPlaywright:
 
     def _contar(self, resposta: "Response") -> None:
         self.requisicoes += 1
-        if "javascript" in (resposta.headers.get("content-type") or ""):
+        if resposta_e_script(resposta):
             self.scripts += 1
 
     def abrir_pagina(self, url: str) -> None:
@@ -105,27 +113,46 @@ class SessaoPlaywright:
         if not paginas:
             return
         try:
-            paginas[0].wait_for_timeout(segundos * 1000)
+            paginas[0].wait_for_timeout(segundos * MILISSEGUNDOS_POR_SEGUNDO)
         except Error:
             return
 
 
 @contextmanager
 def abrir_gravacao(har: Path) -> Iterator[SessaoDeGravacao]:
-    from playwright.sync_api import Error, sync_playwright
-
     with ExitStack() as fechamentos:
-        try:
-            playwright = fechamentos.enter_context(sync_playwright())
-            navegador = abrir_navegador_da_maquina(playwright)
-            contexto = navegador.new_context(
-                record_har_path=str(har), record_har_mode="minimal", no_viewport=True
-            )
-            fechamentos.callback(fechar, contexto, navegador)
-            sessao = SessaoPlaywright(contexto)
-        except Error as erro:
-            raise NavegadorNaoAbriu(primeira_linha(erro)) from erro
-        yield sessao
+        yield abrir_sessao_que_grava(har, fechamentos)
+
+
+def abrir_sessao_que_grava(har: Path, fechamentos: ExitStack) -> SessaoPlaywright:
+    from playwright.sync_api import Error
+
+    try:
+        playwright = iniciar_o_playwright(fechamentos)
+        navegador = abrir_navegador_da_maquina(playwright)
+        contexto = abrir_contexto_que_grava_o_har(navegador, har)
+        fechar_ao_terminar(fechamentos, contexto, navegador)
+        return SessaoPlaywright(contexto)
+    except Error as erro:
+        raise NavegadorNaoAbriu(primeira_linha(erro)) from erro
+
+
+def iniciar_o_playwright(fechamentos: ExitStack) -> "Playwright":
+    from playwright.sync_api import sync_playwright
+
+    return fechamentos.enter_context(sync_playwright())
+
+
+def abrir_contexto_que_grava_o_har(navegador: "Browser", har: Path) -> "BrowserContext":
+    return navegador.new_context(
+        record_har_path=str(har), record_har_mode="minimal", no_viewport=True
+    )
+
+
+def fechar_ao_terminar(
+    fechamentos: ExitStack, contexto: "BrowserContext", navegador: "Browser"
+) -> None:
+    fechamentos.callback(fechar, contexto, navegador)
 
 
 def abrir_navegador_da_maquina(playwright: "Playwright") -> "Browser":
