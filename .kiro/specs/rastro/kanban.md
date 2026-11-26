@@ -109,6 +109,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T92** Separar o histórico e versionar a decisão 11 · rodada de legibilidade · revisão @cristiano.albino · 26/11
 - [ ] **T93** Numerar as travas como a decisão 06 · rodada de legibilidade · revisão @cristiano.albino · 26/11
 - [ ] **T94** Reescrever o README no ritmo do Como usar · rodada de legibilidade · revisão @halan.bacca · 26/11
+- [ ] **T95** Deixar o README técnico só para desenvolvimento · rodada de legibilidade · revisão @luiz.pagliari · 26/11
 
 ## A fazer
 
@@ -148,7 +149,6 @@ _(vazio)_
 
 ### Rodada de legibilidade (até 08/12)
 
-- [ ] **T95** Deixar o README técnico só para desenvolvimento · rodada de legibilidade · revisão @luiz.pagliari
 - [ ] **T96** Enxugar a spec viva, as decisões e o steering · rodada de legibilidade · revisão @geison.santos
 - [ ] **T89** Atualizar diagrama, steering e documentação para a estrutura nova · rodada de legibilidade · revisão @geison.santos
 

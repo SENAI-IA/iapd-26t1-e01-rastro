@@ -842,7 +842,7 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @halan.bacca
 
-- [ ] **T95 Deixar o README técnico só para desenvolvimento**
+- [x] **T95 Deixar o README técnico só para desenvolvimento**
   - Entrega: `README-TECNICO.md` com o que só o time precisa (preparar o ambiente, verificação, build do frontend, mapa da documentação, resultados com link) e o roteiro manual com as pendências do Windows numa lista só em `docs/verificacao-manual.md`.
   - Aceite: nenhum passo de uso repetido do `README.md`; números e nomes atuais.
   - Arquivos: `README-TECNICO.md`, `docs/verificacao-manual.md`
