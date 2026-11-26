@@ -834,7 +834,7 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @cristiano.albino
 
-- [ ] **T94 Reescrever o README no ritmo do Como usar**
+- [x] **T94 Reescrever o README no ritmo do Como usar**
   - Entrega: `README.md` para ler e sair usando, na ordem do guia "Como usar" (antes de começar, instalar, escolher o modo de gravar e seus passos, abrir o relatório, proteções opcionais, problemas comuns, seus dados), com uma seção curta "Desenvolvido com IA" e links de uma linha para o detalhe técnico.
   - Aceite: os passos e nomes batem com `frontend/src/conteudo/guia.ts`; nenhum link quebrado; nada técnico repetido do `README-TECNICO.md`.
   - Arquivos: `README.md`
