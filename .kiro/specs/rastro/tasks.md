@@ -738,10 +738,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @cristiano.albino
 
-- [ ] **T81 Separar regras, mecanismo e textos das checagens e do plano**
+- [x] **T81 Separar regras, mecanismo e textos das checagens e do plano**
   - Entrega: `configuracao/` com regras, avaliação e testes de cabeçalho em arquivos próprios; `acao/` com os textos das correções fora do plano.
   - Aceite: `checagens.py` fica com as checagens e a tupla `CHECAGENS`; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/configuracao/`, `rastro/acao/`, `rastro/risco/prioridade.py`, testes espelhados
+  - Arquivos: `rastro/configuracao/`, `rastro/acao/`, `rastro/risco/prioridade.py`, testes espelhados, `.kiro/steering/structure.md`, `.kiro/skills/rastro-nova-regra/SKILL.md`
   - Teste: os testes atuais.
   - Requisito: R19.4
   - Revisão: @geison.santos

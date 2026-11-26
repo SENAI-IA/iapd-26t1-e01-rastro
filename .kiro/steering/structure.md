@@ -40,9 +40,14 @@ rastro/
                            registro_npm.py (HTTP do registro) e pacote_npm.py (integridade e leitura do tar em memória);
                            opcionais: osv.py, faixas_do_osv.py, nvd.py (cliente), completar_cvss.py (BuscaDeCvss), juncao_dos_avisos.py
   risco/                   modelos.py, nota.py, prioridade.py, achados.py
-  configuracao/            checagens.py (uma função por checagem)
+  configuracao/            modelos.py; checagens.py (uma função por checagem, a tupla CHECAGENS e checar_configuracao);
+                           regras_das_checagens.py (dados de cada regra e os motivos de "não verificada");
+                           avaliacao_do_site.py (percorre as páginas e os cookies do site e monta a Checagem);
+                           falhas_nos_cabecalhos.py e falhas_nos_cookies.py (dizem se uma resposta ou um cookie falha)
   explicacao/              modelos.py, explicacao_dos_achados.py
-  acao/                    modelos.py, plano_de_acao.py, texto_da_tarefa.py
+  acao/                    modelos.py, plano_de_acao.py (junta e ordena as ações), acoes_das_bibliotecas.py,
+                           acoes_das_checagens.py, correcoes_das_checagens.py (o que fazer e o impacto de cada checagem),
+                           texto_da_tarefa.py
   ia/
     provedor.py            contrato do provedor (ProvedorDeIA, RespostaDoProvedor, FalhaDoProvedor)
     cliente.py             interface única: pergunta ao provedor e mede tempo e tokens (ChamadaDaIA)
@@ -74,8 +79,8 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 
 ## Onde colocar algo novo
 
-- **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` e `achados_da_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade em `risco/prioridade.py`).
-- **Checagem nova:** uma função em `configuracao/checagens.py` (e na tupla `CHECAGENS`) e seu teste, e o que fazer e o impacto dela em `acao/plano_de_acao.py`.
+- **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` e `achados_da_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade e `valor_para_ordem_decrescente` em `risco/prioridade.py`).
+- **Checagem nova:** a `RegraDeChecagem` em `configuracao/regras_das_checagens.py`; o teste que diz se uma resposta ou um cookie falha em `configuracao/falhas_nos_cabecalhos.py` ou `configuracao/falhas_nos_cookies.py`; uma função `checar_*` em `configuracao/checagens.py` (e na tupla `CHECAGENS`), que usa o mecanismo de `configuracao/avaliacao_do_site.py`; os testes de cada uma; e o que fazer e o impacto dela em `acao/correcoes_das_checagens.py`.
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
 - **IA nova:** um arquivo em `ia/provedores/` (que roda a CLI com `execucao_da_cli.py`) e o nome em `EXECUTAVEIS_DAS_IAS` (`ia/escolha_da_ia.py`).
 - **Assinatura nova:** em `identificacao/assinaturas.py`.

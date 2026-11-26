@@ -3,8 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from rastro.acao.plano_de_acao import CORRECOES_DAS_CHECAGENS, montar_plano_de_acao
-from rastro.configuracao import checagens as regras
+from rastro.acao.correcoes_das_checagens import CORRECOES_DAS_CHECAGENS
+from rastro.acao.plano_de_acao import montar_plano_de_acao
+from rastro.configuracao import regras_das_checagens as regras
 from rastro.configuracao.modelos import Checagem, RegraDeChecagem, SituacaoDaChecagem
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.github_advisory import converter_resposta

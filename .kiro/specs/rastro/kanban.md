@@ -96,6 +96,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T78** Juntar o acesso HTTP das fontes · rodada de legibilidade · revisão @cristiano.albino · 25/11
 - [ ] **T79** Separar a escolha da IA e o que os provedores repetem · rodada de legibilidade · revisão @luiz.pagliari · 25/11
 - [ ] **T80** Separar as travas por assunto · rodada de legibilidade · revisão @cristiano.albino · 25/11
+- [ ] **T81** Separar regras, mecanismo e textos das checagens e do plano · rodada de legibilidade · revisão @geison.santos · 26/11
 
 ## A fazer
 
@@ -135,7 +136,6 @@ _(vazio)_
 
 ### Rodada de legibilidade (até 08/12)
 
-- [ ] **T81** Separar regras, mecanismo e textos das checagens e do plano · rodada de legibilidade · revisão @geison.santos
 - [ ] **T82** Separar instalação, terminal e captura por papel · rodada de legibilidade · revisão @ali.santos
 - [ ] **T83** Trocar abreviações por nomes completos no Python · rodada de legibilidade · revisão @luiz.pagliari
 - [ ] **T84** Trocar código esperto por laço e função com nome · rodada de legibilidade · revisão @cristiano.albino

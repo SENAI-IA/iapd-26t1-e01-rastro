@@ -4,7 +4,7 @@ from pathlib import Path
 from rastro.acao.modelos import Acao
 from rastro.acao.plano_de_acao import montar_plano_de_acao
 from rastro.acao.texto_da_tarefa import gerar_texto_da_tarefa
-from rastro.configuracao import checagens as regras
+from rastro.configuracao import regras_das_checagens as regras
 from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.github_advisory import converter_resposta

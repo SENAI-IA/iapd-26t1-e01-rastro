@@ -37,8 +37,13 @@ def ordenar_achados(achados: list[Achado]) -> list[Achado]:
 
 def chave_da_ordem(achado: Achado) -> tuple[bool, float, float]:
     nota = achado.nota.valor
-    cvss = achado.aviso.cvss
     sem_nota = nota is None
-    nota_decrescente = -nota if nota is not None else 0.0
-    cvss_decrescente = -cvss if cvss is not None else 0.0
+    nota_decrescente = valor_para_ordem_decrescente(nota)
+    cvss_decrescente = valor_para_ordem_decrescente(achado.aviso.cvss)
     return (sem_nota, nota_decrescente, cvss_decrescente)
+
+
+def valor_para_ordem_decrescente(valor: float | None) -> float:
+    if valor is None:
+        return 0.0
+    return -valor

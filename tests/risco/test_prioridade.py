@@ -6,6 +6,7 @@ from rastro.risco.prioridade import (
     classificar_prioridade,
     nota_da_biblioteca,
     ordenar_achados,
+    valor_para_ordem_decrescente,
 )
 
 JQUERY = Biblioteca(
@@ -108,3 +109,8 @@ def test_r05_6_ordenar_nao_altera_a_lista_recebida() -> None:
     achados = [achado("GHSA-baixa", 6.1, 0.0), achado("GHSA-alta", 6.1, 0.97)]
     ordenar_achados(achados)
     assert ghsas(achados) == ["GHSA-baixa", "GHSA-alta"]
+
+
+def test_r05_6_valor_para_ordem_decrescente_inverte_o_sinal_e_nulo_vira_zero() -> None:
+    assert valor_para_ordem_decrescente(7.5) == -7.5
+    assert valor_para_ordem_decrescente(None) == 0.0
