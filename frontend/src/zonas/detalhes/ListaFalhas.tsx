@@ -1,0 +1,25 @@
+import type { Achado } from "../../relatorio/tiposDoRelatorio.ts";
+import ItemFalha from "./ItemFalha.tsx";
+import "./ListaFalhas.css";
+
+interface Props {
+  achados: Achado[];
+  aoVerOrigem: (achado: Achado) => void;
+}
+
+export default function ListaFalhas({ achados, aoVerOrigem }: Props) {
+  return (
+    <div className="lista-falhas">
+      <h4>Falhas conhecidas</h4>
+      {achados.length === 0 ? (
+        <p className="lista-falhas__vazio">Nenhum aviso do GitHub Advisory atinge esta versão.</p>
+      ) : (
+        <ol className="lista-falhas__lista">
+          {achados.map((achado) => (
+            <ItemFalha key={achado.aviso.ghsa} achado={achado} aoVerOrigem={() => aoVerOrigem(achado)} />
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}

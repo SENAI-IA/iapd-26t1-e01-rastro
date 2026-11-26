@@ -770,11 +770,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @cristiano.albino
 
-- [ ] **T85 Organizar as pastas do frontend por responsabilidade**
+- [x] **T85 Organizar as pastas do frontend por responsabilidade**
   - Entrega: `relatorio/`, `conteudo/`, `estilos/`, `moldura/`, `zonas/`, `janelas/`, `guia/`, `segurancaAtiva/`, `basicos/`, `hooks/`, `calculosDeTela/`, `formatacao/`.
   - Aceite: `dados.ts` e `dados/` deixam de conflitar; Verificação: `npm run build` passa e o `modelo.html` gerado de novo abre igual (claro, escuro, 400px).
-  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`
-  - Teste: verificação manual.
+  - Arquivos: `frontend/src/`, `.kiro/steering/frontend-react.md`, `.kiro/skills/rastro-nova-regra/SKILL.md`
+  - Teste: 60 telas (1280 e 400 px, claro e escuro, painel, foco, tarefa, origem do dado, segurança ativa, Como usar, tour) iguais pixel a pixel às de antes; o `modelo.html` gerado sai byte a byte igual.
   - Requisito: R19.4
   - Revisão: @halan.bacca
 

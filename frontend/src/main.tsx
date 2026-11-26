@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./fontes.css";
-import "./tokens.css";
-import "./base.css";
+import "./estilos/fontes.css";
+import "./estilos/tokens.css";
+import "./estilos/base.css";
 import App from "./App.tsx";
-import { lerRelatorio } from "./dados.ts";
+import { lerRelatorio } from "./relatorio/lerRelatorio.ts";
 
 createRoot(document.getElementById("raiz")!).render(
   <StrictMode>
