@@ -858,10 +858,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @geison.santos
 
-- [ ] **T89 Atualizar diagrama, steering e documentação para a estrutura nova**
+- [x] **T89 Atualizar diagrama, steering e documentação para a estrutura nova**
   - Entrega: diagrama, `structure.md`, `codigo-python.md`, `frontend-react.md`, skill `rastro-nova-regra` e README técnico com os nomes novos.
   - Aceite: nenhum documento cita arquivo que não existe mais.
-  - Arquivos: `.kiro/steering/`, `.kiro/skills/rastro-nova-regra/SKILL.md`, `README-TECNICO.md`, `README.md`
+  - Arquivos: `docs/arquitetura/arquitetura.html`, `docs/cobertura/linux.md`, `docs/cobertura/html/` (steering, skill e READMEs foram atualizados nas T94 a T96)
   - Teste: não se aplica (documentação).
   - Requisito: R19.4
   - Revisão: @geison.santos

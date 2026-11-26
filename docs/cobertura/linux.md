@@ -1,15 +1,15 @@
 # Verificação no Linux
 
-Resultado dos comandos da seção "Verificação" do README, rodados na máquina local.
+Resultado dos comandos da seção [Verificação](../../README-TECNICO.md#verificação) do README técnico, rodados na máquina local.
 
 | | |
 |---|---|
-| Data | 17/11/2026 |
-| Código de partida | `46959c7` |
+| Data | 26/11/2026 |
+| Código de partida | `7b9a6da` (depois da rodada de legibilidade, T72 a T96) |
 | Sistema | Linux |
 | Python | 3.10.12, no `.venv` do projeto |
 | Ferramentas | pytest 9.2.0, pytest-cov 7.1.0, ruff 0.17.4, mypy 2.4.1 |
-| Resultado | os três comandos passam; 788 testes; cobertura total de 96% e 97% nas regras de negócio |
+| Resultado | os três comandos passam; 1056 testes; cobertura total de 96% e 97% nas regras de negócio |
 
 A cobertura das regras de negócio inclui `rastro/pentest/`. O HTML detalhado pode ser atualizado com:
 
@@ -26,23 +26,23 @@ All checks passed!
 ## `mypy rastro`
 
 ```
-Success: no issues found in 67 source files
+Success: no issues found in 133 source files
 ```
 
 ## `pytest --cov=rastro --cov-report=term`
 
 ```
 ============================= test session starts ==============================
-collected 788 items
+collected 1056 items
 ...
-============================= 788 passed in 3.5s ===============================
+============================= 1056 passed in 10.3s ==============================
 ```
 
 Resumo da cobertura:
 
 ```text
-Regras de negócio (inclui pentest): 2362 linhas, 77 sem teste, 97%
-Total do pacote rastro: 3370 linhas, 141 sem teste, 96%
+Regras de negócio (inclui pentest): 2734 linhas, 85 sem teste, 97%
+Total do pacote rastro: 4847 linhas, 208 sem teste, 96%
 ```
 
 Não há CI. A verificação deve ser repetida localmente no Linux e no Windows antes da entrega. Os testes não acessam a rede nem executam uma CLI de IA real.
