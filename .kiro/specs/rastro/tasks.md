@@ -802,11 +802,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @halan.bacca
 
-- [ ] **T90 Achatar ifs encadeados e laços no Python**
+- [x] **T90 Achatar ifs encadeados e laços no Python**
   - Entrega: funções de `rastro/` sem `if` dentro de `for` dentro de `if`; cadeias de `if`/`elif` que só escolhem um valor viram tabela (dicionário) ou função com nome; casos de saída cedo viram `return` logo no começo (cláusula de guarda); o corpo de laço com mais de uma decisão vira função com nome que diz o que cada volta faz.
   - Aceite: `ruff` com `C901` (complexidade) ligado em `pyproject.toml` e limite registrado em `codigo-python.md`, sem exceção; nenhuma função com mais de dois níveis de bloco aninhado (script de conferência no commit); JSON do relatório e `pentest.json` byte a byte iguais nos cenários de referência; `ruff`, `mypy` e `pytest` passam.
-  - Arquivos: `rastro/`, `pyproject.toml`, `.kiro/steering/codigo-python.md`
-  - Teste: os testes atuais; JSON de referência antes e depois.
+  - Arquivos: `rastro/`, `pyproject.toml`, `tests/test_legibilidade_do_codigo.py`, `.kiro/steering/codigo-python.md`
+  - Teste: `test_r19_4_nenhuma_funcao_tem_mais_de_dois_niveis_de_bloco` (mede com `ast` cada função de `rastro/`); JSON do relatório e `pentest.json` de referência iguais antes e depois.
   - Requisito: R19.4
   - Revisão: @ali.santos
 

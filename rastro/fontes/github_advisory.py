@@ -47,10 +47,16 @@ def converter_resposta(avisos_da_fonte: Any, pacote: str) -> list[Aviso]:
         raise TypeError("a resposta não é uma lista de avisos")
     avisos = []
     for aviso_da_fonte in avisos_da_fonte:
-        if aviso_retirado(aviso_da_fonte):
-            continue
-        for faixa in faixas_do_pacote(aviso_da_fonte, pacote):
-            avisos.append(converter_aviso(aviso_da_fonte, faixa))
+        avisos.extend(avisos_do_pacote(aviso_da_fonte, pacote))
+    return avisos
+
+
+def avisos_do_pacote(aviso_da_fonte: Any, pacote: str) -> list[Aviso]:
+    if aviso_retirado(aviso_da_fonte):
+        return []
+    avisos = []
+    for faixa in faixas_do_pacote(aviso_da_fonte, pacote):
+        avisos.append(converter_aviso(aviso_da_fonte, faixa))
     return avisos
 
 

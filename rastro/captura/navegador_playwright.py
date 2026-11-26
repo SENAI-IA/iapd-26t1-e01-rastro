@@ -156,15 +156,22 @@ def fechar_ao_terminar(
 
 
 def abrir_navegador_da_maquina(playwright: "Playwright") -> "Browser":
+    for canal in CANAIS_DO_NAVEGADOR:
+        navegador = abrir_navegador_do_canal(playwright, canal)
+        if navegador is not None:
+            return navegador
+    raise NavegadorAusente()
+
+
+def abrir_navegador_do_canal(playwright: "Playwright", canal: str) -> "Browser | None":
     from playwright.sync_api import Error
 
-    for canal in CANAIS_DO_NAVEGADOR:
-        try:
-            return playwright.chromium.launch(channel=canal, headless=False, handle_sigint=False)
-        except Error as erro:
-            if TEXTO_DE_NAVEGADOR_NAO_ENCONTRADO not in str(erro):
-                raise
-    raise NavegadorAusente()
+    try:
+        return playwright.chromium.launch(channel=canal, headless=False, handle_sigint=False)
+    except Error as erro:
+        if TEXTO_DE_NAVEGADOR_NAO_ENCONTRADO not in str(erro):
+            raise
+        return None
 
 
 def fechar(contexto: "BrowserContext", navegador: "Browser") -> None:

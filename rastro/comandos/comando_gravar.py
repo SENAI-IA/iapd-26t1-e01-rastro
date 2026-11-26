@@ -188,15 +188,26 @@ def gravar_visita(url: str, host: str, har: Path, usar_robo: bool) -> int:
     with LinhaAoVivo() as linha:
         linha.acompanhar(texto_com_tempo_decorrido(TEXTO_ABRINDO_O_NAVEGADOR))
         with parar_ao_apertar_ctrl_c(parada), abrir_gravacao(har) as sessao:
-            if usar_robo:
-                navegar_com_o_robo(sessao, parada, url, host, linha)
-            else:
-                linha.pedir(TEXTO_GRAVANDO.format(host=host))
-                abrir_primeira_pagina(sessao, url, linha)
-                esperar_gravando(sessao, parada, linha)
+            visitar_o_site(sessao, parada, url, host, linha, usar_robo)
             requisicoes = sessao.requisicoes
             linha.acompanhar(texto_com_tempo_decorrido(TEXTO_SALVANDO_A_GRAVACAO))
     return requisicoes
+
+
+def visitar_o_site(
+    sessao: SessaoDeGravacao,
+    parada: PedidoDeParada,
+    url: str,
+    host: str,
+    linha: LinhaAoVivo,
+    usar_robo: bool,
+) -> None:
+    if usar_robo:
+        navegar_com_o_robo(sessao, parada, url, host, linha)
+        return
+    linha.pedir(TEXTO_GRAVANDO.format(host=host))
+    abrir_primeira_pagina(sessao, url, linha)
+    esperar_gravando(sessao, parada, linha)
 
 
 def texto_com_tempo_decorrido(texto: str) -> Callable[[], str]:

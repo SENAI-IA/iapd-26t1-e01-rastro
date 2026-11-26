@@ -1,4 +1,6 @@
+import operator
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 
 OPERADORES = ("<=", ">=", "<", ">", "=")
@@ -19,6 +21,16 @@ ORDEM_DE_VERSAO_SEM_PRE_LANCAMENTO = 2
 
 ParteDoPreLancamento = tuple[int, int, str]
 ChaveDaVersao = tuple[tuple[int, int, int], tuple[ParteDoPreLancamento, ...]]
+
+
+ComparacaoDeVersoes = Callable[[ChaveDaVersao, ChaveDaVersao], bool]
+COMPARACAO_PELO_OPERADOR: dict[str, ComparacaoDeVersoes] = {
+    "<": operator.lt,
+    "<=": operator.le,
+    ">": operator.gt,
+    ">=": operator.ge,
+    "=": operator.eq,
+}
 
 
 class FaixaIlegivel(Exception):
@@ -82,12 +94,5 @@ def ler_parte_do_pre_lancamento(parte: str) -> ParteDoPreLancamento:
 
 
 def condicao_atendida(chave: ChaveDaVersao, condicao: Condicao) -> bool:
-    if condicao.operador == "<":
-        return chave < condicao.versao
-    if condicao.operador == "<=":
-        return chave <= condicao.versao
-    if condicao.operador == ">":
-        return chave > condicao.versao
-    if condicao.operador == ">=":
-        return chave >= condicao.versao
-    return chave == condicao.versao
+    comparar = COMPARACAO_PELO_OPERADOR[condicao.operador]
+    return comparar(chave, condicao.versao)

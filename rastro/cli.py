@@ -1,4 +1,6 @@
 import sys
+from argparse import Namespace
+from collections.abc import Callable
 
 from rastro.comandos.argumentos import criar_leitor_de_argumentos
 from rastro.comandos.comando_analisar import analisar_com_ia, analisar_sem_ia
@@ -19,19 +21,45 @@ def executar(argumentos: list[str] | None = None) -> int:
     if opcoes.comando is None:
         leitor_de_argumentos.print_help()
         return 0
-    if opcoes.comando == "como-usar":
-        return abrir_como_usar()
-    if opcoes.comando == "instalar":
-        return executar_comando_instalar()
-    if opcoes.comando == "desinstalar":
-        return executar_comando_desinstalar()
-    if opcoes.comando == "pentest":
-        return executar_comando_pentest(opcoes.har, opcoes.saida, opcoes.autorizo)
+    executar_comando = COMANDO_PELO_NOME[opcoes.comando]
+    return executar_comando(opcoes)
+
+
+def rodar_como_usar(_opcoes: Namespace) -> int:
+    return abrir_como_usar()
+
+
+def rodar_instalar(_opcoes: Namespace) -> int:
+    return executar_comando_instalar()
+
+
+def rodar_desinstalar(_opcoes: Namespace) -> int:
+    return executar_comando_desinstalar()
+
+
+def rodar_pentest(opcoes: Namespace) -> int:
+    return executar_comando_pentest(opcoes.har, opcoes.saida, opcoes.autorizo)
+
+
+def rodar_gravar(opcoes: Namespace) -> int:
     abrir_no_navegador = not opcoes.nao_abrir
-    if opcoes.comando == "gravar":
-        return gravar_e_analisar(
-            opcoes.url, opcoes.saida, opcoes.ia, opcoes.sem_ia, abrir_no_navegador, opcoes.robo
-        )
+    return gravar_e_analisar(
+        opcoes.url, opcoes.saida, opcoes.ia, opcoes.sem_ia, abrir_no_navegador, opcoes.robo
+    )
+
+
+def rodar_analisar(opcoes: Namespace) -> int:
+    abrir_no_navegador = not opcoes.nao_abrir
     if opcoes.sem_ia:
         return analisar_sem_ia(opcoes.har, opcoes.saida, abrir_no_navegador, opcoes.pentest)
     return analisar_com_ia(opcoes.har, opcoes.saida, opcoes.ia, abrir_no_navegador, opcoes.pentest)
+
+
+COMANDO_PELO_NOME: dict[str, Callable[[Namespace], int]] = {
+    "como-usar": rodar_como_usar,
+    "instalar": rodar_instalar,
+    "desinstalar": rodar_desinstalar,
+    "pentest": rodar_pentest,
+    "gravar": rodar_gravar,
+    "analisar": rodar_analisar,
+}

@@ -30,18 +30,19 @@ def fecha_a_faixa(evento: EventoSemver) -> bool:
 
 
 def faixa_fechada(inicio: str, evento: EventoSemver) -> FaixaSemver:
-    if "fixed" in evento:
-        fim = f"< {evento['fixed']}"
-        versao_corrigida: str | None = evento["fixed"]
-    else:
-        fim = f"<= {evento['last_affected']}"
-        versao_corrigida = None
+    fim, versao_corrigida = fim_da_faixa_e_versao_corrigida(evento)
     condicoes = []
     inicio_da_faixa = condicao_de_inicio(inicio)
     if inicio_da_faixa:
         condicoes.append(inicio_da_faixa)
     condicoes.append(fim)
     return FaixaSemver(", ".join(condicoes), versao_corrigida)
+
+
+def fim_da_faixa_e_versao_corrigida(evento: EventoSemver) -> tuple[str, str | None]:
+    if "fixed" in evento:
+        return f"< {evento['fixed']}", evento["fixed"]
+    return f"<= {evento['last_affected']}", None
 
 
 def faixa_aberta(inicio: str) -> str:

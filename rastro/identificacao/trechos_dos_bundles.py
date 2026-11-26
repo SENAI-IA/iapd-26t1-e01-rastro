@@ -42,14 +42,22 @@ def escolher_bundles(
     bundles: list[Bundle] = []
     conteudos_vistos: set[str] = set()
     for requisicao in requisicoes:
-        if not bundle_sem_assinatura(requisicao, com_assinatura):
-            continue
-        conteudo = conteudo_da_requisicao(requisicao)
-        if conteudo in conteudos_vistos:
-            continue
-        conteudos_vistos.add(conteudo)
-        bundles.append(Bundle(requisicao, extrair_trechos(conteudo)))
+        bundle = bundle_ainda_nao_visto(requisicao, com_assinatura, conteudos_vistos)
+        if bundle is not None:
+            bundles.append(bundle)
     return bundles
+
+
+def bundle_ainda_nao_visto(
+    requisicao: Requisicao, com_assinatura: set[int], conteudos_vistos: set[str]
+) -> Bundle | None:
+    if not bundle_sem_assinatura(requisicao, com_assinatura):
+        return None
+    conteudo = conteudo_da_requisicao(requisicao)
+    if conteudo in conteudos_vistos:
+        return None
+    conteudos_vistos.add(conteudo)
+    return Bundle(requisicao, extrair_trechos(conteudo))
 
 
 def indices_com_assinatura(bibliotecas: list[Biblioteca]) -> set[int]:

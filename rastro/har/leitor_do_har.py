@@ -50,12 +50,13 @@ def extrair_entradas(har: Any) -> list[dict[str, Any]]:
     if not isinstance(har, dict) or not isinstance(har.get("log"), dict):
         raise HarInvalido()
     entradas = har["log"].get("entries")
-    if not isinstance(entradas, list):
+    if not isinstance(entradas, list) or not todas_as_entradas_sao_validas(entradas):
         raise HarInvalido()
-    for entrada in entradas:
-        if not entrada_e_valida(entrada):
-            raise HarInvalido()
     return entradas
+
+
+def todas_as_entradas_sao_validas(entradas: list[Any]) -> bool:
+    return all(entrada_e_valida(entrada) for entrada in entradas)
 
 
 def entrada_e_valida(entrada: Any) -> bool:
@@ -108,13 +109,17 @@ def ler_urls_das_paginas(log: dict[str, Any]) -> dict[str, str]:
         return {}
     urls: dict[str, str] = {}
     for pagina in paginas:
-        if not isinstance(pagina, dict):
-            continue
-        identificador = pagina.get("id")
-        titulo = pagina.get("title")
-        if isinstance(identificador, str) and isinstance(titulo, str) and texto_e_url_web(titulo):
-            urls[identificador] = titulo
+        if pagina_com_url_web(pagina):
+            urls[pagina["id"]] = pagina["title"]
     return urls
+
+
+def pagina_com_url_web(pagina: Any) -> bool:
+    if not isinstance(pagina, dict):
+        return False
+    identificador = pagina.get("id")
+    titulo = pagina.get("title")
+    return isinstance(identificador, str) and isinstance(titulo, str) and texto_e_url_web(titulo)
 
 
 def texto_e_url_web(texto: str) -> bool:
@@ -164,13 +169,16 @@ def ler_duracao_em_milissegundos(entrada: dict[str, Any]) -> float | None:
 def ler_cabecalhos(resposta: dict[str, Any]) -> dict[str, str]:
     cabecalhos: dict[str, str] = {}
     for nome, valor in pares_de_cabecalho(resposta):
-        if nome == "set-cookie":
-            continue
-        if nome in cabecalhos:
-            cabecalhos[nome] = f"{cabecalhos[nome]}, {valor}"
-        else:
-            cabecalhos[nome] = valor
+        if nome != "set-cookie":
+            juntar_cabecalho(cabecalhos, nome, valor)
     return cabecalhos
+
+
+def juntar_cabecalho(cabecalhos: dict[str, str], nome: str, valor: str) -> None:
+    if nome in cabecalhos:
+        cabecalhos[nome] = f"{cabecalhos[nome]}, {valor}"
+        return
+    cabecalhos[nome] = valor
 
 
 def pares_de_cabecalho(resposta: dict[str, Any]) -> list[tuple[str, str]]:
@@ -262,16 +270,18 @@ def interpretar_set_cookie(linha: str) -> Cookie | None:
     nome = nome_e_valor.split("=", 1)[0].strip()
     if not nome:
         return None
-    http_only = False
-    secure = False
-    same_site = None
+    valores_dos_atributos = ler_atributos_do_cookie(atributos)
+    return Cookie(
+        nome=nome,
+        http_only="httponly" in valores_dos_atributos,
+        secure="secure" in valores_dos_atributos,
+        same_site=texto_ou_nada(valores_dos_atributos.get("samesite", "").strip()),
+    )
+
+
+def ler_atributos_do_cookie(atributos: list[str]) -> dict[str, str]:
+    valores_dos_atributos: dict[str, str] = {}
     for atributo in atributos:
         chave, _, valor = atributo.partition("=")
-        chave = chave.strip().lower()
-        if chave == "httponly":
-            http_only = True
-        elif chave == "secure":
-            secure = True
-        elif chave == "samesite":
-            same_site = valor.strip() or None
-    return Cookie(nome=nome, http_only=http_only, secure=secure, same_site=same_site)
+        valores_dos_atributos[chave.strip().lower()] = valor
+    return valores_dos_atributos

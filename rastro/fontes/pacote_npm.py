@@ -15,15 +15,20 @@ PREFIXO_DO_SHA512 = "sha512-"
 
 
 def conferir_integridade(dados: bytes, integridade: str) -> None:
-    esperados = []
-    for parte in integridade.split():
-        if parte.startswith(PREFIXO_DO_SHA512):
-            esperados.append(parte.removeprefix(PREFIXO_DO_SHA512))
+    esperados = resumos_sha512(integridade)
     if not esperados:
         raise ConsultaNaoRealizada(f"pacote sem integridade sha512 no {NOME_DO_REGISTRO}")
     calculado = base64.b64encode(hashlib.sha512(dados).digest()).decode("ascii")
     if calculado not in esperados:
         raise ConsultaNaoRealizada("a integridade do pacote baixado não confere (sha512)")
+
+
+def resumos_sha512(integridade: str) -> list[str]:
+    resumos = []
+    for parte in integridade.split():
+        if parte.startswith(PREFIXO_DO_SHA512):
+            resumos.append(parte.removeprefix(PREFIXO_DO_SHA512))
+    return resumos
 
 
 def ler_arquivos_de_codigo(dados: bytes) -> list[str]:

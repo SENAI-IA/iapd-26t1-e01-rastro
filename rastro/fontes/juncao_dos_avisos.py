@@ -95,11 +95,22 @@ def fontes_do_grupo(na_ordem: list[Aviso]) -> list[str]:
 
 
 def origem_no_grupo(aviso_da_faixa: Aviso, na_ordem: list[Aviso]) -> dict[str, str]:
+    origem = origem_dos_campos_pela_ordem_das_fontes(na_ordem)
+    origem.update(origem_dos_campos_da_faixa(aviso_da_faixa))
+    return origem
+
+
+def origem_dos_campos_pela_ordem_das_fontes(na_ordem: list[Aviso]) -> dict[str, str]:
     origem = {}
     for campo in CAMPOS_PELA_ORDEM_DAS_FONTES:
         quem_traz = primeiro_com_o_campo(campo, na_ordem)
         if quem_traz is not None:
             origem[campo] = quem_traz.origem_dos_campos[campo]
+    return origem
+
+
+def origem_dos_campos_da_faixa(aviso_da_faixa: Aviso) -> dict[str, str]:
+    origem = {}
     for campo in CAMPOS_DA_FAIXA:
         if campo in aviso_da_faixa.origem_dos_campos:
             origem[campo] = aviso_da_faixa.origem_dos_campos[campo]

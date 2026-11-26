@@ -5,6 +5,7 @@ from typing import Literal
 from rastro.har.modelos import Requisicao
 
 Camada = Literal["pagina", "script", "estilo", "dados", "midia"]
+CAMADA_DO_TIPO_EXATO: dict[str, Camada] = {"text/html": "pagina", "text/css": "estilo"}
 
 PREFIXOS_DE_MIDIA = ("image/", "font/", "video/", "audio/")
 MILISSEGUNDOS_POR_SEGUNDO = 1000
@@ -62,12 +63,10 @@ def duracao_ou_zero(duracao_ms: float | None) -> float:
 
 def camada_do_tipo(tipo_conteudo: str | None) -> Camada:
     tipo = tipo_conteudo or ""
-    if tipo == "text/html":
-        return "pagina"
+    if tipo in CAMADA_DO_TIPO_EXATO:
+        return CAMADA_DO_TIPO_EXATO[tipo]
     if tipo_de_script(tipo):
         return "script"
-    if tipo == "text/css":
-        return "estilo"
     if tipo_de_midia(tipo):
         return "midia"
     return "dados"

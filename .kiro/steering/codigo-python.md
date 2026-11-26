@@ -20,6 +20,10 @@ O código será defendido na banca. Qualquer pessoa deve entender um arquivo sem
   - Sem desempacotar com estrela (`[*lista, x]`, `a, *resto = ...`, `**asdict(...)`): passos com nome (`lista + [x]`, `partes[0]` e `partes[1:]`, `dicionario.update(...)`).
   - Números com significado viram constante com nome (`SEGUNDOS_POR_MINUTO`, `ORDEM_DA_PARTE_NUMERICA`, `ESPACOS_DE_RECUO_DO_JSON`).
   - Truque de baixo nível necessário (`os.dup2`, `ExitStack.callback`, `object_pairs_hook`, OU de bits) fica dentro de função cujo nome diz o que ele faz.
+- **Caminho plano, sem escada de blocos** (`ruff` com `C901`, `max-complexity = 5` no `pyproject.toml`; `tests/test_legibilidade_do_codigo.py` barra função com mais de dois níveis de bloco aninhado: `if`, `for`, `while`, `with`, `try` e `match` contam, `elif` não soma, função interna recomeça). Sem `noqa` nem exceção por arquivo.
+  - Guarda: o caso especial sai logo no começo e o caminho normal segue sem recuo (`if not medicoes: return None`).
+  - Tabela: cadeia que só escolhe um valor vira dicionário constante com nome (`COMPARACAO_PELO_OPERADOR[condicao.operador]`, `ARQUIVO_PELO_NOME_DO_SHELL.get(nome, ARQUIVO_DE_QUALQUER_SHELL)`).
+  - Função por volta: laço com mais de uma decisão chama uma função que diz o que cada volta faz (`for requisicao in requisicoes: alvo = alvo_ainda_nao_visto(requisicao, site, alvos_ja_vistos)`); flag que só serve para sair do laço vira `return` ou `any(...)` com condição nomeada.
 - **Regex:** toda regex é uma constante com nome que diz o que ela encontra. A longa usa `re.VERBOSE`, com uma parte por linha; a que junta pedaços é montada de constantes com nome e sem f-string. Grupo usado no código é nomeado (`(?P<versao>...)` e `group("versao")`), nunca por índice.
 - **Funções comuns sem camada:** `sem_repeticao(itens)` (`rastro/listas.py`) tira repetidos mantendo a ordem (no lugar de `dict.fromkeys`); `ler_data_iso(texto)` (`rastro/data_e_hora.py`) lê data ISO 8601 aceitando o `Z` do UTC.
 - **Tipos em tudo:** type hints em funções; `dataclass` para modelos (`Biblioteca`, `Achado`, `Requisicao`, `Checagem`).

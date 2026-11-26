@@ -73,12 +73,19 @@ def conferir_explicacao(
 def fatos_novos(explicacao: dict[str, str], entrada_enviada: str) -> list[str]:
     fatos_da_entrada = {normalizar(fato) for fato in extrair_fatos(entrada_enviada)}
     novos = []
+    for campo, fato in fatos_de_cada_campo(explicacao):
+        citacao = f"`{fato}` ({campo})"
+        if normalizar(fato) not in fatos_da_entrada and citacao not in novos:
+            novos.append(citacao)
+    return novos
+
+
+def fatos_de_cada_campo(explicacao: dict[str, str]) -> list[tuple[str, str]]:
+    fatos: list[tuple[str, str]] = []
     for campo, texto in explicacao.items():
         for fato in extrair_fatos(texto):
-            citacao = f"`{fato}` ({campo})"
-            if normalizar(fato) not in fatos_da_entrada and citacao not in novos:
-                novos.append(citacao)
-    return novos
+            fatos.append((campo, fato))
+    return fatos
 
 
 def extrair_fatos(texto: str) -> list[str]:

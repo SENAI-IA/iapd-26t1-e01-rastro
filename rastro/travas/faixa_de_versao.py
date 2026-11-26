@@ -31,13 +31,20 @@ def descartar_fora_da_faixa(
             mantidos.append(aviso)
         else:
             motivos_por_aviso.setdefault(aviso.ghsa, []).append(motivo)
+    travas_acionadas = travas_dos_avisos_descartados(pacote, versao, mantidos, motivos_por_aviso)
+    return mantidos, travas_acionadas
+
+
+def travas_dos_avisos_descartados(
+    pacote: str, versao: str, mantidos: list[Aviso], motivos_por_aviso: dict[str, list[str]]
+) -> list[TravaAcionada]:
     avisos_mantidos = {aviso.ghsa for aviso in mantidos}
     travas_acionadas = []
     for ghsa, motivos in motivos_por_aviso.items():
         if ghsa not in avisos_mantidos:
             alvo = f"{ghsa} em {pacote}@{versao}"
             travas_acionadas.append(TravaAcionada(NOME_DA_TRAVA, alvo, "; ".join(motivos)))
-    return mantidos, travas_acionadas
+    return travas_acionadas
 
 
 def motivo_para_descartar(versao: str, faixa: str) -> str | None:

@@ -39,13 +39,20 @@ def identificar_em_bundles(
         bibliotecas_do_bundle, travas_do_bundle = identificar_no_bundle(bundle, cliente_de_ia)
         andamento.avancar_item()
         travas_acionadas.extend(travas_do_bundle)
-        for biblioteca in bibliotecas_do_bundle:
-            if nome_com_versao(biblioteca) not in ja_identificadas:
-                anterior = bibliotecas_da_ia.get(nome_com_versao(biblioteca))
-                bibliotecas_da_ia[nome_com_versao(biblioteca)] = preferir_confirmada(
-                    anterior, biblioteca
-                )
+        guardar_bibliotecas_novas(bibliotecas_da_ia, bibliotecas_do_bundle, ja_identificadas)
     return BibliotecasDaIA(list(bibliotecas_da_ia.values()), travas_acionadas)
+
+
+def guardar_bibliotecas_novas(
+    bibliotecas_da_ia: dict[str, Biblioteca],
+    bibliotecas_do_bundle: list[Biblioteca],
+    ja_identificadas: set[str],
+) -> None:
+    for biblioteca in bibliotecas_do_bundle:
+        chave = nome_com_versao(biblioteca)
+        if chave not in ja_identificadas:
+            anterior = bibliotecas_da_ia.get(chave)
+            bibliotecas_da_ia[chave] = preferir_confirmada(anterior, biblioteca)
 
 
 def preferir_confirmada(atual: Biblioteca | None, nova: Biblioteca) -> Biblioteca:

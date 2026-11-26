@@ -81,18 +81,24 @@ class Robo:
             motivo = self.motivo_para_parar(inicio)
             if motivo is not None:
                 return self.resultado(motivo)
-            link = fila.popleft()
-            if self.familia_cheia(link):
-                self.parecidos += 1
-                continue
-            if not self.visitar(link.url, host, inicio):
-                continue
-            if link.cliques < self.limites.cliques:
-                fila.extend(self.proximos_da_fila(link, host))
-        motivo = self.parada.motivo or (
-            f"nenhum link novo a até {self.limites.cliques} cliques da página inicial"
-        )
-        return self.resultado(motivo)
+            self.seguir_link(fila.popleft(), fila, host, inicio)
+        return self.resultado(self.motivo_do_fim_da_fila())
+
+    def seguir_link(
+        self, link: LinkNaFila, fila: deque[LinkNaFila], host: str, inicio: float
+    ) -> None:
+        if self.familia_cheia(link):
+            self.parecidos += 1
+            return
+        if not self.visitar(link.url, host, inicio):
+            return
+        if link.cliques < self.limites.cliques:
+            fila.extend(self.proximos_da_fila(link, host))
+
+    def motivo_do_fim_da_fila(self) -> str:
+        if self.parada.motivo:
+            return self.parada.motivo
+        return f"nenhum link novo a até {self.limites.cliques} cliques da página inicial"
 
     def registrar_janela_fechada(self) -> None:
         if not self.sessao.aberta():
@@ -147,16 +153,21 @@ class Robo:
     def links_novos(self, url_da_pagina: str, host: str) -> list[str]:
         novos = []
         for href in sorted(set(self.sessao.links())):
-            absoluto = urljoin(url_da_pagina, href)
-            chave = url_para_comparar(absoluto)
-            if chave in self.urls_ja_vistas:
-                continue
-            self.urls_ja_vistas.add(chave)
-            if link_permitido(absoluto, host):
-                novos.append(absoluto)
-            else:
-                self.barrados += 1
+            novo = self.link_novo_e_permitido(url_da_pagina, href, host)
+            if novo is not None:
+                novos.append(novo)
         return novos
+
+    def link_novo_e_permitido(self, url_da_pagina: str, href: str, host: str) -> str | None:
+        absoluto = urljoin(url_da_pagina, href)
+        chave = url_para_comparar(absoluto)
+        if chave in self.urls_ja_vistas:
+            return None
+        self.urls_ja_vistas.add(chave)
+        if not link_permitido(absoluto, host):
+            self.barrados += 1
+            return None
+        return absoluto
 
     def resultado(self, motivo: str) -> ResultadoDoRobo:
         return ResultadoDoRobo(motivo, self.paginas, self.barrados, self.parecidos)

@@ -8,9 +8,20 @@ PRIMEIRO_STATUS_DE_ERRO = 400
 
 
 def descobrir_site_analisado(requisicoes: list[Requisicao]) -> str | None:
+    url_da_pagina = primeira_url_da_pagina(requisicoes)
+    if url_da_pagina is not None:
+        return host_com_porta(url_da_pagina)
+    return host_da_primeira_pagina_html(requisicoes)
+
+
+def primeira_url_da_pagina(requisicoes: list[Requisicao]) -> str | None:
     for requisicao in requisicoes:
         if requisicao.url_da_pagina:
-            return host_com_porta(requisicao.url_da_pagina)
+            return requisicao.url_da_pagina
+    return None
+
+
+def host_da_primeira_pagina_html(requisicoes: list[Requisicao]) -> str | None:
     for requisicao in requisicoes:
         if requisicao_e_pagina_html(requisicao):
             return host_com_porta(requisicao.url)

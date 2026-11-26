@@ -1,4 +1,5 @@
 import json
+from http.client import HTTPResponse
 from typing import Protocol
 from urllib.error import HTTPError
 from urllib.parse import quote
@@ -58,9 +59,7 @@ def baixar(requisicao: Request) -> bytes:
     limite = LIMITE_DO_PACOTE_EM_MEGABYTES * MEGABYTE
     try:
         with urlopen(requisicao, timeout=TEMPO_LIMITE_EM_SEGUNDOS) as resposta:
-            if resposta.status != STATUS_HTTP_PUBLICADO:
-                raise ConsultaNaoRealizada(motivo_do_erro_do_registro(resposta.status))
-            dados: bytes = resposta.read(limite + 1)
+            dados = ler_resposta_publicada(resposta, limite)
     except HTTPError as erro:
         raise ConsultaNaoRealizada(motivo_do_erro_do_registro(erro.code)) from erro
     except ERROS_DE_CONEXAO as erro:
@@ -68,6 +67,12 @@ def baixar(requisicao: Request) -> bytes:
     if len(dados) > limite:
         raise ConsultaNaoRealizada(f"pacote acima de {LIMITE_DO_PACOTE_EM_MEGABYTES} MB")
     return dados
+
+
+def ler_resposta_publicada(resposta: HTTPResponse, limite: int) -> bytes:
+    if resposta.status != STATUS_HTTP_PUBLICADO:
+        raise ConsultaNaoRealizada(motivo_do_erro_do_registro(resposta.status))
+    return resposta.read(limite + 1)
 
 
 def ler_endereco_e_integridade(metadados: bytes) -> tuple[str, str]:

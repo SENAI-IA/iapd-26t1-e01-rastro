@@ -29,11 +29,13 @@ def sem_protecao_contra_frame(pagina: Requisicao) -> bool:
 
 def csp_tem_frame_ancestors(pagina: Requisicao) -> bool:
     politica = ler_cabecalho(pagina, "content-security-policy")
-    for diretiva in SEPARADOR_DE_DIRETIVAS_CSP.split(politica):
-        nome_da_diretiva = diretiva.strip().split(" ")[0].lower()
-        if nome_da_diretiva == "frame-ancestors":
-            return True
-    return False
+    diretivas = SEPARADOR_DE_DIRETIVAS_CSP.split(politica)
+    return any(diretiva_e_frame_ancestors(diretiva) for diretiva in diretivas)
+
+
+def diretiva_e_frame_ancestors(diretiva: str) -> bool:
+    nome_da_diretiva = diretiva.strip().split(" ")[0].lower()
+    return nome_da_diretiva == "frame-ancestors"
 
 
 def expoe_versao_do_servidor(pagina: Requisicao) -> bool:

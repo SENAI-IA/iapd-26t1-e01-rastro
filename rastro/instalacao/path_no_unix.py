@@ -5,6 +5,8 @@ INICIO_DO_BLOCO = "# >>> rastro >>> (criado por `rastro instalar`; `rastro desin
 FIM_DO_BLOCO = "# <<< rastro <<<"
 LINHA_DO_PATH = 'export PATH="$HOME/.local/bin:$PATH"'
 ARQUIVOS_DO_SHELL = (".bashrc", ".zshrc", ".profile")
+ARQUIVO_PELO_NOME_DO_SHELL = {"zsh": ".zshrc", "bash": ".bashrc"}
+ARQUIVO_DE_QUALQUER_SHELL = ".profile"
 
 
 def pasta_no_path(pasta: Path, path: str) -> bool:
@@ -19,11 +21,7 @@ def parte_e_a_pasta(parte: str, pasta: Path) -> bool:
 
 def arquivo_do_shell(pasta_do_usuario: Path, shell: str) -> Path:
     nome = Path(shell).name
-    if nome == "zsh":
-        return pasta_do_usuario / ".zshrc"
-    if nome == "bash":
-        return pasta_do_usuario / ".bashrc"
-    return pasta_do_usuario / ".profile"
+    return pasta_do_usuario / ARQUIVO_PELO_NOME_DO_SHELL.get(nome, ARQUIVO_DE_QUALQUER_SHELL)
 
 
 def acrescentar_bloco_do_path(arquivo: Path) -> bool:

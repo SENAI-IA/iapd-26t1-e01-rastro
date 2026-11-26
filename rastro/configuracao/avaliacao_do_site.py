@@ -138,11 +138,17 @@ def checagem_dos_cookies_que_passaram(
 
 def nomes_dos_cookies(respostas: list[Requisicao], teste_do_cookie: TesteDeCookie) -> list[str]:
     nomes: list[str] = []
-    for resposta in respostas:
-        for cookie in resposta.cookies_resposta:
-            if teste_do_cookie(cookie) and cookie.nome not in nomes:
-                nomes.append(cookie.nome)
+    for cookie in cookies_das_respostas(respostas):
+        if teste_do_cookie(cookie) and cookie.nome not in nomes:
+            nomes.append(cookie.nome)
     return nomes
+
+
+def cookies_das_respostas(respostas: list[Requisicao]) -> list[Cookie]:
+    cookies: list[Cookie] = []
+    for resposta in respostas:
+        cookies.extend(resposta.cookies_resposta)
+    return cookies
 
 
 def qualquer_cookie(_cookie: Cookie) -> bool:
