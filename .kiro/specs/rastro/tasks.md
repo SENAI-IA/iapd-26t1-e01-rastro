@@ -722,10 +722,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @cristiano.albino
 
-- [ ] **T79 Separar a escolha da IA e o que os provedores repetem**
+- [x] **T79 Separar a escolha da IA e o que os provedores repetem**
   - Entrega: escolha da IA, contrato do provedor e execução da CLI em arquivos próprios; prompt montado num só lugar.
   - Aceite: os três provedores usam a mesma execução de CLI; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/ia/`, `rastro/identificacao/`, `rastro/explicacao/`, `tests/ia/`
+  - Arquivos: `rastro/ia/`, `rastro/identificacao/bibliotecas_pela_ia.py`, `rastro/explicacao/explicacao_dos_achados.py`, `rastro/comandos/`, `rastro/fluxo_da_analise.py`, `rastro/modelos_da_analise.py`, `rastro/relatorio/painel_da_ia.py`, `tests/`, `.kiro/steering/`, `.kiro/skills/rastro-nova-regra/SKILL.md`
   - Teste: os testes atuais da IA.
   - Requisito: R19.4
   - Revisão: @luiz.pagliari

@@ -1,7 +1,7 @@
 from dataclasses import asdict
 from typing import Any
 
-from rastro.ia.cliente import ChamadaIA
+from rastro.ia.cliente import ChamadaDaIA
 from rastro.modelos_da_analise import Analise
 
 
@@ -41,7 +41,7 @@ def tokens_total(analise: Analise) -> int | None:
     return somar_tokens(analise.chamadas_de_ia)
 
 
-def somar_tokens(chamadas: list[ChamadaIA]) -> int | None:
+def somar_tokens(chamadas: list[ChamadaDaIA]) -> int | None:
     total = 0
     for chamada in chamadas:
         if chamada.tokens is None:

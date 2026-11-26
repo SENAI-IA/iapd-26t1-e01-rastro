@@ -22,13 +22,13 @@ O código será defendido na banca. Qualquer pessoa deve entender um arquivo sem
 - Entrada e saída só nas bordas (`cli.py`, `comandos/`, `har/leitor_do_har.py`, `fontes/`, `ia/`, `relatorio/`, `pentest/leitura_do_resultado.py`, `pentest/gravacao_do_resultado.py`).
 - A IA é chamada só por `ia/cliente.py`, e o que ela devolve passa por `travas/` antes de virar dado. A IA nunca preenche CVE, versão, CVSS, EPSS, nota ou versão-alvo.
 - Prompts ficam em `ia/prompts/`, nunca como texto solto no meio do código.
-- O prompt é lido com `importlib.resources` e os dados entram no marcador `{{entrada}}` (`str.replace`, não `format`, porque o exemplo do prompt tem chaves de JSON).
+- O prompt é lido por `ia/montagem_do_prompt.py` com `importlib.resources` e os dados entram no marcador `{{entrada}}` (`str.replace`, não `format`, porque o exemplo do prompt tem chaves de JSON).
 - Erro que encerra a análise é uma exceção da borda com a mensagem pronta (ex.: `HarInvalido`). Só os arquivos de `comandos/` a transformam em mensagem na saída de erro e código 1 (com `encerrar_com_erro`, de `comandos/saida_de_erro.py`).
 
 ## Portabilidade e segurança
 
 - `pathlib` para caminhos; `encoding="utf-8"` em toda leitura e escrita.
-- CLI de IA: executável via `shutil.which`, prompt pela entrada padrão, saída lida como UTF-8, tempo limite definido.
+- CLI de IA: executável via `shutil.which` (`ia/escolha_da_ia.py`); rodada só por `ia/provedores/execucao_da_cli.py`, com prompt pela entrada padrão, saída lida como UTF-8 e tempo limite definido.
 - Relatório gravado com `open(caminho, "x", encoding="utf-8")` numa pasta nova por análise: nunca sobrescreve.
 - Pacote do npm lido só em memória (`tarfile` + `extractfile`); nunca `extract`/`extractall`, nunca executar.
 - Nunca enviar à IA cookies, cabeçalhos de autenticação ou tokens do HAR; só os trechos necessários.

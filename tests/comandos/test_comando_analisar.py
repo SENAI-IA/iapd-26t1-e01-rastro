@@ -7,8 +7,8 @@ import pytest
 from rastro.cli import executar
 from rastro.comandos import comando_analisar
 from rastro.comandos.resumo_no_terminal import AVISO_SEM_IA
-from rastro.ia import cliente
-from rastro.ia.cliente import FalhaDoProvedor, RespostaDoProvedor
+from rastro.ia import escolha_da_ia
+from rastro.ia.provedor import FalhaDoProvedor, RespostaDoProvedor
 from tests.dubles import (
     DADOS,
     HAR_DA_LOJA,
@@ -90,7 +90,7 @@ def clis_procuradas(monkeypatch: pytest.MonkeyPatch) -> list[str]:
         return f"/usr/local/bin/{nome}"
 
     monkeypatch.delenv("RASTRO_IA", raising=False)
-    monkeypatch.setattr(cliente.shutil, "which", which_falso)
+    monkeypatch.setattr(escolha_da_ia.shutil, "which", which_falso)
     return procuradas
 
 
@@ -123,7 +123,7 @@ def analisar_com_ia(har: Path, saida: Path, *opcoes: str) -> int:
 
 
 def test_r14_1_cada_ia_tem_o_seu_provedor() -> None:
-    assert set(comando_analisar.PROVEDORES_DAS_IAS) == set(cliente.EXECUTAVEIS_DAS_IAS)
+    assert set(comando_analisar.PROVEDORES_DAS_IAS) == set(escolha_da_ia.EXECUTAVEIS_DAS_IAS)
 
 
 @pytest.mark.usefixtures("fontes_falsas")

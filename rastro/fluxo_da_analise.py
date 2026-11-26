@@ -13,7 +13,7 @@ from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.har.leitor_do_har import ler_har
 from rastro.har.site import descobrir_site_analisado
 from rastro.har.visita import montar_visita
-from rastro.ia.cliente import ChamadaIA, ClienteDeIA
+from rastro.ia.cliente import ChamadaDaIA, ClienteDeIA
 from rastro.identificacao.assinaturas import algum_script_com_conteudo, identificar_por_assinatura
 from rastro.identificacao.bibliotecas_pela_ia import identificar_em_bundles
 from rastro.modelos_da_analise import Analise
@@ -101,7 +101,7 @@ def nome_do_provedor(ia: ClienteDeIA | None) -> str | None:
     return ia.provedor.nome
 
 
-def chamadas_feitas(ia: ClienteDeIA | None) -> list[ChamadaIA]:
+def chamadas_feitas(ia: ClienteDeIA | None) -> list[ChamadaDaIA]:
     if ia is None:
         return []
     return list(ia.chamadas)

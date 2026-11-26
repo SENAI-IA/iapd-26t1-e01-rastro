@@ -15,7 +15,8 @@ from rastro.fluxo_da_analise import (
 )
 from rastro.fontes.modelos import FonteSemResposta
 from rastro.har.leitor_do_har import HarInvalido, HarNaoEncontrado
-from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
+from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.provedor import FalhaDoProvedor, RespostaDoProvedor
 from rastro.relatorio.montagem_do_relatorio import montar_relatorio
 from tests.dubles import (
     DADOS,

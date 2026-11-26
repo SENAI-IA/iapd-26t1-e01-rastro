@@ -5,7 +5,7 @@
 - **Clareza e qualidade, sem over engineering.** Só existe abstração que resolve um problema de hoje. Na dúvida, a solução simples.
 - **Responsabilidade única (SRP) em pasta, arquivo e função.** Se a descrição precisa de "e", está fazendo coisas demais.
 - **Núcleo puro, entrada e saída nas bordas.** Ler arquivo, chamar API, chamar IA e gravar relatório ficam nas bordas. Nota, prioridade, checagens e travas são funções puras.
-- **Interface só onde há troca real:** a fonte de dados (`ConectorDeAvisos`), o registro do npm (`RegistroDePacotes`), o cliente da IA (`ProvedorDeIA`, com três provedores reais), o CVSS do NVD (`BuscaDeCvss`, ver `docs/decisoes/10-interface-do-nvd.md`) e o navegador que grava a visita (`SessaoDeGravacao`, ver `docs/decisoes/12-gravar-com-playwright.md`). Nos testes, os cinco viram dublês. Nenhuma outra parte ganha interface.
+- **Interface só onde há troca real:** a fonte de dados (`ConectorDeAvisos`), o registro do npm (`RegistroDePacotes`), o provedor da IA (`ProvedorDeIA`, em `ia/provedor.py`, com três provedores reais), o CVSS do NVD (`BuscaDeCvss`, ver `docs/decisoes/10-interface-do-nvd.md`) e o navegador que grava a visita (`SessaoDeGravacao`, ver `docs/decisoes/12-gravar-com-playwright.md`). Nos testes, os cinco viram dublês. Nenhuma outra parte ganha interface.
 - **A IA sugere, a regra confirma:** toda saída da IA passa por `travas/` antes de virar dado.
 - **Um único ponto de chamada à IA**, que mede tempo e tokens.
 - **Dados separados da apresentação.** O núcleo gera JSON; o React só exibe.
@@ -41,9 +41,13 @@ rastro/
   explicacao/              modelos.py, explicacao_dos_achados.py
   acao/                    modelos.py, plano_de_acao.py, texto_da_tarefa.py
   ia/
-    cliente.py             interface única, escolha do provedor, medição
+    provedor.py            contrato do provedor (ProvedorDeIA, RespostaDoProvedor, FalhaDoProvedor)
+    cliente.py             interface única: pergunta ao provedor e mede tempo e tokens (ChamadaDaIA)
+    escolha_da_ia.py       escolhe e valida a IA (--ia, RASTRO_IA) e localiza a CLI
+    montagem_do_prompt.py  lê o prompt de prompts/ e põe a entrada no marcador {{entrada}}
     sanitizacao.py         tira dados sensíveis do que vai para a IA
-    provedores/            kiro.py, claude.py, codex.py
+    provedores/            kiro.py, claude.py, codex.py; execucao_da_cli.py (roda a CLI, comum aos três),
+                           contagem_de_tokens.py (soma os tokens informados, comum a claude e codex)
     prompts/               prompts versionados, com exemplo de entrada e saída
   relatorio/               montagem_do_relatorio.py (esqueleto do JSON), limitacoes_da_analise.py, resumo_do_relatorio.py,
                            painel_da_ia.py, visita_no_relatorio.py, pagina_do_relatorio.py, gravacao_do_relatorio.py,
@@ -70,7 +74,7 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 - **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` e `achados_da_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade em `risco/prioridade.py`).
 - **Checagem nova:** uma função em `configuracao/checagens.py` (e na tupla `CHECAGENS`) e seu teste, e o que fazer e o impacto dela em `acao/plano_de_acao.py`.
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
-- **IA nova:** um arquivo em `ia/provedores/`.
+- **IA nova:** um arquivo em `ia/provedores/` (que roda a CLI com `execucao_da_cli.py`) e o nome em `EXECUTAVEIS_DAS_IAS` (`ia/escolha_da_ia.py`).
 - **Assinatura nova:** em `identificacao/assinaturas.py`.
 - **Trava nova:** um arquivo em `travas/`, chamado por `conferencia_das_bibliotecas.py` (trava sobre biblioteca) ou direto pelo fluxo (trava sobre aviso ou explicação), com teste em que a IA (dublê) inventa algo e a trava barra.
 

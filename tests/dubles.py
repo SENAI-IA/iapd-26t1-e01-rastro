@@ -9,7 +9,8 @@ from rastro.fontes import osv
 from rastro.fontes.conector import ConsultaNaoRealizada
 from rastro.fontes.github_advisory import converter_resposta
 from rastro.fontes.modelos import Aviso
-from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
+from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.provedor import FalhaDoProvedor, RespostaDoProvedor
 from rastro.modelos_da_analise import Analise
 from rastro.pentest.sonda import RespostaHttp
 from rastro.relatorio.montagem_do_relatorio import montar_relatorio

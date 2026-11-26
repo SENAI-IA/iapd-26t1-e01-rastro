@@ -11,15 +11,15 @@ from rastro.fontes.nvd import Nvd
 from rastro.fontes.osv import Osv
 from rastro.fontes.registro_npm import RegistroNpm
 from rastro.har.leitor_do_har import ErroAoLerHar
-from rastro.ia.cliente import (
+from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.escolha_da_ia import (
     VARIAVEL_DA_IA,
-    CliDaIaAusente,
-    ClienteDeIA,
-    IaInvalida,
-    ProvedorDeIA,
+    CLIDaIAAusente,
+    IAInvalida,
     escolher_ia,
     localizar_cli,
 )
+from rastro.ia.provedor import ProvedorDeIA
 from rastro.ia.provedores.claude import ProvedorClaude
 from rastro.ia.provedores.codex import ProvedorCodex
 from rastro.ia.provedores.kiro import ProvedorKiro
@@ -54,22 +54,22 @@ PROVEDORES_DAS_IAS: dict[str, Callable[[str], ProvedorDeIA]] = {
 def analisar_com_ia(
     caminho_har: Path,
     saida: Path | None,
-    opcao_ia: str | None,
+    opcao_da_ia: str | None,
     abrir: bool,
     caminho_pentest: Path | None,
 ) -> int:
     try:
-        ia = montar_cliente_de_ia(opcao_ia)
-    except IaInvalida as erro:
+        ia = montar_cliente_de_ia(opcao_da_ia)
+    except IAInvalida as erro:
         return encerrar_com_erro(str(erro))
-    except CliDaIaAusente as erro:
+    except CLIDaIAAusente as erro:
         return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
     avisar_analise_com_ia(ia)
     return analisar_e_gravar(caminho_har, saida, ia, abrir, caminho_pentest)
 
 
-def montar_cliente_de_ia(opcao_ia: str | None) -> ClienteDeIA:
-    nome_da_ia = escolher_ia(opcao_ia, os.environ.get(VARIAVEL_DA_IA))
+def montar_cliente_de_ia(opcao_da_ia: str | None) -> ClienteDeIA:
+    nome_da_ia = escolher_ia(opcao_da_ia, os.environ.get(VARIAVEL_DA_IA))
     executavel = localizar_cli(nome_da_ia)
     return ClienteDeIA(PROVEDORES_DAS_IAS[nome_da_ia](executavel))
 

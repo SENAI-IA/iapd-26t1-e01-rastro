@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 from typing import TypeAlias
 
-from rastro.ia.cliente import IA_PADRAO, VARIAVEL_DA_IA
+from rastro.ia.escolha_da_ia import IA_PADRAO, VARIAVEL_DA_IA
 
 DESCRICAO = (
     "Lê um HAR, identifica as bibliotecas front-end do site e prioriza as falhas "

@@ -4,8 +4,9 @@ from typing import Any
 
 import pytest
 
-from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
-from rastro.ia.provedores import claude
+from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.provedor import FalhaDoProvedor, RespostaDoProvedor
+from rastro.ia.provedores import execucao_da_cli
 from rastro.ia.provedores.claude import ProvedorClaude
 from tests.dubles import DADOS
 
@@ -28,7 +29,7 @@ class SubprocessFalso:
 
 
 def trocar_subprocess(monkeypatch: pytest.MonkeyPatch, falso: Any) -> None:
-    monkeypatch.setattr(claude.subprocess, "run", falso)
+    monkeypatch.setattr(execucao_da_cli.subprocess, "run", falso)
 
 
 def resposta_com(**campos: Any) -> str:

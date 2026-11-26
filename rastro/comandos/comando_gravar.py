@@ -38,7 +38,7 @@ from rastro.comandos.comando_analisar import (
     montar_cliente_de_ia,
 )
 from rastro.comandos.saida_de_erro import encerrar_com_erro
-from rastro.ia.cliente import CliDaIaAusente, IaInvalida
+from rastro.ia.escolha_da_ia import CLIDaIAAusente, IAInvalida
 from rastro.terminal import LinhaAoVivo, escrever_tempo
 
 TEXTO_GRAVANDO = (
@@ -101,20 +101,20 @@ TEXTO_HAR_PERDIDO = "o navegador fechou antes de gravar o HAR. Nenhum relatório
 def gravar_e_analisar(
     url: str,
     saida: Path | None,
-    opcao_ia: str | None,
+    opcao_da_ia: str | None,
     sem_ia: bool,
     abrir: bool,
     robo: bool = False,
 ) -> int:
     try:
         host = host_da_url(url)
-        ia = None if sem_ia else montar_cliente_de_ia(opcao_ia)
+        ia = None if sem_ia else montar_cliente_de_ia(opcao_da_ia)
         conferir_playwright()
         pasta = caminho_da_gravacao(pasta_padrao_das_gravacoes(), host, datetime.now())
         har = criar_pasta_da_gravacao(pasta)
-    except CliDaIaAusente as erro:
+    except CLIDaIAAusente as erro:
         return encerrar_com_erro(f"{erro}. Escolha outra IA com --ia. {SUGESTAO_SEM_IA}")
-    except (UrlInvalida, IaInvalida, PlaywrightAusente, GravacaoJaExiste) as erro:
+    except (UrlInvalida, IAInvalida, PlaywrightAusente, GravacaoJaExiste) as erro:
         return encerrar_com_erro(str(erro))
     try:
         requisicoes = gravar_visita(url, host, har, robo)

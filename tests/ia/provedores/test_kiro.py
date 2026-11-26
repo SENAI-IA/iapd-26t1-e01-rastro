@@ -3,8 +3,9 @@ from typing import Any
 
 import pytest
 
-from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
-from rastro.ia.provedores import kiro
+from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.provedor import FalhaDoProvedor, RespostaDoProvedor
+from rastro.ia.provedores import execucao_da_cli
 from rastro.ia.provedores.kiro import ProvedorKiro
 from tests.dubles import DADOS
 
@@ -26,7 +27,7 @@ class SubprocessFalso:
 
 
 def trocar_subprocess(monkeypatch: pytest.MonkeyPatch, falso: Any) -> None:
-    monkeypatch.setattr(kiro.subprocess, "run", falso)
+    monkeypatch.setattr(execucao_da_cli.subprocess, "run", falso)
 
 
 def test_r14_4_prompt_vai_pela_entrada_padrao_e_nunca_como_argumento(

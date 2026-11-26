@@ -6,7 +6,7 @@ from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.modelos import FonteSemResposta
 from rastro.har.visita import PassoDaVisita
-from rastro.ia.cliente import ChamadaIA
+from rastro.ia.cliente import ChamadaDaIA
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.modelos import Achado
 from rastro.travas.modelos import TravaAcionada
@@ -29,5 +29,5 @@ class Analise:
     checagens: list[Checagem]
     plano_de_acao: list[Acao]
     travas_acionadas: list[TravaAcionada]
-    chamadas_de_ia: list[ChamadaIA]
+    chamadas_de_ia: list[ChamadaDaIA]
     visita: list[PassoDaVisita]

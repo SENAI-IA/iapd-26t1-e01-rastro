@@ -3,7 +3,8 @@ from typing import Any
 
 from rastro.har.leitor_do_har import ler_har
 from rastro.har.modelos import Requisicao
-from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
+from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.provedor import FalhaDoProvedor, RespostaDoProvedor
 from rastro.identificacao.assinaturas import identificar_por_assinatura
 from rastro.identificacao.bibliotecas_pela_ia import ETAPA, BibliotecasDaIA, identificar_em_bundles
 from rastro.identificacao.modelos import Biblioteca, Evidencia

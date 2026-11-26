@@ -1,6 +1,7 @@
 from dataclasses import replace
 
-from rastro.ia.cliente import ChamadaIA, FalhaDoProvedor, RespostaDoProvedor
+from rastro.ia.cliente import ChamadaDaIA
+from rastro.ia.provedor import FalhaDoProvedor, RespostaDoProvedor
 from rastro.modelos_da_analise import Analise
 from rastro.relatorio.montagem_do_relatorio import montar_relatorio
 from tests.dubles import analise_da_loja, analise_da_loja_com_ia, relatorio_da_loja
@@ -14,8 +15,8 @@ def lodash_como_se_viesse_da_ia(analise: Analise) -> Analise:
     return replace(analise, bibliotecas=bibliotecas)
 
 
-def chamada(tokens: int | None) -> ChamadaIA:
-    return ChamadaIA("explicar_achado", "kiro", "entrada", "resposta", 1.2, tokens, True)
+def chamada(tokens: int | None) -> ChamadaDaIA:
+    return ChamadaDaIA("explicar_achado", "kiro", "entrada", "resposta", 1.2, tokens, True)
 
 
 def test_r21_10_travas_acionadas_vao_para_o_painel_da_ia() -> None:

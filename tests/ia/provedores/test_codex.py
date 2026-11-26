@@ -4,8 +4,9 @@ from typing import Any
 
 import pytest
 
-from rastro.ia.cliente import ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
-from rastro.ia.provedores import codex
+from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.provedor import FalhaDoProvedor, RespostaDoProvedor
+from rastro.ia.provedores import execucao_da_cli
 from rastro.ia.provedores.codex import ProvedorCodex
 from tests.dubles import DADOS
 
@@ -29,7 +30,7 @@ class SubprocessFalso:
 
 
 def trocar_subprocess(monkeypatch: pytest.MonkeyPatch, falso: Any) -> None:
-    monkeypatch.setattr(codex.subprocess, "run", falso)
+    monkeypatch.setattr(execucao_da_cli.subprocess, "run", falso)
 
 
 def mensagem_do_agente(texto: Any) -> str:

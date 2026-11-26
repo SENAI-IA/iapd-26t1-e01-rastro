@@ -10,7 +10,7 @@ from rastro.fluxo_da_analise import analisar
 from rastro.fontes.completar_cvss import BuscaDeCvss
 from rastro.fontes.conector import ConectorDeAvisos
 from rastro.fontes.registro_npm import RegistroDePacotes
-from rastro.ia import cliente
+from rastro.ia import escolha_da_ia
 from rastro.ia.cliente import ClienteDeIA
 from rastro.modelos_da_analise import Analise
 from tests.dubles import ConectorFalso, NavegadorFalso, NvdFalso, OsvFalso, RegistroFalso
@@ -60,4 +60,4 @@ def fontes_falsas(monkeypatch: pytest.MonkeyPatch, navegador: NavegadorFalso) ->
 @pytest.fixture
 def nenhuma_cli_instalada(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("RASTRO_IA", raising=False)
-    monkeypatch.setattr(cliente.shutil, "which", lambda _nome: None)
+    monkeypatch.setattr(escolha_da_ia.shutil, "which", lambda _nome: None)

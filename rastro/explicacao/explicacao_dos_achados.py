@@ -1,12 +1,12 @@
 import json
 from dataclasses import dataclass
-from importlib import resources
 
 from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.modelos import Aviso
 from rastro.har.site import url_sem_query_string
 from rastro.ia.cliente import ClienteDeIA
+from rastro.ia.montagem_do_prompt import montar_prompt
 from rastro.ia.sanitizacao import sanitizar
 from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.achados import agrupar_por_biblioteca
@@ -25,7 +25,6 @@ from rastro.travas.modelos import TravaAcionada
 
 ETAPA = "explicar_achado"
 ARQUIVO_DO_PROMPT = "explicar_achado.md"
-MARCADOR_DA_ENTRADA = "{{entrada}}"
 CAMPOS_DA_EXPLICACAO = ("o_que_e", "impacto", "como_corrigir", "teste_verificacao")
 
 
@@ -60,7 +59,7 @@ def explicar_biblioteca(
     avisos = [achado.aviso for achado in em_ordem]
     sem_ia = explicacao_pelo_resumo(avisos[0])
     entrada = sanitizar(montar_entrada(biblioteca, avisos))
-    resposta = ia.perguntar(ETAPA, montar_prompt(entrada))
+    resposta = ia.perguntar(ETAPA, montar_prompt(ARQUIVO_DO_PROMPT, entrada))
     if resposta is None:
         return sem_ia, []
     alvo = f"explicação de {biblioteca.pacote}@{biblioteca.versao}"
@@ -108,15 +107,6 @@ def aviso_na_entrada(aviso: Aviso) -> dict[str, object]:
         "versoes_afetadas": aviso.versoes_afetadas,
         "versao_corrigida": aviso.versao_corrigida,
     }
-
-
-def montar_prompt(entrada: str) -> str:
-    return ler_modelo_do_prompt().replace(MARCADOR_DA_ENTRADA, entrada)
-
-
-def ler_modelo_do_prompt() -> str:
-    prompts = resources.files("rastro.ia").joinpath("prompts")
-    return prompts.joinpath(ARQUIVO_DO_PROMPT).read_text(encoding="utf-8")
 
 
 def ler_campos_da_explicacao(resposta: str) -> dict[str, str]:
