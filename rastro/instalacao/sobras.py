@@ -37,5 +37,5 @@ def instalado_pelo_install_sh(projeto: Path) -> bool:
 def comando_para_apagar(caminho: Path, no_windows: bool) -> str:
     if no_windows:
         entre_aspas = str(caminho).replace("'", "''")
-        return f"Remove-Item -Recurse -Force '{entre_aspas}'"
+        return f"Remove-Item -LiteralPath '{entre_aspas}' -Recurse -Force"
     return f"rm -rf {shlex.quote(str(caminho))}"

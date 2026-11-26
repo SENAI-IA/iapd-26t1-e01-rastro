@@ -307,5 +307,6 @@ export const SEUS_DADOS: ItemDoGuia[] = [
     modos: GRAVANDO_PELO_RASTRO,
   },
   { texto: "A IA recebe só trechos de scripts, o nome e a versão das bibliotecas e os dados dos avisos, com tokens, chaves e parâmetros de endereço tirados antes." },
+  { texto: "O GitHub Advisory, o OSV e o registro do npm recebem só o nome e a versão das bibliotecas; o NVD, só o CVE." },
   { texto: "A segurança ativa é opcional: o Rastro só acessa o site quando você executa o `pentest` com `--autorizo`, e o resultado fica separado da nota." },
 ];

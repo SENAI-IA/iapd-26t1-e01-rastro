@@ -1,6 +1,7 @@
 from rastro.comandos.saida_de_erro import encerrar_com_erro
 from rastro.instalacao import instalador
 from rastro.instalacao.atalho import AtalhoDeOutro, ProjetoNaoEncontrado
+from rastro.instalacao.path_no_unix import ArquivoDoShellIlegivel
 
 TEXTO_INSTALADO = "Pronto! Comando rastro instalado."
 TEXTO_TESTE_NO_MESMO_TERMINAL = "Teste com: rastro --help"
@@ -10,7 +11,7 @@ TEXTO_TESTE_NUM_TERMINAL_NOVO = "Abra um terminal novo e teste com: rastro --hel
 def executar_comando_instalar() -> int:
     try:
         instalacao = instalador.instalar()
-    except (ProjetoNaoEncontrado, AtalhoDeOutro) as erro:
+    except (ProjetoNaoEncontrado, AtalhoDeOutro, ArquivoDoShellIlegivel, OSError) as erro:
         return encerrar_com_erro(str(erro))
     print(TEXTO_INSTALADO)
     if instalacao.path_alterado_em:

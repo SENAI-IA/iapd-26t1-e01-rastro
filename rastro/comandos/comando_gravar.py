@@ -7,7 +7,12 @@ from datetime import datetime
 from pathlib import Path
 from types import FrameType
 
-from rastro.captura.endereco_da_visita import UrlInvalida, host_da_url, url_sem_usuario_e_senha
+from rastro.captura.endereco_da_visita import (
+    UrlInvalida,
+    host_da_url,
+    motivo_sem_usuario_e_senha,
+    url_sem_usuario_e_senha,
+)
 from rastro.captura.espera_da_gravacao import (
     PedidoDeParada,
     esperar_a_janela_fechar,
@@ -317,7 +322,8 @@ def mostrar_passo_do_robo(passo: PassoDoRobo, linha: LinhaAoVivo) -> None:
     if passo.falha is not None:
         linha.imprimir(
             TEXTO_PASSO_QUE_FALHOU.format(
-                url=url_sem_usuario_e_senha(passo.url), motivo=passo.falha
+                url=url_sem_usuario_e_senha(passo.url),
+                motivo=motivo_sem_usuario_e_senha(passo.falha, passo.url),
             )
         )
         return
@@ -350,7 +356,8 @@ def abrir_primeira_pagina(sessao: SessaoDeGravacao, url: str, linha: LinhaAoVivo
     try:
         sessao.abrir_pagina(url)
     except FalhaAoNavegar as erro:
-        linha.pedir(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=url_para_exibir, motivo=erro))
+        motivo = motivo_sem_usuario_e_senha(str(erro), url)
+        linha.pedir(TEXTO_FALHA_NA_PRIMEIRA_PAGINA.format(url=url_para_exibir, motivo=motivo))
 
 
 @contextmanager

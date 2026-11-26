@@ -40,6 +40,10 @@ def url_sem_usuario_e_senha(url: str) -> str:
     return partes._replace(netloc=host_e_porta).geturl()
 
 
+def motivo_sem_usuario_e_senha(motivo: str, url: str) -> str:
+    return motivo.replace(url, url_sem_usuario_e_senha(url))
+
+
 def host_e_porta_sem_usuario_e_senha(netloc: str) -> str:
     _, host_e_porta = netloc.rsplit("@", 1)
     return host_e_porta

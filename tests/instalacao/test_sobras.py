@@ -42,5 +42,5 @@ def test_r17_4_comando_para_apagar_no_linux_protege_o_caminho() -> None:
 
 def test_r17_4_comando_para_apagar_no_windows_usa_o_powershell() -> None:
     assert comando_para_apagar(Path("C:/Users/d'ana/Rastro"), no_windows=True) == (
-        "Remove-Item -Recurse -Force 'C:/Users/d''ana/Rastro'"
+        "Remove-Item -LiteralPath 'C:/Users/d''ana/Rastro' -Recurse -Force"
     )

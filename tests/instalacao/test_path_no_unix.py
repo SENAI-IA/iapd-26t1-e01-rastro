@@ -1,9 +1,12 @@
 import os
 from pathlib import Path
 
+import pytest
+
 from rastro.instalacao.path_no_unix import (
     FIM_DO_BLOCO,
     INICIO_DO_BLOCO,
+    ArquivoDoShellIlegivel,
     acrescentar_bloco_do_path,
     arquivo_do_shell,
     pasta_no_path,
@@ -56,3 +59,13 @@ def test_r17_3_posicao_da_linha_ignora_espacos_e_comeca_onde_pedido() -> None:
     assert posicao_da_linha(linhas, INICIO_DO_BLOCO, 0) == 0
     assert posicao_da_linha(linhas, INICIO_DO_BLOCO, 1) == 2
     assert posicao_da_linha(linhas, FIM_DO_BLOCO, 0) is None
+
+
+def test_r17_3_arquivo_do_shell_fora_do_utf8_avisa_sem_traceback(tmp_path: Path) -> None:
+    arquivo = tmp_path / ".bashrc"
+    arquivo.write_bytes("# configuração\n".encode("latin-1"))
+
+    with pytest.raises(ArquivoDoShellIlegivel, match="UTF-8"):
+        acrescentar_bloco_do_path(arquivo)
+    with pytest.raises(ArquivoDoShellIlegivel, match="UTF-8"):
+        remover_bloco_do_path(arquivo)

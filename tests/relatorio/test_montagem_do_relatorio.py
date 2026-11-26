@@ -37,6 +37,8 @@ def test_r24_11_pentest_fica_separado_e_nao_muda_o_resumo() -> None:
     assert com_pentest["achados"] == sem_pentest["achados"]
     assert com_pentest["plano_de_acao"] == sem_pentest["plano_de_acao"]
 
+
+def test_r13_7_relatorio_traz_versao_do_formato_e_todas_as_secoes() -> None:
     relatorio = relatorio_da_loja()
 
     assert relatorio["versao_formato"] == VERSAO_DO_FORMATO == 1

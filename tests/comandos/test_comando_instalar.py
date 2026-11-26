@@ -50,3 +50,15 @@ def test_r17_3_cli_instalar_com_comando_de_outro_sai_com_1(
 
     assert executar(["instalar"]) == 1
     assert "rastro: erro:" in capsys.readouterr().err
+
+
+def test_r17_3_cli_instalar_com_arquivo_do_shell_ilegivel_sai_com_1(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    (tmp_path / ".bashrc").write_bytes("# configuração\n".encode("latin-1"))
+    monkeypatch.setattr(
+        instalador, "instalar", lambda: instalar_no_unix(tmp_path, ambiente(tmp_path))
+    )
+
+    assert executar(["instalar"]) == 1
+    assert "não foi possível ler" in capsys.readouterr().err

@@ -3,6 +3,7 @@ import sys
 from rastro.comandos.saida_de_erro import encerrar_com_erro
 from rastro.instalacao import instalador, sobras
 from rastro.instalacao.atalho import AtalhoDeOutro
+from rastro.instalacao.path_no_unix import ArquivoDoShellIlegivel
 from rastro.instalacao.sobras import Sobra, comando_para_apagar
 
 TEXTO_DESINSTALADO = "Comando rastro removido."
@@ -13,7 +14,7 @@ TEXTO_PARA_LIMPAR_TUDO = "Para limpar tudo, apague também:"
 def executar_comando_desinstalar() -> int:
     try:
         desinstalacao = instalador.desinstalar()
-    except AtalhoDeOutro as erro:
+    except (AtalhoDeOutro, ArquivoDoShellIlegivel, OSError) as erro:
         return encerrar_com_erro(str(erro))
     if desinstalacao.atalho_removido is None and not desinstalacao.path_removido_de:
         print(TEXTO_NADA_A_REMOVER)

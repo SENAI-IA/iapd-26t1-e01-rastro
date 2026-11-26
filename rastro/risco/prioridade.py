@@ -4,7 +4,9 @@ NOTA_MINIMA_DA_ALTA = 7.5
 NOTA_MINIMA_DA_MEDIA = 6.5
 
 PRIORIDADES: tuple[Prioridade, ...] = ("alta", "media", "baixa", "a avaliar")
-ORDEM_DA_PRIORIDADE: dict[Prioridade, int] = {"alta": 0, "media": 1, "baixa": 2, "a avaliar": 3}
+ORDEM_DA_PRIORIDADE: dict[Prioridade, int] = {
+    prioridade: posicao for posicao, prioridade in enumerate(PRIORIDADES)
+}
 ROTULO_DA_PRIORIDADE: dict[Prioridade, str] = {
     "alta": "alta",
     "media": "média",

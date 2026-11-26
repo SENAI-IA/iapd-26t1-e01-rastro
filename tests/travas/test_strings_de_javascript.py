@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from rastro.travas.strings_de_javascript import formas_escritas, strings_do_trecho
@@ -30,3 +32,14 @@ def test_r21_5_formas_escritas_cobrem_as_tres_aspas_com_escape() -> None:
 
 def test_r21_5_formas_escritas_escapam_quebra_de_linha_e_barra() -> None:
     assert formas_escritas("a\\b\nc")[0] == '"a\\\\b\\nc"'
+
+
+def test_r21_5_escape_unicode_fora_do_intervalo_vira_caractere_de_substituicao() -> None:
+    assert strings_do_trecho('"a\\u{110000}b\\u{FFFFFFFFFFFFFFFFFFFF}"') == ["a\ufffdb\ufffd"]
+
+
+def test_r21_5_aspa_seguida_de_muitas_barras_sem_fechar_nao_trava_a_leitura() -> None:
+    inicio = time.monotonic()
+
+    assert strings_do_trecho('"' + "\\" * 60) == []
+    assert time.monotonic() - inicio < 1

@@ -9,6 +9,11 @@ ARQUIVO_PELO_NOME_DO_SHELL = {"zsh": ".zshrc", "bash": ".bashrc"}
 ARQUIVO_DE_QUALQUER_SHELL = ".profile"
 
 
+class ArquivoDoShellIlegivel(Exception):
+    def __init__(self, arquivo: Path, motivo: str) -> None:
+        super().__init__(f"não foi possível ler {arquivo} ({motivo})")
+
+
 def pasta_no_path(pasta: Path, path: str) -> bool:
     return any(parte_e_a_pasta(parte, pasta) for parte in path.split(os.pathsep))
 
@@ -38,7 +43,16 @@ def acrescentar_bloco_do_path(arquivo: Path) -> bool:
 def texto_do_arquivo_se_existir(arquivo: Path) -> str:
     if not arquivo.is_file():
         return ""
-    return arquivo.read_text(encoding="utf-8")
+    return ler_arquivo_do_shell(arquivo)
+
+
+def ler_arquivo_do_shell(arquivo: Path) -> str:
+    try:
+        return arquivo.read_text(encoding="utf-8")
+    except UnicodeDecodeError as erro:
+        raise ArquivoDoShellIlegivel(arquivo, "o arquivo não está em UTF-8") from erro
+    except OSError as erro:
+        raise ArquivoDoShellIlegivel(arquivo, erro.strerror or type(erro).__name__) from erro
 
 
 def quebra_de_linha_que_falta_no_fim(texto: str) -> str:
@@ -50,7 +64,7 @@ def quebra_de_linha_que_falta_no_fim(texto: str) -> str:
 def remover_bloco_do_path(arquivo: Path) -> bool:
     if not arquivo.is_file():
         return False
-    linhas = arquivo.read_text(encoding="utf-8").splitlines(keepends=True)
+    linhas = ler_arquivo_do_shell(arquivo).splitlines(keepends=True)
     inicio = posicao_da_linha(linhas, INICIO_DO_BLOCO, 0)
     if inicio is None:
         return False

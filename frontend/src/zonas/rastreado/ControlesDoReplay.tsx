@@ -15,6 +15,13 @@ function iconeDoBotao(tocando: boolean, terminou: boolean): NomeDoIcone {
   return terminou ? "reiniciar" : "tocar";
 }
 
+function rotuloDoBotao(tocando: boolean, terminou: boolean): string {
+  if (tocando) {
+    return "Pausar a visita";
+  }
+  return terminou ? "Reiniciar a visita" : "Tocar a visita";
+}
+
 export default function ControlesDoReplay({ relogio, duracaoDoReplay, duracaoDaVisita }: Props) {
   const terminou = relogio.tempo >= duracaoDoReplay;
   return (
@@ -23,7 +30,7 @@ export default function ControlesDoReplay({ relogio, duracaoDoReplay, duracaoDaV
         type="button"
         className="replay__tocar"
         onClick={relogio.tocando ? relogio.pausar : relogio.tocar}
-        aria-label={relogio.tocando ? "Pausar a visita" : "Tocar a visita"}
+        aria-label={rotuloDoBotao(relogio.tocando, terminou)}
       >
         <Icone nome={iconeDoBotao(relogio.tocando, terminou)} tamanho={16} />
       </button>

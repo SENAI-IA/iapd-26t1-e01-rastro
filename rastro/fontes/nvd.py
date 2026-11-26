@@ -41,13 +41,13 @@ def ler_cvss(resposta: Any) -> float | None:
     metricas = vulnerabilidades[0]["cve"].get("metrics")
     if not metricas:
         return None
-    medicoes = medicoes_da_versao_mais_recente(metricas)
+    medicoes = medicoes_da_versao_preferida(metricas)
     if not medicoes:
         return None
     return float(medicao_principal(medicoes)["cvssData"]["baseScore"])
 
 
-def medicoes_da_versao_mais_recente(metricas: Any) -> Any:
+def medicoes_da_versao_preferida(metricas: Any) -> Any:
     for versao_do_cvss in METRICAS_NA_ORDEM:
         medicoes = metricas.get(versao_do_cvss)
         if medicoes:

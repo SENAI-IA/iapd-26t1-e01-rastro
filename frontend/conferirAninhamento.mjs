@@ -1,9 +1,10 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { API } from "typescript/unstable/sync";
 import { SyntaxKind } from "typescript/unstable/ast";
 
 const LIMITE_DE_NIVEIS = 2;
-const PASTA_DO_FRONTEND = path.dirname(new URL(import.meta.url).pathname);
+const PASTA_DO_FRONTEND = path.dirname(fileURLToPath(import.meta.url));
 const PASTA_DO_CODIGO = path.join(PASTA_DO_FRONTEND, "src") + path.sep;
 const CONFIGURACAO_DO_PROJETO = path.join(PASTA_DO_FRONTEND, "tsconfig.app.json");
 

@@ -5,18 +5,45 @@ interface Props {
   comandos: Comando[];
 }
 
-export default function ComandosDoPasso({ comandos }: Props) {
-  const [copiado, setCopiado] = useState<string | null>(null);
+type ResultadoDaCopia = "copiado" | "selecionado";
 
-  const copiar = (comando: Comando) => {
+interface CopiaDoComando {
+  sistema: string;
+  resultado: ResultadoDaCopia;
+}
+
+const TEXTO_DO_BOTAO: Record<ResultadoDaCopia, string> = {
+  copiado: "Copiado",
+  selecionado: "Use Ctrl + C",
+};
+
+function selecionarTexto(elemento: Element | null | undefined) {
+  const selecao = window.getSelection();
+  if (elemento && selecao) {
+    selecao.selectAllChildren(elemento);
+  }
+}
+
+export default function ComandosDoPasso({ comandos }: Props) {
+  const [copia, setCopia] = useState<CopiaDoComando | null>(null);
+
+  const copiar = (comando: Comando, botao: HTMLButtonElement) => {
+    const selecionar = () => {
+      selecionarTexto(botao.parentElement?.querySelector("code"));
+      setCopia({ sistema: comando.sistema, resultado: "selecionado" });
+    };
     if (!navigator.clipboard) {
+      selecionar();
       return;
     }
     navigator.clipboard.writeText(comando.texto).then(
-      () => setCopiado(comando.sistema),
-      () => setCopiado(null),
+      () => setCopia({ sistema: comando.sistema, resultado: "copiado" }),
+      selecionar,
     );
   };
+
+  const textoDoBotao = (comando: Comando) =>
+    copia?.sistema === comando.sistema ? TEXTO_DO_BOTAO[copia.resultado] : "Copiar";
 
   return (
     <>
@@ -27,10 +54,10 @@ export default function ComandosDoPasso({ comandos }: Props) {
           <button
             type="button"
             className="passo-do-guia__copiar"
-            onClick={() => copiar(comando)}
+            onClick={(evento) => copiar(comando, evento.currentTarget)}
             aria-label={`Copiar o comando para ${comando.sistema}`}
           >
-            {copiado === comando.sistema ? "Copiado" : "Copiar"}
+            {textoDoBotao(comando)}
           </button>
         </div>
       ))}

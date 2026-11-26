@@ -4,7 +4,7 @@ STRING_DE_JAVASCRIPT = re.compile(
     r"""
     (?P<aspa> ["'`] )
     (?P<conteudo>
-        (?: \\. | (?! (?P=aspa) ) . )*?
+        (?: \\. | (?! (?P=aspa) | \\ ) . )*
     )
     (?P=aspa)
     """,
@@ -24,6 +24,8 @@ ESCAPE_DE_JAVASCRIPT = re.compile(
 )
 ESCAPES_DE_UMA_LETRA = {"n": "\n", "t": "\t", "r": "\r", "b": "\b", "f": "\f", "v": "\v", "0": "\0"}
 BASE_HEXADECIMAL = 16
+MAIOR_CODIGO_UNICODE = 0x10FFFF
+CARACTERE_DE_SUBSTITUICAO = "\ufffd"
 INICIO_DO_CODIGO_ENTRE_CHAVES = "u{"
 LETRAS_DO_CODIGO_HEXADECIMAL = "ux"
 
@@ -66,7 +68,10 @@ def codigo_depois_da_letra(sequencia: str) -> str:
 
 
 def caractere_do_codigo_hexadecimal(codigo: str) -> str:
-    return chr(int(codigo, BASE_HEXADECIMAL))
+    valor = int(codigo, BASE_HEXADECIMAL)
+    if valor > MAIOR_CODIGO_UNICODE:
+        return CARACTERE_DE_SUBSTITUICAO
+    return chr(valor)
 
 
 def formas_escritas(valor: str) -> list[str]:
