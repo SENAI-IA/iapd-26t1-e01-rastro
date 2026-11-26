@@ -730,10 +730,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @luiz.pagliari
 
-- [ ] **T80 Separar as travas por assunto**
+- [x] **T80 Separar as travas por assunto**
   - Entrega: JSON estrito, strings de JavaScript e a trava do pacote existente em arquivos próprios.
   - Aceite: cada arquivo de `travas/` é uma trava ou um apoio de uma trava; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/travas/`, `tests/travas/`
+  - Arquivos: `rastro/travas/`, `rastro/explicacao/explicacao_dos_achados.py`, `rastro/identificacao/bibliotecas_pela_ia.py`, `tests/travas/`, `.kiro/steering/structure.md`, `.kiro/skills/rastro-nova-regra/SKILL.md`
   - Teste: os testes atuais das travas.
   - Requisito: R19.4
   - Revisão: @cristiano.albino

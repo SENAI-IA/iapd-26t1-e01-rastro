@@ -7,7 +7,6 @@ from rastro.identificacao.modelos import Biblioteca, Evidencia
 from rastro.travas.codigo_publicado import (
     conferir_codigo_publicado,
     string_esta_no_codigo,
-    strings_do_trecho,
     trecho_prova_o_pacote,
 )
 from rastro.travas.modelos import TravaAcionada
@@ -149,21 +148,6 @@ def test_r21_5_trava_que_ja_falhou_nao_se_repete() -> None:
     biblioteca, _ = conferir_codigo_publicado(ja_barrada, RegistroFalso())
 
     assert biblioteca.travas_que_falharam == ["código confere"]
-
-
-@pytest.mark.parametrize(
-    ("trecho", "esperado"),
-    [
-        (TRECHO_DO_ANGULAR, ["ng-version", "22.2.2"]),
-        ('U$1=`FA "5.15.4"`', ['FA "5.15.4"']),
-        ('"FA \\"5.15.4\\""', ['FA "5.15.4"']),
-        ("'it\\'s' + \"\"", ["it's"]),
-        ('"\\x41\\u0042\\u{43}\\n\\q"', ["ABC\nq"]),
-        ("sem aspas 22.2.2", []),
-    ],
-)
-def test_r21_5_le_o_valor_das_strings_do_trecho(trecho: str, esperado: list[str]) -> None:
-    assert strings_do_trecho(trecho) == esperado
 
 
 @pytest.mark.parametrize(

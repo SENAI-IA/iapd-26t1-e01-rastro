@@ -29,8 +29,11 @@ rastro/
   terminal.py              linha ao vivo e andamento da análise no terminal
   har/                     leitor_do_har.py, modelos.py, site.py, visita.py
   identificacao/           modelos.py, assinaturas.py, trechos_dos_bundles.py, bibliotecas_pela_ia.py
-  travas/                  formato_das_bibliotecas.py, ancoragem.py, codigo_publicado.py, faixa_de_versao.py,
-                           explicacao_sem_fato_novo.py, conferencia_das_bibliotecas.py
+  travas/                  um arquivo por trava: formato_das_bibliotecas.py, formato_da_explicacao.py, ancoragem.py,
+                           pacote_existe.py, codigo_publicado.py, faixa_de_versao.py, explicacao_sem_fato_novo.py;
+                           conferencia_das_bibliotecas.py (passa cada biblioteca pelas travas do npm);
+                           apoios das travas: json_estrito.py (lê o JSON da IA sem aceitar nada fora do formato),
+                           strings_de_javascript.py, versao_no_trecho.py, marcacao_a_confirmar.py; modelos.py (TravaAcionada)
   fontes/                  modelos.py (Aviso, FonteSemResposta, AvisosDaBiblioteca, marcar_origem), conector.py (interface e ConsultaNaoRealizada),
                            requisicao_http.py (baixa o JSON e monta os motivos de falha, comum a todas as fontes),
                            filtro_do_pacote_npm.py, github_advisory.py, consulta_dos_avisos.py,

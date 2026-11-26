@@ -8,11 +8,8 @@ from rastro.ia.sanitizacao import sanitizar
 from rastro.identificacao.modelos import Biblioteca, Evidencia, nome_com_versao
 from rastro.identificacao.trechos_dos_bundles import Bundle, escolher_bundles
 from rastro.travas.ancoragem import conferir_ancoragem
-from rastro.travas.formato_das_bibliotecas import (
-    BibliotecaSugerida,
-    conferir_formato,
-    tirar_cerca_de_codigo,
-)
+from rastro.travas.formato_das_bibliotecas import BibliotecaSugerida, conferir_formato
+from rastro.travas.json_estrito import tirar_cerca_de_codigo
 from rastro.travas.modelos import TravaAcionada
 
 ETAPA = "identificar_bibliotecas"

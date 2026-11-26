@@ -12,20 +12,12 @@ from rastro.identificacao.modelos import Biblioteca
 from rastro.risco.achados import agrupar_por_biblioteca
 from rastro.risco.modelos import Achado
 from rastro.risco.prioridade import ordenar_achados
-from rastro.travas import formato_das_bibliotecas
 from rastro.travas.explicacao_sem_fato_novo import conferir_explicacao
-from rastro.travas.formato_das_bibliotecas import (
-    ForaDoFormato,
-    exigir_campos,
-    ler_json_sem_texto_fora,
-    ler_texto,
-    tirar_cerca_de_codigo,
-)
+from rastro.travas.formato_da_explicacao import conferir_formato_da_explicacao
 from rastro.travas.modelos import TravaAcionada
 
 ETAPA = "explicar_achado"
 ARQUIVO_DO_PROMPT = "explicar_achado.md"
-CAMPOS_DA_EXPLICACAO = ("o_que_e", "impacto", "como_corrigir", "teste_verificacao")
 
 
 @dataclass(frozen=True)
@@ -63,11 +55,9 @@ def explicar_biblioteca(
     if resposta is None:
         return sem_ia, []
     alvo = f"explicação de {biblioteca.pacote}@{biblioteca.versao}"
-    try:
-        campos = ler_campos_da_explicacao(resposta)
-    except ForaDoFormato as erro:
-        motivo = f"explicação descartada: {erro}"
-        return sem_ia, [TravaAcionada(formato_das_bibliotecas.NOME_DA_TRAVA, alvo, motivo)]
+    campos, barrados = conferir_formato_da_explicacao(resposta, alvo)
+    if campos is None:
+        return sem_ia, barrados
     conferida, barrados = conferir_explicacao(biblioteca.pacote, biblioteca.versao, campos, entrada)
     if conferida is None:
         return sem_ia, barrados
@@ -107,13 +97,3 @@ def aviso_na_entrada(aviso: Aviso) -> dict[str, object]:
         "versoes_afetadas": aviso.versoes_afetadas,
         "versao_corrigida": aviso.versao_corrigida,
     }
-
-
-def ler_campos_da_explicacao(resposta: str) -> dict[str, str]:
-    objeto = ler_json_sem_texto_fora(tirar_cerca_de_codigo(resposta))
-    campos = exigir_campos(objeto, set(CAMPOS_DA_EXPLICACAO), "na explicação")
-    explicacao = {campo: ler_texto(campos, campo).strip() for campo in CAMPOS_DA_EXPLICACAO}
-    vazios = [campo for campo, texto in explicacao.items() if not texto]
-    if vazios:
-        raise ForaDoFormato(f"campo vazio na explicação: {', '.join(vazios)}")
-    return explicacao
