@@ -37,7 +37,8 @@ from rastro.relatorio.limitacoes_da_analise import (
     TEXTO_CONTINUA_IGUAL_SEM_IA,
 )
 from rastro.relatorio.montagem_do_relatorio import montar_relatorio
-from rastro.terminal import AndamentoNoTerminal, LinhaAoVivo
+from rastro.terminal.andamento_no_terminal import AndamentoNoTerminal
+from rastro.terminal.linha_ao_vivo import LinhaAoVivo
 
 SUGESTAO_SEM_IA = f"Use --sem-ia ({AJUDA_SEM_IA})."
 AVISO_COM_IA = (

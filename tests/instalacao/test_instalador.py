@@ -1,35 +1,15 @@
 import os
 import subprocess
-import sys
 from pathlib import Path
 
 import pytest
 
-from rastro import atalho
-from rastro.atalho import (
-    INICIO_DO_BLOCO,
-    MARCA,
-    MARCA_DO_INSTALADOR,
-    AtalhoDeOutro,
-    Sobra,
-    comando_para_apagar,
-    desinstalar_no_unix,
-    instalar_no_unix,
-    sobras_da_instalacao,
-    texto_do_atalho_windows,
-)
+from rastro.instalacao.atalho import MARCA, AtalhoDeOutro
+from rastro.instalacao.instalador import desinstalar_no_unix, instalar_no_unix
+from rastro.instalacao.path_no_unix import INICIO_DO_BLOCO
+from tests.instalacao.apoio import PATH_SEM_A_PASTA, ambiente, atalho_unix, somente_unix
 
-RAIZ_DO_PROJETO = Path(__file__).resolve().parent.parent
-PATH_SEM_A_PASTA = "/usr/bin:/bin"
-somente_unix = pytest.mark.skipif(os.name == "nt", reason="atalho de shell do Linux")
-
-
-def atalho_unix(casa: Path) -> Path:
-    return casa / ".local" / "bin" / "rastro"
-
-
-def ambiente(casa: Path, path: str = PATH_SEM_A_PASTA, shell: str = "/bin/bash") -> dict[str, str]:
-    return {"PATH": path, "SHELL": shell, "HOME": str(casa)}
+RAIZ_DO_PROJETO = Path(__file__).resolve().parent.parent.parent
 
 
 def test_r17_3_instalar_cria_o_atalho_marcado_na_pasta_do_usuario(tmp_path: Path) -> None:
@@ -140,64 +120,3 @@ def test_r17_3_desinstalar_deixa_bloco_sem_fim_como_esta(tmp_path: Path) -> None
 
     assert desinstalar_no_unix(tmp_path).path_removido_de == []
     assert bashrc.read_text(encoding="utf-8") == texto
-
-
-def test_r17_3_atalho_do_windows_chama_o_rastro_do_projeto() -> None:
-    texto = texto_do_atalho_windows(Path("C:/Python310/python.exe"), Path("C:/rastro"))
-
-    assert MARCA in texto
-    assert "PYTHONPATH=" in texto
-    assert "-m rastro %* & exit /b" in texto
-    assert texto.endswith("\r\n")
-
-
-def test_r17_3_python_do_atalho_fica_fora_do_venv(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(sys, "prefix", "/projeto/.venv")
-    monkeypatch.setattr(sys, "base_prefix", sys.base_prefix)
-
-    python = atalho.python_do_sistema()
-
-    assert ".venv" not in python.parts
-
-
-def projeto_do_install_sh(casa: Path) -> Path:
-    projeto = casa / ".local" / "share" / "rastro"
-    projeto.mkdir(parents=True)
-    (projeto / MARCA_DO_INSTALADOR).touch()
-    return projeto
-
-
-def test_r17_4_sobras_trazem_a_pasta_criada_pelo_install_sh(tmp_path: Path) -> None:
-    projeto = projeto_do_install_sh(tmp_path)
-
-    assert sobras_da_instalacao(tmp_path, projeto) == [
-        Sobra(atalho.DESCRICAO_DOS_ARQUIVOS, projeto)
-    ]
-
-
-def test_r17_4_sobras_nao_trazem_a_pasta_de_um_clone(tmp_path: Path) -> None:
-    clone = tmp_path / "meu-clone"
-    clone.mkdir()
-
-    assert sobras_da_instalacao(tmp_path, clone) == []
-
-
-def test_r17_4_sobras_trazem_as_gravacoes_e_relatorios(tmp_path: Path) -> None:
-    dados = tmp_path / "Rastro"
-    dados.mkdir()
-
-    assert sobras_da_instalacao(tmp_path, tmp_path / "clone") == [
-        Sobra(atalho.DESCRICAO_DOS_DADOS, dados)
-    ]
-
-
-def test_r17_4_comando_para_apagar_no_linux_protege_o_caminho() -> None:
-    assert comando_para_apagar(Path("/home/ana/minha pasta"), no_windows=False) == (
-        "rm -rf '/home/ana/minha pasta'"
-    )
-
-
-def test_r17_4_comando_para_apagar_no_windows_usa_o_powershell() -> None:
-    assert comando_para_apagar(Path("C:/Users/d'ana/Rastro"), no_windows=True) == (
-        "Remove-Item -Recurse -Force 'C:/Users/d''ana/Rastro'"
-    )

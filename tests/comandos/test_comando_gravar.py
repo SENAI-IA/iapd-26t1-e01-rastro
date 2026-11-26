@@ -16,7 +16,7 @@ from rastro.captura.navegador_playwright import (
 from rastro.captura.sessao import FalhaAoNavegar
 from rastro.cli import executar
 from rastro.comandos import comando_analisar, comando_gravar
-from rastro.terminal import LinhaAoVivo
+from rastro.terminal.linha_ao_vivo import LinhaAoVivo
 from tests.dubles import DADOS, HAR_DA_LOJA, PASTA_DA_LOJA, ler_relatorio
 
 

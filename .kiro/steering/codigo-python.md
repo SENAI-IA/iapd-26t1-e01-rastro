@@ -38,6 +38,7 @@ O código será defendido na banca. Qualquer pessoa deve entender um arquivo sem
 - Um arquivo de teste por módulo, espelhando `rastro/` em `tests/`.
 - Fonte de dados e IA trocadas por dublês; nenhum teste acessa rede.
 - Dublês usados por mais de um arquivo de teste (`ConectorFalso`, `RegistroFalso`, `ProvedorFalso`) ficam em `tests/dubles.py`; o resto fica no próprio teste.
+- Ajudantes de teste usados por mais de um arquivo ficam num `apoio.py` da pasta do módulo (ex.: `tests/instalacao/apoio.py`, `tests/terminal/apoio.py`).
 - Nome do teste leva o critério da spec e descreve o comportamento: `test_r05_2_prioridade_alta_a_partir_de_7_5`.
 - Arquivos de entrada dos testes ficam em `tests/dados/`, feitos à mão, pequenos e sem dado real (cookie e token só com valor fictício).
 - Um `conftest.py` bloqueia acesso à rede em todos os testes.

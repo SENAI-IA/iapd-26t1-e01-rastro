@@ -5,6 +5,12 @@ from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
+from rastro.captura.endereco_da_visita import UrlInvalida, host_da_url, url_sem_usuario_e_senha
+from rastro.captura.espera_da_gravacao import (
+    PedidoDeParada,
+    esperar_a_janela_fechar,
+    esperar_o_enter,
+)
 from rastro.captura.navegador_playwright import (
     NavegadorAusente,
     NavegadorNaoAbriu,
@@ -12,24 +18,15 @@ from rastro.captura.navegador_playwright import (
     abrir_gravacao,
     conferir_playwright,
 )
-from rastro.captura.pasta import (
+from rastro.captura.pasta_da_gravacao import (
     GravacaoJaExiste,
-    UrlInvalida,
+    apagar_pasta_da_gravacao,
     caminho_da_gravacao,
     criar_pasta_da_gravacao,
-    desfazer_pasta_da_gravacao,
-    host_da_url,
     pasta_padrao_das_gravacoes,
-    url_sem_usuario_e_senha,
 )
 from rastro.captura.robo import LIMITES_PADRAO, PassoDoRobo, ResultadoDoRobo, Robo
-from rastro.captura.sessao import (
-    FalhaAoNavegar,
-    PedidoDeParada,
-    SessaoDeGravacao,
-    esperar_a_janela_fechar,
-    esperar_o_enter,
-)
+from rastro.captura.sessao import FalhaAoNavegar, SessaoDeGravacao
 from rastro.comandos.comando_analisar import (
     SUGESTAO_SEM_IA,
     analisar_e_gravar,
@@ -39,7 +36,8 @@ from rastro.comandos.comando_analisar import (
 )
 from rastro.comandos.saida_de_erro import encerrar_com_erro
 from rastro.ia.escolha_da_ia import CLIDaIAAusente, IAInvalida
-from rastro.terminal import LinhaAoVivo, escrever_tempo
+from rastro.terminal.formatacao import escrever_tempo
+from rastro.terminal.linha_ao_vivo import LinhaAoVivo
 
 TEXTO_GRAVANDO = (
     "Gravando a visita a {host}. Navegue pelo site como um usuário comum "
@@ -119,7 +117,7 @@ def gravar_e_analisar(
     try:
         requisicoes = gravar_visita(url, host, har, robo)
     except (NavegadorAusente, NavegadorNaoAbriu) as erro:
-        desfazer_pasta_da_gravacao(pasta)
+        apagar_pasta_da_gravacao(pasta)
         return encerrar_com_erro(str(erro))
     if requisicoes == 0:
         return encerrar_com_erro(TEXTO_NADA_GRAVADO)

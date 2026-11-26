@@ -20,13 +20,17 @@ rastro/
   comandos/                um arquivo por comando da linha de comando: comando_analisar.py, comando_gravar.py,
                            comando_pentest.py, comando_como_usar.py, comando_instalar.py, comando_desinstalar.py;
                            e as peças que eles dividem: argumentos.py, resumo_no_terminal.py, navegador.py, saida_de_erro.py
-  atalho.py                cria e remove o comando rastro na pasta do usuário (instalar e desinstalar)
+  instalacao/              instalar e desinstalar o comando rastro na pasta do usuário: instalador.py (instalar e desinstalar
+                           no Unix e no Windows), atalho.py (cria e remove o arquivo do atalho, com a MARCA),
+                           path_no_unix.py (bloco do PATH no arquivo do shell), path_no_windows.py (PATH do usuário
+                           no registro e aviso ao sistema), sobras.py (o que fica depois de desinstalar)
   fluxo_da_analise.py      orquestra as etapas, sem regra própria
   modelos_da_analise.py    a Analise: o resultado completo que o fluxo entrega ao relatório
   versao_semver.py         lê e compara versões e faixas semver (usado por travas/, fontes/ e acao/)
   gravacao_segura.py       grava sem sobrescrever: pasta nova, arquivo novo e nome de pasta seguro no Windows
   andamento.py             interface que o fluxo usa para avisar a etapa e os itens
-  terminal.py              linha ao vivo e andamento da análise no terminal
+  terminal/                cores.py (liga as cores do terminal), formatacao.py (tempo, corte e destaque do texto),
+                           linha_ao_vivo.py (a linha que se redesenha com o giro), andamento_no_terminal.py (etapas da análise)
   har/                     leitor_do_har.py, modelos.py, site.py, visita.py
   identificacao/           modelos.py, assinaturas.py, trechos_dos_bundles.py, bibliotecas_pela_ia.py
   travas/                  um arquivo por trava: formato_das_bibliotecas.py, formato_da_explicacao.py, ancoragem.py,
@@ -60,7 +64,10 @@ rastro/
   relatorio/               montagem_do_relatorio.py (esqueleto do JSON), limitacoes_da_analise.py, resumo_do_relatorio.py,
                            painel_da_ia.py, visita_no_relatorio.py, pagina_do_relatorio.py, gravacao_do_relatorio.py,
                            modelo.html (build do frontend, versionado)
-  captura/                 sessao.py (interface), navegador_playwright.py (único import do Playwright), pasta.py, robo.py
+  captura/                 sessao.py (interface), navegador_playwright.py (único import do Playwright),
+                           espera_da_gravacao.py (pedido de parada e espera pela janela ou pelo Enter),
+                           endereco_da_visita.py (host e URL sem usuário e senha), pasta_da_gravacao.py,
+                           regras_dos_links.py (quais links o robô segue, regras puras), robo.py
   pentest/                 pentest --autorizo, isolado da análise: modelos.py (com as constantes do formato), erros.py,
                            privacidade.py, sonda.py, alvos_da_sonda.py (quais requisições do HAR são sondadas),
                            regras_dos_cabecalhos.py (leitura pura dos cabeçalhos), validacoes.py (uma função por validação),

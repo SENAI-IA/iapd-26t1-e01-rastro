@@ -746,10 +746,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @geison.santos
 
-- [ ] **T82 Separar instalação, terminal e captura por papel**
+- [x] **T82 Separar instalação, terminal e captura por papel**
   - Entrega: `atalho.py` vira `instalacao/`, `terminal.py` vira `terminal/`, e `captura/` separa regras dos links, endereço e espera.
   - Aceite: cada arquivo novo tem um papel só; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/atalho.py`, `rastro/terminal.py`, `rastro/captura/`, testes espelhados
+  - Arquivos: `rastro/instalacao/` (era `rastro/atalho.py`), `rastro/terminal/` (era `rastro/terminal.py`), `rastro/captura/`, `rastro/comandos/`, testes espelhados, `.kiro/steering/structure.md`, `.kiro/steering/codigo-python.md`
   - Teste: os testes atuais.
   - Requisito: R19.4
   - Revisão: @ali.santos

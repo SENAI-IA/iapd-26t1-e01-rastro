@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from rastro.atalho import MARCA, MARCA_DO_INSTALADOR
+from rastro.instalacao.atalho import MARCA
+from rastro.instalacao.sobras import MARCA_DO_INSTALADOR
 
 RAIZ_DO_PROJETO = Path(__file__).resolve().parent.parent
 INSTALADOR = RAIZ_DO_PROJETO / "install.sh"
