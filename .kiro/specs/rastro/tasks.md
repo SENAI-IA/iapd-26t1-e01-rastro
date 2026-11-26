@@ -682,10 +682,10 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Requisito: R19.4
   - Revisão: @luiz.pagliari
 
-- [ ] **T74 Corrigir a direção das dependências entre camadas**
+- [x] **T74 Corrigir a direção das dependências entre camadas**
   - Entrega: módulos neutros para o que mais de uma camada usa: gravação segura de arquivos, versão semver e nome `pacote@versao`.
   - Aceite: `fontes/`, `explicacao/` e `captura/` deixam de importar de `acao/`, `travas/` e `relatorio/`; Verificação: `ruff`, `mypy` e `pytest` passam, sem mudar comportamento.
-  - Arquivos: `rastro/gravacao_segura.py`, `rastro/versao_semver.py`, `rastro/identificacao/modelos.py`, `rastro/relatorio/gravacao.py`, `rastro/pentest/gravacao.py`, `rastro/captura/pasta.py`, `rastro/travas/faixa_de_versao.py`, `rastro/acao/plano.py`, `rastro/fontes/`, `rastro/explicacao/ia.py`, testes espelhados
+  - Arquivos: `rastro/gravacao_segura.py`, `rastro/versao_semver.py`, `rastro/modelos_da_analise.py`, `rastro/fontes/faixas_do_osv.py`, `rastro/identificacao/modelos.py`, `rastro/risco/achados.py`, `rastro/risco/prioridade.py`, `rastro/relatorio/gravacao.py`, `rastro/pentest/gravacao.py`, `rastro/captura/pasta.py`, `rastro/travas/`, `rastro/acao/plano.py`, `rastro/fontes/`, `rastro/explicacao/ia.py`, `rastro/fluxo.py`, testes espelhados, `.kiro/steering/structure.md`, `.kiro/skills/rastro-nova-regra/SKILL.md`
   - Teste: os testes atuais, mais um por módulo novo.
   - Requisito: R19.4
   - Revisão: @geison.santos

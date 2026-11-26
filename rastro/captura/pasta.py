@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from rastro.relatorio.gravacao import FORMATO_DA_PASTA_DA_ANALISE, nome_de_pasta_seguro
+from rastro.gravacao_segura import caminho_da_pasta_com_data
 
 NOME_DO_HAR = "visita.har"
 ESQUEMAS_ACEITOS = ("http", "https")
@@ -58,7 +58,7 @@ def url_sem_usuario_e_senha(url: str) -> str:
 
 
 def caminho_da_gravacao(raiz: Path, host: str, momento: datetime) -> Path:
-    return raiz / nome_de_pasta_seguro(host) / momento.strftime(FORMATO_DA_PASTA_DA_ANALISE)
+    return caminho_da_pasta_com_data(raiz, host, momento)
 
 
 def criar_pasta_da_gravacao(pasta: Path) -> Path:

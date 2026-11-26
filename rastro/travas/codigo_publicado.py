@@ -2,8 +2,8 @@ import re
 
 from rastro.fontes.conector import ConsultaNaoRealizada
 from rastro.fontes.registro_npm import RegistroDePacotes
-from rastro.identificacao.modelos import Biblioteca, Evidencia
-from rastro.travas.ancoragem import mandar_para_a_confirmar, nome_completo, versao_esta_no_trecho
+from rastro.identificacao.modelos import Biblioteca, Evidencia, nome_com_versao
+from rastro.travas.ancoragem import mandar_para_a_confirmar, versao_esta_no_trecho
 from rastro.travas.modelos import TravaAcionada
 
 TRAVA_CODIGO_CONFERE = "código confere"
@@ -46,7 +46,7 @@ def conferir_evidencia(
         ]
     return [
         f"a string `{valor}` do trecho de {evidencia.url} não aparece no código publicado "
-        f"de {nome_completo(biblioteca)}"
+        f"de {nome_com_versao(biblioteca)}"
         for valor in strings
         if not string_esta_no_codigo(valor, codigos)
     ]
@@ -100,6 +100,6 @@ def escapar(valor: str, aspa: str) -> str:
 
 
 def barrar(biblioteca: Biblioteca, motivos: list[str]) -> tuple[Biblioteca, list[TravaAcionada]]:
-    alvo = nome_completo(biblioteca)
+    alvo = nome_com_versao(biblioteca)
     travas_acionadas = [TravaAcionada(TRAVA_CODIGO_CONFERE, alvo, motivo) for motivo in motivos]
     return mandar_para_a_confirmar(biblioteca, travas_acionadas), travas_acionadas

@@ -6,7 +6,7 @@ from rastro.har.modelos import Requisicao
 from rastro.ia.cliente import ClienteDeIA
 from rastro.ia.sanitizacao import sanitizar
 from rastro.identificacao.bundles import Bundle, escolher_bundles
-from rastro.identificacao.modelos import Biblioteca, Evidencia
+from rastro.identificacao.modelos import Biblioteca, Evidencia, nome_com_versao
 from rastro.travas.ancoragem import conferir_ancoragem
 from rastro.travas.formato import BibliotecaSugerida, conferir_formato, tirar_cerca_de_codigo
 from rastro.travas.modelos import TravaAcionada
@@ -30,8 +30,8 @@ def identificar_em_bundles(
 ) -> BibliotecasDaIA:
     if ia is None:
         return BibliotecasDaIA([], [])
-    ja_identificadas = {chave(biblioteca) for biblioteca in por_assinatura}
-    da_ia: dict[tuple[str, str], Biblioteca] = {}
+    ja_identificadas = {nome_com_versao(biblioteca) for biblioteca in por_assinatura}
+    da_ia: dict[str, Biblioteca] = {}
     travas_acionadas: list[TravaAcionada] = []
     bundles = escolher_bundles(requisicoes, por_assinatura)
     andamento.itens(len(bundles))
@@ -40,9 +40,9 @@ def identificar_em_bundles(
         andamento.avancar()
         travas_acionadas.extend(barrados)
         for biblioteca in do_bundle:
-            if chave(biblioteca) not in ja_identificadas:
-                anterior = da_ia.get(chave(biblioteca))
-                da_ia[chave(biblioteca)] = preferir_confirmada(anterior, biblioteca)
+            if nome_com_versao(biblioteca) not in ja_identificadas:
+                anterior = da_ia.get(nome_com_versao(biblioteca))
+                da_ia[nome_com_versao(biblioteca)] = preferir_confirmada(anterior, biblioteca)
     return BibliotecasDaIA(list(da_ia.values()), travas_acionadas)
 
 
@@ -96,7 +96,3 @@ def montar_entrada(trechos: list[str]) -> str:
 def ler_modelo_do_prompt() -> str:
     prompts = resources.files("rastro.ia").joinpath("prompts")
     return prompts.joinpath(ARQUIVO_DO_PROMPT).read_text(encoding="utf-8")
-
-
-def chave(biblioteca: Biblioteca) -> tuple[str, str]:
-    return (biblioteca.pacote, biblioteca.versao)

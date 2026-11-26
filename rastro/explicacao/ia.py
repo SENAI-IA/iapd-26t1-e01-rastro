@@ -2,7 +2,6 @@ import json
 from dataclasses import dataclass
 from importlib import resources
 
-from rastro.acao.plano import agrupar_por_biblioteca
 from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.conector import Aviso
@@ -10,6 +9,7 @@ from rastro.har.site import url_sem_query_string
 from rastro.ia.cliente import ClienteDeIA
 from rastro.ia.sanitizacao import sanitizar
 from rastro.identificacao.modelos import Biblioteca
+from rastro.risco.achados import agrupar_por_biblioteca
 from rastro.risco.modelos import Achado
 from rastro.risco.prioridade import ordenar_achados
 from rastro.travas import formato

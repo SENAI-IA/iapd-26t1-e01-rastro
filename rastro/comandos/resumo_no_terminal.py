@@ -1,12 +1,11 @@
 from pathlib import Path
 from typing import Any
 
-from rastro.acao.plano import ROTULO_DA_PRIORIDADE
 from rastro.comandos.comando_pentest import texto_do_resumo_do_pentest
 from rastro.comandos.navegador import abrir_relatorio
 from rastro.relatorio.gravacao import RelatorioGravado
-from rastro.relatorio.json import PRIORIDADES
 from rastro.risco.nota import escrever_nota
+from rastro.risco.prioridade import PRIORIDADES, ROTULO_DA_PRIORIDADE
 
 AVISO_SEM_IA = (
     "Atenção: análise sem IA. Bibliotecas em bundles não foram procuradas; "

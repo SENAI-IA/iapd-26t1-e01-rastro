@@ -21,3 +21,7 @@ class Biblioteca:
     conferida_no_npm: bool | None
     travas_que_falharam: list[str]
     evidencias: list[Evidencia]
+
+
+def nome_com_versao(biblioteca: Biblioteca) -> str:
+    return f"{biblioteca.pacote}@{biblioteca.versao}"

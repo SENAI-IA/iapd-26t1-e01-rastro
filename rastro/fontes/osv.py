@@ -5,7 +5,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from rastro.fontes.conector import Aviso, ConsultaNaoRealizada, marcar_origem
-from rastro.travas.faixa_de_versao import FaixaSemver, faixas_dos_eventos_semver
+from rastro.fontes.faixas_do_osv import FaixaSemver, faixas_dos_eventos_semver
 
 NOME_DA_FONTE = "OSV"
 ENDERECO_DA_API = "https://api.osv.dev/v1/query"

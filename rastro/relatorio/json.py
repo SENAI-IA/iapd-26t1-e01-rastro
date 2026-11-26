@@ -2,20 +2,18 @@ from dataclasses import asdict, replace
 from typing import Any
 
 from rastro.acao.modelos import Acao
-from rastro.acao.plano import chave_da_biblioteca
 from rastro.configuracao.modelos import Checagem, SituacaoDaChecagem
-from rastro.fluxo import Analise
 from rastro.fontes.conector import FonteSemResposta
 from rastro.har.site import url_sem_valores_da_query
 from rastro.har.visita import PassoDaVisita
 from rastro.ia.cliente import ChamadaIA
-from rastro.identificacao.modelos import Biblioteca, Evidencia
+from rastro.identificacao.modelos import Biblioteca, Evidencia, nome_com_versao
+from rastro.modelos_da_analise import Analise
 from rastro.pentest.modelos import ResultadoDoPentest
 from rastro.risco.modelos import Achado, Prioridade
-from rastro.risco.prioridade import classificar_prioridade, nota_da_biblioteca
+from rastro.risco.prioridade import PRIORIDADES, classificar_prioridade, nota_da_biblioteca
 
 VERSAO_FORMATO = 1
-PRIORIDADES: tuple[Prioridade, ...] = ("alta", "media", "baixa", "a avaliar")
 
 TEXTO_BUNDLES_NAO_PROCURADOS = (
     "Bibliotecas escondidas em bundles não foram procuradas: "
@@ -158,7 +156,7 @@ def contar_acoes_por_prioridade(acoes: list[Acao]) -> dict[str, int]:
 
 
 def chaves_das_bibliotecas_com_achados(achados: list[Achado]) -> set[str]:
-    return {chave_da_biblioteca(achado.biblioteca) for achado in achados}
+    return {nome_com_versao(achado.biblioteca) for achado in achados}
 
 
 def contar_checagens(analise: Analise, situacao: SituacaoDaChecagem) -> int:
@@ -172,7 +170,7 @@ def encontradas_so_pela_ia(analise: Analise) -> int | None:
 
 
 def biblioteca_no_relatorio(biblioteca: Biblioteca, analise: Analise) -> dict[str, Any]:
-    chave = chave_da_biblioteca(biblioteca)
+    chave = nome_com_versao(biblioteca)
     achados = achados_da_biblioteca(chave, analise.achados)
     explicacao = analise.explicacoes.get(chave)
     nota = nota_da_biblioteca(achados)
@@ -202,12 +200,12 @@ def checagem_no_relatorio(checagem: Checagem) -> dict[str, Any]:
 
 
 def achados_da_biblioteca(chave: str, achados: list[Achado]) -> list[Achado]:
-    return [achado for achado in achados if chave_da_biblioteca(achado.biblioteca) == chave]
+    return [achado for achado in achados if nome_com_versao(achado.biblioteca) == chave]
 
 
 def achado_no_relatorio(achado: Achado) -> dict[str, Any]:
     return {
-        "biblioteca": chave_da_biblioteca(achado.biblioteca),
+        "biblioteca": nome_com_versao(achado.biblioteca),
         "aviso": asdict(achado.aviso),
         "nota": asdict(achado.nota),
     }
@@ -270,7 +268,7 @@ def agrupar_bibliotecas_por_requisicao(bibliotecas: list[Biblioteca]) -> dict[in
     agrupadas: dict[int, list[str]] = {}
     for biblioteca in bibliotecas:
         for indice in {evidencia.indice_requisicao for evidencia in biblioteca.evidencias}:
-            agrupadas.setdefault(indice, []).append(chave_da_biblioteca(biblioteca))
+            agrupadas.setdefault(indice, []).append(nome_com_versao(biblioteca))
     return agrupadas
 
 

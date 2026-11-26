@@ -9,12 +9,10 @@ from rastro.relatorio.gravacao import (
     caminho_do_relatorio,
     gravar_relatorio,
     nome_da_aplicacao,
-    nome_de_pasta_seguro,
     pasta_padrao,
 )
 
 MOMENTO = datetime(2026, 11, 20, 14, 3, 0)
-CARACTERES_PROIBIDOS_NO_WINDOWS = '<>:"/\\|?*'
 
 
 def test_r13_1_pasta_da_analise_por_aplicacao_e_data_e_hora(tmp_path: Path) -> None:
@@ -61,29 +59,6 @@ def test_r13_3_sem_site_usa_o_nome_do_har() -> None:
 
 def test_r13_3_com_site_usa_o_site() -> None:
     assert nome_da_aplicacao("loja.exemplo.com", Path("loja.har")) == "loja.exemplo.com"
-
-
-def test_r13_3_porta_vira_sublinhado() -> None:
-    assert nome_de_pasta_seguro("localhost:3000") == "localhost_3000"
-
-
-@pytest.mark.parametrize("caractere", list(CARACTERES_PROIBIDOS_NO_WINDOWS))
-def test_r13_3_caractere_proibido_no_windows_vira_sublinhado(caractere: str) -> None:
-    assert nome_de_pasta_seguro(f"site{caractere}x") == "site_x"
-
-
-def test_r13_3_ponto_e_espaco_no_fim_saem() -> None:
-    assert nome_de_pasta_seguro("site. ") == "site"
-
-
-def test_r13_3_nome_vazio_ou_so_pontos_nao_sobe_de_pasta() -> None:
-    assert nome_de_pasta_seguro("") == "_"
-    assert nome_de_pasta_seguro("..") == "_"
-
-
-@pytest.mark.parametrize("reservado", ["CON", "nul", "COM1", "lpt9.har"])
-def test_r13_3_nome_reservado_do_windows_ganha_prefixo(reservado: str) -> None:
-    assert nome_de_pasta_seguro(reservado) == f"_{reservado}"
 
 
 def test_r13_3_pasta_da_data_e_hora_sem_dois_pontos(tmp_path: Path) -> None:

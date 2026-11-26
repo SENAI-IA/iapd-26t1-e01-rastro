@@ -6,21 +6,20 @@ from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.modelos import Explicacao
 from rastro.fontes.conector import Aviso
 from rastro.identificacao.modelos import Biblioteca
+from rastro.risco.achados import agrupar_por_biblioteca
 from rastro.risco.modelos import Achado, Prioridade
 from rastro.risco.nota import escrever_nota
-from rastro.risco.prioridade import classificar_prioridade, nota_da_biblioteca, ordenar_achados
-from rastro.travas.faixa_de_versao import ler_versao
+from rastro.risco.prioridade import (
+    ORDEM_DA_PRIORIDADE,
+    ROTULO_DA_PRIORIDADE,
+    classificar_prioridade,
+    nota_da_biblioteca,
+    ordenar_achados,
+)
+from rastro.versao_semver import ler_versao
 
 QUEM_RESOLVE_A_BIBLIOTECA = "dev front-end"
 SEM_CORRECAO_PUBLICADA = "sem correção publicada: avaliar troca ou mitigação"
-
-ORDEM_DA_PRIORIDADE: dict[Prioridade, int] = {"alta": 0, "media": 1, "baixa": 2, "a avaliar": 3}
-ROTULO_DA_PRIORIDADE: dict[Prioridade, str] = {
-    "alta": "alta",
-    "media": "média",
-    "baixa": "baixa",
-    "a avaliar": "a avaliar",
-}
 
 CORRECOES_DAS_CHECAGENS = {
     "C01": CorrecaoDaChecagem(
@@ -73,24 +72,11 @@ def com_texto_da_task(acao: Acao) -> Acao:
     return replace(acao, texto_task=gerar_texto_da_task(acao))
 
 
-def chave_da_biblioteca(biblioteca: Biblioteca) -> str:
-    return f"{biblioteca.pacote}@{biblioteca.versao}"
-
-
 def acoes_das_bibliotecas(achados: list[Achado], explicacoes: dict[str, Explicacao]) -> list[Acao]:
     acoes = []
     for chave, achados_da_biblioteca in agrupar_por_biblioteca(achados).items():
         acoes.append(acao_da_biblioteca(chave, achados_da_biblioteca, explicacoes.get(chave)))
     return acoes
-
-
-def agrupar_por_biblioteca(achados: list[Achado]) -> dict[str, list[Achado]]:
-    grupos: dict[str, list[Achado]] = {}
-    for achado in achados:
-        if achado.biblioteca.situacao != "confirmada":
-            continue
-        grupos.setdefault(chave_da_biblioteca(achado.biblioteca), []).append(achado)
-    return grupos
 
 
 def acao_da_biblioteca(

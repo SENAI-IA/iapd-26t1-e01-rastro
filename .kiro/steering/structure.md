@@ -21,13 +21,16 @@ rastro/
                            comando_pentest.py, comando_como_usar.py, comando_instalar.py, comando_desinstalar.py;
                            e as peças que eles dividem: argumentos.py, resumo_no_terminal.py, navegador.py, saida_de_erro.py
   atalho.py                cria e remove o comando rastro na pasta do usuário (instalar e desinstalar)
-  fluxo.py                 orquestra as etapas, sem regra própria; define a Analise
+  fluxo.py                 orquestra as etapas, sem regra própria
+  modelos_da_analise.py    a Analise: o resultado completo que o fluxo entrega ao relatório
+  versao_semver.py         lê e compara versões e faixas semver (usado por travas/, fontes/ e acao/)
+  gravacao_segura.py       grava sem sobrescrever: pasta nova, arquivo novo e nome de pasta seguro no Windows
   andamento.py             interface que o fluxo usa para avisar a etapa e os itens
   terminal.py              linha ao vivo e andamento da análise no terminal
   har/                     leitor.py, modelos.py, site.py, visita.py
   identificacao/           modelos.py, assinaturas.py, bundles.py, ia.py
   travas/                  formato.py, ancoragem.py, codigo_publicado.py, faixa_de_versao.py, explicacao.py, conferencia.py
-  fontes/                  conector.py (interface), github_advisory.py, registro_npm.py, consulta.py; opcionais: osv.py, nvd.py, juncao.py
+  fontes/                  conector.py (interface), github_advisory.py, registro_npm.py, consulta.py; opcionais: osv.py, faixas_do_osv.py, nvd.py, juncao.py
   risco/                   modelos.py, nota.py, prioridade.py, achados.py
   configuracao/            checagens.py (uma função por checagem)
   explicacao/              modelos.py, ia.py
@@ -53,6 +56,7 @@ Nada em `rastro/`, `frontend/`, `.kiro/` ou no README depende de arquivo fora do
 
 ## Onde colocar algo novo
 
+- **Direção das dependências:** uma camada só importa das que vêm antes dela no fluxo (har → identificacao → travas → fontes → risco → explicacao → configuracao → acao → relatorio). A exceção é `travas/`, que usa as interfaces e os modelos de `fontes/` (`Aviso`, `RegistroDePacotes`, `AvisosDaBiblioteca`), porque a trava do npm consulta o registro e a trava da faixa roda depois da consulta. O que várias camadas usam fica num módulo neutro na raiz de `rastro/` (`versao_semver.py`, `gravacao_segura.py`, `modelos_da_analise.py`) ou no modelo de quem vem antes (ex.: `nome_com_versao` em `identificacao/modelos.py`, `agrupar_por_biblioteca` em `risco/achados.py`, rótulo e ordem da prioridade em `risco/prioridade.py`).
 - **Checagem nova:** uma função em `configuracao/checagens.py` (e na tupla `CHECAGENS`) e seu teste, e o que fazer e o impacto dela em `acao/plano.py`.
 - **Fonte de dados nova:** um arquivo em `fontes/` que implementa `conector.py`.
 - **IA nova:** um arquivo em `ia/provedores/`.

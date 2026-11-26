@@ -1,7 +1,7 @@
 import re
 from dataclasses import replace
 
-from rastro.identificacao.modelos import Biblioteca, Evidencia
+from rastro.identificacao.modelos import Biblioteca, Evidencia, nome_com_versao
 from rastro.travas.modelos import TravaAcionada
 
 TRAVA_TRECHO_REAL = "trecho real"
@@ -24,7 +24,7 @@ def conferir_ancoragem(
 def conferir_evidencia(
     biblioteca: Biblioteca, evidencia: Evidencia, trechos_enviados: list[str]
 ) -> list[TravaAcionada]:
-    alvo = nome_completo(biblioteca)
+    alvo = nome_com_versao(biblioteca)
     trecho = evidencia.trecho or ""
     travas_acionadas = []
     if not trecho_foi_enviado(trecho, trechos_enviados):
@@ -40,7 +40,7 @@ def conferir_evidencia(
 
 
 def barrar_sem_evidencia(biblioteca: Biblioteca) -> TravaAcionada:
-    return TravaAcionada(TRAVA_TRECHO_REAL, nome_completo(biblioteca), "a IA não citou trecho")
+    return TravaAcionada(TRAVA_TRECHO_REAL, nome_com_versao(biblioteca), "a IA não citou trecho")
 
 
 def trecho_foi_enviado(trecho: str, trechos_enviados: list[str]) -> bool:
@@ -67,7 +67,3 @@ def mandar_para_a_confirmar(
         if trava_acionada.trava not in travas_que_falharam:
             travas_que_falharam.append(trava_acionada.trava)
     return replace(biblioteca, situacao="a_confirmar", travas_que_falharam=travas_que_falharam)
-
-
-def nome_completo(biblioteca: Biblioteca) -> str:
-    return f"{biblioteca.pacote}@{biblioteca.versao}"

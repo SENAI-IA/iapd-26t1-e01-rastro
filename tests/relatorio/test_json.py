@@ -2,9 +2,10 @@ import json
 from dataclasses import replace
 from typing import Any
 
-from rastro.fluxo import Analise, analisar
+from rastro.fluxo import analisar
 from rastro.fontes.conector import FonteSemResposta
 from rastro.ia.cliente import ChamadaIA, ClienteDeIA, FalhaDoProvedor, RespostaDoProvedor
+from rastro.modelos_da_analise import Analise
 from rastro.pentest.modelos import ResultadoDoPentest, ResumoDoPentest
 from rastro.relatorio.json import (
     TEXTO_BUNDLES_NAO_PROCURADOS,

@@ -3,7 +3,7 @@ from dataclasses import dataclass, replace
 from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.fontes.conector import ConsultaNaoRealizada
 from rastro.fontes.registro_npm import RegistroDePacotes
-from rastro.identificacao.modelos import Biblioteca
+from rastro.identificacao.modelos import Biblioteca, nome_com_versao
 from rastro.travas.codigo_publicado import conferir_codigo_publicado
 from rastro.travas.modelos import TravaAcionada
 
@@ -59,7 +59,7 @@ def conferir_pacote_no_npm(
         return conferir_sem_resposta_do_registro(biblioteca, erro.motivo)
     if publicado:
         return replace(biblioteca, conferida_no_npm=True), None
-    motivo = f"{nome_completo(biblioteca)} não foi publicado no npm"
+    motivo = f"{nome_com_versao(biblioteca)} não foi publicado no npm"
     return barrar(replace(biblioteca, conferida_no_npm=False), motivo)
 
 
@@ -78,8 +78,4 @@ def barrar(biblioteca: Biblioteca, motivo: str) -> tuple[Biblioteca, TravaAciona
         situacao="a_confirmar",
         travas_que_falharam=[*biblioteca.travas_que_falharam, TRAVA_PACOTE_EXISTE],
     )
-    return barrada, TravaAcionada(TRAVA_PACOTE_EXISTE, nome_completo(biblioteca), motivo)
-
-
-def nome_completo(biblioteca: Biblioteca) -> str:
-    return f"{biblioteca.pacote}@{biblioteca.versao}"
+    return barrada, TravaAcionada(TRAVA_PACOTE_EXISTE, nome_com_versao(biblioteca), motivo)

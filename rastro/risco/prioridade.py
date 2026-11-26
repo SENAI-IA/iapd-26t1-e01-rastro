@@ -3,6 +3,15 @@ from rastro.risco.modelos import Achado, Prioridade
 NOTA_MINIMA_DA_ALTA = 7.5
 NOTA_MINIMA_DA_MEDIA = 6.5
 
+PRIORIDADES: tuple[Prioridade, ...] = ("alta", "media", "baixa", "a avaliar")
+ORDEM_DA_PRIORIDADE: dict[Prioridade, int] = {"alta": 0, "media": 1, "baixa": 2, "a avaliar": 3}
+ROTULO_DA_PRIORIDADE: dict[Prioridade, str] = {
+    "alta": "alta",
+    "media": "média",
+    "baixa": "baixa",
+    "a avaliar": "a avaliar",
+}
+
 
 def classificar_prioridade(nota: float | None) -> Prioridade:
     if nota is None:

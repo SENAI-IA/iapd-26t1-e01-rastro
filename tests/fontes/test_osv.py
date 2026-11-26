@@ -19,11 +19,7 @@ from rastro.fontes.conector import (
 from rastro.fontes.consulta import consultar_avisos
 from rastro.fontes.osv import Osv
 from rastro.identificacao.modelos import Biblioteca
-from rastro.travas.faixa_de_versao import (
-    FaixaSemver,
-    descartar_fora_da_faixa,
-    faixas_dos_eventos_semver,
-)
+from rastro.travas.faixa_de_versao import descartar_fora_da_faixa
 from tests.dubles import ConectorFalso
 
 PASTA_DE_DADOS = Path(__file__).resolve().parents[1] / "dados"
@@ -207,35 +203,6 @@ def test_r04a_1_a_trava_6_vale_igual_para_as_faixas_do_osv(
 
 def test_r04a_1_sem_avisos_devolve_lista_vazia(monkeypatch: pytest.MonkeyPatch) -> None:
     assert consultar(monkeypatch, UrlopenFalso(b"{}")) == []
-
-
-@pytest.mark.parametrize(
-    ("eventos", "esperado"),
-    [
-        (
-            [{"introduced": "1.2.0"}, {"fixed": "3.5.0"}],
-            [FaixaSemver(">= 1.2.0, < 3.5.0", "3.5.0")],
-        ),
-        ([{"introduced": "0"}, {"fixed": "3.5.0"}], [FaixaSemver("< 3.5.0", "3.5.0")]),
-        (
-            [{"introduced": "1.0.0"}, {"last_affected": "1.0.5"}],
-            [FaixaSemver(">= 1.0.0, <= 1.0.5", None)],
-        ),
-        ([{"introduced": "0"}, {"last_affected": "1.0.5"}], [FaixaSemver("<= 1.0.5", None)]),
-        ([{"introduced": "2.0.0"}], [FaixaSemver(">= 2.0.0", None)]),
-        ([{"introduced": "0"}], [FaixaSemver(">= 0", None)]),
-        ([{"fixed": "1.0.0"}], []),
-        ([{"introduced": "1.0.0"}, {"limit": "2.0.0"}], [FaixaSemver(">= 1.0.0", None)]),
-        (
-            [{"introduced": "0"}, {"fixed": "1.0.0"}, {"introduced": "2.0.0"}, {"fixed": "2.1.0"}],
-            [FaixaSemver("< 1.0.0", "1.0.0"), FaixaSemver(">= 2.0.0, < 2.1.0", "2.1.0")],
-        ),
-    ],
-)
-def test_r04a_1_le_os_eventos_semver_como_faixa_de_versao(
-    eventos: list[dict[str, str]], esperado: list[FaixaSemver]
-) -> None:
-    assert faixas_dos_eventos_semver(eventos) == esperado
 
 
 @pytest.mark.parametrize(

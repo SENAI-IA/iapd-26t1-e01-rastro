@@ -1,31 +1,25 @@
 import time
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from rastro.acao.modelos import Acao
 from rastro.acao.plano import montar_plano_de_acao
 from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.configuracao.checagens import checar_configuracao
-from rastro.configuracao.modelos import Checagem
 from rastro.explicacao.ia import explicar_achados
-from rastro.explicacao.modelos import Explicacao
-from rastro.fontes.conector import ConectorDeAvisos, FonteSemResposta
-from rastro.fontes.consulta import AvisosDaBiblioteca, consultar_avisos
+from rastro.fontes.conector import ConectorDeAvisos
+from rastro.fontes.consulta import consultar_avisos
 from rastro.fontes.nvd import BuscaDeCvss
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.har.leitor import ler_har
 from rastro.har.site import descobrir_site_analisado
-from rastro.har.visita import PassoDaVisita, montar_visita
+from rastro.har.visita import montar_visita
 from rastro.ia.cliente import ChamadaIA, ClienteDeIA
 from rastro.identificacao.assinaturas import algum_script_com_conteudo, identificar_por_assinatura
 from rastro.identificacao.ia import identificar_em_bundles
-from rastro.identificacao.modelos import Biblioteca
+from rastro.modelos_da_analise import Analise
 from rastro.risco.achados import calcular_risco
-from rastro.risco.modelos import Achado
 from rastro.travas.conferencia import conferir_bibliotecas
-from rastro.travas.faixa_de_versao import descartar_fora_da_faixa
-from rastro.travas.modelos import TravaAcionada
+from rastro.travas.faixa_de_versao import conferir_faixas
 
 ETAPA_LER_O_HAR = "Lendo o HAR"
 ETAPA_RECONHECER = "Reconhecendo as bibliotecas pelos arquivos"
@@ -36,27 +30,6 @@ ETAPA_EXPLICAR = "Explicando os achados com a IA"
 ETAPA_PLANO = "Conferindo a configuração e montando o plano de ação"
 ETAPAS_SEM_IA = 5
 ETAPAS_COM_IA = 7
-
-
-@dataclass(frozen=True)
-class Analise:
-    har: str
-    site: str | None
-    inicio: datetime
-    duracao_s: float
-    provedor_de_ia: str | None
-    tem_javascript: bool
-    bibliotecas: list[Biblioteca]
-    a_confirmar: list[Biblioteca]
-    nao_consultadas: dict[str, str]
-    fontes_sem_resposta: list[FonteSemResposta]
-    achados: list[Achado]
-    explicacoes: dict[str, Explicacao]
-    checagens: list[Checagem]
-    plano_de_acao: list[Acao]
-    travas_acionadas: list[TravaAcionada]
-    chamadas_de_ia: list[ChamadaIA]
-    visita: list[PassoDaVisita]
 
 
 def analisar(
@@ -130,17 +103,3 @@ def chamadas_feitas(ia: ClienteDeIA | None) -> list[ChamadaIA]:
     if ia is None:
         return []
     return list(ia.chamadas)
-
-
-def conferir_faixas(
-    avisos: list[AvisosDaBiblioteca],
-) -> tuple[list[AvisosDaBiblioteca], list[TravaAcionada]]:
-    mantidos: list[AvisosDaBiblioteca] = []
-    travas_acionadas: list[TravaAcionada] = []
-    for biblioteca, avisos_da_biblioteca in avisos:
-        na_faixa, barrados = descartar_fora_da_faixa(
-            biblioteca.pacote, biblioteca.versao, avisos_da_biblioteca
-        )
-        mantidos.append((biblioteca, na_faixa))
-        travas_acionadas.extend(barrados)
-    return mantidos, travas_acionadas

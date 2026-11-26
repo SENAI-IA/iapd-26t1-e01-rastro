@@ -6,12 +6,13 @@ import pytest
 
 from rastro.andamento import SEM_ANDAMENTO, Andamento
 from rastro.comandos import comando_analisar
-from rastro.fluxo import Analise, analisar
+from rastro.fluxo import analisar
 from rastro.fontes.conector import ConectorDeAvisos
 from rastro.fontes.nvd import BuscaDeCvss
 from rastro.fontes.registro_npm import RegistroDePacotes
 from rastro.ia import cliente
 from rastro.ia.cliente import ClienteDeIA
+from rastro.modelos_da_analise import Analise
 from tests.dubles import ConectorFalso, NavegadorFalso, NvdFalso, OsvFalso, RegistroFalso
 
 MOMENTO = datetime(2026, 11, 20, 14, 3, 0)
