@@ -664,7 +664,7 @@ O Rastro continua passivo em `analisar`. O comando `pentest --autorizo` faz vali
 
 ## Rodada de legibilidade
 
-Polimento sem mudar comportamento, para que quem não domina Python, TypeScript ou React entenda rápido cada camada, arquivo e função (R19.4). Siglas de domínio ficam; abreviação vira nome completo; a responsabilidade se explica pelo nome, sem comentário. As chaves do JSON do relatório e do `pentest.json` não mudam nesta rodada.
+Polimento sem mudar comportamento, para que quem não domina Python, TypeScript ou React entenda rápido cada camada, arquivo e função (R19.4). A T89 fecha a rodada, depois da T90 e da T91. Siglas de domínio ficam; abreviação vira nome completo; a responsabilidade se explica pelo nome, sem comentário. As chaves do JSON do relatório e do `pentest.json` não mudam nesta rodada.
 
 - [x] **T72 Registrar a rodada de legibilidade e o diagrama da arquitetura**
   - Entrega: tasks T72–T89, critério R19.4 e diagrama interativo das camadas para o time.
@@ -799,6 +799,22 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Aceite: as chaves do JSON não mudam; seletores do tour atualizados junto; Verificação: `npm run build` passa e o `modelo.html` gerado de novo abre igual (claro, escuro, 400px).
   - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`
   - Teste: verificação manual (tour completo).
+  - Requisito: R19.4
+  - Revisão: @halan.bacca
+
+- [ ] **T90 Achatar ifs encadeados e laços no Python**
+  - Entrega: funções de `rastro/` sem `if` dentro de `for` dentro de `if`; cadeias de `if`/`elif` que só escolhem um valor viram tabela (dicionário) ou função com nome; casos de saída cedo viram `return` logo no começo (cláusula de guarda); o corpo de laço com mais de uma decisão vira função com nome que diz o que cada volta faz.
+  - Aceite: `ruff` com `C901` (complexidade) ligado em `pyproject.toml` e limite registrado em `codigo-python.md`, sem exceção; nenhuma função com mais de dois níveis de bloco aninhado (script de conferência no commit); JSON do relatório e `pentest.json` byte a byte iguais nos cenários de referência; `ruff`, `mypy` e `pytest` passam.
+  - Arquivos: `rastro/`, `pyproject.toml`, `.kiro/steering/codigo-python.md`
+  - Teste: os testes atuais; JSON de referência antes e depois.
+  - Requisito: R19.4
+  - Revisão: @ali.santos
+
+- [ ] **T91 Achatar ifs encadeados e laços no frontend**
+  - Entrega: componentes, hooks e contas de tela sem `if` dentro de laço dentro de `if`; cadeias de `if`/`else if` e `switch` que só escolhem um valor viram tabela (objeto) ou função com nome; saída cedo com `return` no começo; laço com mais de uma decisão vira função com nome por volta.
+  - Aceite: nenhuma função com mais de dois níveis de bloco aninhado (script de conferência no commit) e regra registrada em `frontend-react.md`; `npm run build` passa; telas (1280 e 400 px, claro e escuro) e sonda de comportamento iguais às de antes.
+  - Arquivos: `frontend/src/`, `rastro/relatorio/modelo.html`, `.kiro/steering/frontend-react.md`
+  - Teste: comparação das telas e da sonda de comportamento antes e depois.
   - Requisito: R19.4
   - Revisão: @halan.bacca
 

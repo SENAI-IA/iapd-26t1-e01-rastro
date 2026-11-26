@@ -143,6 +143,8 @@ _(vazio)_
 
 - [ ] **T87** Dividir os componentes grandes da tela · rodada de legibilidade · revisão @halan.bacca
 - [ ] **T88** Padronizar os nomes do frontend · rodada de legibilidade · revisão @halan.bacca
+- [ ] **T90** Achatar ifs encadeados e laços no Python · rodada de legibilidade · revisão @ali.santos
+- [ ] **T91** Achatar ifs encadeados e laços no frontend · rodada de legibilidade · revisão @halan.bacca
 - [ ] **T89** Atualizar diagrama, steering e documentação para a estrutura nova · rodada de legibilidade · revisão @geison.santos
 
 ## Feito
