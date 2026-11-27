@@ -883,3 +883,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Teste: o botão, verificação manual.
   - Requisito: R13.11
   - Revisão: sem revisor
+
+- [x] **T99 Mostrar os créditos do Kiro ou os tokens do Claude e do Codex**
+  - Entrega: o provedor do Kiro roda com `--output-format stream-json`, lê o texto do `runFinished` (ou dos pedaços, se vier cortado) e soma os créditos do `meteringUsage`; o JSON ganha `creditos` por chamada e `ia.creditos_total`; o painel da IA mostra tokens ou créditos, o que o provedor informou, e "Consumo: não informado" só quando ele não informou nenhum dos dois (chamada que falhou ou formato da CLI que mudou), para a falha de coleta continuar visível.
+  - Aceite: análise com o Kiro mostra os créditos por chamada e o total; com o Claude ou o Codex, os tokens; relatório antigo, sem créditos, mostra "não informado"; nenhum valor estimado. Uma chamada real ao Kiro 2.31.1 conferida.
+  - Arquivos: `rastro/ia/provedor.py`, `rastro/ia/cliente.py`, `rastro/ia/provedores/kiro.py`, `rastro/ia/provedores/codex.py`, `rastro/ia/provedores/linhas_json.py`, `rastro/relatorio/painel_da_ia.py`, `rastro/relatorio/modelo.html`, `tests/ia/provedores/test_kiro.py`, `tests/relatorio/test_painel_da_ia.py`, `tests/dados/kiro-resposta.jsonl`, `frontend/src/relatorio/tiposDoRelatorio.ts`, `frontend/src/formatacao/formato.ts`, `frontend/src/conteudo/glossario.ts`, `frontend/src/conteudo/tour.ts`, `frontend/src/zonas/rastreado/UsoDaIA.tsx`, `frontend/src/zonas/rastreado/TotalDoConsumo.tsx`, `frontend/src/zonas/rastreado/ItemDaChamadaDaIA.tsx`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`, `.kiro/steering/structure.md`, `docs/decisoes/04-ia-por-cli.md`, `avaliacao/resultados.md`
+  - Teste: `test_r11_4_*` e os `test_r14_4_*` do Kiro; o painel, verificação manual.
+  - Requisito: R11.4
+  - Revisão: sem revisor

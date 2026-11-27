@@ -32,7 +32,7 @@ export const PASSOS_DO_TOUR: PassoDoTour[] = [
     seletor: ".painel-da-ia",
     titulo: "Onde a IA entrou",
     texto:
-      "A IA procura bibliotecas escondidas e explica os achados, mas não decide nada sozinha: travas fixas conferem o que ela sugere. Aqui ficam as chamadas, o tempo, os tokens e o que cada trava barrou.",
+      "A IA procura bibliotecas escondidas e explica os achados, mas não decide nada sozinha: travas fixas conferem o que ela sugere. Aqui ficam as chamadas, o tempo, o consumo (tokens ou créditos) e o que cada trava barrou.",
     termos: ["Trava"],
   },
   {

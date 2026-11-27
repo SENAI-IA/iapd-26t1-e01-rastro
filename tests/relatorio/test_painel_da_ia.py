@@ -15,8 +15,10 @@ def lodash_como_se_viesse_da_ia(analise: Analise) -> Analise:
     return replace(analise, bibliotecas=bibliotecas)
 
 
-def chamada(tokens: int | None) -> ChamadaDaIA:
-    return ChamadaDaIA("explicar_achado", "kiro", "entrada", "resposta", 1.2, tokens, True)
+def chamada(tokens: int | None, creditos: float | None = None) -> ChamadaDaIA:
+    return ChamadaDaIA(
+        "explicar_achado", "kiro", "entrada", "resposta", 1.2, tokens, True, creditos
+    )
 
 
 def test_r21_10_travas_acionadas_vao_para_o_painel_da_ia() -> None:
@@ -32,6 +34,7 @@ def test_r21_10_travas_acionadas_vao_para_o_painel_da_ia() -> None:
     assert painel_da_ia["chamadas"] == []
     assert painel_da_ia["com_e_sem_ia"] is None
     assert painel_da_ia["tokens_total"] is None
+    assert painel_da_ia["creditos_total"] is None
 
 
 def test_r21_10_travas_barradas_com_ia_vao_para_o_painel_com_o_motivo() -> None:
@@ -60,6 +63,7 @@ def test_r11_1_cada_chamada_vai_para_o_painel_com_entrada_resposta_tempo_e_token
         "duracao_s",
         "tokens",
         "sucesso",
+        "creditos",
     ]
     assert chamadas[0]["etapa"] == "explicar_achado"
     assert chamadas[0]["provedor"] == "kiro"
@@ -96,6 +100,35 @@ def test_r11_2_com_ia_e_sem_chamadas_o_total_de_tokens_e_zero() -> None:
     analise = replace(analise_da_loja(), provedor_de_ia="kiro")
 
     assert montar_relatorio(analise)["ia"]["tokens_total"] == 0
+
+
+def test_r11_4_total_de_creditos_soma_as_chamadas() -> None:
+    analise = replace(analise_da_loja(), provedor_de_ia="kiro")
+    analise = replace(analise, chamadas_de_ia=[chamada(None, 0.5), chamada(None, 0.25)])
+
+    assert montar_relatorio(analise)["ia"]["creditos_total"] == 0.75
+
+
+def test_r11_4_total_de_creditos_nao_informado_se_alguma_chamada_nao_informou() -> None:
+    analise = replace(analise_da_loja(), provedor_de_ia="kiro")
+    analise = replace(analise, chamadas_de_ia=[chamada(None, 0.5), chamada(None)])
+
+    assert montar_relatorio(analise)["ia"]["creditos_total"] is None
+
+
+def test_r11_4_provedor_que_informa_tokens_fica_sem_total_de_creditos() -> None:
+    analise = replace(analise_da_loja(), provedor_de_ia="claude")
+    analise = replace(analise, chamadas_de_ia=[chamada(1000)])
+
+    assert montar_relatorio(analise)["ia"]["creditos_total"] is None
+
+
+def test_r11_4_chamada_do_kiro_vai_para_o_painel_com_os_creditos() -> None:
+    resposta = RespostaDoProvedor("{}", None, creditos=0.74)
+    chamadas = montar_relatorio(analise_da_loja_com_ia(resposta))["ia"]["chamadas"]
+
+    assert chamadas[0]["creditos"] == 0.74
+    assert chamadas[0]["tokens"] is None
 
 
 def test_r11_3_com_ia_o_painel_compara_so_por_assinatura_e_com_ia() -> None:

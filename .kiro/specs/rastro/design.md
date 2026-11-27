@@ -385,16 +385,16 @@ class ClienteDeIA:                        # ia/cliente.py
 
 Conferido no Linux no spike T02 (`docs/historico/spike/clis-de-ia.md`). O Windows é conferido na T42.
 
-| Provedor | Comando (prompt pela entrada padrão) | Texto da resposta | Tokens |
+| Provedor | Comando (prompt pela entrada padrão) | Texto da resposta | Consumo |
 |---|---|---|---|
 | Claude | `claude -p --output-format json --tools ""` | campo `result` do JSON | soma de `input_tokens`, `cache_creation_input_tokens`, `cache_read_input_tokens` e `output_tokens` do `usage` |
 | Codex | `codex exec --skip-git-repo-check --sandbox read-only --disable shell_tool --disable unified_exec --ephemeral --json -` | `text` do último evento `item.completed` do tipo `agent_message` | `input_tokens` + `output_tokens` do último `turn.completed` (`cached_input_tokens` e `reasoning_output_tokens` já estão dentro) |
-| Kiro | `kiro-cli chat --no-interactive --trust-tools=` | a saída padrão inteira, sem os espaços em volta | não informa: "não informado" (R11.3) |
+| Kiro | `kiro-cli chat --no-interactive --trust-tools= --output-format stream-json` | `finalText` do evento `runFinished`, sem os espaços em volta; se vier cortado (`finalTextTruncated`), os pedaços `agent_message_chunk` juntos. `status` diferente de `success` é falha | não informa tokens; créditos: soma dos `meteringUsage` com `unit` `credit` dos eventos `metadata` (R11.4) |
 
 - A CLI roda por `ia/provedores/execucao_da_cli.py`: `subprocess.run(..., input=prompt, capture_output=True, encoding="utf-8", timeout=120)`, com o caminho que `localizar_cli` achou. A soma dos tokens fica em `ia/provedores/contagem_de_tokens.py`; faltou campo ou valor não inteiro, fica `None` (soma parcial seria estimativa, R11.2).
 - As opções desligam ferramentas e gravação: a IA só responde, sem ler, rodar ou gravar nada na máquina. Sem `--bare` no Claude: ele exige `ANTHROPIC_API_KEY`, e o Rastro não usa chave.
 - Falha, além do código de saída e do tempo limite: no Claude, saída que não é objeto JSON, `is_error: true` ou `result` vazio; no Codex, nenhum `agent_message` com texto (linha que não é JSON é ignorada); no Kiro, saída vazia.
-- O Kiro pode responder dentro de um bloco de código (`tests/dados/kiro-resposta.txt`). O provedor não tira o bloco: quem tira é a trava de formato, igual para os três. O `--output-format stream-json` do Kiro também não traz tokens, só créditos.
+- O Kiro pode responder dentro de um bloco de código (`tests/dados/kiro-resposta.txt`). O provedor não tira o bloco: quem tira é a trava de formato, igual para os três. O `stream-json` do Kiro não traz tokens, só créditos, e o Rastro guarda os créditos (R11.4). As linhas JSON do Kiro e do Codex são lidas por `ia/provedores/linhas_json.py`.
 - O Rastro não escolhe o modelo: vale o padrão de cada CLI. Cada CLI soma o próprio prompt de sistema (de 12 mil a 27 mil tokens de entrada por chamada no spike).
 
 ### Prompts
@@ -464,7 +464,7 @@ Cada prompt pede **só JSON**, em português simples, com um exemplo de entrada 
   "ia": { "chamadas": [], "travas_acionadas": [],
           "com_e_sem_ia": { "bibliotecas": { "so_por_assinatura": 7, "com_ia": 9 },
                             "achados": { "so_por_assinatura": 5, "com_ia": 8 } },
-          "tokens_total": null },
+          "tokens_total": null, "creditos_total": 5.84 },
   "visita": [],
   "pentest": null
 }
@@ -481,6 +481,7 @@ Toda contagem que a tela mostra já vem no `resumo` (`relatorio/resumo_do_relato
   - `ia.chamadas`: cada `ChamadaDaIA` como veio do cliente, com `entrada` e `resposta` já sanitizadas. Chamada que falhou leva o motivo em `resposta`.
   - `ia.com_e_sem_ia` (R11.3): `so_por_assinatura` conta as bibliotecas confirmadas com `metodo` "assinatura" e os achados delas; `com_ia` é o total da análise. Bibliotecas "a confirmar" não contam. Sem IA, `null`.
   - `ia.tokens_total`: soma dos `tokens` das chamadas; `null` sem IA ou quando alguma chamada não informou tokens (R11.2). Com IA e nenhuma chamada, `0`.
+  - `ia.creditos_total`: soma dos `creditos` das chamadas (só o Kiro informa); `null` sem IA, sem chamadas ou quando alguma chamada não informou créditos (R11.4). Cada chamada leva `creditos`, `null` quando o provedor não informa.
 - **Visita** (R22.2, `relatorio/visita_no_relatorio.py`): cada `PassoDaVisita`, com a `url` sem os valores da query, mais `bibliotecas` (os `id` das bibliotecas com evidência naquela requisição) e `prioridade` (a mais alta delas, ou `null`).
 - `pentest`: o resultado do `pentest.json` pedido com `--pentest`, ou `null` (seção 19).
 - `analise.data` é a hora local do início, sem fração de segundo, a mesma do nome da pasta da análise.

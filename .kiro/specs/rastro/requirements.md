@@ -152,6 +152,7 @@ O GitHub Advisory é a fonte principal. OSV e NVD foram planejados como extensã
 1. O Rastro DEVE registrar cada chamada à IA com etapa, provedor, entrada enviada, resposta, duração e tokens.
 2. SE o provedor não informar tokens, ENTÃO o Rastro DEVE registrar "não informado", nunca uma estimativa.
 3. O Rastro DEVE calcular, para o painel "Onde a IA entrou", quantas bibliotecas e achados vieram só por assinatura e quantos vieram com a IA.
+4. QUANDO o provedor informar créditos em vez de tokens (Kiro), o Rastro DEVE registrar os créditos de cada chamada e o total, também sem estimar. O relatório DEVE mostrar o consumo que o provedor informou (tokens ou créditos), por chamada e no total, e "não informado" quando o provedor não informou nenhum dos dois. *(verificação manual na tela)*
 
 ## R12 Explicar termos técnicos (RF12)
 

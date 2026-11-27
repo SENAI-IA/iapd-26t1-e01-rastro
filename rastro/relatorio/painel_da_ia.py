@@ -11,6 +11,7 @@ def montar_painel_da_ia(analise: Analise) -> dict[str, Any]:
         "travas_acionadas": [asdict(trava) for trava in analise.travas_acionadas],
         "com_e_sem_ia": comparar_com_e_sem_ia(analise),
         "tokens_total": tokens_total(analise),
+        "creditos_total": creditos_total(analise),
     }
 
 
@@ -47,4 +48,21 @@ def somar_tokens(chamadas: list[ChamadaDaIA]) -> int | None:
         if chamada.tokens is None:
             return None
         total += chamada.tokens
+    return total
+
+
+def creditos_total(analise: Analise) -> float | None:
+    if analise.provedor_de_ia is None:
+        return None
+    return somar_creditos(analise.chamadas_de_ia)
+
+
+def somar_creditos(chamadas: list[ChamadaDaIA]) -> float | None:
+    if not chamadas:
+        return None
+    total = 0.0
+    for chamada in chamadas:
+        if chamada.creditos is None:
+            return None
+        total += chamada.creditos
     return total

@@ -1,3 +1,4 @@
+import json
 import subprocess
 from typing import Any
 
@@ -10,7 +11,29 @@ from rastro.ia.provedores.kiro import ProvedorKiro
 from tests.dubles import DADOS
 
 EXECUTAVEL = "/home/auditor/.local/bin/kiro-cli"
-RESPOSTA_GRAVADA = (DADOS / "kiro-resposta.txt").read_text(encoding="utf-8")
+RESPOSTA_GRAVADA = (DADOS / "kiro-resposta.jsonl").read_text(encoding="utf-8")
+TEXTO_DA_RESPOSTA = (DADOS / "kiro-resposta.txt").read_text(encoding="utf-8").strip()
+
+
+def saida_em_eventos(*eventos: dict[str, Any]) -> str:
+    return "".join(json.dumps(evento) + "\n" for evento in eventos)
+
+
+def pedaco(texto: str) -> dict[str, Any]:
+    conteudo = {"type": "text", "text": texto}
+    return {
+        "type": "sessionUpdate",
+        "data": {"update": {"sessionUpdate": "agent_message_chunk", "content": conteudo}},
+    }
+
+
+def fim(**dados: Any) -> dict[str, Any]:
+    return {"type": "runFinished", "data": dados}
+
+
+def creditos(*valores: Any, unidade: str = "credit") -> dict[str, Any]:
+    medicoes = [{"value": valor, "unit": unidade} for valor in valores]
+    return {"type": "metadata", "data": {"meteringUsage": medicoes}}
 
 
 class SubprocessFalso:
@@ -50,21 +73,23 @@ def test_r14_4_chama_a_cli_sem_interacao_sem_ferramentas_com_tempo_limite(
 
     ProvedorKiro(EXECUTAVEL).executar("prompt")
 
-    assert falso.comandos == [[EXECUTAVEL, "chat", "--no-interactive", "--trust-tools="]]
+    assert falso.comandos == [
+        [EXECUTAVEL, "chat", "--no-interactive", "--trust-tools=", "--output-format", "stream-json"]
+    ]
     assert falso.opcoes[0]["capture_output"] is True
     assert falso.opcoes[0]["encoding"] == "utf-8"
     assert falso.opcoes[0]["errors"] == "replace"
     assert falso.opcoes[0]["timeout"] == 120
 
 
-def test_r14_4_le_a_saida_inteira_como_texto_e_deixa_tokens_none(
+def test_r11_4_le_o_texto_final_e_os_creditos_e_deixa_tokens_none(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     trocar_subprocess(monkeypatch, SubprocessFalso())
 
     resposta = ProvedorKiro(EXECUTAVEL).executar("prompt")
 
-    assert resposta == RespostaDoProvedor(RESPOSTA_GRAVADA.strip(), tokens=None)
+    assert resposta == RespostaDoProvedor(TEXTO_DA_RESPOSTA, tokens=None, creditos=0.74)
     assert resposta.texto.startswith('```json\n{"o_que_e": "A GHSA-gxr4-xjj5-5px2')
     assert "manipulação do DOM" in resposta.texto
 
@@ -72,11 +97,67 @@ def test_r14_4_le_a_saida_inteira_como_texto_e_deixa_tokens_none(
 def test_r14_4_espacos_e_quebras_em_volta_da_resposta_saem(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    trocar_subprocess(monkeypatch, SubprocessFalso('\n  {"o_que_e": "XSS"}\n\n'))
+    saida = saida_em_eventos(fim(status="success", finalText='\n  {"o_que_e": "XSS"}\n\n'))
+    trocar_subprocess(monkeypatch, SubprocessFalso(saida))
 
     resposta = ProvedorKiro(EXECUTAVEL).executar("prompt")
 
     assert resposta.texto == '{"o_que_e": "XSS"}'
+
+
+def test_r14_4_texto_final_cortado_vem_dos_pedacos_da_resposta(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    cortado = fim(status="success", finalText='{"o_que', finalTextTruncated=True)
+    saida = saida_em_eventos(pedaco('{"o_que_e": '), pedaco('"XSS"}'), cortado)
+    trocar_subprocess(monkeypatch, SubprocessFalso(saida))
+
+    resposta = ProvedorKiro(EXECUTAVEL).executar("prompt")
+
+    assert resposta.texto == '{"o_que_e": "XSS"}'
+
+
+def test_r14_4_linhas_que_nao_sao_json_ficam_de_fora(monkeypatch: pytest.MonkeyPatch) -> None:
+    saida = "aviso solto\n[1, 2]\n" + saida_em_eventos(fim(status="success", finalText="ok"))
+    trocar_subprocess(monkeypatch, SubprocessFalso(saida))
+
+    assert ProvedorKiro(EXECUTAVEL).executar("prompt").texto == "ok"
+
+
+def test_r14_4_status_diferente_de_sucesso_vira_falha(monkeypatch: pytest.MonkeyPatch) -> None:
+    saida = saida_em_eventos(fim(status="error", finalText="parcial"))
+    trocar_subprocess(monkeypatch, SubprocessFalso(saida))
+
+    with pytest.raises(FalhaDoProvedor) as falha:
+        ProvedorKiro(EXECUTAVEL).executar("prompt")
+
+    assert falha.value.motivo == "a CLI do Kiro terminou com status error"
+
+
+def test_r11_4_soma_os_creditos_de_todas_as_medicoes(monkeypatch: pytest.MonkeyPatch) -> None:
+    saida = saida_em_eventos(creditos(0.5), creditos(0.25), fim(status="success", finalText="ok"))
+    trocar_subprocess(monkeypatch, SubprocessFalso(saida))
+
+    assert ProvedorKiro(EXECUTAVEL).executar("prompt").creditos == 0.75
+
+
+@pytest.mark.parametrize(
+    "medicao",
+    [
+        creditos(),
+        creditos(0.5, unidade="token"),
+        creditos("0,5"),
+        creditos(True),
+        creditos(-1),
+    ],
+)
+def test_r11_2_sem_credito_valido_os_creditos_ficam_none(
+    monkeypatch: pytest.MonkeyPatch, medicao: dict[str, Any]
+) -> None:
+    saida = saida_em_eventos(medicao, fim(status="success", finalText="ok"))
+    trocar_subprocess(monkeypatch, SubprocessFalso(saida))
+
+    assert ProvedorKiro(EXECUTAVEL).executar("prompt").creditos is None
 
 
 @pytest.mark.parametrize("saida", ["", "\n", "   \n\t\n"])
@@ -127,13 +208,14 @@ def test_r14_4_cli_que_sumiu_depois_de_localizada_vira_falha(
     assert falha.value.motivo.startswith("a CLI do Kiro não pôde ser executada")
 
 
-def test_r14_4_cliente_registra_o_nome_do_kiro_e_tokens_none(
+def test_r14_4_cliente_registra_o_nome_do_kiro_os_creditos_e_tokens_none(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     trocar_subprocess(monkeypatch, SubprocessFalso())
     cliente_de_ia = ClienteDeIA(ProvedorKiro(EXECUTAVEL))
 
-    assert cliente_de_ia.perguntar("explicar_achado", "prompt") == RESPOSTA_GRAVADA.strip()
+    assert cliente_de_ia.perguntar("explicar_achado", "prompt") == TEXTO_DA_RESPOSTA
     assert cliente_de_ia.chamadas[0].provedor == "kiro"
     assert cliente_de_ia.chamadas[0].tokens is None
+    assert cliente_de_ia.chamadas[0].creditos == 0.74
     assert cliente_de_ia.chamadas[0].sucesso is True

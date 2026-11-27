@@ -1,6 +1,7 @@
 const UMA_CASA_DECIMAL = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const PERCENTIL = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 5 });
 const INTEIRO = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
+const DUAS_CASAS_DECIMAIS = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const DATA = new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" });
 
 export function formatarNota(nota: number): string {
@@ -26,6 +27,20 @@ export function comPlural(quantidade: number, singular: string, varios: string):
 
 export function formatarTokens(tokens: number | null): string {
   return tokens === null ? "não informado" : INTEIRO.format(tokens);
+}
+
+export function formatarCreditos(creditos: number): string {
+  return DUAS_CASAS_DECIMAIS.format(creditos);
+}
+
+export function descreverConsumo(tokens: number | null, creditos: number | null | undefined): string {
+  if (tokens !== null) {
+    return `Tokens: ${formatarTokens(tokens)}`;
+  }
+  if (creditos != null) {
+    return `Créditos: ${formatarCreditos(creditos)}`;
+  }
+  return "Consumo: não informado";
 }
 
 export function textoDoNpm(conferida: boolean | null): string {

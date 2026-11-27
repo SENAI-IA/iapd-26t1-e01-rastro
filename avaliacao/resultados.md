@@ -72,7 +72,7 @@ Sugestões da IA (identificação em bundles e explicações), por análise:
 | **Total, 13 chamadas** | **14,3 s** | **208,6 s** (16 s por chamada) | **134,7 s** (9 s por chamada) · **410.026 tokens** (31.540 por chamada) |
 
 - O tempo é o `analise.duracao_s`; entre parênteses, a soma do `duracao_s` das chamadas à IA. Sem IA, quase todo o tempo é a consulta às fontes.
-- **Kiro:** a CLI não informa tokens (`tokens_total: null`, R11.2), só créditos, que o Rastro não lê.
+- **Kiro:** a CLI não informa tokens (`tokens_total: null`, R11.2), só créditos, que o Rastro não lia nesta medição (passa a ler na T99, R11.4).
 - **Claude:** cada chamada custa de 30,5 mil a 32,5 mil tokens. Quase tudo é o prompt de sistema da própria CLI (spike T02); o trecho e o aviso enviados pelo Rastro são uma parte pequena.
 - As 13 chamadas de cada provedor responderam, sem nenhuma falha.
 

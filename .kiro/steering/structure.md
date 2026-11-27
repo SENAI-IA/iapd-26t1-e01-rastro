@@ -56,12 +56,13 @@ rastro/
                            texto_da_tarefa.py
   ia/
     provedor.py            contrato do provedor (ProvedorDeIA, RespostaDoProvedor, FalhaDoProvedor)
-    cliente.py             interface única: pergunta ao provedor e mede tempo e tokens (ChamadaDaIA)
+    cliente.py             interface única: pergunta ao provedor e mede tempo, tokens e créditos (ChamadaDaIA)
     escolha_da_ia.py       escolhe e valida a IA (--ia, RASTRO_IA) e localiza a CLI
     montagem_do_prompt.py  lê o prompt de prompts/ e põe a entrada no marcador {{entrada}}
     sanitizacao.py         tira dados sensíveis do que vai para a IA
     provedores/            kiro.py, claude.py, codex.py; execucao_da_cli.py (roda a CLI, comum aos três),
-                           contagem_de_tokens.py (soma os tokens informados, comum a claude e codex)
+                           contagem_de_tokens.py (soma os tokens informados, comum a claude e codex),
+                           linhas_json.py (lê a saída em linhas JSON, comum a kiro e codex)
     prompts/               prompts versionados, com exemplo de entrada e saída
   relatorio/               montagem_do_relatorio.py (esqueleto do JSON), limitacoes_da_analise.py, resumo_do_relatorio.py,
                            painel_da_ia.py, visita_no_relatorio.py, pagina_do_relatorio.py, gravacao_do_relatorio.py,

@@ -6,6 +6,7 @@ from typing import Protocol
 class RespostaDoProvedor:
     texto: str
     tokens: int | None
+    creditos: float | None = None
 
 
 class FalhaDoProvedor(Exception):

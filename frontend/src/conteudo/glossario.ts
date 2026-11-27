@@ -7,6 +7,8 @@ export const glossario = {
   Assinatura:
     "Padrão conhecido que identifica uma biblioteca, como o nome do arquivo ou o comentário de versão no topo dele.",
   npm: "Registro público dos pacotes de JavaScript. O Rastro só lê o registro, para conferir que o pacote e a versão existem.",
+  Crédito:
+    "Medida de uso que o Kiro cobra por chamada, no lugar dos tokens. O Rastro mostra o número que o Kiro informa, sem converter.",
   Token:
     "Pedaço de texto que a IA lê ou escreve, mais ou menos uma sílaba. É a medida de uso que os provedores cobram.",
   Trava:

@@ -1,7 +1,7 @@
 import type { ChamadaDaIA } from "../../relatorio/tiposDoRelatorio.ts";
 import Icone from "../../basicos/Icone.tsx";
 import Selo from "../../basicos/Selo.tsx";
-import { formatarDuracao, formatarTokens } from "../../formatacao/formato.ts";
+import { descreverConsumo, formatarDuracao } from "../../formatacao/formato.ts";
 import "./ItemDaChamadaDaIA.css";
 
 interface Props {
@@ -14,6 +14,7 @@ const NOMES_DAS_ETAPAS: Record<string, string> = {
 };
 
 export default function ItemDaChamadaDaIA({ chamada }: Props) {
+  const consumo = descreverConsumo(chamada.tokens, chamada.creditos);
   return (
     <li className="item-da-chamada-da-ia">
       <details>
@@ -36,7 +37,7 @@ export default function ItemDaChamadaDaIA({ chamada }: Props) {
               <Icone nome="relogio" tamanho={12} />
               {formatarDuracao(chamada.duracao_s)}
             </span>
-            <span>Tokens: {formatarTokens(chamada.tokens)}</span>
+            <span>{consumo}</span>
           </span>
         </summary>
         <div className="item-da-chamada-da-ia__corpo">

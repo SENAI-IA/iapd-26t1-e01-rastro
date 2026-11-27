@@ -1,9 +1,9 @@
-import json
 from typing import Any
 
 from rastro.ia.provedor import FalhaDoProvedor, RespostaDoProvedor
 from rastro.ia.provedores.contagem_de_tokens import somar_tokens
 from rastro.ia.provedores.execucao_da_cli import executar_cli_da_ia
+from rastro.ia.provedores.linhas_json import ler_eventos
 
 OPCOES_SEM_GRAVACAO = [
     "exec",
@@ -38,25 +38,6 @@ def ler_resposta(saida_da_cli: str) -> RespostaDoProvedor:
     if texto is None:
         raise FalhaDoProvedor("a CLI do Codex respondeu sem agent_message")
     return RespostaDoProvedor(texto, somar_tokens(uso_do_turno(eventos), CAMPOS_DE_TOKENS))
-
-
-def ler_eventos(saida_da_cli: str) -> list[dict[str, Any]]:
-    eventos = []
-    for linha in saida_da_cli.splitlines():
-        evento = ler_linha(linha)
-        if evento is not None:
-            eventos.append(evento)
-    return eventos
-
-
-def ler_linha(linha: str) -> dict[str, Any] | None:
-    try:
-        evento = json.loads(linha)
-    except json.JSONDecodeError:
-        return None
-    if not isinstance(evento, dict):
-        return None
-    return evento
 
 
 def ultima_mensagem_do_agente(eventos: list[dict[str, Any]]) -> str | None:

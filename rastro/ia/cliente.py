@@ -14,6 +14,7 @@ class ChamadaDaIA:
     duracao_s: float
     tokens: int | None
     sucesso: bool
+    creditos: float | None = None
 
 
 class ClienteDeIA:
@@ -33,6 +34,7 @@ class ClienteDeIA:
                 resposta=falha.motivo,
                 duracao_em_segundos=segundos_desde(inicio),
                 tokens=None,
+                creditos=None,
                 sucesso=False,
             )
             return None
@@ -43,6 +45,7 @@ class ClienteDeIA:
             resposta=sanitizar(resposta.texto),
             duracao_em_segundos=duracao_em_segundos,
             tokens=resposta.tokens,
+            creditos=resposta.creditos,
             sucesso=True,
         )
         return resposta.texto
@@ -54,10 +57,18 @@ class ClienteDeIA:
         resposta: str,
         duracao_em_segundos: float,
         tokens: int | None,
+        creditos: float | None,
         sucesso: bool,
     ) -> None:
         chamada = ChamadaDaIA(
-            etapa, self.provedor.nome, entrada, resposta, duracao_em_segundos, tokens, sucesso
+            etapa,
+            self.provedor.nome,
+            entrada,
+            resposta,
+            duracao_em_segundos,
+            tokens,
+            sucesso,
+            creditos,
         )
         self.chamadas.append(chamada)
 

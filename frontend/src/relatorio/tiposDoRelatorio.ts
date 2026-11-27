@@ -138,6 +138,7 @@ export interface ChamadaDaIA {
   duracao_s: number;
   tokens: number | null;
   sucesso: boolean;
+  creditos?: number | null;
 }
 
 export interface Contagem {
@@ -155,6 +156,7 @@ export interface DadosDaIA {
   travas_acionadas: TravaAcionada[];
   com_e_sem_ia: ComESemIA | null;
   tokens_total: number | null;
+  creditos_total?: number | null;
 }
 
 export interface Relatorio {
