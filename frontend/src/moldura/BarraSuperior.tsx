@@ -1,6 +1,7 @@
 import AcoesDaBarra from "./AcoesDaBarra.tsx";
 import BotaoDaAba from "./BotaoDaAba.tsx";
 import Icone from "../basicos/Icone.tsx";
+import type { Relatorio } from "../relatorio/tiposDoRelatorio.ts";
 import type { Aba, Tema } from "../telas/tiposDaTela.ts";
 import "./BarraSuperior.css";
 
@@ -10,10 +11,10 @@ interface Props {
   aoTrocarTema: () => void;
   aoTrocarAba: (aba: Aba) => void;
   aoAbrirTour: (() => void) | null;
-  temPentest: boolean;
+  relatorio: Relatorio | null;
 }
 
-export default function BarraSuperior({ tema, abaAtual, aoTrocarTema, aoTrocarAba, aoAbrirTour, temPentest }: Props) {
+export default function BarraSuperior({ tema, abaAtual, aoTrocarTema, aoTrocarAba, aoAbrirTour, relatorio }: Props) {
   return (
     <header className="barra-superior">
       <div className="barra-superior__conteudo">
@@ -25,7 +26,7 @@ export default function BarraSuperior({ tema, abaAtual, aoTrocarTema, aoTrocarAb
           <BotaoDaAba aba="painel" abaAtual={abaAtual} icone="painel" aoTrocarAba={aoTrocarAba}>
             Painel
           </BotaoDaAba>
-          {temPentest && (
+          {relatorio?.pentest != null && (
             <BotaoDaAba
               aba="pentest"
               abaAtual={abaAtual}
@@ -40,7 +41,7 @@ export default function BarraSuperior({ tema, abaAtual, aoTrocarTema, aoTrocarAb
             Como usar
           </BotaoDaAba>
         </nav>
-        <AcoesDaBarra tema={tema} aoTrocarTema={aoTrocarTema} aoAbrirTour={aoAbrirTour} />
+        <AcoesDaBarra tema={tema} aoTrocarTema={aoTrocarTema} aoAbrirTour={aoAbrirTour} relatorio={relatorio} />
       </div>
     </header>
   );

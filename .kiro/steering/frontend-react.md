@@ -46,9 +46,10 @@ Tudo em `frontend/src/`. Cada `.tsx` fica com o seu `.css` ao lado.
 - `guia/`: a tela "Como usar".
 - `guia/desenhos/`: os desenhos SVG do guia, um componente por arquivo: `pecas/` (peças usadas pelas ilustrações dos passos e pelas animações dos modos: `Robo`, `Cursor`, `Janela`, `MenuDeLinks`, `MolduraDeTerminal` e o `TerminalQueDigita`, que desenha as linhas de `conteudo/terminaisDoGuia.ts`), `passos/` (um desenho por ilustração de passo) e `modos/` (as miniaturas de cada modo de uso).
 - `basicos/`: peças pequenas usadas em várias telas (ícone, selos, termo com a sua `DicaDoTermo`, texto com negrito e código).
-- `hooks/`: hooks próprios (`usar…`): tempo e tamanho na tela, tema, modo foco, janela modal, posição do tour, passos feitos do guia e cópia de texto.
+- `hooks/`: hooks próprios (`usar…`): tempo e tamanho na tela, tema, modo foco, janela modal, menu aberto, posição do tour, passos feitos do guia e cópia de texto.
 - `calculosDeTela/`: contas de posição e desenho (radar, replay, tour, linhas do terminal), rolagem, movimento reduzido, `semRepetir` e os `id`s dos elementos, sem JSX.
 - `formatacao/`: formatação de números, datas e plurais para exibir.
+- `exportacao/`: o que o botão "Baixar" gera, a partir do JSON: a planilha das falhas (`planilhaDeFalhas.ts`, CSV com `;`, vírgula decimal, BOM e proteção contra fórmula), a página original guardada pelo `main.tsx` antes do React montar a tela (`paginaOriginal.ts`) e o download pelo navegador (`arquivosParaBaixar.ts`).
 
 ## Organização da tela
 
@@ -81,4 +82,4 @@ Clique em qualquer dado abre a origem dele num painel lateral (`PainelOrigemDoDa
 - Estado nunca só por cor: sempre com ícone e texto.
 - Foco visível, navegação por teclado, `prefers-reduced-motion` respeitado.
 - Funciona a partir de 400px de largura, sem rolagem lateral.
-- Animação só para orientar: entrada dos blocos, reordenação, abertura de painéis. Há duas exceções. O replay da visita (`ReplayDaVisita`) é a única animação contínua do painel: para no fim, tem pausa e com `prefers-reduced-motion` já abre parada no fim. As ilustrações do guia "Como usar" (`IlustracaoDoGuia` e `AnimacaoDoModo`, com os desenhos em `guia/desenhos/`) repetem, para mostrar o gesto de cada passo, e ficam paradas com `prefers-reduced-motion`.
+- Animação só para orientar: entrada dos blocos, reordenação, abertura de painéis. Há duas exceções. O replay da visita (`ReplayDaVisita`) é a única animação contínua do painel: toca sozinho só na primeira abertura, tem pausa e, depois do fim, o ponteiro do radar segue girando devagar; com `prefers-reduced-motion` já abre parado no fim e sem giro. As ilustrações do guia "Como usar" (`IlustracaoDoGuia` e `AnimacaoDoModo`, com os desenhos em `guia/desenhos/`) repetem, para mostrar o gesto de cada passo, e ficam paradas com `prefers-reduced-motion`.

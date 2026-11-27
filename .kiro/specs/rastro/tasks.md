@@ -875,3 +875,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Teste: o radar, verificação manual.
   - Requisito: R22.9
   - Revisão: sem revisor
+
+- [x] **T98 Baixar as falhas em CSV e o relatório completo**
+  - Entrega: botão "Baixar" na barra superior, no modelo do painel do riskmap, com as falhas das bibliotecas em CSV e o relatório completo num HTML só, para mandar a outra pessoa.
+  - Aceite: o CSV abre no Excel em pt-BR com acentos, vírgula decimal e uma linha por falha; texto com cara de fórmula sai protegido; o HTML baixado abre sozinho, com todas as abas, sem erro e sem requisição externa; o menu fecha no Esc e no clique fora; funciona em 400px e nos dois temas. *(verificação manual na tela)*
+  - Arquivos: `frontend/src/exportacao/`, `frontend/src/hooks/usarMenuAberto.ts`, `frontend/src/moldura/MenuDeBaixar.*`, `frontend/src/moldura/OpcaoDeBaixar.tsx`, `frontend/src/moldura/AcoesDaBarra.tsx`, `frontend/src/moldura/BarraSuperior.tsx`, `frontend/src/basicos/Icone.tsx`, `frontend/src/App.tsx`, `frontend/src/main.tsx`, `rastro/relatorio/modelo.html`, `.kiro/specs/rastro/requirements.md`, `.kiro/steering/frontend-react.md`, `README.md`
+  - Teste: o botão, verificação manual.
+  - Requisito: R13.11
+  - Revisão: sem revisor

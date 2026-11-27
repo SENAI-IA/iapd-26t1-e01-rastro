@@ -12,7 +12,7 @@ Este documento é para o time e para a banca: como preparar o ambiente, verifica
 | Este documento | Time e banca | Ambiente de desenvolvimento, verificação, frontend, resultados e como a IA foi usada. |
 | [`requirements.md`](.kiro/specs/rastro/requirements.md) | Time e agente de IA | Requisitos R01 a R25 em EARS, cada critério com ID. |
 | [`design.md`](.kiro/specs/rastro/design.md) | Time e agente de IA | Arquitetura, modelos, fórmulas, travas e provedores de IA. |
-| [`tasks.md`](.kiro/specs/rastro/tasks.md) | Time e agente de IA | Tasks T01 a T97, com entrega, aceite, arquivos, teste, requisito e revisor. |
+| [`tasks.md`](.kiro/specs/rastro/tasks.md) | Time e agente de IA | Tasks T01 a T98, com entrega, aceite, arquivos, teste, requisito e revisor. |
 | [`kanban.md`](.kiro/specs/rastro/kanban.md) | Time | Estado de cada task. |
 | [`product.md`](.kiro/steering/product.md) | Agente de IA | Para quem é o Rastro e o que ele promete. |
 | [`tech.md`](.kiro/steering/tech.md) | Agente de IA | Stack, dependências e regras de Windows e Linux. |
@@ -132,7 +132,7 @@ O Rastro foi construído com um agente de IA guiado por arquivos versionados nes
 |---|---|---|
 | [`requirements.md`](.kiro/specs/rastro/requirements.md) | Requisitos R01 a R25 em EARS | Cada critério vira pelo menos um teste com o ID no nome (`test_r05_2_...`); os que só se veem na tela estão na [verificação manual](docs/verificacao-manual.md). |
 | [`design.md`](.kiro/specs/rastro/design.md) | Arquitetura, modelos, fórmulas, travas e provedores de IA | O agente lê antes de cada task; o que se decide no meio da task volta para o design no mesmo commit. |
-| [`tasks.md`](.kiro/specs/rastro/tasks.md) e [`kanban.md`](.kiro/specs/rastro/kanban.md) | Tasks T01 a T97 e o estado de cada uma | Uma task por vez, um commit por task (`feat(risco): ... (T17)`), com o revisor como coautor. O `git log` conta a construção task por task. |
+| [`tasks.md`](.kiro/specs/rastro/tasks.md) e [`kanban.md`](.kiro/specs/rastro/kanban.md) | Tasks T01 a T98 e o estado de cada uma | Uma task por vez, um commit por task (`feat(risco): ... (T17)`), com o revisor como coautor. O `git log` conta a construção task por task. |
 | [`.kiro/steering/`](.kiro/steering/) | Padrões de produto, tecnologia, estrutura, processo, Python e React | Regras que o agente segue em toda task: biblioteca padrão primeiro, núcleo puro, nomes em português, Windows e Linux, nada destrutivo. Mudou um padrão, o steering muda no mesmo commit. |
 | [`rastro-nova-regra`](.kiro/skills/rastro-nova-regra/SKILL.md) | Skill para acrescentar checagem, assinatura, fonte, provedor de IA ou trava | Usada nas tasks de regra nova (checagens, assinaturas, OSV, NVD, provedores); o que faltou nela foi corrigido no commit da task. |
 | [`docs/decisoes/`](docs/decisoes/) | Uma decisão por arquivo | O porquê das escolhas (fórmula da nota, IA por CLI, travas contra invenção), em vez de comentário no código. |

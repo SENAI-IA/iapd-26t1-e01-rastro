@@ -100,7 +100,7 @@ export default function App({ relatorio }: Props) {
           aoTrocarTema={trocarTema}
           aoTrocarAba={trocarAba}
           aoAbrirTour={relatorio ? abrirTour : null}
-          temPentest={relatorio?.pentest != null}
+          relatorio={relatorio}
         />
         {relatorio && zonaEmFoco && (
           <BarraDeFoco zonaEmFoco={zonaEmFoco} aoTrocarZona={entrarNoFoco} aoSair={sairDoFoco} />

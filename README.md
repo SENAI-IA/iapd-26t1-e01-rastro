@@ -116,6 +116,7 @@ O relatório abre sozinho no navegador ao fim da análise e funciona sem interne
 - Comece pela **primeira ação** e por **O que fazer agora**: é o que corrigir antes.
 - Na primeira vez, clique em **Tour guiado**, que passa por cada parte da tela.
 - **Ver a origem** mostra de onde veio cada informação.
+- **Baixar** leva as falhas das bibliotecas para uma planilha (CSV) ou salva o relatório completo num arquivo só, para mandar por e-mail ou chat.
 
 Cada análise fica numa pasta nova, em `~/Rastro/relatorios/<site>/<data e hora>/`, com o `relatorio.html` e o `relatorio.json` (os mesmos dados, para guardar ou comparar). Para não abrir o navegador ao terminar, acrescente `--nao-abrir`.
 

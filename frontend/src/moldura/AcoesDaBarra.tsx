@@ -1,16 +1,20 @@
 import Icone from "../basicos/Icone.tsx";
+import type { Relatorio } from "../relatorio/tiposDoRelatorio.ts";
+import MenuDeBaixar from "./MenuDeBaixar.tsx";
 import type { Tema } from "../telas/tiposDaTela.ts";
 
 interface Props {
   tema: Tema;
   aoTrocarTema: () => void;
   aoAbrirTour: (() => void) | null;
+  relatorio: Relatorio | null;
 }
 
-export default function AcoesDaBarra({ tema, aoTrocarTema, aoAbrirTour }: Props) {
+export default function AcoesDaBarra({ tema, aoTrocarTema, aoAbrirTour, relatorio }: Props) {
   const proximoTema = tema === "claro" ? "escuro" : "claro";
   return (
     <div className="barra-superior__acoes">
+      {relatorio && <MenuDeBaixar relatorio={relatorio} />}
       {aoAbrirTour && (
         <button
           type="button"

@@ -124,6 +124,7 @@ const DESENHOS_DOS_ICONES = {
       <path d="M8 7h8M8 11h6" />
     </>
   ),
+  baixar: <path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14" />,
   painel: (
     <>
       <rect x="3" y="3" width="7" height="9" rx="1" />

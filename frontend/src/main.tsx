@@ -4,7 +4,10 @@ import "./estilos/fontes.css";
 import "./estilos/tokens.css";
 import "./estilos/base.css";
 import App from "./App.tsx";
+import { guardarPaginaOriginal } from "./exportacao/paginaOriginal.ts";
 import { lerRelatorioSemValidar } from "./relatorio/lerRelatorioSemValidar.ts";
+
+guardarPaginaOriginal(document);
 
 const raiz = document.getElementById("raiz");
 if (raiz === null) {
