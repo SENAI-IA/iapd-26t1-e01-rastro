@@ -53,7 +53,6 @@ export default function ReplayDaVisita({ passos, bibliotecas, aoIrParaBiblioteca
             arquivos={chegaram}
             totalDeArquivos={passos.length}
             falhas={falhasQueChegaram.length}
-            totalDeFalhas={chegadas.length}
           />
           <ControlesDoReplay relogio={relogio} duracaoDoReplay={duracaoDoReplayEmMilissegundos} duracaoDaVisita={duracaoDaVisita(passos)} />
           <LegendaDoReplay />

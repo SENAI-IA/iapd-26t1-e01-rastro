@@ -4,10 +4,9 @@ interface Props {
   arquivos: number;
   totalDeArquivos: number;
   falhas: number;
-  totalDeFalhas: number;
 }
 
-export default function ContagemDoReplay({ arquivos, totalDeArquivos, falhas, totalDeFalhas }: Props) {
+export default function ContagemDoReplay({ arquivos, totalDeArquivos, falhas }: Props) {
   return (
     <dl className="replay__contagem">
       <div>
@@ -19,7 +18,7 @@ export default function ContagemDoReplay({ arquivos, totalDeArquivos, falhas, to
       </div>
       <div>
         <dt>Com falha</dt>
-        <NumeroQuePulsa valor={falhas} total={totalDeFalhas} />
+        <NumeroQuePulsa valor={falhas} />
       </div>
     </dl>
   );
