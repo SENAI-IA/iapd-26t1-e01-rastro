@@ -6,7 +6,6 @@ from rastro.terminal.linha_ao_vivo import LinhaAoVivo
 
 TEXTO_DA_ETAPA = "[{numero}/{total}] {nome}"
 TEXTO_DOS_ITENS = "{feitos} de {total}"
-TEXTO_ETAPA_FEITA = "ok"
 
 
 class AndamentoNoTerminal:
@@ -46,7 +45,7 @@ class AndamentoNoTerminal:
             return
         if self.linha.ao_vivo:
             self.linha.soltar()
-            self.linha.imprimir(f"{self.texto()} · {TEXTO_ETAPA_FEITA}")
+            self.linha.concluir(self.texto())
         self.nome_da_etapa = None
 
     def titulo(self) -> str:

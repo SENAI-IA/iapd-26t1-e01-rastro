@@ -891,3 +891,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Teste: `test_r11_4_*` e os `test_r14_4_*` do Kiro; o painel, verificação manual.
   - Requisito: R11.4
   - Revisão: sem revisor
+
+- [x] **T100 Girar a cobrinha no começo da linha do terminal, como no riskmap**
+  - Entrega: a linha ao vivo começa com a cobrinha em braille (`⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏`), redesenhada a cada 0,1 s, com o tempo da etapa contando no fim; a etapa concluída fica com `✓` no começo, no lugar do `· ok` no fim.
+  - Aceite: `analisar` e `gravar` mostram a cobrinha num terminal interativo; fora do terminal nada muda; no console antigo do Windows (sem `WT_SESSION`) e em saída que não codifica os símbolos, o giro volta para `| / - \` e o `✓` para `ok`.
+  - Arquivos: `rastro/terminal/linha_ao_vivo.py`, `rastro/terminal/andamento_no_terminal.py`, `tests/terminal/test_linha_ao_vivo.py`, `tests/terminal/test_andamento_no_terminal.py`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`
+  - Teste: `test_r13_10_*`; a cobrinha no terminal, verificação manual.
+  - Requisito: R13.10
+  - Revisão: sem revisor

@@ -1,3 +1,4 @@
+import os
 import shutil
 import sys
 import threading
@@ -8,14 +9,34 @@ from typing import TextIO
 from rastro.terminal.cores import ativar_cores_no_terminal
 from rastro.terminal.formatacao import cortar_no_limite, destacar
 
-SIMBOLOS_DO_GIRO = "|/-\\"
-INTERVALO_DO_GIRO_EM_SEGUNDOS = 0.12
+GIRO_EM_BRAILLE = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+MARCA_DE_FEITO = "✓"
+GIRO_SEM_UNICODE = "|/-\\"
+MARCA_DE_FEITO_SEM_UNICODE = "ok"
+INTERVALO_DO_GIRO_EM_SEGUNDOS = 0.1
 LARGURA_MINIMA = 20
 ESPACO_DO_SIMBOLO_DO_GIRO = 2
 
 
 def largura_do_terminal() -> int:
     return shutil.get_terminal_size().columns
+
+
+def console_antigo_do_windows() -> bool:
+    return sys.platform == "win32" and "WT_SESSION" not in os.environ
+
+
+def aceita_os_simbolos(saida: TextIO) -> bool:
+    if console_antigo_do_windows():
+        return False
+    codificacao = getattr(saida, "encoding", None)
+    if codificacao is None:
+        return True
+    try:
+        (GIRO_EM_BRAILLE + MARCA_DE_FEITO).encode(codificacao)
+    except (UnicodeEncodeError, LookupError):
+        return False
+    return True
 
 
 def decidir_se_e_ao_vivo(saida: TextIO, ao_vivo: bool | None) -> bool:
@@ -44,6 +65,9 @@ class LinhaAoVivo:
         self.ao_vivo = decidir_se_e_ao_vivo(self.saida, ao_vivo)
         self.cores = decidir_se_usa_cores(self.ao_vivo, cores)
         self.largura = largura
+        com_simbolos = aceita_os_simbolos(self.saida)
+        self.simbolos_do_giro = GIRO_EM_BRAILLE if com_simbolos else GIRO_SEM_UNICODE
+        self.marca_de_feito = MARCA_DE_FEITO if com_simbolos else MARCA_DE_FEITO_SEM_UNICODE
         self._texto: Callable[[], str] | None = None
         self._quadro_do_giro = 0
         self._largura_ocupada = 0
@@ -84,6 +108,9 @@ class LinhaAoVivo:
             print(linha, file=self.saida, flush=True)
             self._desenhar()
 
+    def concluir(self, linha: str) -> None:
+        self.imprimir(f"{self.marca_de_feito} {linha}")
+
     def pedir(self, linha: str) -> None:
         self.imprimir(destacar(linha) if self.cores else linha)
 
@@ -97,8 +124,8 @@ class LinhaAoVivo:
         if not self.ao_vivo or self._texto is None:
             return
         largura = max(self.largura(), LARGURA_MINIMA) - 1
-        simbolo = SIMBOLOS_DO_GIRO[self._quadro_do_giro % len(SIMBOLOS_DO_GIRO)]
-        linha = f"{cortar_no_limite(self._texto(), largura - ESPACO_DO_SIMBOLO_DO_GIRO)} {simbolo}"
+        simbolo = self.simbolos_do_giro[self._quadro_do_giro % len(self.simbolos_do_giro)]
+        linha = f"{simbolo} {cortar_no_limite(self._texto(), largura - ESPACO_DO_SIMBOLO_DO_GIRO)}"
         self.saida.write("\r" + linha.ljust(self._largura_ocupada))
         self.saida.flush()
         self._largura_ocupada = len(linha)

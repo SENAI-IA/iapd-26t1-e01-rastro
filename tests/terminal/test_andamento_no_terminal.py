@@ -45,11 +45,11 @@ def test_r13_10_no_terminal_mostra_etapa_itens_e_tempo_ao_vivo() -> None:
     linha.acompanhar(andamento.texto)
 
     assert ultima_tela(saida) == (
-        "[1/7] Procurando bibliotecas nos bundles com a IA · 2 de 5 · 0:42 |"
+        "⠋ [1/7] Procurando bibliotecas nos bundles com a IA · 2 de 5 · 0:42"
     )
 
 
-def test_r13_10_etapa_concluida_fica_no_terminal_com_ok() -> None:
+def test_r13_10_etapa_concluida_fica_no_terminal_marcada_como_feita() -> None:
     saida = io.StringIO()
     relogio = RelogioFalso()
     andamento = AndamentoNoTerminal(LinhaAoVivo(saida, ao_vivo=True), relogio)
@@ -61,6 +61,6 @@ def test_r13_10_etapa_concluida_fica_no_terminal_com_ok() -> None:
     andamento.terminar()
 
     linhas = [trecho.strip() for trecho in saida.getvalue().split("\r")]
-    assert "[1/5] Lendo o HAR · 0:03 · ok" in "\n".join(linhas)
-    assert "[2/5] Reconhecendo as bibliotecas pelos arquivos · 0:00 · ok" in "\n".join(linhas)
+    assert "✓ [1/5] Lendo o HAR · 0:03" in "\n".join(linhas)
+    assert "✓ [2/5] Reconhecendo as bibliotecas pelos arquivos · 0:00" in "\n".join(linhas)
     assert saida.getvalue().endswith("\n")
