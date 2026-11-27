@@ -32,7 +32,7 @@ export default function ControlesDoReplay({ relogio, duracaoDoReplay, duracaoDaV
         onClick={relogio.tocando ? relogio.pausar : relogio.tocar}
         aria-label={rotuloDoBotao(relogio.tocando, terminou)}
       >
-        <Icone nome={iconeDoBotao(relogio.tocando, terminou)} tamanho={16} />
+        <Icone nome={iconeDoBotao(relogio.tocando, terminou)} tamanho={14} />
       </button>
       <input
         type="range"

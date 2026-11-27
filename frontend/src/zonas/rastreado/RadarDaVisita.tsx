@@ -2,6 +2,7 @@ import type { PassoDaVisita } from "../../relatorio/tiposDoRelatorio.ts";
 import type { ChegadaDeBiblioteca } from "../../calculosDeTela/chegadasDaVisita.ts";
 import { estadoDoRadar, type EstadoDoRadar } from "../../calculosDeTela/estadoDoRadar.ts";
 import { CENTRO, enquadramento, fatiaDoRastro } from "../../calculosDeTela/geometriaDoRadar.ts";
+import { prefereMenosMovimento } from "../../calculosDeTela/movimento.ts";
 import { caminhoDaUrl } from "../../formatacao/formato.ts";
 import AneisDoRadar from "./AneisDoRadar.tsx";
 import CentroDoRadar from "./CentroDoRadar.tsx";
@@ -10,6 +11,7 @@ import RotuloDaFalha from "./RotuloDaFalha.tsx";
 import "./RadarDaVisita.css";
 
 const ABERTURA_DO_RASTRO = 40;
+const VOLTA_DA_VARREDURA = "16s";
 
 interface Props {
   passos: PassoDaVisita[];
@@ -57,6 +59,20 @@ export default function RadarDaVisita({
           <path className="radar__rastro" d={fatiaDoRastro(estado.anguloAtual, ABERTURA_DO_RASTRO)} />
           <line className="radar__ponteiro" x1={CENTRO.x} y1={CENTRO.y} x2={estado.ponteiro.x} y2={estado.ponteiro.y} />
         </>
+      )}
+      {estado.terminou && !prefereMenosMovimento() && (
+        <g className="radar__varredura" aria-hidden="true">
+          <path className="radar__rastro" d={fatiaDoRastro(estado.anguloAtual, ABERTURA_DO_RASTRO)} />
+          <line className="radar__ponteiro" x1={CENTRO.x} y1={CENTRO.y} x2={estado.ponteiro.x} y2={estado.ponteiro.y} />
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from={`0 ${CENTRO.x} ${CENTRO.y}`}
+            to={`360 ${CENTRO.x} ${CENTRO.y}`}
+            dur={VOLTA_DA_VARREDURA}
+            repeatCount="indefinite"
+          />
+        </g>
       )}
       {estado.recentes.map(({ ordem, ponto }) => (
         <line key={`recente-${ordem}`} className="radar__recente" x1={CENTRO.x} y1={CENTRO.y} x2={ponto.x} y2={ponto.y} />

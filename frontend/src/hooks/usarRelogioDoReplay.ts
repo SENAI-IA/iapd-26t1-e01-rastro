@@ -9,10 +9,20 @@ export interface RelogioDoReplay {
   irPara: (tempo: number) => void;
 }
 
+let replayJaTocou = false;
+
+function comecaParado(): boolean {
+  return replayJaTocou || prefereMenosMovimento();
+}
+
 export function usarRelogioDoReplay(duracao: number): RelogioDoReplay {
-  const [tempo, setTempo] = useState(() => (prefereMenosMovimento() ? duracao : 0));
-  const [tocando, setTocando] = useState(() => !prefereMenosMovimento());
+  const [tempo, setTempo] = useState(() => (comecaParado() ? duracao : 0));
+  const [tocando, setTocando] = useState(() => !comecaParado());
   const quadroAnterior = useRef<number | null>(null);
+
+  useEffect(() => {
+    replayJaTocou = true;
+  }, []);
 
   useEffect(() => {
     if (!tocando) {

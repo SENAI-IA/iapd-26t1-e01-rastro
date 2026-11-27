@@ -865,3 +865,13 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Teste: não se aplica (documentação).
   - Requisito: R19.4
   - Revisão: @geison.santos
+
+## Ajustes do relatório
+
+- [x] **T97 Deixar o replay da visita mais discreto**
+  - Entrega: o replay toca sozinho só na primeira vez que o relatório abre e, ao voltar de outra aba, abre no fim; depois do fim, o ponteiro do radar gira devagar sobre os pontos; botão e linha do tempo do replay mais discretos.
+  - Aceite: trocar de aba e voltar não recomeça o replay; o ponteiro gira depois do fim e não gira com `prefers-reduced-motion`; controles legíveis no tema claro e no escuro. *(verificação manual na tela)*
+  - Arquivos: `frontend/src/hooks/usarRelogioDoReplay.ts`, `frontend/src/zonas/rastreado/RadarDaVisita.tsx`, `frontend/src/zonas/rastreado/RadarDaVisita.css`, `frontend/src/zonas/rastreado/ReplayDaVisita.css`, `frontend/src/zonas/rastreado/ControlesDoReplay.tsx`, `rastro/relatorio/modelo.html`, `.kiro/specs/rastro/requirements.md`
+  - Teste: o radar, verificação manual.
+  - Requisito: R22.9
+  - Revisão: sem revisor

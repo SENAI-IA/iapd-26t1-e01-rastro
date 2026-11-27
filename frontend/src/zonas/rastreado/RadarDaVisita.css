@@ -68,6 +68,11 @@
   transition: stroke .3s;
 }
 
+.radar__varredura {
+  opacity: .45;
+  animation: radar-rotulo 1.2s ease-out;
+}
+
 .radar__recente {
   stroke: var(--cor-do-ponteiro);
   stroke-width: 1;

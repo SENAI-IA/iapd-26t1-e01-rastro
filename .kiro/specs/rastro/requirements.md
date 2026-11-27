@@ -271,6 +271,7 @@ O princípio: **a IA sugere, a regra confirma.** Toda saída da IA passa por tra
 6. QUANDO o auditor acionar uma biblioteca no radar, o relatório DEVE abrir essa biblioteca nos Detalhes, saindo do modo foco se estiver nele. *(verificação manual)*
 7. O radar DEVE caber inteiro na primeira dobra em tela de computador (a partir de 900px de largura), também no modo foco, e funcionar no tema claro, no escuro e em 400px. *(verificação manual)*
 8. O radar DEVE mostrar só o que vem no JSON: tempo e ordem são os do HAR, e a prioridade é a das bibliotecas (R05.2).
+9. O radar DEVE tocar a visita sozinho só na primeira vez que o relatório abre; ao voltar de outra aba, DEVE abrir já no fim. Depois do fim, o ponteiro DEVE seguir girando devagar sobre os pontos, sem mudar o que eles mostram, e os controles do replay DEVEM ficar discretos até o mouse ou o foco chegar neles. ENQUANTO o sistema pedir menos movimento, o ponteiro NÃO DEVE girar. *(verificação manual)*
 
 ## R23 Aprender a usar o relatório (RF18)
 

@@ -112,6 +112,7 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T95** Deixar o README técnico só para desenvolvimento · rodada de legibilidade · revisão @luiz.pagliari · 26/11
 - [ ] **T96** Enxugar a spec viva, as decisões e o steering · rodada de legibilidade · revisão @geison.santos · 26/11
 - [ ] **T89** Atualizar diagrama, steering e documentação para a estrutura nova · rodada de legibilidade · revisão @geison.santos · 26/11
+- [ ] **T97** Deixar o replay da visita mais discreto · ajustes do relatório · sem revisor · 27/11
 
 ## A fazer
 
