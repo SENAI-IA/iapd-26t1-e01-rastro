@@ -899,3 +899,11 @@ Polimento sem mudar comportamento, para que quem não domina Python, TypeScript 
   - Teste: `test_r13_10_*`; a cobrinha no terminal, verificação manual.
   - Requisito: R13.10
   - Revisão: sem revisor
+
+- [x] **T101 Simular o terminal nos passos do Como usar e baixar o guia**
+  - Entrega: nos passos com comando, a ilustração dá lugar à prévia do terminal com "Simular", como no guia do riskmap; um terminal único toca a saída simulada daquele passo (comando digitado, etapas com a cobrinha e o tempo contando, perguntas e respostas), com "Simular de novo" e "Fechar"; o "Baixar" ganha o guia "Como usar" num HTML sem os dados da análise e aparece também quando a página abre só o guia. O texto do guia e do README passa a dizer "sinal no começo da linha" (T100).
+  - Aceite: um terminal ao vivo por vez; abrir outro passo devolve a prévia ao anterior; fechar devolve o foco ao "Simular"; com `prefers-reduced-motion` a simulação abre no fim; o guia baixado abre sozinho e não traz nada da análise; sem rolagem lateral em 400px. *(verificação manual na tela)*
+  - Arquivos: `frontend/src/conteudo/simulacoesDoGuia.ts`, `frontend/src/calculosDeTela/quadrosDoTerminal.ts`, `frontend/src/hooks/usarSimulacaoDoTerminal.ts`, `frontend/src/guia/TerminalDoPasso.*`, `frontend/src/guia/PreviaDoTerminal.tsx`, `frontend/src/guia/SimulacaoNoTerminal.tsx`, `frontend/src/guia/BarraDoTerminal.tsx`, `frontend/src/guia/TelaDoTerminal.tsx`, `frontend/src/guia/PassoDoGuia.tsx`, `frontend/src/guia/GuiaComoUsar.tsx`, `frontend/src/guia/IlustracaoDoGuia.*`, `frontend/src/conteudo/guia.ts`, `frontend/src/exportacao/`, `frontend/src/moldura/MenuDeBaixar.tsx`, `frontend/src/moldura/AcoesDaBarra.tsx`, `rastro/relatorio/modelo.html`, `.kiro/specs/rastro/requirements.md`, `.kiro/specs/rastro/design.md`, `.kiro/steering/frontend-react.md`, `README.md`; saem `TerminalQueDigita.tsx`, `terminaisDoGuia.ts` e `linhasDoTerminal.ts`
+  - Teste: o guia, verificação manual.
+  - Requisito: R23.9, R13.11
+  - Revisão: sem revisor

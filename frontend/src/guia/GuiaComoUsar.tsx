@@ -18,10 +18,12 @@ interface Props {
 export default function GuiaComoUsar({ aoIrParaOPainel, medirAlturaDoCabecalhoFixo }: Props) {
   const [modo, setModo] = useState<ModoDeUso>("devtools");
   const passos = PASSOS_POR_MODO[modo];
+  const [passoSimulando, setPassoSimulando] = useState<number | null>(null);
   const { feitos, alternar, desmarcarTodos } = usarPassosFeitos(passos.length, medirAlturaDoCabecalhoFixo);
 
   const escolherModo = (novo: ModoDeUso) => {
     setModo(novo);
+    setPassoSimulando(null);
     desmarcarTodos();
   };
 
@@ -44,6 +46,9 @@ export default function GuiaComoUsar({ aoIrParaOPainel, medirAlturaDoCabecalhoFi
             passo={passo}
             feito={feitos.has(indice)}
             aoMarcar={() => alternar(indice)}
+            simulando={passoSimulando === indice}
+            aoSimular={() => setPassoSimulando(indice)}
+            aoFecharSimulacao={() => setPassoSimulando(null)}
           />
         ))}
       </ol>

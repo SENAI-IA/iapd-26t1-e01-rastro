@@ -14,7 +14,7 @@ export default function AcoesDaBarra({ tema, aoTrocarTema, aoAbrirTour, relatori
   const proximoTema = tema === "claro" ? "escuro" : "claro";
   return (
     <div className="barra-superior__acoes">
-      {relatorio && <MenuDeBaixar relatorio={relatorio} />}
+      <MenuDeBaixar relatorio={relatorio} />
       {aoAbrirTour && (
         <button
           type="button"

@@ -68,7 +68,7 @@ rastro --help
    rastro analisar site.har
    ```
 
-   Com IA, pode levar alguns minutos: o terminal mostra a etapa e o tempo, e enquanto o sinal no fim da linha girar, o Rastro está trabalhando. Para outra IA, acrescente `--ia claude` ou `--ia codex`. Sem CLI de IA, acrescente `--sem-ia`.
+   Com IA, pode levar alguns minutos: o terminal mostra a etapa e o tempo, e enquanto o sinal no começo da linha girar, o Rastro está trabalhando. Para outra IA, acrescente `--ia claude` ou `--ia codex`. Sem CLI de IA, acrescente `--sem-ia`.
 
 Sem site para testar? Use um dos exemplos que vêm com o Rastro (WebGoat, Drupal e Juice Shop, descritos em [`avaliacao/`](avaliacao/README.md)):
 
@@ -116,7 +116,7 @@ O relatório abre sozinho no navegador ao fim da análise e funciona sem interne
 - Comece pela **primeira ação** e por **O que fazer agora**: é o que corrigir antes.
 - Na primeira vez, clique em **Tour guiado**, que passa por cada parte da tela.
 - **Ver a origem** mostra de onde veio cada informação.
-- **Baixar** leva as falhas das bibliotecas para uma planilha (CSV) ou salva o relatório completo num arquivo só, para mandar por e-mail ou chat.
+- **Baixar** leva as falhas das bibliotecas para uma planilha (CSV) ou salva o relatório completo num arquivo só, para mandar por e-mail ou chat. Também salva só o guia "Como usar", sem os dados da análise, para quem vai começar.
 
 Cada análise fica numa pasta nova, em `~/Rastro/relatorios/<site>/<data e hora>/`, com o `relatorio.html` e o `relatorio.json` (os mesmos dados, para guardar ou comparar). Para não abrir o navegador ao terminar, acrescente `--nao-abrir`.
 

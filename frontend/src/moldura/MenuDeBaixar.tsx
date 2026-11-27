@@ -1,6 +1,6 @@
 import { useId, useRef } from "react";
 import Icone from "../basicos/Icone.tsx";
-import { baixarArquivo, planilhaDeFalhas, relatorioCompleto, type ArquivoParaBaixar } from "../exportacao/arquivosParaBaixar.ts";
+import { baixarArquivo, guiaComoUsar, planilhaDeFalhas, relatorioCompleto, type ArquivoParaBaixar } from "../exportacao/arquivosParaBaixar.ts";
 import { comPlural } from "../formatacao/formato.ts";
 import { usarMenuAberto } from "../hooks/usarMenuAberto.ts";
 import type { Relatorio } from "../relatorio/tiposDoRelatorio.ts";
@@ -8,7 +8,7 @@ import OpcaoDeBaixar from "./OpcaoDeBaixar.tsx";
 import "./MenuDeBaixar.css";
 
 interface Props {
-  relatorio: Relatorio;
+  relatorio: Relatorio | null;
 }
 
 function descricaoDaPlanilha(falhas: number): string {
@@ -35,22 +35,31 @@ export default function MenuDeBaixar({ relatorio }: Props) {
         onClick={menu.alternar}
         aria-expanded={menu.aberto}
         aria-controls={idDaLista}
-        title="Baixar a planilha de falhas ou o relatório completo"
+        title="Baixar para compartilhar: planilha de falhas, relatório ou guia"
       >
         <Icone nome="baixar" tamanho={16} />
         <span className="barra-superior__rotulo">Baixar</span>
       </button>
       {menu.aberto && (
         <div className="menu-de-baixar__lista" id={idDaLista}>
+          {relatorio && (
+            <>
+              <OpcaoDeBaixar
+                titulo="Falhas das bibliotecas (CSV)"
+                descricao={descricaoDaPlanilha(relatorio.achados.length)}
+                aoEscolher={() => baixar(planilhaDeFalhas(relatorio))}
+              />
+              <OpcaoDeBaixar
+                titulo="Relatório completo (HTML)"
+                descricao="Um arquivo só, com todas as abas: abre sozinho no navegador e pode ir por e-mail ou chat. Não leva o login do site."
+                aoEscolher={() => baixar(relatorioCompleto(relatorio))}
+              />
+            </>
+          )}
           <OpcaoDeBaixar
-            titulo="Falhas das bibliotecas (CSV)"
-            descricao={descricaoDaPlanilha(relatorio.achados.length)}
-            aoEscolher={() => baixar(planilhaDeFalhas(relatorio))}
-          />
-          <OpcaoDeBaixar
-            titulo="Relatório completo (HTML)"
-            descricao="Um arquivo só, com todas as abas: abre sozinho no navegador e pode ir por e-mail ou chat. Não leva o login do site."
-            aoEscolher={() => baixar(relatorioCompleto(relatorio))}
+            titulo="Guia Como usar (HTML)"
+            descricao="Só o passo a passo, sem os dados desta análise: para mandar a quem vai começar a usar o Rastro."
+            aoEscolher={() => baixar(guiaComoUsar())}
           />
         </div>
       )}

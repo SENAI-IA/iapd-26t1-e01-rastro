@@ -115,7 +115,8 @@ Quadro de controle das tasks. **O que** cada task faz está no `tasks.md`; **em 
 - [ ] **T97** Deixar o replay da visita mais discreto · ajustes do relatório · sem revisor · commit 6800929 · ajuste 32f0ac8 · 27/11
 - [ ] **T98** Baixar as falhas em CSV e o relatório completo · ajustes do relatório · sem revisor · commit ea7a594 · 27/11
 - [ ] **T99** Mostrar os créditos do Kiro ou os tokens do Claude e do Codex · ajustes do relatório · sem revisor · commit 5efa24e · 27/11
-- [ ] **T100** Girar a cobrinha no começo da linha do terminal, como no riskmap · ajustes do relatório · sem revisor · 27/11
+- [ ] **T100** Girar a cobrinha no começo da linha do terminal, como no riskmap · ajustes do relatório · sem revisor · commit f491b9c · 27/11
+- [ ] **T101** Simular o terminal nos passos do Como usar e baixar o guia · ajustes do relatório · sem revisor · 27/11
 
 ## A fazer
 

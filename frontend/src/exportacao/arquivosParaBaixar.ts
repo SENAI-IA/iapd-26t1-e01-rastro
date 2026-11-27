@@ -1,5 +1,5 @@
 import type { Relatorio } from "../relatorio/tiposDoRelatorio.ts";
-import { lerPaginaOriginal } from "./paginaOriginal.ts";
+import { lerPaginaOriginal, lerPaginaSemOsDados } from "./paginaOriginal.ts";
 import { montarPlanilhaDeFalhas } from "./planilhaDeFalhas.ts";
 
 export interface ArquivoParaBaixar {
@@ -24,6 +24,10 @@ export function planilhaDeFalhas(relatorio: Relatorio): ArquivoParaBaixar {
 
 export function relatorioCompleto(relatorio: Relatorio): ArquivoParaBaixar {
   return { nome: `${comecoDoNome(relatorio)}.html`, conteudo: lerPaginaOriginal(), tipo: "text/html" };
+}
+
+export function guiaComoUsar(): ArquivoParaBaixar {
+  return { nome: "rastro-como-usar.html", conteudo: lerPaginaSemOsDados(), tipo: "text/html" };
 }
 
 export function baixarArquivo(arquivo: ArquivoParaBaixar): void {

@@ -2,6 +2,8 @@ import type { DescricaoDoPasso } from "../conteudo/guia.ts";
 import ComandosDoPasso from "./ComandosDoPasso.tsx";
 import Icone from "../basicos/Icone.tsx";
 import IlustracaoDoGuia from "./IlustracaoDoGuia.tsx";
+import TerminalDoPasso from "./TerminalDoPasso.tsx";
+import { ehTerminalDoGuia } from "../conteudo/simulacoesDoGuia.ts";
 import TextoComMarcas from "../basicos/TextoComMarcas.tsx";
 import { idDoPassoDoGuia } from "../calculosDeTela/identificadores.ts";
 import "./PassoDoGuia.css";
@@ -11,9 +13,12 @@ interface Props {
   passo: DescricaoDoPasso;
   feito: boolean;
   aoMarcar: () => void;
+  simulando: boolean;
+  aoSimular: () => void;
+  aoFecharSimulacao: () => void;
 }
 
-export default function PassoDoGuia({ numero, passo, feito, aoMarcar }: Props) {
+export default function PassoDoGuia({ numero, passo, feito, aoMarcar, simulando, aoSimular, aoFecharSimulacao }: Props) {
   return (
     <li
       id={idDoPassoDoGuia(numero)}
@@ -41,7 +46,11 @@ export default function PassoDoGuia({ numero, passo, feito, aoMarcar }: Props) {
           {feito ? "Feito" : "Marcar como feito"}
         </button>
       </div>
-      <IlustracaoDoGuia ilustracao={passo.ilustracao} />
+      {ehTerminalDoGuia(passo.ilustracao) ? (
+        <TerminalDoPasso terminal={passo.ilustracao} simulando={simulando} aoSimular={aoSimular} aoFechar={aoFecharSimulacao} />
+      ) : (
+        <IlustracaoDoGuia ilustracao={passo.ilustracao} />
+      )}
     </li>
   );
 }

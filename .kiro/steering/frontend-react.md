@@ -38,16 +38,16 @@ Tudo em `frontend/src/`. Cada `.tsx` fica com o seu `.css` ao lado.
 - `estilos/`: CSS global da página (tokens, base e fontes embutidas).
 - `assets/`: logos e arquivos de fonte usados pelo CSS e pelo favicon.
 - `relatorio/`: leitura do JSON embutido no HTML (`lerRelatorioSemValidar`: confia no JSON que o Python gerou, sem conferir campo a campo) e os tipos que espelham esse JSON.
-- `conteudo/`: textos fixos da tela (glossário, zonas, passos do tour e do guia, linhas dos terminais desenhados no guia, descrições e grupos do pentest).
+- `conteudo/`: textos fixos da tela (glossário, zonas, passos do tour e do guia, a saída simulada dos comandos do guia em `simulacoesDoGuia.ts`, descrições e grupos do pentest).
 - `moldura/`: o que envolve as zonas (barras do topo, aviso de limitações, cabeçalho da análise e a caixa de cada zona).
 - `zonas/rastreado/`, `zonas/agir/`, `zonas/detalhes/`: os componentes de cada zona do painel, um por pasta.
 - `segurancaAtiva/`: a aba "Segurança ativa" (o resultado do pentest); o agrupamento das validações por categoria fica em `agruparValidacoes.ts`.
 - `janelas/`: o que abre por cima da tela (painel da origem do dado e tour guiado). A janela da tarefa (`JanelaDaTarefa`) fica em `zonas/agir/`, junto do plano de ação.
 - `guia/`: a tela "Como usar".
-- `guia/desenhos/`: os desenhos SVG do guia, um componente por arquivo: `pecas/` (peças usadas pelas ilustrações dos passos e pelas animações dos modos: `Robo`, `Cursor`, `Janela`, `MenuDeLinks`, `MolduraDeTerminal` e o `TerminalQueDigita`, que desenha as linhas de `conteudo/terminaisDoGuia.ts`), `passos/` (um desenho por ilustração de passo) e `modos/` (as miniaturas de cada modo de uso).
+- `guia/desenhos/`: os desenhos SVG do guia, um componente por arquivo: `pecas/` (peças usadas pelas ilustrações dos passos e pelas animações dos modos: `Robo`, `Cursor`, `Janela`, `MenuDeLinks` e `MolduraDeTerminal`), `passos/` (um desenho por ilustração de passo) e `modos/` (as miniaturas de cada modo de uso).
 - `basicos/`: peças pequenas usadas em várias telas (ícone, selos, termo com a sua `DicaDoTermo`, texto com negrito e código).
 - `hooks/`: hooks próprios (`usar…`): tempo e tamanho na tela, tema, modo foco, janela modal, menu aberto, posição do tour, passos feitos do guia e cópia de texto.
-- `calculosDeTela/`: contas de posição e desenho (radar, replay, tour, linhas do terminal), rolagem, movimento reduzido, `semRepetir` e os `id`s dos elementos, sem JSX.
+- `calculosDeTela/`: contas de posição e desenho (radar, replay, tour, quadros da simulação do terminal do guia), rolagem, movimento reduzido, `semRepetir` e os `id`s dos elementos, sem JSX.
 - `formatacao/`: formatação de números, datas e plurais para exibir.
 - `exportacao/`: o que o botão "Baixar" gera, a partir do JSON: a planilha das falhas (`planilhaDeFalhas.ts`, CSV com `;`, vírgula decimal, BOM e proteção contra fórmula), a página original guardada pelo `main.tsx` antes do React montar a tela (`paginaOriginal.ts`) e o download pelo navegador (`arquivosParaBaixar.ts`).
 
@@ -82,4 +82,4 @@ Clique em qualquer dado abre a origem dele num painel lateral (`PainelOrigemDoDa
 - Estado nunca só por cor: sempre com ícone e texto.
 - Foco visível, navegação por teclado, `prefers-reduced-motion` respeitado.
 - Funciona a partir de 400px de largura, sem rolagem lateral.
-- Animação só para orientar: entrada dos blocos, reordenação, abertura de painéis. Há duas exceções. O replay da visita (`ReplayDaVisita`) é a única animação contínua do painel: toca sozinho só na primeira abertura, tem pausa e, depois do fim, o ponteiro do radar segue girando devagar; com `prefers-reduced-motion` já abre parado no fim e sem giro. As ilustrações do guia "Como usar" (`IlustracaoDoGuia` e `AnimacaoDoModo`, com os desenhos em `guia/desenhos/`) repetem, para mostrar o gesto de cada passo, e ficam paradas com `prefers-reduced-motion`.
+- Animação só para orientar: entrada dos blocos, reordenação, abertura de painéis. Há duas exceções. O replay da visita (`ReplayDaVisita`) é a única animação contínua do painel: toca sozinho só na primeira abertura, tem pausa e, depois do fim, o ponteiro do radar segue girando devagar; com `prefers-reduced-motion` já abre parado no fim e sem giro. As ilustrações do guia "Como usar" (`IlustracaoDoGuia` e `AnimacaoDoModo`, com os desenhos em `guia/desenhos/`) repetem, para mostrar o gesto de cada passo, e ficam paradas com `prefers-reduced-motion`. A simulação do terminal nos passos com comando (`TerminalDoPasso`) só toca quando a pessoa clica em "Simular", um terminal por vez, e com `prefers-reduced-motion` abre já no fim.

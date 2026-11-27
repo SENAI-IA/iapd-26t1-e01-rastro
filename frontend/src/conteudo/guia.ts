@@ -127,7 +127,7 @@ const ABRIR_O_RELATORIO: DescricaoDoPasso = {
 const ABRIR_O_RELATORIO_GRAVADO: DescricaoDoPasso = {
   titulo: "Abra o relatório",
   texto:
-    "Ao fechar a janela, o Rastro analisa o que foi gravado e abre o relatório no navegador. Com IA, pode levar alguns minutos: o terminal mostra a etapa e o tempo, e enquanto o sinal no fim da linha girar, o Rastro está trabalhando. Comece pela **primeira ação** e por **O que fazer agora**. Na primeira vez, clique em **Tour guiado**.",
+    "Ao fechar a janela, o Rastro analisa o que foi gravado e abre o relatório no navegador. Com IA, pode levar alguns minutos: o terminal mostra a etapa e o tempo, e enquanto o sinal no começo da linha girar, o Rastro está trabalhando. Comece pela **primeira ação** e por **O que fazer agora**. Na primeira vez, clique em **Tour guiado**.",
   observacao: "A gravação fica em `Rastro/gravacoes/` e o relatório em `Rastro/relatorios/`, dentro da pasta do usuário.",
   ilustracao: "relatorio",
 };
@@ -181,7 +181,7 @@ const PASSOS_PELO_DEVTOOLS: DescricaoDoPasso[] = [
   {
     titulo: "Rode o Rastro",
     texto:
-      "Abra o terminal na pasta onde salvou o `site.har` e rode o comando. Com IA, pode levar alguns minutos: o terminal mostra a etapa e o tempo, e enquanto o sinal no fim da linha girar, o Rastro está trabalhando. No fim, ele mostra o resumo e onde gravou o relatório.",
+      "Abra o terminal na pasta onde salvou o `site.har` e rode o comando. Com IA, pode levar alguns minutos: o terminal mostra a etapa e o tempo, e enquanto o sinal no começo da linha girar, o Rastro está trabalhando. No fim, ele mostra o resumo e onde gravou o relatório.",
     comandos: [
       { sistema: "Linux", texto: "rastro analisar site.har" },
       { sistema: "Windows", texto: "rastro analisar site.har" },
